@@ -89,7 +89,7 @@ dialogs cover the top bar, because they freeze the game or wait for an answer.
 
 Explicitly a **later phase**. The tabletop device is fully functional alone; the
 phone is an enhancement, never a dependency. If a phone drops off, that player
-uses the iPad exactly as before.
+uses the table device exactly as before.
 
 | Screen              | Purpose                                                           |
 | ------------------- | ----------------------------------------------------------------- |

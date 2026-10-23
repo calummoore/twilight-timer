@@ -138,9 +138,14 @@ Run the checks, push, and review the branch.
       re-review once, and report the rest.
   - Review 1 ran on commits `3620109` and `c2205db`. Fixed: finding 3.
     Report: `.context/phone-mockups/review-1.md`.
+  - Review 2 ran on the full branch after commit `866c2f5`. Fixed: 9, 10, 11, 12, 13, and 17. Report: `.context/phone-version/review-2.md`. Evidence: `.context/phone-version/reach-after-fix.log`.
   - 4. Phone History and Join have no way in. Severity Low, effort Small. Recommended: B, add the controls.
   - 7. Up and down keys block keyboard scrolling. Severity Low, effort Small. Recommended: A, use the I and P keys.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
+  - 14. Limit changes do not reach an open reaction window. Severity Low, effort Small. Recommended: A, state the current rule in `docs/concepts.md`.
+  - 15. No model tests for top bar taps during a window. Severity Low, effort Small. Recommended: A, three model tests.
+  - 16. Top bar defines the phase labels twice. Severity Low, effort Small. Recommended: B, one phase table.
+  - `docs/mockups/index.html`: the demo reaction clock counts into overtime, but the app closes the window at its limit. Separate branch.
   - Review 1 also listed three iPad mockup problems outside its scope: the reaction clock runs behind the scrim, the agenda runs two clocks, and the strategy demo picks skip Kira. Milestone 2 fixes them while it aligns the iPad layouts with the app.
   - `docs/mockups/index.html`: no iPad layout opens the Join screen. Finding 4 covers it.
   - `docs/mockups/index.html`: the companion Pass Confirmation note calls it the only confirmation dialog. Separate branch.

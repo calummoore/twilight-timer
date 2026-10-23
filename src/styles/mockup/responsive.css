@@ -2,17 +2,10 @@
    space. Prettier skips this folder, so it stays easy to compare with the mockup. The mockup sets --safe-top and
    --safe-bottom on its device frames; the app falls back to the browser's safe areas. */
 
-/* app controls that the screens share */
-.big.lg{font-size:23px; padding:21px}
-.big.md{font-size:20px; padding:19px}
-.picker .spkb{margin-left:6px; padding:10px 14px}
-.ord-body{padding:11px 14px}
-.tabletimer .t.md{font-size:78px}
-.agenda-card.ag-card{margin-bottom:0}
-
 /* ─────────── layout helpers: the screens use these in place of inline grids ─────────── */
 .split{display:grid; grid-template-columns:1fr var(--side,420px); gap:18px}
 .col{display:flex; flex-direction:column; gap:16px; min-height:0}
+.col > *{margin-top:0; margin-bottom:0}
 .grow{flex:1; min-height:0}
 .scroll{overflow:auto; min-height:0}
 .foot{display:flex; gap:12px; padding:0 22px 20px; flex:none}
@@ -24,7 +17,9 @@
 
 /* The top bar stays above a reaction window, so the table can still pause, undo or move the speaker. */
 .top.game{position:relative; z-index:5}
-.rw{inset:calc(var(--top-h, 68px) + 16px) 60px 30px}
+.rw{inset:calc(var(--top-h, 68px) + 16px) 60px 30px; overflow-y:auto}
+.rw .tiles{flex:1 0 auto}
+:has(.rw) .top.game{position:sticky; top:0}
 /* Overlays stay put while a narrow screen scrolls under them. */
 .scrim, .rw{position:fixed}
 
@@ -33,13 +28,13 @@
 .ringwrap::before{width:60%; height:56%}
 .ringwrap .cc{width:46%}
 
-/* The top bar clears the status bar of a phone with a notch. */
+/* The top bar clears the status bar of a phone with a notch, and every screen clears the side cutouts. */
 .top{padding-top:calc(14px + var(--safe-top, env(safe-area-inset-top, 0px)))}
+.lay{padding-left:env(safe-area-inset-left, 0px); padding-right:env(safe-area-inset-right, 0px)}
 
 /* ─────────── narrow: an upright iPad or a phone ─────────── */
 @container app (max-width: 900px){
-  .lay{overflow-y:auto; scrollbar-width:none; padding-bottom:var(--safe-bottom, env(safe-area-inset-bottom, 0px));
-    padding-left:env(safe-area-inset-left, 0px); padding-right:env(safe-area-inset-right, 0px)}
+  .lay{overflow-y:auto; scrollbar-width:none; padding-bottom:var(--safe-bottom, env(safe-area-inset-bottom, 0px))}
   .lay::-webkit-scrollbar{display:none}
   .lay > *{flex:none}
   .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
@@ -168,6 +163,7 @@
   .rw-clock .t{font-size:68px}
   .rw-bar{margin:12px 0 10px}
   .tiles{grid-template-columns:1fr; gap:7px; overflow-y:auto; align-content:start; scrollbar-width:none}
+  .rw .tiles{flex:1 1 0; min-height:120px}
   .tile{display:grid; grid-template-columns:1fr auto; column-gap:12px; align-items:center; min-height:54px; padding:8px 9px 8px 14px}
   .tile .nm{grid-row:1; grid-column:1; font-size:16px}
   .tile .fc{grid-row:2; grid-column:1; margin-top:2px}

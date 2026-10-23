@@ -1,4 +1,6 @@
-/* App-only styles: the scaled stage, controls, and overlays. */
+/* App-only styles: the button reset, the full-window stage, fields, and the
+   load notice. mockup/controls.css holds the controls that the mockup draws
+   too. */
 
 button {
   font: inherit;
@@ -50,28 +52,13 @@ select {
   container: app / size;
 }
 
-.clock-over {
-  color: var(--danger);
-}
 /* The reset above makes buttons inherit text-align; the mockup centres the
    big buttons. */
 .big {
   text-align: center;
 }
-.big:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-.big.small {
-  grid-column: auto;
-  font-size: 19px;
-  padding: 16px 26px;
-}
 .sec:disabled {
   opacity: 0.45;
-}
-.sec.muted .k {
-  color: var(--warn);
 }
 .fld {
   width: 100%;
@@ -82,27 +69,6 @@ select {
 }
 select.fld {
   appearance: none;
-}
-
-/* Setup rows: up and down buttons replace the drag handle. */
-.seat {
-  grid-template-columns: 26px 34px 216px 1fr 170px 44px;
-}
-.seat-move {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.seat-move button {
-  color: var(--faint);
-  font-size: 11px;
-  line-height: 1;
-  padding: 3px 0;
-  border-radius: 5px;
-  text-align: center;
-}
-.seat-move button:disabled {
-  opacity: 0.25;
 }
 
 .notice {
@@ -119,55 +85,4 @@ select.fld {
 }
 .notice .ibtn {
   margin-left: auto;
-}
-
-/* Full-stage overlays: pause and confirmation. Fixed, so that they stay put
-   while a narrow screen scrolls under them. */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 4, 7, 0.87);
-  backdrop-filter: blur(7px);
-  display: grid;
-  place-items: center;
-  z-index: 10;
-}
-.dialog {
-  width: 520px;
-  background: #121a24;
-  border: 1px solid var(--line2);
-  border-radius: 20px;
-  padding: 28px;
-}
-.dialog h3 {
-  font-size: 25px;
-  font-weight: 750;
-}
-.dialog p {
-  font-size: 14.5px;
-  color: var(--dim);
-  margin-top: 10px;
-  line-height: 1.55;
-}
-.dialog .btns {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-  justify-content: flex-end;
-}
-.pause-card {
-  text-align: center;
-}
-.pause-card .t {
-  font-size: 120px;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 0.9;
-}
-.pause-card .l {
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--faint);
-  margin: 14px 0 34px;
 }
