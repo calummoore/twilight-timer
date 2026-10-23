@@ -15,7 +15,10 @@ export function Stage({ children }: { children: ReactNode }) {
   }, [])
   return (
     <div className="viewport app-root">
-      <div className="stage" style={{ transform: `scale(${scale})` }}>
+      <div
+        className="stage"
+        style={{ transform: `translate(-50%, -50%) scale(${scale})` }}
+      >
         <div className="space" />
         {children}
       </div>

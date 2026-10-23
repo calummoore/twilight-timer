@@ -39,17 +39,18 @@ select {
 .viewport {
   position: fixed;
   inset: 0;
-  display: grid;
-  place-items: center;
   overflow: hidden;
   background: var(--bg);
 }
+/* Centred by its position, not by a grid: a grid track keeps the unscaled
+   size, so a window smaller than the stage pushed it off screen. */
 .stage {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 1194px;
   height: 834px;
   overflow: hidden;
-  flex: none;
 }
 
 .clock-over {
