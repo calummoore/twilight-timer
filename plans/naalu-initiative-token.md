@@ -257,7 +257,7 @@ Run the checks, push, and review the branch again.
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
   Evidence: `.context/naalu-initiative-token/check-3.log`.
 - [x] Commit with Conventional Commits and push the branch.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest. Findings 2 and 3 of review 1
@@ -265,7 +265,11 @@ Run the checks, push, and review the branch again.
   - Review 3 found 2 findings. Fixed: 4, doc comments said a player can
     pick no faction, and 5, the setup note said the Naalu always goes
     first. Report: `.context/naalu-initiative-token/review-3.md`.
+  - Review 4 checked fix commit df26f09: findings 4 and 5 are resolved,
+    and it found no new finding. Report:
+    `.context/naalu-initiative-token/review-4.md`.
   - `src/styles/app.css`: the button reset sets `text-align: inherit`, so BEGIN GAME, BEGIN ACTION PHASE, and END TURN sit at the left, but the mockup centres them. Separate branch.
+  - `src/model/types.ts`: the `naaluTokenOwnerId` comment says that the Naalu player holds the token each round, but Gift of Prescience can move it for one round. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
