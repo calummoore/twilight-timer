@@ -22,7 +22,9 @@ in the futex account, at https://twilight-timer.futex.workers.dev.
 ## Docs
 
 - [Product spec](docs/product.md): requirements, decisions, and the MVP scope.
-- [Mockup](docs/mockups/index.html): open it in a browser.
+- [Mockup](docs/mockups/index.html): open it in a browser. Each table screen
+  has an iPad layout and a phone layout. A link such as `#action/phone` opens
+  one layout.
 - [Plans](plans/)
 
 ## Get started
