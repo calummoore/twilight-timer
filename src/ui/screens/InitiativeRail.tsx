@@ -1,7 +1,7 @@
 import { cardName } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
-import { clock } from '../format'
+import { clock, plural } from '../format'
 
 type ActionView = Extract<PhaseView, { phase: 'action' }>
 
@@ -60,7 +60,7 @@ export function InitiativeRail(props: {
                 <div className="b num">
                   {active
                     ? `this turn ${clock(turnMs)}`
-                    : `${row.turns} ${row.turns === 1 ? 'turn' : 'turns'}`}
+                    : plural(row.turns, 'turn')}
                 </div>
               </div>
             </div>

@@ -98,17 +98,17 @@ describe('Politics reaction window', () => {
     })
   })
 
-  it('undoes the choice and keeps every clock running', () => {
+  it('undoes the choice and returns every clock to the choice', () => {
     const t = playPolitics()
     t.wait(5 * SEC)
     t.act({ kind: 'speakerMoved', playerId: 'tom' })
     t.wait(5 * SEC)
-    t.undo()
+    t.undo() // the 5 seconds since the choice are charged to nobody
     t.wait(5 * SEC)
     expect(t.view().speakerId).toBe('jaz')
     expect(t.view().timer).toMatchObject({
       kind: 'reaction',
-      elapsedMs: 15 * SEC,
+      elapsedMs: 10 * SEC,
     })
     expect(reaction(t)).toMatchObject({
       pausedTurnMs: 20 * SEC,

@@ -1,8 +1,9 @@
 # TI4 Tempo MVP and Cloudflare deploy
 
 Status: Completed. [PR #1](https://github.com/calummoore/twilight-timer/pull/1)
-merged on 2026-10-23. Review findings 1, 3, 5, 6, 10, and 11 and one
-follow-up stay open for Cal, as the review TODO lists.
+merged on 2026-10-23. Review finding 6 and one follow-up stay open for
+Cal. Findings 1, 3, 5, and 10 moved to the
+[MVP review follow-ups](mvp-review-follow-ups.md) plan.
 
 TI4 Tempo is a shared-table time tracker for Twilight Imperium 4th Edition.
 It runs on one iPad in the middle of the table. It is a chess clock for the
@@ -216,12 +217,12 @@ Run the checks, push, and review the branch.
       re-review once, and report the rest.
   - Review 1 found 10 findings. Fixed: 2, 4, 7, 8, and 9. Report:
     `.context/ti4-tempo-mvp/review-1.md`.
-  - 1. Undo does not restore clocks after some taps. Severity Medium, effort Small. Recommended: A, keep the code and state the exception in the docs.
-  - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Recommended: B, keep the top bar above the scrim and update the mockup.
-  - 5. Model tests skip key undo and attribution paths. Severity Low, effort Medium. Recommended: B, add a seeded property test.
+  - 1. Undo does not restore clocks after some taps. Severity Medium, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
+  - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
+  - 5. Model tests skip key undo and attribution paths. Severity Low, effort Medium. Decided 2026-10-23: A, example tests, in [MVP review follow-ups](mvp-review-follow-ups.md).
   - 6. A version bump would hide saved games silently. Severity Low, effort Small. Recommended: B, one unversioned key and the version field.
-  - 10. Stats screen prints "1 rounds" and "1 times". Severity Low, effort Small. Recommended: B, a shared plural helper.
-  - 11. Plan misrecords the recommendation for finding 1. Severity Low, effort Small. Recommended: B, keep A and record the reason.
+  - 10. Stats screen prints "1 rounds" and "1 times". Severity Low, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
+  - 11. Plan misrecords the recommendation for finding 1. Severity Low, effort Small. No longer applies: the decision on finding 1 replaced the recommendation.
   - Follow-up: add an unused-export check such as knip to `npm run check`. Effort Large. Covers finding 9. Previous examples: none.
   - Review 2 checked the fix commit: findings 2, 4, 7, 8, and 9 are resolved. Finding 12, the repeated action kind list, is fixed. Report: `.context/ti4-tempo-mvp/review-2.md`.
   - `docs/product.md`: the data model sketch shows Game, Round, PhaseLog, and Entry shapes that the code does not have. Separate branch.
@@ -229,7 +230,7 @@ Run the checks, push, and review the branch.
 
 ## Post-merge follow-up (non-blocking)
 
-- [ ] Check that the deploy step passed on `main`.
+- [x] Check that the deploy step passed on `main`. CI run 39954026174 deployed version `d5df20a4`.
 - [ ] Open https://twilight-timer.futex.workers.dev on the iPad, add it
       to the home screen, and play one round.
 - [ ] Write the next plan for the spec items that the MVP leaves out.
