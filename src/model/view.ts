@@ -37,6 +37,18 @@ export interface ReactionView {
   pausedTurnMs: number
   tiles: ReactionTile[]
   doneCount: number
+  /** The new speaker, for Politics only. */
+  speakerChoice: SpeakerChoice | null
+}
+
+/** Politics hands the speaker token to a player who does not hold it. */
+export interface SpeakerChoice {
+  /** The speaker when the window opened. */
+  fromId: string
+  /** Every other player, in seat order. */
+  options: string[]
+  /** The new speaker, or null until a player takes the token. */
+  chosenId: string | null
 }
 
 export interface VoterRow {

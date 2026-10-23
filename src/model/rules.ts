@@ -28,6 +28,9 @@ export const STRATEGY_CARDS = [
   { number: 8, name: 'Imperial' },
 ] as const
 
+/** Its primary ability hands the speaker token to a player who lacks it. */
+export const POLITICS = 3
+
 export function isStrategyCard(card: number): boolean {
   return STRATEGY_CARDS.some((c) => c.number === card)
 }
