@@ -131,6 +131,7 @@ export function GameScreen(props: {
           reaction={reaction}
           onDone={(playerId) => dispatch({ kind: 'reactionDone', playerId })}
           onExtend={(ms) => dispatch({ kind: 'reactionExtended', ms })}
+          onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
           onUndo={onUndo}
           onClose={() => dispatch({ kind: 'reactionClosed' })}
         />

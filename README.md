@@ -14,7 +14,8 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 - Setup for 5 to 8 players: name, colour, faction, seat, and the speaker.
 - Strategy picks in speaker order, with trade goods on unpicked cards.
 - The action-phase chess clock: End Turn, the strategic action, and Pass.
-- A reaction window for secondary abilities that is charged to nobody.
+- A reaction window for secondary abilities that is charged to nobody. For
+  Politics, it also asks for the new speaker.
 - The status checklist, and clocks for agenda discussion and each vote.
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause, a round summary, and game stats.

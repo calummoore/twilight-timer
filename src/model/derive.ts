@@ -6,12 +6,19 @@ import {
   reactionEntry,
   toEntry,
   type FoldState,
+  type Reaction,
 } from './fold-state'
 import { initiativeOrder, pickOrder, voteOrder } from './orders'
-import { STRATEGY_CARDS } from './rules'
+import { POLITICS, STRATEGY_CARDS } from './rules'
 import { gameClock, mergeIntervals } from './time'
 import type { Entry, Game } from './types'
-import type { GameView, PhaseView, RailRow, TimerView } from './view'
+import type {
+  GameView,
+  PhaseView,
+  RailRow,
+  SpeakerChoice,
+  TimerView,
+} from './view'
 
 /** Everything a screen shows, at wall-clock time `now`. */
 export function derive(game: Game, now: number): GameView {
@@ -161,7 +168,18 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
         tookMs: r.done.get(playerId) ?? null,
       })),
       doneCount: r.done.size,
+      speakerChoice: speakerChoice(s, r),
     },
+  }
+}
+
+function speakerChoice(s: FoldState, r: Reaction): SpeakerChoice | null {
+  if (r.card !== POLITICS) return null
+  const fromId = r.speakerAtStart
+  return {
+    fromId,
+    options: s.seats.filter((id) => id !== fromId),
+    chosenId: s.speakerId === fromId ? null : s.speakerId,
   }
 }
 

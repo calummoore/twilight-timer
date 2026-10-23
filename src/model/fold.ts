@@ -212,6 +212,7 @@ function playStrategyCard(s: FoldState, ms: number, wall: number): boolean {
   s.reaction = {
     card,
     byId: id,
+    speakerAtStart: s.speakerId,
     startMs: ms,
     limitMs: limitAt(s.game.limitsLog, 'reactionWindow', wall),
     extraMs: 0,
