@@ -70,6 +70,9 @@ Tags: ui
 
 - [x] Run the complete gate named in `AGENTS.md`.
 - [x] Commit with Conventional Commits and push the branch.
+- [x] Merge `origin/main` into the branch, which brings in PR #3, the
+      Politics speaker choice. Its undo test now expects the decided undo
+      rule of finding 1. The PR description lists each resolution.
 - [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
