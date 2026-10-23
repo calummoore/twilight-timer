@@ -1,0 +1,38 @@
+/* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
+/* setup */
+.setup-grid{display:grid; grid-template-columns:1fr 330px; gap:18px; height:100%; min-height:0}
+.seat{display:grid; grid-template-columns:26px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
+  padding:11px; border:1px solid var(--line); border-radius:11px; margin-bottom:9px; background:#0a0f16}
+.seat.sp{border-color:#4d4322; background:#14110a}
+.seat .sn{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); text-align:center}
+.fld{background:#121a24; border:1px solid var(--line2); border-radius:8px; padding:9px 11px; font-size:14px; color:var(--txt); font-family:var(--f)}
+.fld.sel{color:var(--dim); font-size:13px}
+.swatches{display:flex; gap:5px}
+.sw{width:22px; height:22px; border-radius:6px; background:var(--pc); opacity:.28; cursor:pointer}
+.sw.on{opacity:1; box-shadow:0 0 0 2px #0a0f16, 0 0 0 4px var(--pc)}
+.spk{width:32px; height:32px; border-radius:50%; border:1px solid var(--line2); display:grid; place-items:center;
+  font-size:14px; color:var(--faint); cursor:pointer}
+.spk.on{border-color:#8a7530; background:#2a2210; color:#f0cf6a}
+.count{display:flex; gap:6px}
+.count button{flex:1; text-align:center; padding:11px 0; border:1px solid var(--line2); border-radius:9px;
+  font-size:16px; color:var(--dim); cursor:pointer; font-weight:600}
+.count button.on{background:var(--accent); border-color:var(--accent); color:#04211f}
+.kv{display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line); font-size:13.5px}
+.kv span{color:var(--dim)} .kv b{font-weight:600}
+
+/* settings */
+.set-row{display:grid; grid-template-columns:1fr 200px 62px; gap:14px; align-items:center; padding:15px 18px;
+  border-bottom:1px solid var(--line)}
+.set-row:last-child{border-bottom:none}
+.set-row .lb{font-size:15px; font-weight:600}
+.set-row .ds{font-size:12px; color:var(--faint); margin-top:3px; line-height:1.45}
+.set-row.off{opacity:.34}
+.stepper{display:flex; align-items:center; gap:0; border:1px solid var(--line2); border-radius:9px; overflow:hidden}
+.stepper b{flex:1; text-align:center; font-size:17px; font-weight:700; padding:9px 0}
+.stepper button{width:38px; text-align:center; padding:9px 0; color:var(--dim); background:#121a24; cursor:pointer; font-style:normal; font-size:15px}
+.tog{width:52px; height:30px; border-radius:16px; background:#1e2836; position:relative; cursor:pointer; justify-self:end}
+.tog::after{content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#5d6c7e; transition:.2s}
+.tog.on{background:var(--accent)} .tog.on::after{left:25px; background:#04211f}
+.master{display:flex; align-items:center; gap:16px; padding:17px 20px; background:#0d1620;
+  border:1px solid #23404b; border-radius:12px; margin-bottom:18px}
+.master .lb{font-size:16px; font-weight:700} .master .ds{font-size:12.5px; color:var(--dim); margin-top:3px}

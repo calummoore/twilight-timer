@@ -1,0 +1,68 @@
+/* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
+:root{
+  --bg:#05070b; --panel:#0b1017; --panel2:#111925; --panel3:#18222f;
+  --line:#1d2836; --line2:#2a3849;
+  --txt:#e9eff7; --dim:#8e9bad; --faint:#5b6878;
+  --accent:#5ce1d6; --accent-d:#0f3f3d;
+  --warn:#f2ab45; --danger:#ff5a4d; --ok:#4ad07a;
+
+  --c-red:#e2453c; --c-blue:#3d8ee6; --c-green:#31ab60; --c-yellow:#dfb833;
+  --c-purple:#9257da; --c-orange:#e8802e; --c-pink:#e56fa8; --c-black:#7c8797;
+
+  --r:14px;
+  --f:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--txt); font-family:var(--f);
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+.num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1}
+
+/* ─────────── shared app UI ─────────── */
+.space{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(900px 500px at 78% -12%, #10243a 0%, transparent 62%),
+    radial-gradient(700px 460px at 6% 108%, #1a1430 0%, transparent 60%),
+    var(--bg);
+}
+.lay{position:absolute; inset:0; display:flex; flex-direction:column}
+
+/* top bar */
+.top{display:flex; align-items:center; gap:16px; padding:14px 22px; border-bottom:1px solid var(--line); flex:none}
+.top .round{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.top .round b{color:var(--txt); font-weight:600}
+.phase-pill{display:flex; gap:4px; background:#0a0e14; border:1px solid var(--line); border-radius:9px; padding:3px}
+.phase-pill span{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); padding:5px 11px; border-radius:6px}
+.phase-pill span.on{background:var(--accent); color:#04211f; font-weight:700}
+.phase-pill span.done{color:#4e6a68}
+.top .spacer{flex:1}
+.top .gt{font-size:12px; color:var(--faint); letter-spacing:.08em; text-transform:uppercase}
+.top .gt b{color:var(--txt); font-size:16px; font-weight:600; margin-left:7px; letter-spacing:0}
+
+.ibtn{display:flex; align-items:center; gap:7px; background:var(--panel2); border:1px solid var(--line2);
+  color:var(--dim); font-size:12px; font-weight:600; padding:8px 13px; border-radius:9px; cursor:pointer; font-family:var(--f)}
+.ibtn:hover{color:var(--txt); border-color:#3a4c62}
+.ibtn.warnish{color:var(--warn); border-color:#4a3a1c; background:#1d160a}
+
+
+/* generic panels */
+.pnl{background:var(--panel); border:1px solid var(--line); border-radius:var(--r)}
+.pnl-h{padding:14px 18px; border-bottom:1px solid var(--line); font-size:11px; letter-spacing:.17em;
+  text-transform:uppercase; color:var(--dim); font-weight:600; display:flex; justify-content:space-between; align-items:center}
+.content{flex:1; padding:20px 22px; overflow:auto; min-height:0}
+.h1{font-size:30px; font-weight:700; letter-spacing:-.02em}
+.h1s{font-size:13.5px; color:var(--dim); margin-top:6px}
+
+.mini{background:var(--panel2); border:1px solid var(--line2); color:var(--dim); font-family:var(--f);
+  font-size:11.5px; font-weight:600; padding:6px 11px; border-radius:7px; cursor:pointer; margin-left:6px}
+.mini:hover{color:var(--txt)}
+.mini.dn{background:var(--accent); border-color:var(--accent); color:#04211f}
+
+.ibtn.spkb{color:#f0cf6a; border-color:#5a4d22; background:#1a1509}
+
+.note-box{background:#0d1620; border:1px solid #23404b; border-radius:11px; padding:14px 16px;
+  font-size:12.5px; color:var(--dim); line-height:1.65}
+.note-box b{color:var(--txt); font-weight:600}

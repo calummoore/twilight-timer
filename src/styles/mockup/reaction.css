@@ -1,0 +1,33 @@
+/* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
+/* reaction window */
+.scrim{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px)}
+.rw{position:absolute; inset:44px 60px; background:linear-gradient(180deg,#0f1722,#080c12);
+  border:1px solid #2b4a58; border-radius:20px; padding:26px 32px; display:flex; flex-direction:column;
+  box-shadow:0 40px 110px rgba(0,0,0,.8)}
+.rw-h{display:flex; align-items:center; gap:16px; flex:none}
+.rw-h .lbl{font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent)}
+.rw-h h3{font-size:33px; font-weight:750; letter-spacing:-.02em; margin-top:5px}
+.rw-h .by{font-size:14px; color:var(--dim); margin-top:5px; display:flex; align-items:center; gap:8px}
+.rw-h .by i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal}
+.rw-clock{margin-left:auto; text-align:right}
+.rw-clock .t{font-size:88px; font-weight:800; letter-spacing:-.05em; line-height:.92; color:var(--accent)}
+.rw-clock .t.over{color:var(--danger)}
+.rw-clock .l{font-size:10.5px; letter-spacing:.17em; text-transform:uppercase; color:var(--faint); margin-top:4px}
+.rw-bar{height:6px; background:#131b25; border-radius:4px; margin:20px 0 22px; overflow:hidden; flex:none}
+.rw-bar i{display:block; height:100%; background:var(--accent); transition:width .9s linear}
+.tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:13px; flex:1; min-height:0}
+.tile{border:1px solid var(--line2); border-radius:13px; padding:17px; background:#0b111a; display:flex; flex-direction:column; position:relative}
+.tile .nm{font-size:19px; font-weight:700; display:flex; align-items:center; gap:9px}
+.tile .nm i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
+.tile .fc{font-size:11.5px; color:var(--faint); margin-top:3px}
+.tile .st{margin-top:auto; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase}
+.tile.done{background:#0a1c13; border-color:#2a5c3d}
+.tile.done .st{color:var(--ok)}
+.tile.wait .st{color:var(--warn)}
+.tile .tapme{margin-top:auto; background:var(--panel3); border:1px solid #3c5168; color:var(--txt);
+  font-family:var(--f); font-size:14px; font-weight:700; padding:12px; border-radius:9px; cursor:pointer; letter-spacing:.04em}
+.tile .took{font-size:12px; color:var(--faint); margin-top:5px}
+.tile .pchip{position:absolute; top:14px; right:14px; font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  background:#242f3d; color:#7c8b9d; padding:2px 7px; border-radius:20px; font-weight:700}
+.rw-f{display:flex; align-items:center; gap:12px; margin-top:20px; flex:none}
+.rw-f .note{font-size:12.5px; color:var(--faint); line-height:1.5}

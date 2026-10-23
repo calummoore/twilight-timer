@@ -1,0 +1,8 @@
+dist
+docs
+plans
+.context
+.wrangler
+package-lock.json
+*.md
+src/styles/mockup

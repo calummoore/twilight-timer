@@ -1,0 +1,80 @@
+/* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
+/* body grid */
+.body{flex:1; display:grid; grid-template-columns:1fr 428px; gap:18px; padding:18px 22px 20px; min-height:0}
+
+/* active player hero */
+.hero{background:linear-gradient(180deg,var(--panel) 0%,#080c12 100%);
+  border:1px solid var(--line); border-radius:var(--r); padding:24px 28px; display:flex; flex-direction:column; min-height:0; position:relative; overflow:hidden}
+.hero{border-color:color-mix(in srgb,var(--pc) 45%, var(--line))}
+.hero.over{border-color:#5a2320; background:linear-gradient(180deg,#1a0c0b 0%,#0a0607 100%)}
+.hero-top{display:flex; align-items:flex-start; gap:16px}
+.dot{width:20px; height:20px; border-radius:50%; background:var(--pc); flex:none; margin-top:9px;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 22%, transparent)}
+.hero h3{font-size:46px; font-weight:700; letter-spacing:-.02em; line-height:1.05}
+.hero .fac{font-size:15px; color:var(--dim); margin-top:5px}
+.hero .init{margin-left:auto; text-align:right}
+.hero .init .n{font-size:52px; font-weight:800; color:var(--pc); line-height:1; letter-spacing:-.03em}
+.hero .init .l{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin-top:4px}
+
+.bigclock{font-size:186px; font-weight:800; letter-spacing:-.055em; line-height:.9; margin:auto 0 0;
+  text-align:center; color:var(--txt)}
+.hero.over .bigclock{color:var(--danger)}
+.clock-sub{text-align:center; font-size:13px; color:var(--faint); margin-top:8px; letter-spacing:.06em}
+.clock-sub b{color:var(--dim)}
+.hero.over .clock-sub b{color:var(--danger)}
+
+.limitbar{height:7px; background:#131b25; border-radius:4px; margin-top:20px; overflow:hidden}
+.limitbar i{display:block; height:100%; background:var(--pc); border-radius:4px; transition:width .9s linear}
+.hero.over .limitbar i{background:var(--danger)}
+.limitrow{display:flex; justify-content:space-between; font-size:11px; color:var(--faint); margin-top:8px;
+  letter-spacing:.1em; text-transform:uppercase}
+
+.alarm{display:flex; align-items:center; gap:11px; background:#3a110d; border:1px solid #7a2a22;
+  border-radius:10px; padding:11px 15px; margin-bottom:16px; animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{background:#3a110d}50%{background:#521812}}
+.alarm .b{font-size:13px; font-weight:700; color:#ffb4ad; letter-spacing:.05em}
+.alarm .s{font-size:12px; color:#d08d86}
+.alarm .ico{font-size:17px}
+
+/* action buttons */
+.acts{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; flex:none}
+.big{grid-column:1/-1; background:linear-gradient(180deg,#25d3c5,#12a89c); color:#032422; border:none;
+  font-family:var(--f); font-size:29px; font-weight:800; letter-spacing:.04em; padding:24px; border-radius:13px;
+  cursor:pointer; box-shadow:0 8px 0 #0a5f58, 0 14px 30px rgba(18,168,156,.28)}
+.big:active{transform:translateY(3px); box-shadow:0 5px 0 #0a5f58}
+.big.red{background:linear-gradient(180deg,#ff6b5e,#d63c30); color:#2a0704; box-shadow:0 8px 0 #7d211a,0 14px 30px rgba(214,60,48,.28)}
+.sec{background:var(--panel2); border:1px solid var(--line2); color:var(--txt); font-family:var(--f);
+  font-size:15px; font-weight:600; padding:17px; border-radius:11px; cursor:pointer; text-align:left}
+.sec:hover{border-color:#3d5168; background:var(--panel3)}
+.sec .k{display:block; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin-bottom:4px}
+.sec.hl{border-color:#3c5f77; background:#0e1f2b}
+.sec.hl .k{color:var(--accent)}
+
+/* initiative rail */
+.rail{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); display:flex; flex-direction:column; min-height:0; overflow:hidden}
+.rail-h{display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--line); flex:none}
+.rail-h .t{font-size:11px; letter-spacing:.17em; text-transform:uppercase; color:var(--dim); font-weight:600}
+.rail-h .c{font-size:11px; color:var(--faint)}
+.rail-b{overflow-y:auto; padding:7px; flex:1}
+.row{display:grid; grid-template-columns:30px 1fr auto; gap:11px; align-items:center;
+  padding:11px 11px; border-radius:10px; position:relative; margin-bottom:3px}
+.row .in{font-size:19px; font-weight:800; color:var(--pc); text-align:center; letter-spacing:-.02em}
+.row .nm{font-size:17px; font-weight:650; display:flex; align-items:center; gap:8px}
+.row .nm i{width:9px; height:9px; border-radius:50%; background:var(--pc); flex:none; font-style:normal}
+.row .fc{font-size:11.5px; color:var(--faint); margin-top:2px}
+.row .tm{text-align:right}
+.row .tm .a{font-size:17px; font-weight:700; letter-spacing:-.01em}
+.row .tm .b{font-size:11px; color:var(--faint); margin-top:2px}
+.row.active{background:color-mix(in srgb,var(--pc) 14%, #0b111a); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 45%, transparent)}
+.row.passed{opacity:.42}
+.row.passed .nm{text-decoration:line-through; text-decoration-color:var(--faint)}
+.chip{position:absolute; right:11px; top:-6px; font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  padding:2px 7px; border-radius:20px; font-weight:700}
+.chip.now{background:var(--accent); color:#04211f}
+.chip.pass{background:#242f3d; color:#7c8b9d}
+.chip.sc{background:#123044; color:#79c4e8}
+.sccard{display:inline-block; font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+  padding:2px 7px; border-radius:5px; margin-right:7px; background:#0f2a3c; color:#7fc8ec; border:1px solid #24506b}
+.sccard.used{background:#141b24; color:#5c6a79; border-color:#27313d}
+.rail-f{border-top:1px solid var(--line); padding:11px 16px; display:flex; justify-content:space-between;
+  font-size:11px; color:var(--faint); letter-spacing:.06em; flex:none}

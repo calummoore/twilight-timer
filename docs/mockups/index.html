@@ -1,0 +1,1380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TI4 Tempo — Mockups</title>
+<style>
+:root{
+  --bg:#05070b; --panel:#0b1017; --panel2:#111925; --panel3:#18222f;
+  --line:#1d2836; --line2:#2a3849;
+  --txt:#e9eff7; --dim:#8e9bad; --faint:#5b6878;
+  --accent:#5ce1d6; --accent-d:#0f3f3d;
+  --warn:#f2ab45; --danger:#ff5a4d; --ok:#4ad07a;
+
+  --c-red:#e2453c; --c-blue:#3d8ee6; --c-green:#31ab60; --c-yellow:#dfb833;
+  --c-purple:#9257da; --c-orange:#e8802e; --c-pink:#e56fa8; --c-black:#7c8797;
+
+  --r:14px;
+  --f:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--txt); font-family:var(--f);
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+.num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1}
+[data-clock].over{color:var(--danger)}
+
+/* ─────────── prototype chrome ─────────── */
+.app{display:grid; grid-template-columns:246px 1fr; height:100vh}
+
+.nav{
+  background:#080b11; border-right:1px solid var(--line);
+  padding:20px 0; overflow-y:auto; display:flex; flex-direction:column;
+}
+.nav h1{font-size:14px; letter-spacing:.14em; text-transform:uppercase; padding:0 20px 2px; color:var(--txt)}
+.nav .sub{font-size:11px; color:var(--faint); padding:0 20px 20px; line-height:1.5}
+.nav-group{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint);
+  padding:16px 20px 8px; border-top:1px solid var(--line); margin-top:8px}
+.nav-item{
+  display:flex; align-items:center; gap:10px; padding:8px 20px; font-size:13px;
+  color:var(--dim); cursor:pointer; user-select:none;
+}
+.nav-item:hover{color:var(--txt); background:#0d121a}
+.nav-item.on{color:var(--txt); background:#0e1620}
+.nav-item .idx{font-size:10px; color:var(--faint); width:16px; flex:none}
+.nav-item.on .idx{color:var(--accent)}
+.nav-foot{margin-top:auto; padding:18px 20px 0; font-size:11px; color:var(--faint); line-height:1.6; border-top:1px solid var(--line)}
+kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; padding:1px 5px; font:inherit; font-size:10px}
+
+.stage{display:flex; flex-direction:column; min-width:0; overflow:hidden}
+.stage-head{padding:18px 28px 14px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px}
+.stage-head h2{font-size:17px; font-weight:600}
+.stage-head .tag{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
+  border:1px solid var(--accent-d); background:#0a1f1e; padding:3px 8px; border-radius:20px}
+.stage-body{flex:1; display:flex; align-items:center; justify-content:center; padding:24px; min-height:0; overflow:hidden}
+.stage-note{padding:14px 28px 18px; border-top:1px solid var(--line); font-size:12.5px; color:var(--dim);
+  line-height:1.65; max-width:1100px}
+.stage-note b{color:var(--txt); font-weight:600}
+
+.frame-wrap{position:relative}
+.frame{
+  position:absolute; top:0; left:0; transform-origin:top left;
+  background:var(--bg); overflow:hidden; color:var(--txt);
+  box-shadow:0 30px 90px rgba(0,0,0,.7), 0 0 0 1px var(--line2), 0 0 0 12px #0b0e13, 0 0 0 13px #222c39;
+}
+.frame.ipad{width:1194px; height:834px; border-radius:20px}
+.frame.phone{width:393px; height:852px; border-radius:38px}
+.screen{display:none; position:absolute; inset:0}
+.screen.active{display:block}
+
+/* ─────────── shared app UI ─────────── */
+.space{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(900px 500px at 78% -12%, #10243a 0%, transparent 62%),
+    radial-gradient(700px 460px at 6% 108%, #1a1430 0%, transparent 60%),
+    var(--bg);
+}
+.lay{position:absolute; inset:0; display:flex; flex-direction:column}
+
+/* top bar */
+.top{display:flex; align-items:center; gap:16px; padding:14px 22px; border-bottom:1px solid var(--line); flex:none}
+.top .round{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.top .round b{color:var(--txt); font-weight:600}
+.phase-pill{display:flex; gap:4px; background:#0a0e14; border:1px solid var(--line); border-radius:9px; padding:3px}
+.phase-pill span{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); padding:5px 11px; border-radius:6px}
+.phase-pill span.on{background:var(--accent); color:#04211f; font-weight:700}
+.phase-pill span.done{color:#4e6a68}
+.top .spacer{flex:1}
+.top .gt{font-size:12px; color:var(--faint); letter-spacing:.08em; text-transform:uppercase}
+.top .gt b{color:var(--txt); font-size:16px; font-weight:600; margin-left:7px; letter-spacing:0}
+
+.ibtn{display:flex; align-items:center; gap:7px; background:var(--panel2); border:1px solid var(--line2);
+  color:var(--dim); font-size:12px; font-weight:600; padding:8px 13px; border-radius:9px; cursor:pointer; font-family:var(--f)}
+.ibtn:hover{color:var(--txt); border-color:#3a4c62}
+.ibtn.warnish{color:var(--warn); border-color:#4a3a1c; background:#1d160a}
+
+/* body grid */
+.body{flex:1; display:grid; grid-template-columns:1fr 428px; gap:18px; padding:18px 22px 20px; min-height:0}
+
+/* active player hero */
+.hero{background:linear-gradient(180deg,var(--panel) 0%,#080c12 100%);
+  border:1px solid var(--line); border-radius:var(--r); padding:24px 28px; display:flex; flex-direction:column; min-height:0; position:relative; overflow:hidden}
+.hero{border-color:color-mix(in srgb,var(--pc) 45%, var(--line))}
+.hero.over{border-color:#5a2320; background:linear-gradient(180deg,#1a0c0b 0%,#0a0607 100%)}
+.hero-top{display:flex; align-items:flex-start; gap:16px}
+.dot{width:20px; height:20px; border-radius:50%; background:var(--pc); flex:none; margin-top:9px;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 22%, transparent)}
+.hero h3{font-size:46px; font-weight:700; letter-spacing:-.02em; line-height:1.05}
+.hero .fac{font-size:15px; color:var(--dim); margin-top:5px}
+.hero .init{margin-left:auto; text-align:right}
+.hero .init .n{font-size:52px; font-weight:800; color:var(--pc); line-height:1; letter-spacing:-.03em}
+.hero .init .l{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin-top:4px}
+
+.bigclock{font-size:186px; font-weight:800; letter-spacing:-.055em; line-height:.9; margin:auto 0 0;
+  text-align:center; color:var(--txt)}
+.hero.over .bigclock{color:var(--danger)}
+.clock-sub{text-align:center; font-size:13px; color:var(--faint); margin-top:8px; letter-spacing:.06em}
+.clock-sub b{color:var(--dim)}
+.hero.over .clock-sub b{color:var(--danger)}
+
+.limitbar{height:7px; background:#131b25; border-radius:4px; margin-top:20px; overflow:hidden}
+.limitbar i{display:block; height:100%; background:var(--pc); border-radius:4px; transition:width .9s linear}
+.hero.over .limitbar i{background:var(--danger)}
+.limitrow{display:flex; justify-content:space-between; font-size:11px; color:var(--faint); margin-top:8px;
+  letter-spacing:.1em; text-transform:uppercase}
+
+.alarm{display:flex; align-items:center; gap:11px; background:#3a110d; border:1px solid #7a2a22;
+  border-radius:10px; padding:11px 15px; margin-bottom:16px; animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{background:#3a110d}50%{background:#521812}}
+.alarm .b{font-size:13px; font-weight:700; color:#ffb4ad; letter-spacing:.05em}
+.alarm .s{font-size:12px; color:#d08d86}
+.alarm .ico{font-size:17px}
+
+/* action buttons */
+.acts{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; flex:none}
+.big{grid-column:1/-1; background:linear-gradient(180deg,#25d3c5,#12a89c); color:#032422; border:none;
+  font-family:var(--f); font-size:29px; font-weight:800; letter-spacing:.04em; padding:24px; border-radius:13px;
+  cursor:pointer; box-shadow:0 8px 0 #0a5f58, 0 14px 30px rgba(18,168,156,.28)}
+.big:active{transform:translateY(3px); box-shadow:0 5px 0 #0a5f58}
+.big.red{background:linear-gradient(180deg,#ff6b5e,#d63c30); color:#2a0704; box-shadow:0 8px 0 #7d211a,0 14px 30px rgba(214,60,48,.28)}
+.sec{background:var(--panel2); border:1px solid var(--line2); color:var(--txt); font-family:var(--f);
+  font-size:15px; font-weight:600; padding:17px; border-radius:11px; cursor:pointer; text-align:left}
+.sec:hover{border-color:#3d5168; background:var(--panel3)}
+.sec .k{display:block; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin-bottom:4px}
+.sec.hl{border-color:#3c5f77; background:#0e1f2b}
+.sec.hl .k{color:var(--accent)}
+
+/* initiative rail */
+.rail{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); display:flex; flex-direction:column; min-height:0; overflow:hidden}
+.rail-h{display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--line); flex:none}
+.rail-h .t{font-size:11px; letter-spacing:.17em; text-transform:uppercase; color:var(--dim); font-weight:600}
+.rail-h .c{font-size:11px; color:var(--faint)}
+.rail-b{overflow-y:auto; padding:7px; flex:1}
+.row{display:grid; grid-template-columns:30px 1fr auto; gap:11px; align-items:center;
+  padding:11px 11px; border-radius:10px; position:relative; margin-bottom:3px}
+.row .in{font-size:19px; font-weight:800; color:var(--pc); text-align:center; letter-spacing:-.02em}
+.row .nm{font-size:17px; font-weight:650; display:flex; align-items:center; gap:8px}
+.row .nm i{width:9px; height:9px; border-radius:50%; background:var(--pc); flex:none; font-style:normal}
+.row .fc{font-size:11.5px; color:var(--faint); margin-top:2px}
+.row .tm{text-align:right}
+.row .tm .a{font-size:17px; font-weight:700; letter-spacing:-.01em}
+.row .tm .b{font-size:11px; color:var(--faint); margin-top:2px}
+.row.active{background:color-mix(in srgb,var(--pc) 14%, #0b111a); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 45%, transparent)}
+.row.passed{opacity:.42}
+.row.passed .nm{text-decoration:line-through; text-decoration-color:var(--faint)}
+.chip{position:absolute; right:11px; top:-6px; font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  padding:2px 7px; border-radius:20px; font-weight:700}
+.chip.now{background:var(--accent); color:#04211f}
+.chip.pass{background:#242f3d; color:#7c8b9d}
+.chip.sc{background:#123044; color:#79c4e8}
+.sccard{display:inline-block; font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+  padding:2px 7px; border-radius:5px; margin-right:7px; background:#0f2a3c; color:#7fc8ec; border:1px solid #24506b}
+.sccard.used{background:#141b24; color:#5c6a79; border-color:#27313d}
+.rail-f{border-top:1px solid var(--line); padding:11px 16px; display:flex; justify-content:space-between;
+  font-size:11px; color:var(--faint); letter-spacing:.06em; flex:none}
+
+/* generic panels */
+.pnl{background:var(--panel); border:1px solid var(--line); border-radius:var(--r)}
+.pnl-h{padding:14px 18px; border-bottom:1px solid var(--line); font-size:11px; letter-spacing:.17em;
+  text-transform:uppercase; color:var(--dim); font-weight:600; display:flex; justify-content:space-between; align-items:center}
+.content{flex:1; padding:20px 22px; overflow:auto; min-height:0}
+.h1{font-size:30px; font-weight:700; letter-spacing:-.02em}
+.h1s{font-size:13.5px; color:var(--dim); margin-top:6px}
+
+/* setup */
+.setup-grid{display:grid; grid-template-columns:1fr 330px; gap:18px; height:100%; min-height:0}
+.seat{display:grid; grid-template-columns:26px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
+  padding:11px; border:1px solid var(--line); border-radius:11px; margin-bottom:9px; background:#0a0f16}
+.seat.sp{border-color:#4d4322; background:#14110a}
+.seat .sn{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); text-align:center}
+.fld{background:#121a24; border:1px solid var(--line2); border-radius:8px; padding:9px 11px; font-size:14px; color:var(--txt); font-family:var(--f)}
+.fld.sel{color:var(--dim); font-size:13px}
+.swatches{display:flex; gap:5px}
+.sw{width:22px; height:22px; border-radius:6px; background:var(--pc); opacity:.28; cursor:pointer}
+.sw.on{opacity:1; box-shadow:0 0 0 2px #0a0f16, 0 0 0 4px var(--pc)}
+.spk{width:32px; height:32px; border-radius:50%; border:1px solid var(--line2); display:grid; place-items:center;
+  font-size:14px; color:var(--faint); cursor:pointer}
+.spk.on{border-color:#8a7530; background:#2a2210; color:#f0cf6a}
+.count{display:flex; gap:6px}
+.count b{flex:1; text-align:center; padding:11px 0; border:1px solid var(--line2); border-radius:9px;
+  font-size:16px; color:var(--dim); cursor:pointer; font-weight:600}
+.count b.on{background:var(--accent); border-color:var(--accent); color:#04211f}
+.kv{display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line); font-size:13.5px}
+.kv span{color:var(--dim)} .kv b{font-weight:600}
+
+/* settings */
+.set-row{display:grid; grid-template-columns:1fr 200px 62px; gap:14px; align-items:center; padding:15px 18px;
+  border-bottom:1px solid var(--line)}
+.set-row:last-child{border-bottom:none}
+.set-row .lb{font-size:15px; font-weight:600}
+.set-row .ds{font-size:12px; color:var(--faint); margin-top:3px; line-height:1.45}
+.set-row.off{opacity:.34}
+.stepper{display:flex; align-items:center; gap:0; border:1px solid var(--line2); border-radius:9px; overflow:hidden}
+.stepper b{flex:1; text-align:center; font-size:17px; font-weight:700; padding:9px 0}
+.stepper i{width:38px; text-align:center; padding:9px 0; color:var(--dim); background:#121a24; cursor:pointer; font-style:normal; font-size:15px}
+.tog{width:52px; height:30px; border-radius:16px; background:#1e2836; position:relative; cursor:pointer; justify-self:end}
+.tog::after{content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#5d6c7e; transition:.2s}
+.tog.on{background:var(--accent)} .tog.on::after{left:25px; background:#04211f}
+.master{display:flex; align-items:center; gap:16px; padding:17px 20px; background:#0d1620;
+  border:1px solid #23404b; border-radius:12px; margin-bottom:18px}
+.master .lb{font-size:16px; font-weight:700} .master .ds{font-size:12.5px; color:var(--dim); margin-top:3px}
+
+/* strategy cards */
+.cards{display:grid; grid-template-columns:repeat(4,1fr); gap:13px}
+.card{border:1px solid var(--line2); border-radius:12px; padding:15px; background:#0a0f16; position:relative; min-height:132px;
+  display:flex; flex-direction:column}
+.card .n{font-size:38px; font-weight:800; letter-spacing:-.04em; color:var(--faint); line-height:1}
+.card .nm{font-size:15px; font-weight:650; margin-top:5px}
+.card.taken{background:color-mix(in srgb,var(--pc) 12%, #0a0f16); border-color:color-mix(in srgb,var(--pc) 55%, transparent)}
+.card.taken .n{color:var(--pc)}
+.card .own{margin-top:auto; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:650}
+.card .own i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
+.card .free{margin-top:auto; font-size:12px; color:var(--faint)}
+.card .tg{position:absolute; top:12px; right:12px; background:#2a2410; border:1px solid #5e4f1c; color:#e8c95a;
+  font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:20px}
+.card.next{border-style:dashed; border-color:#33566b; background:#080e15}
+.card.next .free{color:var(--accent); font-weight:600}
+.picker{display:flex; align-items:center; gap:14px; background:#0d1620; border:1px solid #23404b;
+  border-radius:12px; padding:14px 18px; margin-bottom:16px}
+.picker .who{font-size:19px; font-weight:700; display:flex; align-items:center; gap:9px}
+.picker .who i{width:13px; height:13px; border-radius:50%; background:var(--pc); font-style:normal}
+.picker .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.picker .t{margin-left:auto; font-size:30px; font-weight:700; letter-spacing:-.02em}
+.order-strip{display:flex; gap:7px; margin-top:16px; align-items:center; flex-wrap:wrap}
+.order-strip .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-right:5px}
+.oc{display:flex; align-items:center; gap:7px; background:#0d131c; border:1px solid var(--line2); border-radius:20px; padding:5px 12px 5px 8px; font-size:13px; font-weight:600}
+.oc i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.oc b{color:var(--pc); font-weight:800; font-size:12px}
+
+/* reaction window */
+.scrim{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px)}
+.rw{position:absolute; inset:44px 60px; background:linear-gradient(180deg,#0f1722,#080c12);
+  border:1px solid #2b4a58; border-radius:20px; padding:26px 32px; display:flex; flex-direction:column;
+  box-shadow:0 40px 110px rgba(0,0,0,.8)}
+.rw-h{display:flex; align-items:center; gap:16px; flex:none}
+.rw-h .lbl{font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent)}
+.rw-h h3{font-size:33px; font-weight:750; letter-spacing:-.02em; margin-top:5px}
+.rw-h .by{font-size:14px; color:var(--dim); margin-top:5px; display:flex; align-items:center; gap:8px}
+.rw-h .by i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal}
+.rw-clock{margin-left:auto; text-align:right}
+.rw-clock .t{font-size:88px; font-weight:800; letter-spacing:-.05em; line-height:.92; color:var(--accent)}
+.rw-clock .t.over{color:var(--danger)}
+.rw-clock .l{font-size:10.5px; letter-spacing:.17em; text-transform:uppercase; color:var(--faint); margin-top:4px}
+.rw-bar{height:6px; background:#131b25; border-radius:4px; margin:20px 0 22px; overflow:hidden; flex:none}
+.rw-bar i{display:block; height:100%; background:var(--accent); transition:width .9s linear}
+.tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:13px; flex:1; min-height:0}
+.tile{border:1px solid var(--line2); border-radius:13px; padding:17px; background:#0b111a; display:flex; flex-direction:column; position:relative}
+.tile .nm{font-size:19px; font-weight:700; display:flex; align-items:center; gap:9px}
+.tile .nm i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
+.tile .fc{font-size:11.5px; color:var(--faint); margin-top:3px}
+.tile .st{margin-top:auto; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase}
+.tile.done{background:#0a1c13; border-color:#2a5c3d}
+.tile.done .st{color:var(--ok)}
+.tile.wait .st{color:var(--warn)}
+.tile .tapme{margin-top:auto; background:var(--panel3); border:1px solid #3c5168; color:var(--txt);
+  font-family:var(--f); font-size:14px; font-weight:700; padding:12px; border-radius:9px; cursor:pointer; letter-spacing:.04em}
+.tile .took{font-size:12px; color:var(--faint); margin-top:5px}
+.tile .pchip{position:absolute; top:14px; right:14px; font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  background:#242f3d; color:#7c8b9d; padding:2px 7px; border-radius:20px; font-weight:700}
+.rw-f{display:flex; align-items:center; gap:12px; margin-top:20px; flex:none}
+.rw-f .note{font-size:12.5px; color:var(--faint); line-height:1.5}
+
+/* status phase */
+.steps{display:grid; gap:9px}
+.step{display:flex; align-items:center; gap:14px; padding:15px 17px; border:1px solid var(--line); border-radius:11px; background:#0a0f16}
+.step .bx{width:26px; height:26px; border-radius:7px; border:1.5px solid var(--line2); flex:none; display:grid; place-items:center; font-size:14px; color:transparent}
+.step.on{background:#0a1a12; border-color:#2a5c3d}
+.step.on .bx{background:var(--ok); border-color:var(--ok); color:#03230f}
+.step.on .lb{color:var(--dim); text-decoration:line-through; text-decoration-color:#38505f}
+.step .lb{font-size:15.5px; font-weight:600}
+.step .no{margin-left:auto; font-size:12px; color:var(--faint)}
+.tabletimer{text-align:center; padding:26px 0 22px}
+.tabletimer .t{font-size:104px; font-weight:800; letter-spacing:-.05em; line-height:.9}
+.tabletimer .l{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin-top:9px}
+
+/* agenda */
+.vote-row{display:grid; grid-template-columns:30px 1fr 116px 122px; gap:13px; align-items:center;
+  padding:12px 14px; border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16}
+.vote-row.now{border-color:var(--pc); background:color-mix(in srgb,var(--pc) 11%, #0a0f16)}
+.vote-row.done{opacity:.55}
+.vote-row .ord{font-size:12px; color:var(--faint); text-align:center}
+.vote-row .nm{font-size:16px; font-weight:650; display:flex; align-items:center; gap:9px}
+.vote-row .nm i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal}
+.vote-row .vt{font-size:16px; font-weight:700; text-align:right}
+.vote-row .badge{font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; text-align:center;
+  padding:6px; border-radius:7px; background:#151e2a; color:var(--faint)}
+.vote-row .badge.f{background:#0d2418; color:var(--ok)} .vote-row .badge.a{background:#2a1210; color:#ff8b80}
+.vote-row .badge.ab{background:#1c1f26; color:#7a8798}
+.agenda-card{background:linear-gradient(180deg,#171122,#0b0810); border:1px solid #3a2b52; border-radius:13px;
+  padding:19px 22px; margin-bottom:16px}
+.agenda-card .k{font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#b58bef}
+.agenda-card h4{font-size:23px; font-weight:700; margin-top:6px}
+.agenda-card p{font-size:13px; color:var(--dim); margin-top:7px; line-height:1.5}
+
+/* charts */
+.bars{display:grid; gap:13px}
+.bar-row{display:grid; grid-template-columns:112px 1fr 92px; gap:14px; align-items:center}
+.bar-row .nm{font-size:14.5px; font-weight:650; display:flex; align-items:center; gap:8px}
+.bar-row .nm i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal}
+.track{height:26px; background:#0d131c; border-radius:6px; overflow:hidden; display:flex}
+.track u{display:block; height:100%; text-decoration:none}
+.track u.ac{background:var(--pc)} .track u.win{background:color-mix(in srgb,var(--pc) 48%, #0d131c)}
+.track u.ot{background:repeating-linear-gradient(45deg,var(--danger),var(--danger) 4px,#a8342b 4px,#a8342b 8px)}
+.bar-row .vl{text-align:right; font-size:15px; font-weight:700}
+.legend{display:flex; gap:18px; margin-top:18px; font-size:11.5px; color:var(--faint); flex-wrap:wrap}
+.legend b{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:7px; vertical-align:-1px}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:13px; margin-bottom:20px}
+.stat{background:#0a0f16; border:1px solid var(--line); border-radius:12px; padding:16px 17px}
+.stat .l{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+.stat .v{font-size:31px; font-weight:800; letter-spacing:-.03em; margin-top:7px}
+.stat .s{font-size:11.5px; color:var(--faint); margin-top:4px}
+
+/* history */
+.tbl{width:100%; border-collapse:collapse; font-size:13.5px}
+.tbl th{text-align:left; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint);
+  padding:0 12px 10px; font-weight:600}
+.tbl td{padding:11px 12px; border-top:1px solid var(--line)}
+.tbl tr.edited td{background:#141007}
+.tbl .pl{display:flex; align-items:center; gap:8px; font-weight:650}
+.tbl .pl i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.tbl .dur{font-weight:700; font-size:15px}
+.tbl .ot{color:var(--danger); font-size:11.5px; margin-left:6px; font-weight:700}
+.tbl .acts2{text-align:right; white-space:nowrap}
+.mini{background:var(--panel2); border:1px solid var(--line2); color:var(--dim); font-family:var(--f);
+  font-size:11.5px; font-weight:600; padding:6px 11px; border-radius:7px; cursor:pointer; margin-left:6px}
+.mini:hover{color:var(--txt)}
+.mini.dn{background:var(--accent); border-color:var(--accent); color:#04211f}
+.editing td{background:#0c1721 !important}
+.edit-box{display:flex; align-items:center; gap:12px; padding:6px 0}
+.pill-note{background:#141007; border:1px solid #4a3a1c; color:var(--warn); font-size:11px; font-weight:700;
+  padding:2px 8px; border-radius:20px; letter-spacing:.08em; text-transform:uppercase}
+/* corrections — reversible state log */
+.ev{display:grid; grid-template-columns:34px 1fr auto; gap:13px; align-items:center; padding:13px 15px;
+  border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16; position:relative}
+.ev .ico{width:34px; height:34px; border-radius:9px; background:#141d29; display:grid; place-items:center;
+  font-size:15px; color:var(--dim)}
+.ev .t{font-size:15px; font-weight:650}
+.ev .d{font-size:12.5px; color:var(--dim); margin-top:3px; display:flex; align-items:center; gap:8px}
+.ev .ago{font-size:11px; color:var(--faint); text-align:right; white-space:nowrap}
+.ev.head{border-color:#2b4a58; background:#0c1620}
+.ev.head .ico{background:#123a3a; color:var(--accent)}
+.ev.sel{border-color:var(--warn); background:#16110a}
+.ev.stale{opacity:.5}
+.ev .hchip{position:absolute; top:-7px; left:14px; background:var(--accent); color:#04211f; font-size:9px;
+  font-weight:800; letter-spacing:.14em; text-transform:uppercase; padding:2px 8px; border-radius:20px}
+.cascade{grid-column:1/-1; border-top:1px solid #4a3a1c; margin-top:12px; padding-top:12px}
+.cascade .w{font-size:13px; color:var(--warn); font-weight:650; display:flex; align-items:center; gap:9px}
+.cascade .l{font-size:12.5px; color:var(--dim); line-height:1.6; margin-top:8px}
+.cascade .l b{color:var(--txt); font-weight:600}
+.cascade .btns{display:flex; gap:10px; margin-top:14px}
+/* speaker & seating ring */
+.ibtn.spkb{color:#f0cf6a; border-color:#5a4d22; background:#1a1509}
+.ringwrap{position:relative; width:500px; height:410px; margin:0 auto}
+.ringwrap::before{content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:300px; height:230px; border-radius:50%; border:1px dashed #263544; background:#080d14}
+.ringwrap .cc{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; width:230px}
+.ringwrap .cc .l{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
+.ringwrap .cc .v{font-size:19px; font-weight:700; margin-top:7px; color:#f0cf6a}
+.ringwrap .cc .s{font-size:11.5px; color:var(--faint); margin-top:9px; line-height:1.5}
+.seatnode{position:absolute; transform:translate(-50%,-50%); width:112px; padding:11px 8px; text-align:center;
+  border:1px solid var(--line2); border-radius:12px; background:#0b111a; cursor:pointer}
+.seatnode i{width:13px; height:13px; border-radius:50%; background:var(--pc); font-style:normal; display:block; margin:0 auto}
+.seatnode .nm{font-size:15px; font-weight:700; margin-top:6px}
+.seatnode .sn2{font-size:10.5px; color:var(--faint); margin-top:2px; letter-spacing:.08em; text-transform:uppercase}
+.seatnode.isspk{border-color:#8a7530; background:#1a1509; box-shadow:0 0 0 1px #8a7530, 0 0 26px rgba(240,207,106,.14)}
+.seatnode .tok{position:absolute; top:-11px; left:50%; transform:translateX(-50%); background:#f0cf6a; color:#2a2008;
+  font-size:11px; font-weight:800; width:24px; height:24px; border-radius:50%; display:grid; place-items:center}
+.seatnode .hint{position:absolute; bottom:-9px; left:50%; transform:translateX(-50%); white-space:nowrap;
+  background:var(--accent); color:#04211f; font-size:9px; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; padding:2px 8px; border-radius:20px}
+.seatnode.cand{border-style:dashed; border-color:#33566b}
+.ordlist{display:flex; flex-direction:column; gap:5px}
+.ordrow{display:grid; grid-template-columns:24px 1fr auto; gap:11px; align-items:center; padding:7px 12px;
+  border:1px solid var(--line); border-radius:9px; background:#0a0f16; font-size:14px}
+.ordrow .n2{font-size:12px; color:var(--faint); text-align:center; font-weight:700}
+.ordrow .nm{font-weight:650; display:flex; align-items:center; gap:8px}
+.ordrow .nm i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.ordrow .tag2{font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:800;
+  padding:2px 7px; border-radius:20px; background:#2a2210; color:#f0cf6a}
+.ordrow.isspk{border-color:#5a4d22; background:#14110a}
+.drag{width:26px; text-align:center; color:#3d4a5a; font-size:15px; cursor:grab}
+.undo-bar{display:flex; align-items:center; gap:18px; background:#0c1620; border:1px solid #2b4a58;
+  border-radius:13px; padding:15px 18px; margin-bottom:16px}
+.undo-bar .k{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.undo-bar .v{font-size:18px; font-weight:700; margin-top:5px}
+.undo-bar .s{font-size:12.5px; color:var(--dim); margin-top:4px}
+.ev .dur2{font-size:15px; font-weight:700; margin-right:14px}
+.ev .dur2 s{text-decoration:none; color:var(--danger); font-size:11.5px; margin-left:5px}
+.note-box{background:#0d1620; border:1px solid #23404b; border-radius:11px; padding:14px 16px;
+  font-size:12.5px; color:var(--dim); line-height:1.65}
+.note-box b{color:var(--txt); font-weight:600}
+.undo-toast{position:absolute; left:50%; transform:translateX(-50%); bottom:24px; display:flex; align-items:center; gap:16px;
+  background:#16202c; border:1px solid var(--line2); border-radius:12px; padding:13px 16px 13px 19px;
+  box-shadow:0 16px 44px rgba(0,0,0,.6); font-size:13.5px}
+.undo-toast b{font-weight:650}
+
+/* join / qr */
+.qr{width:250px; height:250px; background:#fff; border-radius:14px; padding:14px; display:grid;
+  grid-template-columns:repeat(25,1fr); grid-template-rows:repeat(25,1fr)}
+.qr u{background:#000; border-radius:1px}
+.joincode{font-size:52px; font-weight:800; letter-spacing:.14em; margin-top:6px}
+.dev-row{display:flex; align-items:center; gap:12px; padding:13px 15px; border:1px solid var(--line);
+  border-radius:11px; margin-bottom:8px; background:#0a0f16}
+.dev-row i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
+.dev-row .nm{font-size:15px; font-weight:650}
+.dev-row .st{margin-left:auto; font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase}
+.dev-row .st.ok{color:var(--ok)} .dev-row .st.no{color:var(--faint)}
+
+/* ─────────── phone ─────────── */
+.ph{position:absolute; inset:0; display:flex; flex-direction:column; padding:52px 20px 30px}
+.ph-top{display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--faint);
+  letter-spacing:.14em; text-transform:uppercase; flex:none; padding-bottom:14px}
+.ph h2{font-size:29px; font-weight:750; letter-spacing:-.02em}
+.ph .sub{font-size:14px; color:var(--dim); margin-top:8px; line-height:1.5}
+.ph-flood{position:absolute; inset:0; background:linear-gradient(170deg,color-mix(in srgb,var(--pc) 34%, #05070b) 0%, #05070b 62%)}
+.ph .card2{background:#0b111a; border:1px solid var(--line); border-radius:14px; padding:16px}
+.ph-clock{font-size:96px; font-weight:800; letter-spacing:-.05em; text-align:center; line-height:.92}
+.ph-clock.over{color:var(--danger)}
+.ph-btn{background:linear-gradient(180deg,#25d3c5,#12a89c); color:#032422; border:none; font-family:var(--f);
+  font-size:22px; font-weight:800; letter-spacing:.04em; padding:22px; border-radius:15px; width:100%;
+  box-shadow:0 7px 0 #0a5f58; cursor:pointer}
+.ph-btn.ghost{background:transparent; border:1px solid var(--line2); color:var(--txt); box-shadow:none; font-size:15px; padding:15px}
+.ph-btn.red{background:linear-gradient(180deg,#ff6b5e,#d63c30); color:#2a0704; box-shadow:0 7px 0 #7d211a}
+.ph-btn.big2{font-size:26px; padding:28px}
+.codebox{display:flex; gap:9px; justify-content:center; margin:26px 0}
+.codebox b{width:50px; height:64px; border:1px solid var(--line2); border-radius:11px; background:#0b111a;
+  display:grid; place-items:center; font-size:28px; font-weight:800}
+.codebox b.f{border-color:var(--accent); background:#0b1c1f}
+.seat-pick{display:flex; align-items:center; gap:13px; padding:15px; border:1px solid var(--line2);
+  border-radius:13px; margin-bottom:10px; background:#0b111a}
+.seat-pick i{width:26px; height:26px; border-radius:8px; background:var(--pc); flex:none; font-style:normal}
+.seat-pick .nm{font-size:17px; font-weight:650}
+.seat-pick .fc{font-size:12px; color:var(--faint); margin-top:2px}
+.seat-pick .tk{margin-left:auto; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+.seat-pick.taken{opacity:.42}
+.seat-pick.you{border-color:var(--accent); background:#0a1a1c}
+.seat-pick.you .tk{color:var(--accent)}
+.mini-rail{display:flex; gap:6px; margin-top:14px}
+.mini-rail u{flex:1; height:5px; border-radius:3px; background:var(--pc); opacity:.3; display:block}
+.mini-rail u.on{opacity:1} .mini-rail u.p{opacity:.12}
+.ph-modal{position:absolute; inset:0; background:rgba(2,4,7,.86); backdrop-filter:blur(6px); display:flex;
+  align-items:flex-end; padding:20px}
+.ph-sheet{background:#121a24; border:1px solid var(--line2); border-radius:20px; padding:24px; width:100%}
+.ph-sheet h3{font-size:23px; font-weight:750}
+.ph-sheet p{font-size:14px; color:var(--dim); margin-top:10px; line-height:1.55}
+.warnbox{background:#241408; border:1px solid #5b3a14; border-radius:11px; padding:13px 15px; margin-top:16px;
+  font-size:13px; color:#f0c489; line-height:1.5}
+.ph-stat{display:flex; justify-content:space-between; align-items:baseline; padding:14px 0; border-bottom:1px solid var(--line)}
+.ph-stat span{font-size:14px; color:var(--dim)} .ph-stat b{font-size:22px; font-weight:750}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="nav">
+    <h1>TI4 Tempo</h1>
+    <div class="sub">Screen mockups · Twilight Imperium 4th Ed.</div>
+    <div id="navlist"></div>
+    <div class="nav-foot">
+      <kbd>←</kbd> <kbd>→</kbd> to step through screens.<br>
+      Timers on the action &amp; reaction screens run live.
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-head">
+      <h2 id="stitle">—</h2>
+      <span class="tag" id="stag">iPad</span>
+    </div>
+    <div class="stage-body">
+      <div class="frame-wrap" id="wrap">
+        <div class="frame ipad" id="frame"></div>
+      </div>
+    </div>
+    <div class="stage-note" id="snote"></div>
+  </main>
+</div>
+
+<script>
+/* ══════════════════ demo data ══════════════════ */
+const P = {
+  jaz  :{name:'Jaz',   c:'blue',   f:'Federation of Sol',  seat:1, speaker:true},
+  kira :{name:'Kira',  c:'red',    f:'Embers of Muaat',    seat:2},
+  tom  :{name:'Tom',   c:'green',  f:'Arborec',            seat:3},
+  priya:{name:'Priya', c:'yellow', f:'Emirates of Hacan',  seat:4},
+  sam  :{name:'Sam',   c:'purple', f:'Nekro Virus',        seat:5},
+  wren :{name:'Wren',  c:'orange', f:'Argent Flight',      seat:6},
+};
+const col = id => `--pc:var(--c-${P[id].c})`;
+
+// snapshot mid-strategy-phase: 4 picked, Sam picking now, Kira still to come
+const CARDS = [
+  {n:1, nm:'Leadership',   o:'tom'},   {n:2, nm:'Diplomacy',   o:'wren'},
+  {n:3, nm:'Politics',     o:'jaz'},   {n:4, nm:'Construction',o:null},
+  {n:5, nm:'Trade',        o:null},    {n:6, nm:'Warfare',     o:null, tg:true},
+  {n:7, nm:'Technology',   o:'priya'}, {n:8, nm:'Imperial',    o:null, tg:true},
+];
+
+// Round 3 action phase — initiative order derived from card numbers
+const ORDER = [
+  {id:'tom',   init:1, state:'passed', sc:true,  total:1122},
+  {id:'wren',  init:2, state:'passed', sc:true,  total:903 },
+  {id:'jaz',   init:3, state:'wait',   sc:true,  total:1277},
+  {id:'sam',   init:4, state:'wait',   sc:false, total:775 },
+  {id:'kira',  init:5, state:'active', sc:false, total:1050},
+  {id:'priya', init:7, state:'wait',   sc:true,  total:1448},
+];
+
+const fmt = s => { s=Math.max(0,Math.round(s));
+  const m=Math.floor(s/60), ss=String(s%60).padStart(2,'0');
+  return m>=60 ? `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}:${ss}` : `${m}:${ss}`; };
+const fmtL = s => { const m=Math.floor(s/60); return `${m}:${String(Math.round(s)%60).padStart(2,'0')}`; };
+
+/* ══════════════════ fragments ══════════════════ */
+const CARDNAME = {1:'Leadership',2:'Diplomacy',3:'Politics',4:'Construction',
+                  5:'Trade',6:'Warfare',7:'Technology',8:'Imperial'};
+const railRow = p => {
+  const d=P[p.id], live = p.state==='active';
+  const chip = p.state==='active' ? '<b class="chip now">Turn</b>'
+             : p.state==='passed' ? '<b class="chip pass">Passed</b>' : '';
+  return `<div class="row ${p.state}" style="${col(p.id)}">
+    ${chip}
+    <div class="in num">${p.init}</div>
+    <div><div class="nm"><i></i>${d.name}</div>
+      <div class="fc"><span class="sccard ${p.sc?'used':''}">${p.sc?'✓ ':''}${CARDNAME[p.init]}</span>${d.f}</div></div>
+    <div class="tm">
+      <div class="a num">${fmt(p.total)}</div>
+      <div class="b num">${live?'this turn 1:47':(p.state==='passed'?'4 turns':'3 turns')}</div>
+    </div></div>`;
+};
+
+const topBar = (phase, extra='') => `
+  <div class="top">
+    <div class="round">Round <b>3</b></div>
+    <div class="phase-pill">
+      <span class="${phase==='str'?'on':'done'}">Strategy</span>
+      <span class="${phase==='act'?'on':(phase==='str'?'':'done')}">Action</span>
+      <span class="${phase==='sta'?'on':''}">Status</span>
+      <span class="${phase==='age'?'on':''}">Agenda</span>
+    </div>
+    <button class="ibtn spkb">★ Speaker: Jaz</button>
+    <div class="spacer"></div>
+    ${extra}
+    <div class="gt">Game <b class="num" data-clock="up" data-t="9847">2:44:07</b></div>
+    <button class="ibtn">↺ Undo</button>
+    <button class="ibtn">⏸ Pause</button>
+    <button class="ibtn">⚙</button>
+  </div>`;
+
+/* ══════════════════ screens ══════════════════ */
+const S = {};
+
+/* ── 1. Setup ── */
+S.setup = {t:'Setup — New Game', d:'ipad', note:
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here and moves only when someone moves it from the speaker chip, for example after Politics (3) is played.`,
+ h:`<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
+    <button class="ibtn">Load last game</button><button class="ibtn">⚙ Settings</button></div>
+  <div class="content"><div class="setup-grid">
+    <div style="display:flex;flex-direction:column;min-height:0">
+      <div style="margin-bottom:16px">
+        <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:9px">Players · drag to match where people are actually sitting</div>
+        <div class="count">${[3,4,5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
+      </div>
+      <div style="overflow:auto;flex:1;min-height:0">
+      ${Object.entries(P).map(([id,d])=>`
+        <div class="seat ${d.speaker?'sp':''}" style="${col(id)}">
+          <div class="drag">⠿</div>
+          <div class="sn">Seat<br>${d.seat}</div>
+          <div class="swatches">${['red','blue','green','yellow','purple','orange'].map(c=>
+            `<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}</div>
+          <div class="fld">${d.name}</div>
+          <div class="fld sel">${d.f} ▾</div>
+          <div class="spk ${d.speaker?'on':''}">★</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="pnl" style="display:flex;flex-direction:column">
+      <div class="pnl-h">Game</div>
+      <div style="padding:16px 18px;flex:1">
+        <div class="kv"><span>Players</span><b>6</b></div>
+        <div class="kv"><span>Strategy cards each</span><b>1</b></div>
+        <div class="kv"><span>Speaker</span><b>Jaz</b></div>
+        <div class="kv"><span>Time limits</span><b style="color:var(--warn)">Enabled</b></div>
+        <div class="kv"><span>Turn limit</span><b>3:00</b></div>
+        <div class="kv" style="border:none"><span>Reaction window</span><b>2:00</b></div>
+        <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:18px">
+          Seat order is the physical ring. The <b style="color:var(--dim)">speaker ★</b> is a pointer into it —
+          move it and the strategy pick order and agenda voting order both re-derive.</div>
+        <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:12px">
+          At 3–4 players each player picks <b style="color:var(--dim)">two</b> strategy cards and takes a turn at each initiative number. The app handles this automatically.</div>
+      </div>
+      <div style="padding:16px 18px">
+        <button class="big" style="width:100%;font-size:23px;padding:20px">BEGIN GAME</button>
+      </div>
+    </div>
+  </div></div></div>`};
+
+/* ── 2. Settings ── */
+const setRow = (lb,ds,val,on,off) => `<div class="set-row ${off?'off':''}">
+  <div><div class="lb">${lb}</div><div class="ds">${ds}</div></div>
+  <div class="stepper"><i>−</i><b class="num">${val}</b><i>+</i></div>
+  <div class="tog ${on?'on':''}"></div></div>`;
+
+S.settings = {t:'Settings — Time Limits', d:'ipad', note:
+ `Limits ship <b>off</b> — tracking is the product, enforcement is opt-in. Each timer is independently switchable so a group can, say, cap the agenda phase (the usual offender) while leaving turns unlimited. Expiry is always soft: red, alarm, and the clock keeps counting <b>upward into overtime</b>, which is logged separately and shows up in the post-game stats. The app never ends a turn on its own.`,
+ h:`<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>Settings</b></div><div class="spacer"></div><button class="ibtn">✕ Close</button></div>
+  <div class="content">
+    <div class="master"><div style="flex:1"><div class="lb">Enforce time limits</div>
+      <div class="ds">Off = pure tracking. Clocks still run and everything is recorded, but nothing ever turns red.</div></div>
+      <div class="tog on"></div></div>
+    <div class="pnl">
+      <div class="pnl-h">Timers <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">minutes : seconds</span></div>
+      ${setRow('Turn limit','A single player turn in the action phase.','3:00',true)}
+      ${setRow('Reaction window','Secondary abilities after a strategy card is played. Charged to nobody.','2:00',true)}
+      ${setRow('Agenda discussion','Per agenda, before voting opens.','4:00',true)}
+      ${setRow('Vote','Per player, in speaker order.','1:00',true)}
+      ${setRow('Status phase','Whole table, across all seven steps.','5:00',false,true)}
+      ${setRow('Strategy pick','Per player, choosing a card.','0:45',true)}
+    </div>
+    <div class="pnl" style="margin-top:16px">
+      <div class="pnl-h">On expiry</div>
+      <div class="set-row"><div><div class="lb">Alarm sound</div>
+        <div class="ds">Audible chime so the table notices without watching the screen.</div></div>
+        <div class="fld sel" style="text-align:center">Klaxon ▾</div><div class="tog on"></div></div>
+      <div class="set-row"><div><div class="lb">Count overtime</div>
+        <div class="ds">Clock flips to counting up. Overage is logged per turn and totalled per player.</div></div>
+        <div style="font-size:12px;color:var(--faint);text-align:center">Always on</div><div class="tog on" style="opacity:.4"></div></div>
+      <div class="set-row"><div><div class="lb">Auto-advance turn</div>
+        <div class="ds">End the turn automatically when the limit is hit. Off by design — the app is not a referee.</div></div>
+        <div></div><div class="tog"></div></div>
+    </div>
+    <div class="pnl" style="margin-top:16px">
+      <div class="pnl-h">Display</div>
+      <div class="set-row"><div><div class="lb">Keep screen awake</div><div class="ds">Prevents the iPad sleeping mid-game.</div></div><div></div><div class="tog on"></div></div>
+      <div class="set-row"><div><div class="lb">Show cumulative time on rail</div><div class="ds">Off shows only the current turn, which some groups find less competitive.</div></div><div></div><div class="tog on"></div></div>
+      <div class="set-row"><div><div class="lb">Allow phone companions</div><div class="ds">Players can join on their own device and end their own turns.</div></div><div></div><div class="tog on"></div></div>
+    </div>
+  </div></div>`};
+
+/* ── 3. Speaker & seating ── */
+// physical seating ring, clockwise. Speaker is a pointer into it.
+const SEATS = ['jaz','kira','tom','priya','sam','wren'];
+const SPK = 0;
+const rot = (a,k) => a.slice(k).concat(a.slice(0,k));
+const PICK_ORDER = rot(SEATS, SPK);        // speaker picks first, then clockwise
+const VOTE_ORDER = rot(SEATS, SPK+1);      // starts left of speaker; speaker votes last
+
+const ringNodes = () => SEATS.map((id,i)=>{
+  const n=SEATS.length, cx=250, cy=205, rx=190, ry=150;
+  const a=(-90 + i*360/n)*Math.PI/180;
+  return `<div class="seatnode ${i===SPK?'isspk':''} ${i===3?'cand':''}"
+      style="${col(id)};left:${cx+rx*Math.cos(a)}px;top:${cy+ry*Math.sin(a)}px">
+    ${i===SPK?'<span class="tok">★</span>':''}
+    <i></i><div class="nm">${P[id].name}</div><div class="sn2">Seat ${i+1}</div>
+    ${i===3?'<span class="hint">Tap to make speaker</span>':''}</div>`;
+}).join('');
+
+const ordList = (ids, spkIdx) => ids.map((id,i)=>
+  `<div class="ordrow ${i===spkIdx?'isspk':''}" style="${col(id)}">
+    <div class="n2">${i+1}</div><div class="nm"><i></i>${P[id].name}</div>
+    ${i===spkIdx?'<span class="tag2">★ Speaker</span>':'<span></span>'}</div>`).join('');
+
+S.seating = {t:'Speaker & Seating', d:'ipad', note:
+ `Seating is a <b>fixed ring</b> set at game start; the speaker is just a <b>pointer into it</b>. Both derived
+  orders fall out automatically, so moving the token is the only thing anyone ever needs to do — and the token
+  does move, via Politics (3) and certain agendas. Note the two orders differ: strategy picks start <b>with</b>
+  the speaker, while agenda voting starts to their <b>left and leaves the speaker until last</b>, since they
+  break ties. Re-ordering seats is available but deliberately understated — it's a correction for a setup
+  mistake, not something a round should ever need.`,
+ h:`<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>Speaker &amp; seating</b> · Round 3</div>
+    <div class="spacer"></div><button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
+  <div class="content" style="display:grid;grid-template-columns:1fr 400px;gap:20px">
+    <div class="pnl" style="display:flex;flex-direction:column">
+      <div class="pnl-h">The table
+        <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">tap a seat to move the speaker token</span></div>
+      <div style="padding:18px 0 8px">
+        <div class="ringwrap">
+          <div class="cc"><div class="l">Speaker</div><div class="v">★ Jaz</div>
+            <div class="s">Picks first in the strategy phase.<br>Votes last, and breaks ties.</div></div>
+          ${ringNodes()}
+        </div>
+      </div>
+      <div style="padding:0 20px 18px;margin-top:auto">
+        <div class="note-box">Seat positions match where people are actually sitting, so "clockwise" and
+          "to the left" mean the same thing on screen as at the table.</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto">
+      <div class="pnl"><div class="pnl-h">Strategy pick order</div>
+        <div style="padding:11px 14px"><div class="ordlist">${ordList(PICK_ORDER, 0)}</div>
+          <div style="font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5">Speaker first, then clockwise.</div></div></div>
+      <div class="pnl"><div class="pnl-h">Agenda voting order</div>
+        <div style="padding:11px 14px"><div class="ordlist">${ordList(VOTE_ORDER, 5)}</div>
+          <div style="font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5">Starts left of the speaker; speaker votes last.</div></div></div>
+      <button class="ibtn" style="justify-content:center;padding:13px">⠿ Re-order seats</button>
+      <div style="font-size:11.5px;color:var(--faint);line-height:1.6;text-align:center">
+        Seating is set once at game start. Re-order only to fix a mistake — it changes both orders above.</div>
+    </div>
+  </div></div>`};
+
+/* ── 4. Strategy phase ── */
+S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
+ `Picks happen in <b>speaker order</b>, one at a time, with an optional per-pick timer. As cards are claimed the app builds the initiative order along the bottom — no separate ordering step, because in TI4 the card number <b>is</b> the turn order. Unchosen cards accumulate a trade good each round, shown top-right on the card, so the strip doubles as a reminder at the table.`,
+ h:`<div class="space"></div><div class="lay">
+  ${topBar('str')}
+  <div class="content" style="display:flex;flex-direction:column">
+    <div class="picker" style="${col('sam')}">
+      <div><div class="lbl">Now picking · 5 of 6</div><div class="who"><i></i>Sam</div></div>
+      <div style="font-size:12.5px;color:var(--faint);line-height:1.5;margin-left:22px;max-width:250px">
+        Order derives from the speaker. Tap a card to assign it.</div>
+      <button class="ibtn spkb" style="margin-left:6px;padding:10px 14px">★ Speaker: Jaz · change</button>
+      <div class="t num" data-clock="down" data-t="27" data-limit="45">0:27</div>
+    </div>
+    <div class="cards" style="flex:1">
+      ${CARDS.map(c=>{
+        const taken=!!c.o;
+        return `<div class="card ${taken?'taken':'next'}" style="${taken?col(c.o):''}">
+          ${c.tg?'<div class="tg">+1 TG</div>':''}
+          <div class="n num">${c.n}</div><div class="nm">${c.nm}</div>
+          ${taken?`<div class="own"><i></i>${P[c.o].name}</div>`:'<div class="free">Tap to assign to Sam</div>'}
+        </div>`}).join('')}
+    </div>
+    <div class="order-strip"><span class="lbl">Initiative order so far</span>
+      ${ORDER.filter(p=>CARDS.some(c=>c.o===p.id)).map(p=>
+        `<span class="oc" style="${col(p.id)}"><b>${p.init}</b><i></i>${P[p.id].name}</span>`).join('')}
+      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Sam</span>
+      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Kira</span></div>
+  </div>
+  <div style="padding:0 22px 20px"><button class="big" style="width:100%;opacity:.45" disabled>BEGIN ACTION PHASE — 2 PICKS REMAINING</button></div>
+  </div>`};
+
+/* ── 4. Action phase ── */
+const actionScreen = over => `<div class="space"></div><div class="lay">
+  ${topBar('act')}
+  <div class="body">
+    <div class="hero ${over?'over':''}" style="${col('kira')}">
+      ${over?`<div class="alarm"><span class="ico">🔔</span>
+        <div style="flex:1"><div class="b">TURN LIMIT EXCEEDED</div>
+        <div class="s">Alarm sounded. Nothing has been ended — the clock is now counting overtime.</div></div>
+        <button class="ibtn warnish">Silence</button></div>`:''}
+      <div class="hero-top">
+        <div class="dot"></div>
+        <div><h3>Kira</h3><div class="fac">Embers of Muaat · Seat 2</div></div>
+        <div class="init"><div class="n num">5</div><div class="l">Initiative</div></div>
+      </div>
+      <div class="bigclock num" data-clock="up" data-t="${over?192:107}" data-limit="180" data-bar="lb${over?'2':'1'}">${over?'3:12':'1:47'}</div>
+      <div class="clock-sub">${over
+        ? 'Turn 4 · cumulative 17:30 · <b>counting overtime</b>'
+        : 'Turn 4 this round · cumulative <b>17:30</b>'}</div>
+      <div class="limitbar"><i id="lb${over?'2':'1'}" style="width:${over?100:59}%"></i></div>
+      <div class="limitrow"><span>Turn limit 3:00</span><span data-rem="lb${over?'2':'1'}">${over?'Over by 0:12':'1:13 remaining'}</span></div>
+      <div class="acts">
+        <button class="big ${over?'red':''}">END TURN</button>
+        <button class="sec hl"><span class="k">Strategic action</span>Play Trade (5) ▸</button>
+        <button class="sec"><span class="k">Cannot pass — SC unplayed</span>Pass</button>
+      </div>
+    </div>
+    <div class="rail">
+      <div class="rail-h"><span class="t">Initiative · set by strategy card</span><span class="c">2 of 6 passed</span></div>
+      <div class="rail-b">${ORDER.map(railRow).join('')}</div>
+      <div class="rail-f"><span><span class="sccard" style="margin-right:5px">Card</span>still to play</span>
+        <span><span class="sccard used" style="margin-right:5px">✓ Card</span>already played</span></div>
+    </div>
+  </div></div>`;
+
+S.action = {t:'Action Phase', d:'ipad', note:
+ `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal, which is why Kira's Pass button is greyed. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
+ h:actionScreen(false)};
+
+S.overtime = {t:'Action Phase — Limit Exceeded', d:'ipad', note:
+ `The same screen once the limit passes. Soft expiry: the clock goes red and <b>flips to counting overtime upward</b>, an alarm sounds so the table notices without watching, and the End Turn button turns red. Nothing has advanced and nothing is blocked — the overage is simply recorded and surfaces in the round and post-game stats.`,
+ h:actionScreen(true)};
+
+/* ── 5. Reaction window ── */
+const RW = [
+  {id:'jaz',   done:true,  took:14},
+  {id:'tom',   done:true,  took:31, passed:true},
+  {id:'priya', done:true,  took:48},
+  {id:'wren',  done:false, passed:true},
+  {id:'sam',   done:false},
+];
+S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries.`,
+ h:`${actionScreen(false)}<div class="scrim"></div>
+  <div class="rw">
+    <div class="rw-h" style="${col('kira')}">
+      <div><div class="lbl">Strategic action · secondary abilities</div>
+        <h3>Trade <span style="color:var(--faint);font-weight:600">(5)</span></h3>
+        <div class="by"><i></i>Played by Kira · her clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">1:47</b></div></div>
+      <div class="rw-clock"><div class="t num" data-clock="down" data-t="92" data-limit="120" data-bar="rwb">1:32</div>
+        <div class="l">Window remaining · 2:00</div></div>
+    </div>
+    <div class="rw-bar"><i id="rwb" style="width:77%"></i></div>
+    <div class="tiles">
+      ${RW.map(r=>`<div class="tile ${r.done?'done':'wait'}" style="${col(r.id)}">
+        ${r.passed?'<span class="pchip">Passed</span>':''}
+        <div class="nm"><i></i>${P[r.id].name}</div><div class="fc">${P[r.id].f}</div>
+        ${r.done
+          ? `<div class="st">✓ Done</div><div class="took num">Took ${fmtL(r.took)}</div>`
+          : `<button class="tapme">MARK DONE</button>`}
+      </div>`).join('')}
+      <div class="tile" style="border-style:dashed;opacity:.5;justify-content:center;align-items:center">
+        <div style="font-size:13px;color:var(--faint);text-align:center;line-height:1.5">Active player<br>does not react</div></div>
+    </div>
+    <div class="rw-f">
+      <div class="note"><b style="color:var(--dim)">3 of 5 done.</b> Window closes automatically when the last player marks done.</div>
+      <button class="ibtn">＋ Add 1:00</button>
+      <button class="ibtn">↺ Undo last</button>
+      <button class="big" style="padding:15px 30px;font-size:18px">CLOSE WINDOW</button>
+    </div>
+  </div>`};
+
+/* ── 6. Status phase ── */
+const STEPS = [
+  ['Score objectives','1 public + 1 secret',1],
+  ['Reveal public objective','Speaker reveals',1],
+  ['Draw action cards','1 each, in initiative order',1],
+  ['Remove command tokens','From the board',0],
+  ['Gain and redistribute command tokens','2 each',0],
+  ['Ready cards','All exhausted cards',0],
+  ['Repair units','All damaged units',0],
+];
+S.status = {t:'Status Phase', d:'ipad', note:
+ `A whole-table timer rather than a per-player one — the status phase is procedural and mostly simultaneous. The seven steps are a checklist because they're the ones groups reliably forget (usually "remove command tokens"), and ticking them gives the timer something honest to measure. Whether the round ends here or continues into the agenda phase depends on the Custodians token, which the app tracks from setup.`,
+ h:`<div class="space"></div><div class="lay">
+  ${topBar('sta')}
+  <div class="content" style="display:grid;grid-template-columns:1fr 420px;gap:18px">
+    <div class="pnl" style="display:flex;flex-direction:column">
+      <div class="pnl-h">Status phase steps <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">3 of 7</span></div>
+      <div style="padding:16px"><div class="steps">
+        ${STEPS.map((s,i)=>`<div class="step ${s[2]?'on':''}">
+          <div class="bx">✓</div><div><div class="lb">${s[0]}</div></div>
+          <div class="no">${s[1]}</div></div>`).join('')}
+      </div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="pnl">
+        <div class="tabletimer"><div class="t num" data-clock="up" data-t="221">3:41</div>
+          <div class="l">Status phase · no limit set</div></div>
+      </div>
+      <div class="pnl" style="flex:1">
+        <div class="pnl-h">Round 3 so far</div>
+        <div style="padding:14px 18px">
+          <div class="kv"><span>Strategy phase</span><b class="num">2:14</b></div>
+          <div class="kv"><span>Action phase</span><b class="num">41:26</b></div>
+          <div class="kv"><span>Reaction windows</span><b class="num">7:52</b></div>
+          <div class="kv" style="border:none"><span>Status phase</span><b class="num" data-clock="up" data-t="221">3:41</b></div>
+        </div>
+      </div>
+      <button class="big" style="font-size:23px;padding:21px">BEGIN AGENDA PHASE</button>
+      <div style="font-size:12px;color:var(--faint);text-align:center;line-height:1.5">
+        Custodians token removed in round 2 —<br>agenda phase is active from this round on.</div>
+    </div>
+  </div></div>`};
+
+/* ── 7. Agenda phase ── */
+// clockwise starting left of the speaker; speaker (Jaz) votes last and breaks ties
+const VOTES = [
+  {id:'kira',  v:'For',     n:'12', st:'done'},
+  {id:'tom',   v:'Against', n:'8',  st:'done'},
+  {id:'priya', v:'For',     n:'15', st:'done'},
+  {id:'sam',   v:'',        n:'',   st:'now'},
+  {id:'wren',  v:'',        n:'',   st:''},
+  {id:'jaz',   v:'',        n:'',   st:'', spk:1},
+];
+S.agenda = {t:'Agenda Phase', d:'ipad', note:
+ `Two timers, because the agenda phase has two distinct failure modes. The <b>discussion timer</b> is table-wide and covers the open negotiation before voting. Then voting runs with a <b>per-player timer</b>, which is where the phase usually haemorrhages time — one player agonising over an influence count while five people wait. Voting starts to the <b>speaker's left and ends with the speaker</b>, who breaks ties — so this order is derived from the seating ring, not from initiative, and it is not the same order as the strategy phase.`,
+ h:`<div class="space"></div><div class="lay">
+  ${topBar('age')}
+  <div class="content" style="display:grid;grid-template-columns:1fr 430px;gap:18px">
+    <div style="display:flex;flex-direction:column;min-height:0">
+      <div class="agenda-card">
+        <div class="k">Agenda 1 of 2 · Law</div>
+        <h4>Anti-Intellectual Revolution</h4>
+        <p>For: after a player researches a technology, they must destroy one non-fighter ship. &nbsp;·&nbsp; Against: each player exhausts one planet per technology owned.</p>
+      </div>
+      <div class="pnl" style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <div class="pnl-h">Voting · from speaker's left, speaker last <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">3 of 6 voted</span></div>
+        <div style="padding:14px;overflow:auto">
+          ${VOTES.map((v,i)=>`<div class="vote-row ${v.st}" style="${col(v.id)}">
+            <div class="ord num">${i+1}${v.spk?' ★':''}</div>
+            <div><div class="nm"><i></i>${P[v.id].name}</div></div>
+            <div class="badge ${v.v==='For'?'f':v.v==='Against'?'a':''}">${v.v||(v.st==='now'?'Voting…':'Waiting')}</div>
+            <div class="vt num">${v.n?v.n+' votes':(v.st==='now'?'<span data-clock="down" data-t="38" data-limit="60">0:38</span>':'—')}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="pnl"><div class="tabletimer" style="padding:22px 0 18px">
+        <div class="t num" id="agd" style="font-size:78px" data-clock="up" data-t="266" data-limit="240">4:26</div>
+        <div class="l">Discussion · limit 4:00 · <span data-rem="agd" style="color:var(--danger)">over by 0:26</span></div></div></div>
+      <div class="pnl" style="flex:1">
+        <div class="pnl-h">Running tally</div>
+        <div style="padding:16px 18px">
+          <div class="kv"><span>For</span><b class="num" style="color:var(--ok);font-size:19px">27</b></div>
+          <div class="kv"><span>Against</span><b class="num" style="color:#ff8b80;font-size:19px">8</b></div>
+          <div class="kv" style="border:none"><span>Not yet cast</span><b class="num" style="color:var(--faint)">3 players</b></div>
+          <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:16px">
+            Tally is a convenience only — the app does not resolve outcomes or apply laws.</div>
+        </div>
+      </div>
+      <button class="big" style="font-size:20px;padding:19px">RESOLVE → AGENDA 2</button>
+    </div>
+  </div></div>`};
+
+/* ── 8. Round summary ── */
+// round 3 only — own-turn seconds sum to the 41:26 action phase
+const RS = [
+  {id:'priya', ac:560, rw:120, ot:0},
+  {id:'jaz',   ac:498, rw:95,  ot:0},
+  {id:'tom',   ac:432, rw:88,  ot:74},
+  {id:'kira',  ac:380, rw:70,  ot:12},
+  {id:'wren',  ac:328, rw:62,  ot:0},
+  {id:'sam',   ac:288, rw:110, ot:0},
+];
+const MAXR = 700;
+S.round = {t:'Round Summary', d:'ipad', note:
+ `Shown between rounds — a natural pause while the table resets. The stacked bar separates <b>own turn time</b> from <b>reaction window time</b>, because they mean different things: the first is your decision-making, the second is you holding everyone else up during someone else's strategy card. Overtime is hatched so it reads as distinct from ordinary time at a glance.`,
+ h:`<div class="space"></div><div class="lay">
+  ${topBar('sta','<button class="ibtn">📊 Full stats</button>')}
+  <div class="content">
+    <div class="h1">Round 3 complete</div>
+    <div class="h1s">58 minutes 43 seconds · game total 2 hours 44 minutes</div>
+    <div class="stat-grid" style="margin-top:22px">
+      <div class="stat"><div class="l">Round length</div><div class="v num">58:43</div><div class="s">+6:12 vs round 2</div></div>
+      <div class="stat"><div class="l">Action phase</div><div class="v num">41:26</div><div class="s">71% of the round</div></div>
+      <div class="stat"><div class="l">Reaction windows</div><div class="v num">7:52</div><div class="s">6 windows · avg 1:19</div></div>
+      <div class="stat"><div class="l">Overtime</div><div class="v num" style="color:var(--danger)">1:26</div><div class="s">2 turns over limit</div></div>
+    </div>
+    <div class="pnl"><div class="pnl-h">Time by player · this round</div>
+      <div style="padding:18px 20px"><div class="bars">
+        ${RS.map(r=>`<div class="bar-row" style="${col(r.id)}">
+          <div class="nm"><i></i>${P[r.id].name}</div>
+          <div class="track">
+            <u class="ac" style="width:${(r.ac-r.ot)/MAXR*100}%"></u>
+            ${r.ot?`<u class="ot" style="width:${r.ot/MAXR*100}%"></u>`:''}
+            <u class="win" style="width:${r.rw/MAXR*100}%"></u>
+          </div>
+          <div class="vl num">${fmt(r.ac+r.rw)}</div></div>`).join('')}
+      </div>
+      <div class="legend">
+        <span><b style="background:var(--c-blue)"></b>Own turns</span>
+        <span><b style="background:#2a4f70"></b>Reaction windows</span>
+        <span><b style="background:var(--danger)"></b>Overtime</span>
+      </div></div>
+    </div>
+  </div>
+  <div style="padding:0 22px 20px;display:flex;gap:12px">
+    <button class="ibtn" style="padding:18px 24px">↺ History &amp; undo</button>
+    <button class="big" style="flex:1">START ROUND 4 — STRATEGY PHASE</button>
+  </div></div>`};
+
+/* ── 9. History & Undo ── */
+// append-only action log, newest first. Undo pops from the top.
+const EV = [
+  {ico:'▸', t:'Turn ended',             d:'Sam → Kira',             dur:'2:31', ago:'14s ago', head:1},
+  {ico:'▸', t:'Turn ended',             d:'Jaz → Sam',              dur:'0:14', ago:'1m ago', warn:'Unusually short'},
+  {ico:'⊘', t:'Wren passed',            d:'Initiative 2',                       ago:'4m ago'},
+  {ico:'⊘', t:'Tom passed',             d:'Initiative 1',                       ago:'5m ago', sel:1},
+  {ico:'▸', t:'Turn ended',             d:'Priya → Tom',            dur:'4:12', ot:'+1:12', ago:'9m ago', edit:1},
+  {ico:'◷', t:'Reaction window closed', d:'Technology (7)',         dur:'1:38', ago:'11m ago'},
+  {ico:'★', t:'Strategy card played',   d:'Priya — Technology (7)',             ago:'13m ago'},
+  {ico:'▸', t:'Turn ended',             d:'Kira → Priya',           dur:'3:20', ago:'13m ago'},
+  {ico:'⟳', t:'Action phase began',     d:'Round 3',                            ago:'52m ago'},
+];
+
+S.history = {t:'History & Undo', d:'ipad', note:
+ `Two operations, and deliberately no others. <b>Undo</b> pops the last action off the log — press it again to
+  keep stepping back until the board matches the app, then carry on from there. It restores elapsed time as
+  well as state, so a mis-tapped End Turn costs nobody their seconds. <b>Edit time</b> changes a duration and
+  nothing else, because nothing is derived from a duration. Anything further — reassigning a turn, deleting an
+  entry — is left out: turn order comes from initiative, so those would produce states the game can't reach.
+  Undoing to an older point is the same operation repeated, so the row just says how many presses it saves.`,
+ h:`<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>History</b> · Round 3</div>
+    <div class="phase-pill"><span class="on">Round 3</span><span>Round 2</span><span>Round 1</span><span>All</span></div>
+    <div class="spacer"></div><button class="ibtn">⬇ Export</button><button class="ibtn">✕ Close</button></div>
+  <div class="content">
+    <div class="undo-bar">
+      <div style="flex:1"><div class="k">Last action</div>
+        <div class="v">Turn ended — Sam → Kira</div>
+        <div class="s">14 seconds ago · undoing returns Sam's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to him</div></div>
+      <button class="big" style="padding:18px 34px;font-size:21px">↺ UNDO</button>
+    </div>
+    <div class="pnl">
+      <div class="pnl-h">Everything that has happened · newest first
+        <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">press undo repeatedly to step back</span></div>
+      <div style="padding:15px 16px">
+        ${EV.map(e=>{
+          if(e.sel) return `<div class="ev sel">
+            <div class="ico">${e.ico}</div>
+            <div><div class="t">${e.t}</div><div class="d">${e.d}</div></div>
+            <div class="ago">${e.ago}</div>
+            <div class="cascade">
+              <div class="w"><span>↺</span>Undo back to here?</div>
+              <div class="l">That's <b>4 presses of undo</b> — everything above this row comes off the log too:
+                <b>Wren's pass</b> and the two turns taken since. About <b>5 minutes</b> of recorded time returns
+                to the clocks, and Tom rejoins the initiative order.</div>
+              <div class="btns"><button class="mini">Cancel</button>
+                <button class="mini dn" style="padding:8px 15px">Undo 4 actions</button></div>
+            </div></div>`;
+          if(e.edit) return `<div class="ev" style="border-color:#33566b;background:#0c1721">
+            <div class="ico">${e.ico}</div>
+            <div><div class="t">${e.t}</div><div class="d">${e.d}</div></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:12px;color:var(--faint)">5-second steps</span>
+              <div class="stepper" style="width:140px"><i>−</i><b class="num">4:12</b><i>+</i></div>
+              <button class="mini">Cancel</button><button class="mini dn">Save</button></div>
+            <div class="cascade" style="border-top-color:var(--line)">
+              <div class="l" style="margin-top:0;color:var(--faint)">Changes Priya's turn length and the totals it
+                feeds. Nothing else moves — the turn order, the passes and the phase are untouched.</div></div></div>`;
+          return `<div class="ev ${e.head?'head':''}">
+            ${e.head?'<span class="hchip">Most recent</span>':''}
+            <div class="ico">${e.ico}</div>
+            <div><div class="t">${e.t}</div>
+              <div class="d">${e.d}${e.warn?`<span class="pill-note">${e.warn}</span>`:''}</div></div>
+            <div style="display:flex;align-items:center">
+              ${e.dur?`<span class="dur2 num">${e.dur}${e.ot?`<s>${e.ot}</s>`:''}</span>`:''}
+              <span class="ago" style="width:70px">${e.ago}</span>
+              ${e.dur?'<button class="mini">Edit time</button>':''}
+              <button class="mini${e.head?' dn':''}">${e.head?'↺ Undo':'Undo to here'}</button></div></div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>
+  </div>`};
+
+/* ── 10. Post-game stats ── */
+// whole game — own-turn seconds sum to 15600 (4:20:00), 168 turns
+const PG = [
+  {id:'priya', tot:3240, turns:33, worst:612, ot:3, ots:402},
+  {id:'jaz',   tot:2940, turns:30, worst:498, ot:1, ots:142},
+  {id:'kira',  tot:2760, turns:30, worst:455, ot:2, ots:192},
+  {id:'tom',   tot:2520, turns:28, worst:521, ot:4, ots:388},
+  {id:'wren',  tot:2220, turns:25, worst:389, ot:0, ots:0},
+  {id:'sam',   tot:1920, turns:22, worst:344, ot:0, ots:0},
+];
+const PGTOT = 15600, PGMAX = 3400;
+S.stats = {t:'Post-game Stats', d:'ipad', note:
+ `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Exportable as JSON or CSV so a group can build a season's worth of data.`,
+ h:`<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>Game complete</b> · 8 rounds</div><div class="spacer"></div>
+    <button class="ibtn">⬇ Export CSV</button><button class="ibtn">⬇ Export JSON</button><button class="ibtn">New game</button></div>
+  <div class="content">
+    <div class="h1">7 hours 30 minutes</div>
+    <div class="h1s">6 players · 8 rounds · 168 turns · 41 reaction windows</div>
+    <div class="stat-grid" style="margin-top:22px">
+      <div class="stat"><div class="l">Longest round</div><div class="v num">1:04:18</div><div class="s">Round 6</div></div>
+      <div class="stat"><div class="l">Average turn</div><div class="v num">1:33</div><div class="s">across all players</div></div>
+      <div class="stat"><div class="l">Agenda phase total</div><div class="v num">58:00</div><div class="s">13% of the game</div></div>
+      <div class="stat"><div class="l">Total overtime</div><div class="v num" style="color:var(--danger)">18:44</div><div class="s">10 turns over limit</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 400px;gap:18px">
+      <div class="pnl"><div class="pnl-h">Own-turn time by player <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">4:20:00 total</span></div>
+        <div style="padding:18px 20px"><div class="bars">
+          ${PG.map(r=>`<div class="bar-row" style="${col(r.id)}">
+            <div class="nm"><i></i>${P[r.id].name}</div>
+            <div class="track"><u class="ac" style="width:${(r.tot-r.ots)/PGMAX*100}%"></u>
+              ${r.ots?`<u class="ot" style="width:${r.ots/PGMAX*100}%"></u>`:''}</div>
+            <div class="vl num">${fmt(r.tot)}</div></div>`).join('')}
+        </div>
+        <div class="legend"><span><b style="background:var(--c-blue)"></b>Within limit</span>
+          <span><b style="background:var(--danger)"></b>Overtime</span></div>
+        <table class="tbl" style="margin-top:20px">
+          <thead><tr><th>Player</th><th>Turns</th><th>Avg turn</th><th>Worst turn</th><th>Over limit</th><th>Share</th></tr></thead>
+          <tbody>${PG.map(r=>`<tr><td><div class="pl" style="${col(r.id)}"><i></i>${P[r.id].name}</div></td>
+            <td class="num">${r.turns}</td>
+            <td class="num">${fmt(r.tot/r.turns)}</td><td class="num">${fmt(r.worst)}</td>
+            <td class="num" style="${r.ot?'color:var(--danger)':'color:var(--faint)'}">${r.ot?r.ot+' · '+fmt(r.ots):'—'}</td>
+            <td class="num">${Math.round(r.tot/PGTOT*100)}%</td></tr>`).join('')}</tbody>
+        </table></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="pnl"><div class="pnl-h">Where the game went</div>
+          <div style="padding:16px 18px">
+            ${[['Action phase — own turns','4:20:00',57,'var(--c-blue)'],
+               ['Reaction windows','1:02:00',14,'#2a4f70'],
+               ['Agenda phase','0:58:00',13,'var(--c-purple)'],
+               ['Status phase','0:44:00',10,'var(--c-green)'],
+               ['Strategy phase','0:26:00',6,'var(--c-yellow)']].map(x=>`
+              <div style="margin-bottom:13px">
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+                  <span>${x[0]}</span><b class="num">${x[1]}</b></div>
+                <div class="track" style="height:9px"><u style="width:${x[2]}%;background:${x[3]}"></u></div></div>`).join('')}
+          </div></div>
+        <div class="pnl" style="flex:1"><div class="pnl-h">Longest turns</div>
+          <div style="padding:8px 18px 16px">
+            ${[['priya',612,'R6 · tactical action, Mecatol'],['tom',521,'R4 · Leadership primary'],
+               ['jaz',498,'R7 · tactical action'],['kira',455,'R6 · Warfare primary']].map(x=>`
+              <div class="kv" style="${col(x[0])}"><span class="pl" style="display:flex;align-items:center;gap:8px">
+                <i style="width:9px;height:9px;border-radius:50%;background:var(--pc);font-style:normal"></i>
+                ${P[x[0]].name} <span style="color:var(--faint);font-size:11.5px">${x[2]}</span></span>
+                <b class="num" style="color:var(--danger)">${fmt(x[1])}</b></div>`).join('')}
+          </div></div>
+      </div>
+    </div>
+  </div></div>`};
+
+/* ── 11. Join ── */
+S.join = {t:'Join — Phone Companions', d:'ipad', note:
+ `The bridge to the add-on. Phones are always <b>optional</b> — the tabletop device stays fully functional on its own, and a player whose phone drops off simply uses the iPad as before. That constraint is what keeps the companion an add-on rather than a dependency, and it's the reason this screen shows connection state so plainly.`,
+ h:`<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>Join game</b></div><div class="spacer"></div><button class="ibtn">✕ Close</button></div>
+  <div class="content" style="display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center;padding:0 60px">
+    <div style="text-align:center">
+      <div class="qr" id="qr" style="margin:0 auto"></div>
+      <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:22px">Or enter the code at ti4tempo.app</div>
+      <div class="joincode num">7QK2</div>
+    </div>
+    <div>
+      <div class="h1" style="font-size:25px">Play from your own phone</div>
+      <div class="h1s" style="line-height:1.65">End your own turn, mark yourself done in a reaction window, and see your running time — without reaching across the table.<br><br>
+        <b style="color:var(--dim)">Entirely optional.</b> The iPad stays fully functional on its own, and anyone who doesn't join just uses it as normal.</div>
+      <div style="margin-top:26px">
+        <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:11px">Connected · 4 of 6</div>
+        ${Object.entries(P).map(([id,d],i)=>`<div class="dev-row" style="${col(id)}">
+          <i></i><div><div class="nm">${d.name}</div></div>
+          <div class="st ${i<4?'ok':'no'}">${i<4?'● Connected':'Table device'}</div></div>`).join('')}
+      </div>
+    </div>
+  </div></div>`};
+
+/* ══════════════════ phone screens ══════════════════ */
+S.pJoin = {t:'Phone — Join', d:'phone', note:
+ `Deliberately the shortest possible path in: four characters, no account, no install. A player who arrives late or whose phone dies mid-game must be able to rejoin in seconds, or they'll just use the iPad — which is fine, but the companion only earns its place if joining is faster than reaching.`,
+ h:`<div class="space"></div><div class="ph">
+  <div class="ph-top"><span>TI4 Tempo</span><span>9:41</span></div>
+  <div style="margin-top:34px"><h2>Join the table</h2>
+    <div class="sub">Enter the four-character code shown on the table device, or scan its QR.</div></div>
+  <div class="codebox"><b>7</b><b>Q</b><b>K</b><b class="f">|</b></div>
+  <div class="card2" style="display:flex;align-items:center;gap:13px">
+    <div style="width:40px;height:40px;border-radius:10px;background:#16202c;display:grid;place-items:center;font-size:19px">⛶</div>
+    <div style="flex:1"><div style="font-size:15px;font-weight:650">Scan QR instead</div>
+      <div style="font-size:12px;color:var(--faint);margin-top:2px">Point at the table device</div></div></div>
+  <div style="margin-top:auto;display:grid;gap:11px">
+    <button class="ph-btn">JOIN</button>
+    <div style="font-size:12px;color:var(--faint);text-align:center;line-height:1.5">No account needed. The companion is optional —<br>you can always just use the table device.</div>
+  </div></div>`};
+
+S.pSeat = {t:'Phone — Claim Seat', d:'phone', note:
+ `Players claim a seat rather than being assigned one, because the table has already sorted out who is which colour physically. Claimed seats grey out so two people can't fight over Blue. This is the only screen where the phone writes identity — everything after it is read-and-act.`,
+ h:`<div class="space"></div><div class="ph">
+  <div class="ph-top"><span>Round 3 · Action</span><span>9:41</span></div>
+  <div style="margin-top:26px"><h2>Which one are you?</h2>
+    <div class="sub">Pick your seat. Greyed-out seats are already claimed on another phone.</div></div>
+  <div style="margin-top:24px;overflow:auto">
+    ${Object.entries(P).map(([id,d],i)=>`<div class="seat-pick ${id==='kira'?'you':(i<4&&id!=='kira'?'taken':'')}" style="${col(id)}">
+      <i></i><div><div class="nm">${d.name}</div><div class="fc">${d.f}</div></div>
+      <div class="tk">${id==='kira'?'✓ You':(i<4?'Claimed':'Free')}</div></div>`).join('')}
+  </div>
+  <div style="margin-top:auto"><button class="ph-btn">CONTINUE AS KIRA</button></div></div>`};
+
+S.pWait = {t:'Phone — Waiting', d:'phone', note:
+ `The state a player is in for most of the game, so it's built for a two-second glance from across the table: whose turn, how long they've had, and how far away yours is. The <b>"3 turns away"</b> line is the one genuinely new thing a phone offers over the iPad — a private heads-up to start thinking now.`,
+ h:`<div class="space"></div><div class="ph">
+  <div class="ph-top"><span>Round 3 · Action phase</span><span>9:41</span></div>
+  <div class="card2" style="margin-top:20px;${col('jaz')};border-color:color-mix(in srgb,var(--pc) 45%, transparent);background:color-mix(in srgb,var(--pc) 10%, #0b111a)">
+    <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">Current turn</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:9px">
+      <i style="width:14px;height:14px;border-radius:50%;background:var(--pc);font-style:normal"></i>
+      <div style="font-size:26px;font-weight:750">Jaz</div>
+      <div class="num" style="margin-left:auto;font-size:32px;font-weight:800" data-clock="up" data-t="88">1:28</div></div>
+    <div style="font-size:12px;color:var(--faint);margin-top:6px">Federation of Sol · initiative 3 · limit 3:00</div>
+  </div>
+  <div style="margin-top:22px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">You</div>
+  <div class="card2" style="margin-top:10px;${col('kira')}">
+    <div style="display:flex;align-items:center;gap:10px">
+      <i style="width:12px;height:12px;border-radius:50%;background:var(--pc);font-style:normal"></i>
+      <div style="font-size:20px;font-weight:700">Kira</div>
+      <div class="tk" style="margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--warn)">Not passed</div></div>
+    <div class="mini-rail">
+      <u class="p" style="--pc:var(--c-green)"></u><u class="p" style="--pc:var(--c-orange)"></u>
+      <u class="on" style="--pc:var(--c-blue)"></u><u style="--pc:var(--c-purple)"></u>
+      <u style="--pc:var(--c-red)"></u><u style="--pc:var(--c-yellow)"></u></div>
+    <div style="display:flex;justify-content:space-between;margin-top:16px">
+      <div><div style="font-size:11px;color:var(--faint)">Your total</div><div class="num" style="font-size:22px;font-weight:750">17:30</div></div>
+      <div><div style="font-size:11px;color:var(--faint)">Avg turn</div><div class="num" style="font-size:22px;font-weight:750">1:45</div></div>
+      <div><div style="font-size:11px;color:var(--faint)">Strategy card</div><div style="font-size:16px;font-weight:700;margin-top:4px">Trade (5)</div></div></div>
+  </div>
+  <div style="margin-top:24px;text-align:center;padding:20px;border:1px dashed var(--line2);border-radius:14px">
+    <div style="font-size:15px;color:var(--dim)">You're <b style="color:var(--txt)">2 turns away</b></div>
+    <div style="font-size:12.5px;color:var(--faint);margin-top:6px">Jaz, then Sam. Tom and Wren have passed.</div></div>
+  <div style="margin-top:auto;font-size:12px;color:var(--faint);text-align:center">Buttons unlock when it's your turn.</div>
+  </div>`};
+
+S.pTurn = {t:'Phone — Your Turn', d:'phone', note:
+ `Colour-flooded so a player knows it's theirs before reading a word — and so five other people can see the glow across the table. The three actions mirror the iPad exactly; anything done here updates the table device instantly and vice versa, so a player can start on their phone and finish with a tap on the iPad. Pass is greyed until the strategy card is played.`,
+ h:`<div class="ph-flood" style="${col('kira')}"></div><div class="ph">
+  <div class="ph-top"><span>Round 3 · Turn 4</span><span>9:41</span></div>
+  <div style="margin-top:22px;text-align:center">
+    <div style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)">Your turn</div>
+    <h2 style="font-size:38px;margin-top:8px">Kira</h2>
+    <div style="font-size:13px;color:var(--dim);margin-top:5px">Embers of Muaat · initiative 5</div></div>
+  <div class="ph-clock num" style="margin-top:32px" data-clock="up" data-t="107" data-limit="180" data-bar="pb1">1:47</div>
+  <div style="margin:20px 4px 0"><div class="limitbar"><i id="pb1" style="width:59%;background:var(--c-red)"></i></div>
+    <div class="limitrow"><span>Limit 3:00</span><span data-rem="pb1">1:13 left</span></div></div>
+  <div style="margin-top:auto;display:grid;gap:11px">
+    <button class="ph-btn big2">END TURN</button>
+    <button class="ph-btn ghost" style="text-align:left;padding:16px 18px">
+      <span style="display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">Strategic action</span>
+      Play Trade (5)</button>
+    <button class="ph-btn ghost" style="opacity:.4">PASS — strategy card unplayed</button>
+  </div></div>`};
+
+S.pReaction = {t:'Phone — Reaction Window', d:'phone', note:
+ `The clearest win for the companion. Five people reaching across a board the size of a coffee table to tap tiles is exactly the friction the phone removes — one enormous button, no aim required. Marking done means "I'm finished with this window", whether the secondary was resolved or declined, so there is no second decision to make.`,
+ h:`<div class="space"></div><div class="ph">
+  <div class="ph-top"><span style="color:var(--accent)">Reaction window</span><span>9:41</span></div>
+  <div class="card2" style="margin-top:20px;${col('kira')};text-align:center;padding:22px">
+    <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)">Secondary ability</div>
+    <div style="font-size:29px;font-weight:750;margin-top:8px">Trade <span style="color:var(--faint)">(5)</span></div>
+    <div style="font-size:13px;color:var(--dim);margin-top:7px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <i style="width:9px;height:9px;border-radius:50%;background:var(--pc);font-style:normal"></i>Played by Kira</div></div>
+  <div class="ph-clock num" style="margin-top:26px;color:var(--accent)" data-clock="down" data-t="92" data-limit="120" data-bar="pb2">1:32</div>
+  <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);text-align:center;margin-top:8px">Window remaining</div>
+  <div style="margin:18px 4px 0"><div class="limitbar"><i id="pb2" style="width:77%;background:var(--accent)"></i></div></div>
+  <div style="margin-top:24px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">Table status · 3 of 5 done</div>
+  <div style="display:flex;gap:8px;margin-top:11px">
+    ${['jaz','tom','priya','wren','sam'].map((id,i)=>`<div style="flex:1;text-align:center;${col(id)};
+      padding:11px 4px;border-radius:10px;border:1px solid ${i<3?'#2a5c3d':'var(--line2)'};background:${i<3?'#0a1c13':'#0b111a'}">
+      <i style="width:11px;height:11px;border-radius:50%;background:var(--pc);font-style:normal;display:block;margin:0 auto"></i>
+      <div style="font-size:11px;margin-top:7px;color:${i<3?'var(--ok)':'var(--faint)'}">${i<3?'✓':'…'}</div></div>`).join('')}
+  </div>
+  <div style="margin-top:auto;display:grid;gap:11px">
+    <button class="ph-btn big2">I'M DONE</button>
+    <div style="font-size:12px;color:var(--faint);text-align:center;line-height:1.5">Tap whether or not you used the secondary.<br>The window closes when everyone has.</div>
+  </div></div>`};
+
+S.pPass = {t:'Phone — Pass Confirmation', d:'phone', note:
+ `The only confirmation dialog in the app. Passing is the single irreversible decision in a round — you're out until the next one — and it's the mistake with the highest cost, so it gets a guard rail that End Turn deliberately does not. Even so it's undoable from the table device, because a rules argument can retroactively change what should have happened.`,
+ h:`<div class="space"></div>${S.pTurn.h.replace('<div class="space"></div>','')}
+  <div class="ph-modal"><div class="ph-sheet">
+    <h3>Pass for the rest of round 3?</h3>
+    <p>You won't take another turn this round. You'll be skipped in the initiative order until round 4 begins.</p>
+    <div class="warnbox"><b>You can still resolve secondary abilities.</b> Passing only stops you taking turns — you'll still get a tile in every reaction window.</div>
+    <div style="display:grid;gap:10px;margin-top:20px">
+      <button class="ph-btn red">YES, PASS</button>
+      <button class="ph-btn ghost">Cancel</button></div>
+  </div></div>`};
+
+S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
+ `Kept private to the player's own device on purpose. The iPad shows everyone's numbers side by side, which is the social contract of the shared screen; the phone is where someone can quietly check whether they really are the slow one before anyone says it out loud.`,
+ h:`<div class="space"></div><div class="ph">
+  <div class="ph-top"><span>Game complete</span><span>9:41</span></div>
+  <div style="margin-top:24px;${col('kira')}">
+    <div style="display:flex;align-items:center;gap:11px">
+      <i style="width:15px;height:15px;border-radius:50%;background:var(--pc);font-style:normal"></i>
+      <h2>Kira</h2></div>
+    <div class="sub">Embers of Muaat · 8 rounds · 30 turns</div></div>
+  <div class="card2" style="margin-top:22px;text-align:center;padding:24px">
+    <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">Your own-turn time</div>
+    <div class="num" style="font-size:56px;font-weight:800;letter-spacing:-.04em;margin-top:8px">46:00</div>
+    <div style="font-size:13px;color:var(--dim);margin-top:6px">18% of all turn time · 3rd of 6</div></div>
+  <div style="margin-top:20px">
+    <div class="ph-stat"><span>Average turn</span><b class="num">1:32</b></div>
+    <div class="ph-stat"><span>Longest turn</span><b class="num">7:35</b></div>
+    <div class="ph-stat"><span>Turns over limit</span><b class="num" style="color:var(--danger)">2</b></div>
+    <div class="ph-stat"><span>Total overtime</span><b class="num" style="color:var(--danger)">3:12</b></div>
+    <div class="ph-stat"><span>Reaction window time</span><b class="num">9:44</b></div>
+    <div class="ph-stat" style="border:none"><span>Fastest round</span><b class="num">Round 2</b></div></div>
+  <div style="margin-top:auto"><button class="ph-btn ghost">See the full table breakdown</button></div>
+  </div>`};
+
+/* ══════════════════ shell ══════════════════ */
+const GROUPS = [
+  ['iPad — table device', ['setup','settings','seating','strategy','action','overtime','reaction','status','agenda','round','history','stats','join']],
+  ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
+];
+const KEYS = GROUPS.flatMap(g=>g[1]);
+
+const nav = document.getElementById('navlist');
+nav.innerHTML = GROUPS.map(([g,ks])=>
+  `<div class="nav-group">${g}</div>` +
+  ks.map(k=>`<div class="nav-item" data-k="${k}"><span class="idx num">${KEYS.indexOf(k)+1}</span>${S[k].t.replace(/^Phone — /,'')}</div>`).join('')
+).join('');
+
+const frame=document.getElementById('frame'), wrap=document.getElementById('wrap');
+let cur=null;
+
+function show(k){
+  cur=k; const s=S[k];
+  frame.className='frame '+(s.d==='phone'?'phone':'ipad');
+  frame.innerHTML=`<div class="screen active">${s.h}</div>`;
+  document.getElementById('stitle').textContent=s.t;
+  document.getElementById('stag').textContent = s.d==='phone' ? 'iPhone · 393×852' : 'iPad · 1194×834';
+  document.getElementById('snote').innerHTML=s.note;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on',n.dataset.k===k));
+  if(k==='join') drawQR();
+  fit();
+}
+nav.addEventListener('click',e=>{const n=e.target.closest('.nav-item'); if(n) show(n.dataset.k);});
+addEventListener('keydown',e=>{
+  const i=KEYS.indexOf(cur);
+  if(e.key==='ArrowRight') show(KEYS[(i+1)%KEYS.length]);
+  if(e.key==='ArrowLeft')  show(KEYS[(i-1+KEYS.length)%KEYS.length]);
+});
+
+function fit(){
+  const isPhone=frame.classList.contains('phone');
+  const W=isPhone?393:1194, H=isPhone?852:834;
+  const box=wrap.parentElement.getBoundingClientRect();
+  const s=Math.min((box.width-56)/W,(box.height-56)/H,1);
+  frame.style.transform=`scale(${s})`;
+  wrap.style.width=W*s+'px'; wrap.style.height=H*s+'px';
+}
+addEventListener('resize',fit);
+
+/* fake but deterministic QR */
+function drawQR(){
+  const q=document.getElementById('qr'); if(!q||q.dataset.done) return;
+  let h=0x5f3a7c, out='';
+  for(let y=0;y<25;y++)for(let x=0;x<25;x++){
+    const fin=(x<7&&y<7)||(x>17&&y<7)||(x<7&&y>17);
+    const finOn=fin&&!((x>1&&x<5&&y>1&&y<5&&!(x===3&&y===3))||(x>19&&x<23&&y>1&&y<5&&!(x===21&&y===3))||(x>1&&x<5&&y>19&&y<23&&!(x===3&&y===21)));
+    h=(h*1103515245+12345)&0x7fffffff;
+    const on = fin ? finOn : ((h>>7)&1);
+    out += on ? '<u></u>' : '<span></span>';
+  }
+  q.innerHTML=out; q.dataset.done=1;
+}
+
+/* live clocks */
+setInterval(()=>{
+  document.querySelectorAll('.screen.active [data-clock]').forEach(el=>{
+    let t=+el.dataset.t, dir=el.dataset.clock, lim=+el.dataset.limit||0;
+    if(dir==='down'){
+      if(t>0){ t--; if(t===0) el.dataset.clock='over'; }
+    } else { t++; }
+    if(dir==='over') t++;
+    el.dataset.t=t;
+    if(el.dataset.clock==='over'){ el.textContent='+'+fmt(t); el.classList.add('over'); }
+    else el.textContent=fmt(t);
+    if(lim&&dir==='up'&&t>lim){
+      el.classList.add('over');
+      const hero=el.closest('.hero'); if(hero) hero.classList.add('over');
+    }
+    const bar=el.dataset.bar&&document.getElementById(el.dataset.bar);
+    if(bar&&lim){
+      const pct = dir==='down' ? t/lim*100 : Math.min(t/lim,1)*100;
+      bar.style.width=pct+'%';
+    }
+    const key=el.dataset.bar||el.id;
+    if(key&&lim){
+      const rem=document.querySelector(`.screen.active [data-rem="${key}"]`);
+      if(rem) rem.textContent = t>lim ? `over by ${fmt(t-lim)}` : `${fmt(lim-t)} remaining`;
+    }
+  });
+},1000);
+
+show('action');
+</script>
+</body>
+</html>

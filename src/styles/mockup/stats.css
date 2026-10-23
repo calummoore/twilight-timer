@@ -1,0 +1,29 @@
+/* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
+/* charts */
+.bars{display:grid; gap:13px}
+.bar-row{display:grid; grid-template-columns:112px 1fr 92px; gap:14px; align-items:center}
+.bar-row .nm{font-size:14.5px; font-weight:650; display:flex; align-items:center; gap:8px}
+.bar-row .nm i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal}
+.track{height:26px; background:#0d131c; border-radius:6px; overflow:hidden; display:flex}
+.track u{display:block; height:100%; text-decoration:none}
+.track u.ac{background:var(--pc)} .track u.win{background:color-mix(in srgb,var(--pc) 48%, #0d131c)}
+.track u.ot{background:repeating-linear-gradient(45deg,var(--danger),var(--danger) 4px,#a8342b 4px,#a8342b 8px)}
+.bar-row .vl{text-align:right; font-size:15px; font-weight:700}
+.legend{display:flex; gap:18px; margin-top:18px; font-size:11.5px; color:var(--faint); flex-wrap:wrap}
+.legend b{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:7px; vertical-align:-1px}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:13px; margin-bottom:20px}
+.stat{background:#0a0f16; border:1px solid var(--line); border-radius:12px; padding:16px 17px}
+.stat .l{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+.stat .v{font-size:31px; font-weight:800; letter-spacing:-.03em; margin-top:7px}
+.stat .s{font-size:11.5px; color:var(--faint); margin-top:4px}
+
+/* history */
+.tbl{width:100%; border-collapse:collapse; font-size:13.5px}
+.tbl th{text-align:left; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint);
+  padding:0 12px 10px; font-weight:600}
+.tbl td{padding:11px 12px; border-top:1px solid var(--line)}
+.tbl tr.edited td{background:#141007}
+.tbl .pl{display:flex; align-items:center; gap:8px; font-weight:650}
+.tbl .pl i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.tbl .dur{font-weight:700; font-size:15px}
+.tbl .ot{color:var(--danger); font-size:11.5px; margin-left:6px; font-weight:700}
