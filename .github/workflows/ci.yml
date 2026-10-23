@@ -59,3 +59,97 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: npx wrangler deploy
+
+  preview:
+    name: Preview
+    # Pull requests from forks get no secrets and a read-only token, so they
+    # get no preview.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    # An explicit bash adds pipefail, so a failed command in a pipe fails the
+    # step.
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the pull request head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          # The upload step holds a Cloudflare token, so skip the shared cache.
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # The upload adds a Worker version with an alias. It does not deploy the
+      # version, so production traffic does not change.
+      - name: Upload preview to Cloudflare
+        id: upload
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.json
+        run: |
+          if [ -z "${CLOUDFLARE_ACCOUNT_ID}" ] || [ -z "${CLOUDFLARE_API_TOKEN}" ]; then
+            echo "::warning title=No preview::This run has no Cloudflare credentials, so it skips the preview."
+            exit 0
+          fi
+          npx wrangler versions upload \
+            --preview-alias "pr-${PR_NUMBER}" \
+            --message "Preview of pull request #${PR_NUMBER} at ${HEAD_SHA:0:7}"
+          result=$(jq -c 'select(.type == "version-upload")' "${WRANGLER_OUTPUT_FILE_PATH}")
+          alias_url=$(jq -r '.preview_alias_url // empty' <<< "${result}")
+          version_url=$(jq -r '.preview_url // empty' <<< "${result}")
+          if [ -z "${alias_url}" ]; then
+            echo "::error title=No preview URL::Cloudflare returned no preview URL. Turn on Preview URLs for the Worker."
+            exit 1
+          fi
+          echo "alias_url=${alias_url}" >> "${GITHUB_OUTPUT}"
+          echo "version_url=${version_url}" >> "${GITHUB_OUTPUT}"
+
+      - name: Comment the preview link
+        if: steps.upload.outputs.alias_url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ALIAS_URL: ${{ steps.upload.outputs.alias_url }}
+          VERSION_URL: ${{ steps.upload.outputs.version_url }}
+          # The marker finds the comment of an earlier run, so that each pull
+          # request keeps one preview comment.
+          MARKER: '<!-- preview-deploy -->'
+        run: |
+          body=$(cat <<EOF
+          ${MARKER}
+          **Preview:** ${ALIAS_URL}
+
+          This comment was last updated for commit ${HEAD_SHA:0:7}. Each successful preview run updates it.
+
+          Link to commit ${HEAD_SHA:0:7} only: ${VERSION_URL}
+          EOF
+          )
+          comments="repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments"
+          comment_id=$(gh api --paginate "${comments}?per_page=100" | jq -rn --arg marker "${MARKER}" \
+            '[inputs | .[] | select(.user.login == "github-actions[bot]" and (.body | startswith($marker))) | .id] | first // empty')
+          if [ -n "${comment_id}" ]; then
+            gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" -f body="${body}" > /dev/null
+          else
+            gh api --method POST "${comments}" -f body="${body}" > /dev/null
+          fi
