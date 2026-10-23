@@ -6,7 +6,7 @@ enough of the round structure to know whose turn it is. The repository is
 `twilight-timer`.
 
 Each push to `main` deploys the app to the Cloudflare Worker `twilight-timer`
-in the futex account, at `https://twilight-timer.<account-subdomain>.workers.dev`.
+in the futex account, at https://twilight-timer.futex.workers.dev.
 
 ## Key features
 

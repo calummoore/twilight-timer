@@ -255,13 +255,7 @@ Entry           // one timed unit
   edited: bool                 // flagged if the duration was hand-edited
 
 Action          // the undo log — append-only, state is a fold over this
-  kind:     'turnEnded' | 'passed' | 'strategyCardPlayed' | 'phaseStepped'
-          | 'cardPicked' | 'reactionDone' | 'reactionExtended' | 'reactionClosed'
-          | 'statusStepToggled' | 'custodiansSet' | 'votingOpened' | 'voteCast'
-          | 'agendaResolved' | 'speakerMoved' | 'gameEnded'
-  at, plus the fields that the kind needs, such as playerId or card
-
-Pauses and limit changes are kept beside the action log, not in it.
+  one action per game tap, as Corrections lists, with its time
 ```
 
 Two rules make corrections tractable:
