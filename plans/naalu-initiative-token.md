@@ -191,12 +191,15 @@ Run the checks, push, and review the branch.
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
   Evidence: `.context/naalu-initiative-token/check.log`.
 - [x] Commit with Conventional Commits and push the branch.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
   - Review 1 found 3 findings. Fixed: 1, the faction select cut off long
     names. Report: `.context/naalu-initiative-token/review-1.md`.
+  - Review 2 checked fix commit 158a7ee: finding 1 is resolved, and it found
+    no new finding. The smoke log now has 17 checks, with the name-fit
+    check. Report: `.context/naalu-initiative-token/review-2.md`.
   - 2. No test loads a player with no faction. Severity Low, effort Small. Recommended: B, a round-trip test for each faction id and for no faction.
   - 3. Rail header says the card sets initiative. Severity Low, effort Small. Recommended: A, the header "Initiative order" in the app and the mockup.
   - `src/model/commands.ts`: undo of a Naalu token move leaves the time since the move on the running clock, as open finding 1 of the MVP plan describes. Separate branch.
