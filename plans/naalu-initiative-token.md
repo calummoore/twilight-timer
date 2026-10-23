@@ -1,7 +1,7 @@
 # Naalu "0" initiative token
 
-Status: Active. The work is on branch `calummoore/naalu-initiative-token-plan`.
-The plan closes when its PR merges.
+Status: Active. [PR #7](https://github.com/calummoore/twilight-timer/pull/7)
+is open. The plan closes when its PR merges.
 
 In TI4, the Naalu Collective faction has the ability Telepathic. At the end
 of each strategy phase, it puts the Naalu "0" token on the Naalu player's
@@ -288,7 +288,7 @@ conflict, and adapt the tests that met a rule from main.
   description copies them.
 - [x] Run the complete gate, audit the merge, and push.
   Evidence: `.context/naalu-initiative-token/merge/check.log`.
-- [ ] Open the PR and link it in the status paragraph.
+- [x] Open the PR and link it in the status paragraph.
 - [ ] Review the merge with the `implementation-review` skill after the
       push. Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
