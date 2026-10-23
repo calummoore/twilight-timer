@@ -142,6 +142,11 @@ The window closes when **either**:
 - every other player has marked themselves done, **or**
 - the window timer expires
 
+The table can also close the window early with **Mark all done**. It marks
+every player who is still waiting as done at that moment, and the window closes
+at once. Rejected: a warning before the window closes, because the label says
+what the tap does, and undo reverts a mis-tap.
+
 Per-player completion times inside the window are recorded, so a player who
 consistently soaks the whole secondary window shows up in the stats.
 

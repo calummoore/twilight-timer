@@ -125,7 +125,7 @@ export function ReactionOverlay(props: {
             ↺ Undo last
           </button>
           <button className="big small" onClick={props.onClose}>
-            CLOSE WINDOW
+            MARK ALL DONE
           </button>
         </div>
       </div>

@@ -869,12 +869,12 @@ const reactionScreen = w => `${actionScreen(false)}<div class="scrim"></div>
       <div class="note"><b style="color:var(--dim)">${w.tiles.filter(r=>r.done).length} of ${w.tiles.length} done.</b> Window closes automatically when the last player marks done.</div>
       <button class="ibtn">＋ Add 1:00</button>
       <button class="ibtn">↺ Undo last</button>
-      <button class="big" style="padding:15px 30px;font-size:18px">CLOSE WINDOW</button>
+      <button class="big" style="padding:15px 30px;font-size:18px">MARK ALL DONE</button>
     </div>
   </div>`;
 
 S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
- `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
  h:reactionScreen(WINDOWS.trade)};
 
 S.politics = {t:'Reaction Window — Politics', d:'ipad', note:
