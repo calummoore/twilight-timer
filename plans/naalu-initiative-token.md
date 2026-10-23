@@ -292,6 +292,11 @@ conflict, and adapt the tests that met a rule from main.
 - [ ] Review the merge with the `implementation-review` skill after the
       push. Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
+  - Review 5 found 1 finding. Fixed: 6, the follow-ups plan said MVP
+    finding 6 stays open. Report:
+    `.context/naalu-initiative-token/review-5.md`.
+  - `plans/mvp-review-follow-ups.md`: the status says that PR #2 is open, but PR #2 merged into main as 7c74a07. Separate branch.
+  - `docs/mockups/index.html`: the History events follow card order, such as "Jaz → Sam", but Sam is now the Naalu and goes first with 0. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
