@@ -47,7 +47,7 @@ body{
 .ibtn:hover{color:var(--txt); border-color:#3a4c62}
 .ibtn.warnish{color:var(--warn); border-color:#4a3a1c; background:#1d160a}
 /* icon-only button: a bigger glyph, stretched to the height of the buttons beside it */
-.ibtn.icon{align-self:stretch; padding:0 8px; font-size:24px; line-height:1}
+.ibtn.icon{align-self:stretch; padding:0 10px; font-size:24px; line-height:1}
 
 
 /* generic panels */
