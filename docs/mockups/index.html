@@ -96,6 +96,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   color:var(--dim); font-size:12px; font-weight:600; padding:8px 13px; border-radius:9px; cursor:pointer; font-family:var(--f)}
 .ibtn:hover{color:var(--txt); border-color:#3a4c62}
 .ibtn.warnish{color:var(--warn); border-color:#4a3a1c; background:#1d160a}
+/* icon-only button: a bigger glyph, stretched to the height of the buttons beside it */
+.ibtn.icon{align-self:stretch; padding:0 8px; font-size:24px; line-height:1}
 
 /* body grid */
 .body{flex:1; display:grid; grid-template-columns:1fr 428px; gap:18px; padding:18px 22px 20px; min-height:0}
@@ -582,7 +584,7 @@ const topBar = (phase, extra='') => `
     <div class="gt">Game <b class="num" data-clock="up" data-t="9847">2:44:07</b></div>
     <button class="ibtn">↺ Undo</button>
     <button class="ibtn">⏸ Pause</button>
-    <button class="ibtn">⚙</button>
+    <button class="ibtn icon">⚙</button>
   </div>`;
 
 /* ══════════════════ screens ══════════════════ */

@@ -60,7 +60,11 @@ export function TopBar(props: TopBarProps) {
       <button className="ibtn" onClick={props.onPause}>
         ⏸ Pause
       </button>
-      <button className="ibtn" onClick={props.onSettings} aria-label="Settings">
+      <button
+        className="ibtn icon"
+        onClick={props.onSettings}
+        aria-label="Settings"
+      >
         ⚙
       </button>
     </div>
