@@ -70,10 +70,13 @@ Tags: ui
 
 - [x] Run the complete gate named in `AGENTS.md`.
 - [x] Commit with Conventional Commits and push the branch.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - The review found one finding and no `Auto-fix: yes` finding, so no fix
+    round ran. Report: `.context/mvp-review-follow-ups/review-1.md`.
+  - 13. Pause during a reaction window has no test. Severity Low, effort Small. Recommended: B, three examples in `reaction.test.ts`: a pause, a game end, and a limit change during an open window.
 
 ## Post-merge follow-up (non-blocking)
 
