@@ -44,6 +44,14 @@ Decisions:
 - 2026-10-23: the list holds the 30 official factions, with the 5 factions
   of Thunder's Edge. A faction outside the list cannot be entered, so a
   player can choose no faction instead.
+- 2026-10-23, Cal: decision 4, option C. Every seat must pick an official
+  faction, and BEGIN GAME stays off until each seat has one. This replaces
+  the "no faction" choice of the entry above. Alternatives: A, keep the
+  faction optional, B, warn and continue, and D, require a choice with a
+  "No faction" choice, which was the recommendation. Reason: a forgotten
+  Naalu faction puts the Naalu player in card order for the whole game,
+  with no fix after the start. A faction outside the list cannot be
+  entered at all.
 
 Contract owners:
 
@@ -58,9 +66,13 @@ Contract owners:
   `src/ui/factions.ts`.
 - A player stores `factionId`, a faction id or null, in place of the
   free-text `faction`. The screens show the name from the list.
-- Setup shows one faction select for each seat, with an empty choice.
-  Taking a faction that another seat holds swaps the two factions, as
-  colours do. The Game panel names the Naalu player when one is chosen.
+- Setup shows one faction select for each seat. Its empty choice is a
+  placeholder that a player cannot pick. BEGIN GAME stays off until every
+  seat has a faction. Taking a faction that another seat holds swaps the
+  two factions, as colours do. The Game panel names the Naalu player when
+  one is chosen.
+- A player can still have no faction in a game from an older build, so
+  `factionId` stays nullable.
 - The stored game gets `naaluTokenOwnerId`: the player with the Naalu
   faction, or null. `startGame` sets it. A version 1 game gets null, so it
   folds exactly as before, also when a player is the Naalu.
@@ -203,6 +215,53 @@ Run the checks, push, and review the branch.
   - 2. No test loads a player with no faction. Severity Low, effort Small. Recommended: B, a round-trip test for each faction id and for no faction.
   - 3. Rail header says the card sets initiative. Severity Low, effort Small. Recommended: A, the header "Initiative order" in the app and the mockup.
   - `src/model/commands.ts`: undo of a Naalu token move leaves the time since the move on the running clock, as open finding 1 of the MVP plan describes. Separate branch.
+
+## Milestone 6: Required faction in the spec
+
+Decision 4 makes the faction required. State it in the spec before the
+screens change.
+
+- [x] Update "Factions" in `docs/product.md`: every seat needs a faction
+      before the game begins, with the rejected optional faction.
+
+## Milestone 7: Required faction in the mockup
+
+Tags: mockup
+
+Show the setup screen while a seat has no faction.
+
+- [x] Add the screen "Setup — Faction Missing": one seat shows the
+      placeholder, BEGIN GAME is off, and a hint asks for every faction.
+- [x] Update the setup note.
+- [x] Render the setup screens in headless Chrome. Save the screenshots
+      under `.context/naalu-initiative-token/mockup/`.
+- Evidence: `.context/naalu-initiative-token/mockup/setupMissing.png`.
+
+## Milestone 8: Required faction on the setup screen
+
+Tags: ui
+
+Turn BEGIN GAME off until every seat has a faction.
+
+- [x] Make the placeholder choice of the faction select unpickable.
+- [x] Turn BEGIN GAME off and show the hint while a seat has no faction.
+- [x] Scratch smoke test, not committed: BEGIN GAME is off with a missing
+      faction and on when every seat has one.
+- Evidence: `.context/naalu-initiative-token/smoke/smoke.log` and
+  `setup-missing.png`. All 22 checks passed, with no console error.
+
+## Milestone 9: Verification, commit, and review of decision 4
+
+Run the checks, push, and review the branch again.
+
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+  Evidence: `.context/naalu-initiative-token/check-3.log`.
+- [x] Commit with Conventional Commits and push the branch.
+- [ ] Review the complete local diff against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest. Findings 2 and 3 of review 1
+      stay open under Milestone 5.
 
 ## Post-merge follow-up (non-blocking)
 

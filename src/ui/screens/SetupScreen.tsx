@@ -40,6 +40,8 @@ export function SetupScreen(props: {
   const seats = rows.slice(0, count)
   const nameOf = (i: number) => seats[i]?.name.trim() || `Player ${i + 1}`
   const naalu = seats.findIndex((row) => row.factionId === NAALU)
+  // The game begins only when every seat has a faction.
+  const factionsMissing = seats.some((row) => row.factionId === null)
 
   const update = (i: number, patch: Partial<Row>) =>
     setRows((all) =>
@@ -194,7 +196,7 @@ export function SetupScreen(props: {
                     onChange={(e) => update(i, { name: e.target.value })}
                   />
                   <select
-                    className="fld sel"
+                    className={`fld sel ${row.factionId ? '' : 'none'}`}
                     aria-label="Faction"
                     value={row.factionId ?? ''}
                     onChange={(e) => {
@@ -204,7 +206,9 @@ export function SetupScreen(props: {
                       pickFaction(i, faction?.id ?? null)
                     }}
                   >
-                    <option value="">Faction</option>
+                    <option value="" disabled>
+                      Faction
+                    </option>
                     {FACTIONS.map((f) => (
                       <option key={f.id} value={f.id}>
                         {f.name}
@@ -226,6 +230,7 @@ export function SetupScreen(props: {
             count={count}
             speakerName={nameOf(speaker)}
             naaluName={naalu < 0 ? null : nameOf(naalu)}
+            factionsMissing={factionsMissing}
             settings={props.settings}
             onBegin={begin}
           />

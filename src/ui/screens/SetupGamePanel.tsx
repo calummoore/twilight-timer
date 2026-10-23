@@ -7,6 +7,8 @@ export function SetupGamePanel(props: {
   speakerName: string
   /** The player with the Naalu faction, or null when nobody has it. */
   naaluName: string | null
+  /** A seat has no faction yet, so the game cannot begin. */
+  factionsMissing: boolean
   settings: Settings
   onBegin: () => void
 }) {
@@ -64,9 +66,15 @@ export function SetupGamePanel(props: {
         </div>
       </div>
       <div style={{ padding: '16px 18px' }}>
+        {props.factionsMissing && (
+          <div className="setup-need">
+            Pick a faction for every seat to begin.
+          </div>
+        )}
         <button
           className="big"
           style={{ width: '100%', fontSize: 23, padding: 20 }}
+          disabled={props.factionsMissing}
           onClick={props.onBegin}
         >
           BEGIN GAME

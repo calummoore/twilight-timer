@@ -90,15 +90,21 @@ lives behind a secondary control rather than in the main flow.
 
 ### Factions
 
-Each player picks their faction at setup from the list of official factions,
-or picks none. The list holds every faction of the base game, its expansions,
-and the codices. The app stores the faction itself, not a typed name, so a rule
-that depends on a faction can find its player. Two players cannot hold the same
-faction: taking a faction that another seat holds swaps the two, as colours do.
+Each player picks their faction at setup from the list of official factions.
+The list holds every faction of the base game, its expansions, and the codices.
+The game cannot begin until every seat has a faction. The app stores the faction
+itself, not a typed name, so a rule that depends on a faction can find its
+player. Two players cannot hold the same faction: taking a faction that another
+seat holds swaps the two, as colours do.
 
 Rejected: a free-text faction field, because the app cannot apply a faction rule
 to a name that a player typed. A faction outside the official list cannot be
-entered, so its player picks none.
+entered. Rejected: an optional faction, because a forgotten Naalu faction would
+put the Naalu player in card order for the whole game, with no fix after the
+start.
+
+A game saved by an older build can hold a player without a faction, because
+those builds did not require one.
 
 ### Initiative order
 

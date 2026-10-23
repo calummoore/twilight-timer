@@ -205,6 +205,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .count b.on{background:var(--accent); border-color:var(--accent); color:#04211f}
 .kv{display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line); font-size:13.5px}
 .kv span{color:var(--dim)} .kv b{font-weight:600}
+.fld.sel.none{color:var(--faint)}
+.setup-need{font-size:12.5px; color:var(--warn); text-align:center; margin-bottom:10px}
 
 /* settings */
 .set-row{display:grid; grid-template-columns:1fr 200px 62px; gap:14px; align-items:center; padding:15px 18px;
@@ -591,9 +593,8 @@ const topBar = (phase, extra='') => `
 const S = {};
 
 /* ── 1. Setup ── */
-S.setup = {t:'Setup — New Game', d:'ipad', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here and moves only when someone moves it from the speaker chip, for example after Politics (3) is played. Factions come from the list of official factions, or none, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in every action phase.`,
- h:`<div class="space"></div><div class="lay">
+// missing: Wren has not picked a faction yet, so BEGIN GAME is off.
+const setupScreen = missing => `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">Load last game</button><button class="ibtn">⚙ Settings</button></div>
   <div class="content"><div class="setup-grid">
@@ -603,16 +604,18 @@ S.setup = {t:'Setup — New Game', d:'ipad', note:
         <div class="count">${[3,4,5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
       </div>
       <div style="overflow:auto;flex:1;min-height:0">
-      ${Object.entries(P).map(([id,d])=>`
+      ${Object.entries(P).map(([id,d])=>{
+        const none = missing && id==='wren';
+        return `
         <div class="seat ${d.speaker?'sp':''}" style="${col(id)}">
           <div class="drag">⠿</div>
           <div class="sn">Seat<br>${d.seat}</div>
           <div class="swatches">${['red','blue','green','yellow','purple','orange'].map(c=>
             `<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}</div>
           <div class="fld">${d.name}</div>
-          <div class="fld sel">${d.f} ▾</div>
+          <div class="fld sel ${none?'none':''}">${none?'Faction':d.f} ▾</div>
           <div class="spk ${d.speaker?'on':''}">★</div>
-        </div>`).join('')}
+        </div>`}).join('')}
       </div>
     </div>
     <div class="pnl" style="display:flex;flex-direction:column">
@@ -632,10 +635,19 @@ S.setup = {t:'Setup — New Game', d:'ipad', note:
           At 3–4 players each player picks <b style="color:var(--dim)">two</b> strategy cards and takes a turn at each initiative number. The app handles this automatically.</div>
       </div>
       <div style="padding:16px 18px">
-        <button class="big" style="width:100%;font-size:23px;padding:20px">BEGIN GAME</button>
+        ${missing?'<div class="setup-need">Pick a faction for every seat to begin.</div>':''}
+        <button class="big" style="width:100%;font-size:23px;padding:20px${missing?';opacity:.45':''}" ${missing?'disabled':''}>BEGIN GAME</button>
       </div>
     </div>
-  </div></div></div>`};
+  </div></div></div>`;
+
+S.setup = {t:'Setup — New Game', d:'ipad', note:
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here and moves only when someone moves it from the speaker chip, for example after Politics (3) is played. Each seat picks its faction from the list of official factions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in every action phase.`,
+ h:setupScreen(false)};
+
+S.setupMissing = {t:'Setup — Faction Missing', d:'ipad', note:
+ `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet.`,
+ h:setupScreen(true)};
 
 /* ── 2. Settings ── */
 const setRow = (lb,ds,val,on,off) => `<div class="set-row ${off?'off':''}">
@@ -1321,7 +1333,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['iPad — table device', ['setup','settings','seating','strategy','token','action','overtime','reaction','status','agenda','round','history','stats','join']],
+  ['iPad — table device', ['setup','setupMissing','settings','seating','strategy','token','action','overtime','reaction','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
