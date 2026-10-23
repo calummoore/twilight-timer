@@ -1,0 +1,5 @@
+/* Ported from docs/mockups/index.html: the layout helpers and the container queries that arrange each screen for the space. Prettier skips this folder, so it stays easy to compare with the mockup. */
+
+/* The top bar stays above a reaction window, so the table can still pause, undo or move the speaker. */
+.top.game{position:relative; z-index:5}
+.rw{inset:calc(var(--top-h, 68px) + 16px) 60px 30px}

@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefCallback,
+} from 'react'
 import type { Settings } from '../model/settings'
 import type { TimerView } from '../model/view'
 import { playAlarm } from './alarm'
@@ -41,6 +47,21 @@ export function useWakeLock(enabled: boolean): void {
       void lock?.release()
     }
   }, [enabled])
+}
+
+/** The rendered height of an element, kept current as it resizes. */
+export function useHeight<T extends HTMLElement>(): [
+  number | null,
+  RefCallback<T>,
+] {
+  const [height, setHeight] = useState<number | null>(null)
+  const ref = useCallback((el: T | null) => {
+    if (!el) return
+    const observer = new ResizeObserver(() => setHeight(el.offsetHeight))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return [height, ref]
 }
 
 export function isOver(timer: TimerView | null): boolean {

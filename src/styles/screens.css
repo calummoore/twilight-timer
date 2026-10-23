@@ -59,8 +59,9 @@
   color: var(--dim);
 }
 
+/* Full-screen screens cover the in-game top bar. */
 .settings-screen {
-  z-index: 5;
+  z-index: 6;
   background: var(--bg);
 }
 

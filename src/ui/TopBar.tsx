@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import type { Phase } from '../model/types'
 import { clock } from './format'
 
@@ -27,12 +28,14 @@ export interface TopBarProps {
   onUndo: () => void
   onPause: () => void
   onSettings: () => void
+  /** Measures the bar, so that overlays can open under it. */
+  ref?: Ref<HTMLDivElement>
 }
 
-export function TopBar(props: TopBarProps) {
+export function TopBar({ ref, ...props }: TopBarProps) {
   const at = ORDER.indexOf(props.phase)
   return (
-    <div className="top">
+    <div className="top game" ref={ref}>
       <div className="round">
         Round <b>{props.round}</b>
       </div>

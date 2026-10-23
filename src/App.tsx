@@ -26,6 +26,7 @@ import './styles/mockup/stats.css'
 import './styles/mockup/seating.css'
 import './styles/app.css'
 import './styles/screens.css'
+import './styles/mockup/responsive.css'
 
 const UNREADABLE = 'The saved game could not be read. Start a new game below.'
 

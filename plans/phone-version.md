@@ -95,10 +95,10 @@ Tags: ui
 Make Pause, Undo, Settings, and the speaker chip usable while a reaction
 window is open.
 
-- [ ] Put the in-game top bar above the reaction window scrim, and start the
+- [x] Put the in-game top bar above the reaction window scrim, and start the
       window below the top bar.
-- [ ] Smoke test: open a reaction window on the dev server, then pause and
-      resume.
+- [x] Smoke test: open a reaction window on the dev server, then pause and
+      resume. Evidence: `.context/phone-version/app/m3-*.png`.
 
 ## Milestone 4: Responsive app
 
