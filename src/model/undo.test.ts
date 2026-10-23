@@ -40,15 +40,16 @@ describe('undo', () => {
     expect(t.view().view).toMatchObject({ passedCount: 0 })
   })
 
-  it('keeps the running clock when the undone tap did not change it', () => {
+  it('returns the clocks to the tap also when the tap changed no clock', () => {
     const t = actionTable()
+    t.wait(10 * SEC)
     t.act({ kind: 'speakerMoved', playerId: 'kira' })
     t.wait(30 * SEC)
     t.undo()
     expect(t.view().speakerId).toBe('jaz')
     expect(t.view().timer).toMatchObject({
       playerId: 'tom',
-      elapsedMs: 30 * SEC,
+      elapsedMs: 10 * SEC,
     })
   })
 
@@ -81,6 +82,53 @@ describe('undo', () => {
         limitMs: 2 * MIN,
         pausedTurnMs: 10 * SEC,
       },
+    })
+  })
+
+  it('reopens the game when the game end is undone', () => {
+    const t = actionTable()
+    t.wait(MIN)
+    t.act({ kind: 'gameEnded' })
+    const ended = t.view().gameMs
+    t.wait(10 * MIN)
+    t.undo()
+    const view = t.view()
+    expect(view.view).toMatchObject({ phase: 'action', activeId: 'tom' })
+    expect(view.timer).toMatchObject({ playerId: 'tom', elapsedMs: MIN })
+    expect(view.gameMs).toBe(ended)
+  })
+
+  it('returns the clocks to the tap across a pause', () => {
+    const t = actionTable()
+    t.wait(20 * SEC)
+    const atTap = t.view().gameMs
+    t.act({ kind: 'turnEnded' })
+    t.wait(5 * SEC)
+    t.pause()
+    t.wait(10 * MIN)
+    t.resume()
+    t.wait(5 * SEC)
+    t.undo()
+    expect(t.view().timer).toMatchObject({
+      playerId: 'tom',
+      elapsedMs: 20 * SEC,
+    })
+    expect(t.view().gameMs).toBe(atTap)
+  })
+
+  it('keeps a self-closed reaction window closed when a later tap is undone', () => {
+    const t = table(LIMITS_ON) // the window limit is 2:00
+    playStrategy(t)
+    t.wait(10 * SEC)
+    t.act({ kind: 'strategyCardPlayed' })
+    t.wait(3 * MIN) // the window closes at 2:00, then Tom's turn runs 1:00
+    t.act({ kind: 'turnEnded' })
+    t.wait(10 * SEC)
+    t.undo()
+    expect(t.view().view).toMatchObject({ activeId: 'tom', reaction: null })
+    expect(t.view().timer).toMatchObject({
+      playerId: 'tom',
+      elapsedMs: 70 * SEC,
     })
   })
 

@@ -137,6 +137,10 @@ consistently soaks the whole secondary window shows up in the stats.
 Only one strategic action per player per round, so at most one window per player
 per action phase.
 
+The top bar stays usable while the window is open, so the table can pause, undo,
+or move the speaker. Rejected: covering the top bar with the window, because a
+break or a Politics speaker change can come during a window.
+
 ### Time limits and overtime
 
 All limits are **off by default**. When on, expiry is soft:

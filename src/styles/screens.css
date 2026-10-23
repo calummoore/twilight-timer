@@ -91,12 +91,6 @@
   cursor: default;
 }
 
-.rw {
-  z-index: 4;
-}
-.scrim {
-  z-index: 3;
-}
 .rw-f .spacer {
   flex: 1;
 }

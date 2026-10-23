@@ -1,7 +1,9 @@
 /* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
 /* reaction window */
 .scrim{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px)}
-.rw{position:absolute; inset:44px 60px; background:linear-gradient(180deg,#0f1722,#080c12);
+/* The top bar stays above the scrim: Pause, Undo, Settings, and the speaker chip work during a window. */
+.top{position:relative; z-index:2}
+.rw{position:absolute; inset:80px 60px 32px; background:linear-gradient(180deg,#0f1722,#080c12);
   border:1px solid #2b4a58; border-radius:20px; padding:26px 32px; display:flex; flex-direction:column;
   box-shadow:0 40px 110px rgba(0,0,0,.8)}
 .rw-h{display:flex; align-items:center; gap:16px; flex:none}
