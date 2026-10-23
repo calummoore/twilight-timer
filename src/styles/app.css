@@ -85,9 +85,10 @@ select.fld {
   background-position: right 10px center;
 }
 
-/* Setup rows: up and down buttons replace the drag handle. */
+/* Setup rows: up and down buttons replace the drag handle. The faction
+   column fits the longest faction name. */
 .seat {
-  grid-template-columns: 26px 34px 216px 1fr 170px 44px;
+  grid-template-columns: 26px 34px 216px 1fr max-content 44px;
 }
 .seat-move {
   display: flex;
