@@ -252,7 +252,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 
 /* reaction window */
 .scrim{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px)}
-.rw{position:absolute; inset:44px 60px; background:linear-gradient(180deg,#0f1722,#080c12);
+/* The top bar stays above the scrim: Pause, Undo, Settings, and the speaker chip work during a window. */
+.top{position:relative; z-index:2}
+.rw{position:absolute; inset:74px 60px 24px; background:linear-gradient(180deg,#0f1722,#080c12);
   border:1px solid #2b4a58; border-radius:20px; padding:26px 32px; display:flex; flex-direction:column;
   box-shadow:0 40px 110px rgba(0,0,0,.8)}
 .rw-h{display:flex; align-items:center; gap:16px; flex:none}
@@ -866,7 +868,7 @@ const reactionScreen = w => `${actionScreen(false)}<div class="scrim"></div>
   </div>`;
 
 S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
- `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries.`,
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
  h:reactionScreen(WINDOWS.trade)};
 
 S.politics = {t:'Reaction Window — Politics', d:'ipad', note:
