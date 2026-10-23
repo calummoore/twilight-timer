@@ -1,6 +1,6 @@
 # MVP review follow-ups
 
-Status: Active. Branch `calummoore/untitled-v1`. No PR is open yet. The plan
+Status: Active. [PR #2](https://github.com/calummoore/twilight-timer/pull/2) is open. The plan
 closes when its PR merges.
 
 [PR #1](https://github.com/calummoore/twilight-timer/pull/1) shipped the TI4
@@ -69,7 +69,7 @@ Tags: ui
 ## Milestone 5: Verification, commit, and review
 
 - [x] Run the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits and push the branch.
+- [x] Commit with Conventional Commits and push the branch.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
