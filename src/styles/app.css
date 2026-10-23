@@ -118,39 +118,7 @@ select.fld {
   margin-left: auto;
 }
 
-/* Full-stage overlays: pause and confirmation. */
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(2, 4, 7, 0.87);
-  backdrop-filter: blur(7px);
-  display: grid;
-  place-items: center;
-  z-index: 10;
-}
-.dialog {
-  width: 520px;
-  background: #121a24;
-  border: 1px solid var(--line2);
-  border-radius: 20px;
-  padding: 28px;
-}
-.dialog h3 {
-  font-size: 25px;
-  font-weight: 750;
-}
-.dialog p {
-  font-size: 14.5px;
-  color: var(--dim);
-  margin-top: 10px;
-  line-height: 1.55;
-}
-.dialog .btns {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-  justify-content: flex-end;
-}
+/* The pause card. Its overlay is in mockup/reaction.css, with the dialog. */
 .pause-card {
   text-align: center;
 }
