@@ -21,11 +21,11 @@ move to version 2, and version 1 games migrate on load.
 
 Decisions:
 
-- 2026-10-23: Each action that ends or changes a clock names that clock by
-  round, phase, and turn or agenda number. Undo names the action that it
-  removes. Alternative: add only the acting player to some actions.
-  Reason: plan review finding 2 of the multiplayer plan found repeats that
-  the player alone does not stop.
+- 2026-10-23: One model helper names the running clock by round, phase,
+  player, and turn or agenda number. Each action that ends or changes a
+  clock carries that name. Undo names the action that it removes.
+  Alternative: add only the acting player, or a name without the player.
+  Reason: plan reviews 1 and 2 found repeats that each partial name misses.
 
 Open decision, proposed on 2026-10-23, numbered as in the multiplayer plan:
 
@@ -46,15 +46,17 @@ State the action targets and the stored-game rule in the docs.
 
 Make every action safe to apply again on a newer state.
 
-- [ ] Each action that ends or changes a clock names that clock by round,
-      phase, and turn or agenda number. The fold rejects the action when
-      that clock does not run. Replace `statusStepToggled` with
-      `statusStepSet`.
+- [ ] Add one model helper that names the running clock by round, phase,
+      player, and turn or agenda number. Each action that ends or changes
+      a clock carries that name. The fold rejects the action when another
+      clock runs. Replace `statusStepToggled` with `statusStepSet`.
 - [ ] Undo names the action that it removes, not only the log length.
 - [ ] Update the parser, and pass the new fields from `GameScreen.tsx`.
-- [ ] Migrate the current game and the last game from their version 1 keys
-      on load. A replay of each log fills the new fields. The settings key
-      keeps version 1. Decision 16 can change the key layout.
+- [ ] Build the migration as ordered version steps, each tested with a
+      recorded game. The first step moves the current game and the last
+      game from version 1 to version 2. A replay of each log fills the new
+      fields. The settings key keeps version 1. Decision 16 can change the
+      key layout.
 - [ ] Add one table-driven test that applies each change twice. Test the
       migration of recorded version 1 games under both keys.
 

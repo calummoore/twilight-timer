@@ -196,7 +196,10 @@ times and a fixed random source.
 - [ ] Outbox: the pending changes in order, the game with them applied,
       and the next step after a write: done, retry, or drop with a notice.
 - [ ] Time base: move a game to server time, and give `now` for a game
-      from its time base.
+      from its time base. The mark is a new stored version. Its migration
+      step reads a game without the mark as device time.
+- [ ] A limits change names one timer or the master switch. The change
+      planner applies it to the newest limits of the game.
 - [ ] Join codes: make a code, read typed input, and parse a join link.
 - [ ] Companion views: who acts now and their clock, the turns before
       mine, my totals and card, my reaction tile, and my game stats.
@@ -248,7 +251,7 @@ Build the table device parts of the mockup.
 - [ ] Show the notice for a dropped tap.
 - [ ] In a shared game, Settings shows the newest limits of the game and
       changes only the edited timer.
-- [ ] Use the shared clock on every screen of a shared game.
+- [ ] Every screen takes `now` from the time base of its game.
 
 ## Milestone 7: Companion screens
 
@@ -277,9 +280,11 @@ Run the checks, push, and review the branch.
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
   - Plan review 1 of dbde952 found 8 findings. Fixed: 2, 3, 4, 5, and 7. Finding 1 got option A and stays open. The fixes of findings 2 and 5 moved to `plans/retry-safe-actions.md`. Report: `.context/multiplayer-live-sync/review-1.md`.
+  - Plan review 2 of 97fb703 found 4 findings, 17 to 20. Fixed: 17, 18, and 19, and the rest of 3 and 4. Report: `.context/multiplayer-live-sync/review-2.md`.
   - 1. A code holder can erase the game. Severity High, effort Small. Recommended: D, narrowed rules and six-character codes.
   - 6. CI steps for the rules are missing. Severity Low, effort Small. Recommended: A, a CI test step, the rules deploy first, and Cal's credential.
   - 8. Join mockup names a domain the app lacks. Severity Low, effort Small. Recommended: A, show the deployed address.
+  - 20. Finding 1 line cites an unrecorded option. Severity Low, effort Small. Recommended: A, record option D in the review report.
   - Follow-up: make the open game the one source of the limits in force. Effort Small. Covers finding 3. Previous examples: none.
   - `docs/mockups/index.html`: the Waiting note says "3 turns away", but its screen says "2 turns away". Separate branch.
 
