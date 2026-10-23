@@ -22,9 +22,10 @@ in the futex account, at https://twilight-timer.futex.workers.dev.
 ## Docs
 
 - [Product spec](docs/product.md): requirements, decisions, and the MVP scope.
-- [Mockup](docs/mockups/index.html): open it in a browser. Each table screen
-  has an iPad layout and a phone layout. A link such as `#action/phone` opens
-  one layout.
+- [Core concepts](docs/concepts.md): the game rules that the app models.
+- [Mockup](docs/mockups/index.html): open it in a browser. It draws each table
+  screen once, in an iPad, an upright iPad, and a phone frame. A link such as
+  `#action/phone` opens one frame. **Later** marks a control that is not built.
 - [Plans](plans/)
 
 ## Get started

@@ -217,7 +217,7 @@ Run the checks, push, and review the branch.
   - Review 1 found 10 findings. Fixed: 2, 4, 7, 8, and 9. Report:
     `.context/ti4-tempo-mvp/review-1.md`.
   - 1. Undo does not restore clocks after some taps. Severity Medium, effort Small. Recommended: A, keep the code and state the exception in the docs.
-  - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Recommended: B, keep the top bar above the scrim and update the mockup.
+  - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Recommended: B, keep the top bar above the scrim and update the mockup. Cal chose B on 2026-10-23. [phone-version.md](phone-version.md) Milestones 2 and 3 do it.
   - 5. Model tests skip key undo and attribution paths. Severity Low, effort Medium. Recommended: B, add a seeded property test.
   - 6. A version bump would hide saved games silently. Severity Low, effort Small. Recommended: B, one unversioned key and the version field.
   - 10. Stats screen prints "1 rounds" and "1 times". Severity Low, effort Small. Recommended: B, a shared plural helper.
