@@ -38,9 +38,9 @@ select {
 /*
  * The app is drawn at iPad size and scaled to fit the window's safe area, so
  * the status bar and the home indicator do not cover it. Stage.tsx sets the
- * transform. Do not centre the stage with grid or flex: when the window is
- * smaller than the stage, they pin it to the top left, and the scale then
- * pushes it off the right and bottom edges.
+ * transform. Do not centre the stage with grid `place-items: center`: when
+ * the window is smaller than the stage, the grid cell starts at the top left,
+ * and the scale then pushes the stage off the right and bottom edges.
  */
 .viewport {
   position: fixed;
