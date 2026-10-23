@@ -148,7 +148,7 @@ describe('the Naalu "0" token', () => {
     expect(activeId(t)).toBe('tom')
   })
 
-  it('undoes a move without voiding time', () => {
+  it('undoes a move and returns the clocks to the move', () => {
     const t = naaluTable()
     t.wait(5 * SEC)
     t.act({ kind: 'naaluTokenMoved', playerId: 'kira' })
@@ -156,7 +156,7 @@ describe('the Naalu "0" token', () => {
     t.undo()
     const view = t.view()
     expect(view.view).toMatchObject({ naaluTokenHolderId: 'sam' })
-    expect(view.timer).toMatchObject({ playerId: 'jaz', elapsedMs: 8 * SEC })
-    expect(t.game.voids).toEqual([])
+    expect(view.timer).toMatchObject({ playerId: 'jaz', elapsedMs: 5 * SEC })
+    expect(t.game.voids).toEqual([{ from: T0 + 5 * SEC, to: T0 + 8 * SEC }])
   })
 })

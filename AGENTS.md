@@ -51,6 +51,9 @@ skill at that moment instead of guessing the rule.
   versions, so that a saved game from an older build still loads.
 - A push to `main` deploys to Cloudflare. CI needs the repository variable
   `CLOUDFLARE_ACCOUNT_ID` and the repository secret `CLOUDFLARE_API_TOKEN`.
+- Each pull request from this repository gets a preview at
+  `https://pr-<number>-twilight-timer.futex.workers.dev`. A bot comment on
+  the pull request gives the link.
 
 ## Product
 

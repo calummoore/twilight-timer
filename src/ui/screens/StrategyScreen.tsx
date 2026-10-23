@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { STRATEGY_CARDS } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
-import { timerText } from '../format'
+import { plural, timerText } from '../format'
 import { NaaluTokenPicker } from './NaaluTokenPicker'
 
 type StrategyView = Extract<PhaseView, { phase: 'strategy' }>
@@ -135,7 +135,7 @@ export function StrategyScreen(props: {
           onClick={props.onBegin}
         >
           {remaining > 0
-            ? `BEGIN ACTION PHASE — ${remaining} ${remaining === 1 ? 'PICK' : 'PICKS'} REMAINING`
+            ? `BEGIN ACTION PHASE — ${plural(remaining, 'pick').toUpperCase()} REMAINING`
             : 'BEGIN ACTION PHASE'}
         </button>
       </div>

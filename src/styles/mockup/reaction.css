@@ -1,7 +1,9 @@
 /* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
 /* reaction window */
 .scrim{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px)}
-.rw{position:absolute; inset:44px 60px; background:linear-gradient(180deg,#0f1722,#080c12);
+/* The top bar stays above the scrim: Pause, Undo, Settings, and the speaker chip work during a window. */
+.top{position:relative; z-index:2}
+.rw{position:absolute; inset:74px 60px 24px; background:linear-gradient(180deg,#0f1722,#080c12);
   border:1px solid #2b4a58; border-radius:20px; padding:26px 32px; display:flex; flex-direction:column;
   box-shadow:0 40px 110px rgba(0,0,0,.8)}
 .rw-h{display:flex; align-items:center; gap:16px; flex:none}
@@ -31,3 +33,16 @@
   background:#242f3d; color:#7c8b9d; padding:2px 7px; border-radius:20px; font-weight:700}
 .rw-f{display:flex; align-items:center; gap:12px; margin-top:20px; flex:none}
 .rw-f .note{font-size:12.5px; color:var(--faint); line-height:1.5}
+/* Politics: the new speaker */
+.rw-spk{display:flex; align-items:center; gap:16px; padding:12px 14px; margin-bottom:16px; flex:none;
+  border:1px solid #3a3218; border-radius:13px; background:#0f0d08}
+.rw-spk .l{flex:none; width:190px}
+.rw-spk .l b{display:block; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:#f0cf6a}
+.rw-spk .l span{display:block; font-size:12.5px; color:var(--dim); margin-top:4px; line-height:1.4}
+.rw-spk .opts{display:flex; gap:8px; flex:1; min-width:0}
+.spkopt{flex:1; min-width:0; display:flex; align-items:center; justify-content:center; gap:7px; padding:11px 8px;
+  border:1px solid var(--line2); border-radius:10px; background:#0b111a; color:var(--txt);
+  font-family:var(--f); font-size:14px; font-weight:700; cursor:pointer}
+.spkopt i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal; flex:none}
+.spkopt .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.spkopt.on{border-color:#8a7530; background:#1a1509; color:#f0cf6a; box-shadow:0 0 0 1px #8a7530; cursor:default}

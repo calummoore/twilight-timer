@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MIN, SEC, passAll, playStrategy, table } from './test-table'
+import { LIMITS_ON, MIN, SEC, passAll, playStrategy, table } from './test-table'
 
 function statusTable() {
   const t = table()
@@ -71,6 +71,32 @@ describe('status, agenda, and the next round', () => {
     })
     expect(view.speakerId).toBe('sam')
     expect(view.custodiansRemoved).toBe(false)
+  })
+
+  it('charges every moment of a round to exactly one entry', () => {
+    const t = table(LIMITS_ON)
+    playStrategy(t)
+    t.wait(30 * SEC)
+    t.act({ kind: 'strategyCardPlayed' })
+    t.wait(20 * SEC)
+    t.act({ kind: 'reactionClosed' })
+    t.wait(15 * SEC)
+    t.act({ kind: 'turnEnded' })
+    t.pause()
+    t.wait(5 * MIN)
+    t.resume()
+    t.wait(10 * SEC)
+    t.act({ kind: 'turnEnded' })
+    t.wait(5 * SEC)
+    t.undo()
+    t.wait(25 * SEC)
+    passAll(t)
+    t.wait(2 * MIN)
+    t.act({ kind: 'phaseStepped' })
+    t.wait(MIN)
+    const view = t.view()
+    const total = view.entries.reduce((sum, e) => sum + e.durationMs, 0)
+    expect(total).toBe(view.gameMs)
   })
 
   it('ends the game from any phase and stops every clock', () => {

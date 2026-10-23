@@ -1,6 +1,7 @@
 import { factionName } from '../../model/factions'
 import { cardName } from '../../model/rules'
-import type { GameView, ReactionView } from '../../model/view'
+import type { Player } from '../../model/types'
+import type { GameView, ReactionView, SpeakerChoice } from '../../model/view'
 import { pc } from '../colour'
 import { clock, countdown } from '../format'
 
@@ -11,6 +12,7 @@ export function ReactionOverlay(props: {
   reaction: ReactionView
   onDone: (playerId: string) => void
   onExtend: (ms: number) => void
+  onSpeaker: (playerId: string) => void
   onUndo: () => void
   onClose: () => void
 }) {
@@ -60,6 +62,13 @@ export function ReactionOverlay(props: {
             />
           )}
         </div>
+        {r.speakerChoice && (
+          <SpeakerRow
+            choice={r.speakerChoice}
+            byId={byId}
+            onSpeaker={props.onSpeaker}
+          />
+        )}
         <div className="tiles">
           {r.tiles.map((tile) => {
             const p = byId.get(tile.playerId)
@@ -117,10 +126,54 @@ export function ReactionOverlay(props: {
             ↺ Undo last
           </button>
           <button className="big small" onClick={props.onClose}>
-            CLOSE WINDOW
+            MARK ALL DONE
           </button>
         </div>
       </div>
     </>
+  )
+}
+
+/** Politics: one tap hands the speaker token to a player. */
+function SpeakerRow(props: {
+  choice: SpeakerChoice
+  byId: Map<string, Player>
+  onSpeaker: (playerId: string) => void
+}) {
+  const { choice, byId } = props
+  const from = byId.get(choice.fromId)?.name
+  const chosen = choice.chosenId === null ? null : byId.get(choice.chosenId)
+
+  return (
+    <div className="rw-spk" role="group" aria-label="New speaker">
+      <div className="l">
+        <b>★ New speaker</b>
+        <span>
+          {chosen
+            ? `${chosen.name} is the new speaker.`
+            : `Tap the player who takes the token from ${from}.`}
+        </span>
+      </div>
+      <div className="opts">
+        {choice.options.map((id) => {
+          const p = byId.get(id)
+          const on = id === choice.chosenId
+          return (
+            <button
+              key={id}
+              className={`spkopt ${on ? 'on' : ''}`}
+              style={pc(p?.colour)}
+              aria-pressed={on}
+              disabled={on}
+              onClick={() => props.onSpeaker(id)}
+            >
+              <i />
+              <span className="n">{p?.name}</span>
+              {on && <span>★</span>}
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }

@@ -1,8 +1,6 @@
 import { NAALU } from './factions'
 import { foldGame } from './fold'
-import { gameClock, mergeIntervals } from './time'
 import type { Settings } from './settings'
-import { expireReaction } from './fold-state'
 import type { ActionInput, Game, Limits, Player } from './types'
 
 export function startGame(
@@ -40,19 +38,17 @@ export function act(game: Game, input: ActionInput, now: number): Game {
 }
 
 /**
- * Pops the last action. When the action changed which clock ran, the time
- * since the action is charged to nobody, so every clock returns to its
- * value at the moment of the action.
+ * Pops the last action. The time since the action is charged to nobody,
+ * so every clock returns to its value at the moment of the action.
  */
 export function undo(game: Game, now: number): Game {
   const last = game.actions.at(-1)
   if (!last || isPaused(game)) return game
-  const prev = { ...game, actions: game.actions.slice(0, -1) }
-  const sameClock = clockKey(prev, last.at) === clockKey(game, last.at)
-  const voids = sameClock
-    ? game.voids
-    : [...game.voids, { from: last.at, to: Math.max(now, last.at) }]
-  return { ...prev, voids }
+  return {
+    ...game,
+    actions: game.actions.slice(0, -1),
+    voids: [...game.voids, { from: last.at, to: Math.max(now, last.at) }],
+  }
 }
 
 export function canUndo(game: Game): boolean {
@@ -83,18 +79,4 @@ export function setLimits(
     ...game,
     limitsLog: [...game.limitsLog, { at: now, enforce, limits }],
   }
-}
-
-function clockKey(game: Game, wall: number): string {
-  const s = foldGame(game)
-  const excluded = mergeIntervals([...game.pauses, ...game.voids], wall)
-  const ms = gameClock(game.startedAt, excluded)(wall)
-  expireReaction(s, ms)
-  const seg = s.segment
-  const segKey = seg ? `${seg.kind}:${seg.playerId}:${seg.firstStartMs}` : '-'
-  // The window end counts too: an extension changes which clock runs later.
-  const r = s.reaction
-  const end = r?.limitMs == null ? '-' : r.limitMs + r.extraMs
-  const reactionKey = r ? `${r.startMs}:${end}` : '-'
-  return `${segKey}|${reactionKey}|${s.phase}`
 }

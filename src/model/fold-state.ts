@@ -24,6 +24,8 @@ export interface Segment {
 export interface Reaction {
   card: number
   byId: string
+  /** The speaker when the window opened. */
+  speakerAtStart: string
   startMs: number
   /** The window length when it opened, or null when no limit applies. */
   limitMs: number | null

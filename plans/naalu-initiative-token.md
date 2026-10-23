@@ -80,8 +80,8 @@ Contract owners:
   as the owner, and it resets to the owner when the next round starts.
 - The new action `naaluTokenMoved` gives the token to another seated
   player for the current round. It is valid only in the strategy phase of
-  a game with a token owner. It changes no running clock, so its undo voids
-  no time.
+  a game with a token owner. Undo takes it back, and every clock returns to
+  its value at the move, as for every tap.
 - One function in `orders.ts` maps the picks and the holder to initiative
   numbers. The holder gets 0, and each other player gets their card number.
   The first turn, the next turn, the rail, and the order strip of the
@@ -214,7 +214,7 @@ Run the checks, push, and review the branch.
     check. Report: `.context/naalu-initiative-token/review-2.md`.
   - 2. No test loads a player with no faction. Severity Low, effort Small. Recommended: D, one round-trip test of a sample game with one action of every kind, every faction, and no faction.
   - 3. Rail header says the card sets initiative. Severity Low, effort Small. Recommended: A, the header "Initiative order" in the app and the mockup.
-  - `src/model/commands.ts`: undo of a Naalu token move leaves the time since the move on the running clock, as open finding 1 of the MVP plan describes. Separate branch.
+  - `src/model/commands.ts`: undo of a Naalu token move leaves the time since the move on the running clock, as open finding 1 of the MVP plan describes. Resolved by PR #2, merged from `origin/main` in Milestone 10: undo now returns every clock to its value at the tap.
 
 ## Milestone 6: Required faction in the spec
 
@@ -270,6 +270,28 @@ Run the checks, push, and review the branch again.
     `.context/naalu-initiative-token/review-4.md`.
   - `src/styles/app.css`: the button reset sets `text-align: inherit`, so BEGIN GAME, BEGIN ACTION PHASE, and END TURN sit at the left, but the mockup centres them. Separate branch.
   - `src/model/types.ts`: the `naaluTokenOwnerId` comment says that the Naalu player holds the token each round, but Gift of Prescience can move it for one round. Separate branch.
+
+## Milestone 10: Merge origin/main
+
+Main moved ahead with PRs #2 to #6. Merge it, keep both sides of each
+conflict, and adapt the tests that met a rule from main.
+
+- [x] Merge `origin/main` at e8bd201 and resolve the conflicts in
+      `README.md`, `docs/mockups/index.html`, `plans/ti4-tempo-mvp.md`,
+      `src/model/derive.ts`, and `src/ui/screens/StrategyScreen.tsx`.
+- [x] Make the token undo test expect main's undo rule, and give main's
+      unknown-version test version 3 under the `.v2` key.
+- [x] Render the merged mockup screens in headless Chrome with no script
+      error.
+- Justifications for each path:
+  `.context/naalu-initiative-token/merge/justifications.md`. The PR
+  description copies them.
+- [x] Run the complete gate, audit the merge, and push.
+  Evidence: `.context/naalu-initiative-token/merge/check.log`.
+- [ ] Open the PR and link it in the status paragraph.
+- [ ] Review the merge with the `implementation-review` skill after the
+      push. Report the findings, then apply the review-fix rule: fix the
+      `Auto-fix: yes` findings, re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 

@@ -78,6 +78,16 @@ describe('storage', () => {
     expect(loadGame(store)).toEqual({ status: 'invalid' })
   })
 
+  it('rejects a saved game with an unknown version or a broken pause', () => {
+    const store = memoryStore()
+    const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
+    store.data.set('ti4tempo.game.v2', JSON.stringify({ ...game, version: 3 }))
+    expect(loadGame(store)).toEqual({ status: 'invalid' })
+    const pauses = [{ from: T0, to: 'later' }]
+    store.data.set('ti4tempo.game.v2', JSON.stringify({ ...game, pauses }))
+    expect(loadGame(store)).toEqual({ status: 'invalid' })
+  })
+
   it('keeps the archived game as the last game', () => {
     const store = memoryStore()
     const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
@@ -141,8 +151,6 @@ describe('storage', () => {
     expect(loadGame(store)).toEqual({ status: 'invalid' })
     const owner = { ...game, naaluTokenOwnerId: 'zed' }
     store.data.set('ti4tempo.game.v2', JSON.stringify(owner))
-    expect(loadGame(store)).toEqual({ status: 'invalid' })
-    store.data.set('ti4tempo.game.v2', JSON.stringify({ ...game, version: 3 }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
   })
 
