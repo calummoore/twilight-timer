@@ -62,9 +62,10 @@ To deploy by hand, run `npx wrangler login`, then `npm run build` and
 ### Pull request previews
 
 The same workflow gives each pull request a preview. Its `preview` job builds
-the newest commit of the pull request. Then it runs `wrangler versions upload`
-with the alias `pr-<number>`. This adds a version of the Worker but does not
-deploy it, so production does not change.
+the pull request head commit of each run. A rerun builds the same commit
+again. Then the job runs `wrangler versions upload` with the alias
+`pr-<number>`. This adds a version of the Worker but does not deploy it, so
+production does not change.
 
 The preview opens at `https://pr-<number>-twilight-timer.futex.workers.dev`.
 A bot comment on the pull request gives this link and a link to the exact

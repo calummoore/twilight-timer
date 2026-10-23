@@ -140,9 +140,9 @@ jobs:
           ${MARKER}
           **Preview:** ${ALIAS_URL}
 
-          This link opens commit ${HEAD_SHA:0:7}. Each successful preview run updates this comment.
+          This comment was last updated for commit ${HEAD_SHA:0:7}. Each successful preview run updates it.
 
-          Link to this commit only: ${VERSION_URL}
+          Link to commit ${HEAD_SHA:0:7} only: ${VERSION_URL}
           EOF
           )
           comments="repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments"
