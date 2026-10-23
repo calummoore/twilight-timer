@@ -88,12 +88,12 @@ export function RoundSummaryScreen(props: {
                   <div className="track">
                     <u
                       className="ac"
-                      style={{ width: width(p.turnMs - p.overtimeMs) }}
+                      style={{ width: width(p.turnMs - p.turnOvertimeMs) }}
                     />
-                    {p.overtimeMs > 0 && (
+                    {p.turnOvertimeMs > 0 && (
                       <u
                         className="ot"
-                        style={{ width: width(p.overtimeMs) }}
+                        style={{ width: width(p.turnOvertimeMs) }}
                       />
                     )}
                     <u className="win" style={{ width: width(p.reactionMs) }} />

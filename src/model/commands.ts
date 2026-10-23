@@ -90,5 +90,9 @@ function clockKey(game: Game, wall: number): string {
   expireReaction(s, ms)
   const seg = s.segment
   const segKey = seg ? `${seg.kind}:${seg.playerId}:${seg.firstStartMs}` : '-'
-  return `${segKey}|${s.reaction?.startMs ?? '-'}|${s.phase}`
+  // The window end counts too: an extension changes which clock runs later.
+  const r = s.reaction
+  const end = r?.limitMs == null ? '-' : r.limitMs + r.extraMs
+  const reactionKey = r ? `${r.startMs}:${end}` : '-'
+  return `${segKey}|${reactionKey}|${s.phase}`
 }

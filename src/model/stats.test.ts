@@ -47,10 +47,25 @@ describe('stats', () => {
     expect(stats.players[0]).toMatchObject({
       playerId: 'tom',
       turnMs: 4 * MIN,
-      overtimeMs: MIN,
+      turnOvertimeMs: MIN,
     })
     expect(stats.players.find((p) => p.playerId === 'jaz')).toMatchObject({
       reactionMs: 30 * SEC,
+    })
+  })
+
+  it('keeps pick overtime out of the own-turn overtime', () => {
+    const t = table(LIMITS_ON) // the pick limit is 0:45
+    t.wait(105 * SEC)
+    t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
+    t.act({ kind: 'gameEnded' })
+    const jaz = gameStats(t.view().entries, IDS).players.find(
+      (p) => p.playerId === 'jaz',
+    )
+    expect(jaz).toMatchObject({
+      turnOvertimeMs: 0,
+      limitOvertimeMs: MIN,
+      overLimitCount: 1,
     })
   })
 

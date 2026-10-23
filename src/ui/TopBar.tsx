@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import type { Phase } from '../model/types'
 import { clock } from './format'
 
@@ -28,7 +27,6 @@ export interface TopBarProps {
   onUndo: () => void
   onPause: () => void
   onSettings: () => void
-  extra?: ReactNode
 }
 
 export function TopBar(props: TopBarProps) {
@@ -53,7 +51,6 @@ export function TopBar(props: TopBarProps) {
         ★ Speaker: {props.speakerName}
       </button>
       <div className="spacer" />
-      {props.extra}
       <div className="gt">
         Game <b className="num">{clock(props.gameMs)}</b>
       </div>

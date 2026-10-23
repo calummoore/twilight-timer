@@ -152,9 +152,12 @@ under a master "enforce time limits" switch.
 
 ### Corrections
 
-Game state is a fold over an **append-only log of actions**. Four kinds exist:
-a turn ended, a player passed, a player played their strategy card, the round
-stepped a phase.
+Game state is a fold over an **append-only log of actions**. The log records
+every game tap: card picks, turns ended, passes, strategy cards played,
+reaction marks and window changes, phase steps, status steps, the Custodians
+switch, votes, agenda resolutions, speaker moves, and the game end. So undo can
+take back any tap. Pauses and time-limit changes are kept beside the log, not in
+it.
 
 Because state is *derived*, it is never edited directly. There are exactly two
 correction operations, and deliberately no others:
@@ -253,7 +256,12 @@ Entry           // one timed unit
 
 Action          // the undo log — append-only, state is a fold over this
   kind:     'turnEnded' | 'passed' | 'strategyCardPlayed' | 'phaseStepped'
-  playerId, at, entryId | null  // the Entry this action closed, if any
+          | 'cardPicked' | 'reactionDone' | 'reactionExtended' | 'reactionClosed'
+          | 'statusStepToggled' | 'custodiansSet' | 'votingOpened' | 'voteCast'
+          | 'agendaResolved' | 'speakerMoved' | 'gameEnded'
+  at, plus the fields that the kind needs, such as playerId or card
+
+Pauses and limit changes are kept beside the action log, not in it.
 ```
 
 Two rules make corrections tractable:

@@ -38,9 +38,9 @@ npm run check   # lint, format check, unit tests, and build
 ## Deploy
 
 The GitHub Actions workflow `.github/workflows/ci.yml` runs `npm run check` on
-every pull request and push. On a push to `main`, it then runs
-`wrangler deploy`, which uploads `dist/` as static assets. `wrangler.jsonc`
-configures the Worker.
+every pull request and on every push to `main`. On a push to `main`, it then
+runs `wrangler deploy`, which uploads `dist/` as static assets.
+`wrangler.jsonc` configures the Worker.
 
 One-time setup:
 

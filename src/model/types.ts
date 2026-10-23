@@ -54,8 +54,6 @@ export type Action =
   | { kind: 'speakerMoved'; at: number; playerId: string }
   | { kind: 'gameEnded'; at: number }
 
-export type ActionKind = Action['kind']
-
 /** An action before it gets its timestamp. */
 export type ActionInput = Action extends infer A
   ? A extends Action

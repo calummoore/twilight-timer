@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MIN, SEC, playStrategy, table } from './test-table'
+import { LIMITS_ON, MIN, SEC, playStrategy, table } from './test-table'
 
 function actionTable() {
   const t = table()
@@ -63,6 +63,24 @@ describe('undo', () => {
     t.undo()
     expect(t.view().view).toMatchObject({
       reaction: { doneCount: 4, elapsedMs: 8 * SEC },
+    })
+  })
+
+  it('restores an open reaction window when an extension is undone late', () => {
+    const t = table(LIMITS_ON) // the window limit is 2:00
+    playStrategy(t)
+    t.wait(10 * SEC)
+    t.act({ kind: 'strategyCardPlayed' })
+    t.wait(110 * SEC)
+    t.act({ kind: 'reactionExtended', ms: MIN })
+    t.wait(20 * SEC) // past the old 2:00 end
+    t.undo()
+    expect(t.view().view).toMatchObject({
+      reaction: {
+        elapsedMs: 110 * SEC,
+        limitMs: 2 * MIN,
+        pausedTurnMs: 10 * SEC,
+      },
     })
   })
 

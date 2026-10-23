@@ -132,16 +132,14 @@ export function StatsScreen(props: {
                       <u
                         className="ac"
                         style={{
-                          width: width(
-                            p.turnMs - Math.min(p.turnMs, p.overtimeMs),
-                          ),
+                          width: width(p.turnMs - p.turnOvertimeMs),
                         }}
                       />
-                      {p.overtimeMs > 0 && (
+                      {p.turnOvertimeMs > 0 && (
                         <u
                           className="ot"
                           style={{
-                            width: width(Math.min(p.turnMs, p.overtimeMs)),
+                            width: width(p.turnOvertimeMs),
                           }}
                         />
                       )}
@@ -185,7 +183,7 @@ export function StatsScreen(props: {
                         }}
                       >
                         {p.overLimitCount
-                          ? `${p.overLimitCount} · ${clock(p.overtimeMs)}`
+                          ? `${p.overLimitCount} · ${clock(p.limitOvertimeMs)}`
                           : '—'}
                       </td>
                       <td className="num">{percent(p.share, 1)}</td>

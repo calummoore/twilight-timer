@@ -1,6 +1,6 @@
 # TI4 Tempo MVP and Cloudflare deploy
 
-Status: Active. Branch `calummoore/twilight-imperium-app-plan`. No PR is open yet.
+Status: Active. [PR #1](https://github.com/calummoore/twilight-timer/pull/1) is open.
 The plan closes when its PR merges.
 
 TI4 Tempo is a shared-table time tracker for Twilight Imperium 4th Edition.
@@ -38,8 +38,9 @@ Decisions:
   minus the time of the last action, so a reload or a sleeping iPad loses
   no time. Undo pops the last action.
 - 2026-10-23: The spec sketch names four action kinds. The log also records
-  setup, card picks, reaction marks, votes, status steps, speaker moves,
-  and pauses, so that undo covers every tap.
+  card picks, reaction marks, votes, status steps, speaker moves, and the
+  game end, so that undo covers every tap. Setup, pauses, and limit changes
+  are kept beside the log.
 - 2026-10-23: Design. Port the mockup CSS and keep its class names. Reason:
   it is the fastest way to match the mockup.
 - 2026-10-23: Spec open questions. A pause charges nobody and is logged on
@@ -207,11 +208,19 @@ fit the window, as the mockup does.
 Run the checks, push, and review the branch.
 
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits and push the branch.
+- [x] Commit with Conventional Commits and push the branch.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 1 found 10 findings. Fixed: 2, 4, 7, 8, and 9. Report:
+    `.context/ti4-tempo-mvp/review-1.md`.
+  - 1. Undo does not restore clocks after some taps. Severity Medium, effort Small. Recommended: A, keep the code and state the exception in the docs.
+  - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Recommended: B, keep the top bar above the scrim and update the mockup.
+  - 5. Model tests skip key undo and attribution paths. Severity Low, effort Medium. Recommended: B, add a seeded property test.
+  - 6. A version bump would hide saved games silently. Severity Low, effort Small. Recommended: B, one unversioned key and the version field.
+  - 10. Stats screen prints "1 rounds" and "1 times". Severity Low, effort Small. Recommended: B, a shared plural helper.
+  - Follow-up: add an unused-export check such as knip to `npm run check`. Effort Large. Covers finding 9. Previous examples: none.
 
 ## Post-merge follow-up (non-blocking)
 

@@ -3,7 +3,8 @@ import type { Entry } from './types'
 export interface PlayerRoundStats {
   playerId: string
   turnMs: number
-  overtimeMs: number
+  /** Overtime on the player's own turns only. */
+  turnOvertimeMs: number
   /** Time the player took to mark done in other players' reaction windows. */
   reactionMs: number
 }
@@ -30,8 +31,12 @@ export interface PlayerGameStats {
   turns: number
   averageMs: number
   worstMs: number
+  /** Entries of any kind that passed their limit: turns, picks, and votes. */
   overLimitCount: number
-  overtimeMs: number
+  /** Overtime on the player's own turns only. */
+  turnOvertimeMs: number
+  /** Overtime on every limit: turns, picks, and votes. */
+  limitOvertimeMs: number
   reactionMs: number
   /** Share of all own-turn time, from 0 to 1. */
   share: number
@@ -90,7 +95,7 @@ export function roundStats(
         return {
           playerId,
           turnMs: sum(own),
-          overtimeMs: overtime(own),
+          turnOvertimeMs: overtime(own),
           reactionMs: reactionTime(windows, playerId),
         }
       })
@@ -142,7 +147,8 @@ export function gameStats(
           averageMs: own.length ? turnMs / own.length : 0,
           worstMs: Math.max(0, ...own.map((e) => e.durationMs)),
           overLimitCount: mineAll.filter((e) => e.overtimeMs > 0).length,
-          overtimeMs: overtime(mineAll),
+          turnOvertimeMs: overtime(own),
+          limitOvertimeMs: overtime(mineAll),
           reactionMs: reactionTime(windows, playerId),
           share: turnsMs ? turnMs / turnsMs : 0,
         }
