@@ -46,8 +46,9 @@ body{
   color:var(--dim); font-size:12px; font-weight:600; padding:8px 13px; border-radius:9px; cursor:pointer; font-family:var(--f)}
 .ibtn:hover{color:var(--txt); border-color:#3a4c62}
 .ibtn.warnish{color:var(--warn); border-color:#4a3a1c; background:#1d160a}
-/* icon-only button: a bigger glyph, stretched to the height of the buttons beside it */
-.ibtn.icon{align-self:stretch; padding:0 10px; font-size:24px; line-height:1}
+/* icon-only button: an 18px SVG icon, stretched to the height of the buttons beside it */
+.ibtn.icon{align-self:stretch; padding:0 8px}
+.ibtn.icon svg{width:18px; height:18px; fill:currentColor}
 
 
 /* generic panels */

@@ -96,8 +96,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   color:var(--dim); font-size:12px; font-weight:600; padding:8px 13px; border-radius:9px; cursor:pointer; font-family:var(--f)}
 .ibtn:hover{color:var(--txt); border-color:#3a4c62}
 .ibtn.warnish{color:var(--warn); border-color:#4a3a1c; background:#1d160a}
-/* icon-only button: a bigger glyph, stretched to the height of the buttons beside it */
-.ibtn.icon{align-self:stretch; padding:0 10px; font-size:24px; line-height:1}
+/* icon-only button: an 18px SVG icon, stretched to the height of the buttons beside it */
+.ibtn.icon{align-self:stretch; padding:0 8px}
+.ibtn.icon svg{width:18px; height:18px; fill:currentColor}
 
 /* body grid */
 .body{flex:1; display:grid; grid-template-columns:1fr 428px; gap:18px; padding:18px 22px 20px; min-height:0}
@@ -569,6 +570,9 @@ const railRow = p => {
     </div></div>`;
 };
 
+/* solid gear with eight teeth and a round hole, in a 24x24 box */
+const GEAR = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M9.9 4L10.1 1.2L13.9 1.2L14.1 4L16.2 4.8L18.3 3L21 5.7L19.2 7.8L20 9.9L22.8 10.1L22.8 13.9L20 14.1L19.2 16.2L21 18.3L18.3 21L16.2 19.2L14.1 20L13.9 22.8L10.1 22.8L9.9 20L7.8 19.2L5.7 21L3 18.3L4.8 16.2L4 14.1L1.2 13.9L1.2 10.1L4 9.9L4.8 7.8L3 5.7L5.7 3L7.8 4.8ZM15.3 12a3.3 3.3 0 1 0 -6.6 0a3.3 3.3 0 1 0 6.6 0Z"/></svg>`;
+
 const topBar = (phase, extra='') => `
   <div class="top">
     <div class="round">Round <b>3</b></div>
@@ -584,7 +588,7 @@ const topBar = (phase, extra='') => `
     <div class="gt">Game <b class="num" data-clock="up" data-t="9847">2:44:07</b></div>
     <button class="ibtn">↺ Undo</button>
     <button class="ibtn">⏸ Pause</button>
-    <button class="ibtn icon">⚙</button>
+    <button class="ibtn icon" aria-label="Settings">${GEAR}</button>
   </div>`;
 
 /* ══════════════════ screens ══════════════════ */
