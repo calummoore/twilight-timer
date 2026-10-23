@@ -1068,11 +1068,11 @@ S.round = {t:'Round Summary', d:'ipad', note:
 /* ── 9. History & Undo ── */
 // append-only action log, newest first. Undo pops from the top.
 const EV = [
-  {ico:'▸', t:'Turn ended',             d:'Sam → Kira',             dur:'2:31', ago:'14s ago', head:1},
-  {ico:'▸', t:'Turn ended',             d:'Jaz → Sam',              dur:'0:14', ago:'1m ago', warn:'Unusually short'},
-  {ico:'⊘', t:'Wren passed',            d:'Initiative 2',                       ago:'4m ago'},
+  {ico:'▸', t:'Turn ended',             d:'Jaz → Kira',             dur:'2:31', ago:'14s ago', head:1},
+  {ico:'⊘', t:'Wren passed',            d:'Initiative 2',                       ago:'3m ago'},
   {ico:'⊘', t:'Tom passed',             d:'Initiative 1',                       ago:'5m ago', sel:1},
-  {ico:'▸', t:'Turn ended',             d:'Priya → Tom',            dur:'4:12', ot:'+1:12', ago:'9m ago', edit:1},
+  {ico:'▸', t:'Turn ended',             d:'Sam → Tom',              dur:'0:14', ago:'9m ago', warn:'Unusually short'},
+  {ico:'▸', t:'Turn ended',             d:'Priya → Sam',            dur:'4:12', ot:'+1:12', ago:'9m ago', edit:1},
   {ico:'◷', t:'Reaction window closed', d:'Technology (7)',         dur:'1:38', ago:'11m ago'},
   {ico:'★', t:'Strategy card played',   d:'Priya — Technology (7)',             ago:'13m ago'},
   {ico:'▸', t:'Turn ended',             d:'Kira → Priya',           dur:'3:20', ago:'13m ago'},
@@ -1093,8 +1093,8 @@ S.history = {t:'History & Undo', d:'ipad', note:
   <div class="content">
     <div class="undo-bar">
       <div style="flex:1"><div class="k">Last action</div>
-        <div class="v">Turn ended — Sam → Kira</div>
-        <div class="s">14 seconds ago · undoing returns Sam's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to him</div></div>
+        <div class="v">Turn ended — Jaz → Kira</div>
+        <div class="s">14 seconds ago · undoing returns Jaz's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to Jaz</div></div>
       <button class="big" style="padding:18px 34px;font-size:21px">↺ UNDO</button>
     </div>
     <div class="pnl">
@@ -1108,11 +1108,11 @@ S.history = {t:'History & Undo', d:'ipad', note:
             <div class="ago">${e.ago}</div>
             <div class="cascade">
               <div class="w"><span>↺</span>Undo back to here?</div>
-              <div class="l">That's <b>4 presses of undo</b> — everything above this row comes off the log too:
-                <b>Wren's pass</b> and the two turns taken since. About <b>5 minutes</b> of recorded time returns
+              <div class="l">That's <b>3 presses of undo</b> — everything above this row comes off the log too:
+                <b>Wren's pass</b> and Jaz's turn after it. About <b>5 minutes</b> of recorded time returns
                 to the clocks, and Tom rejoins the initiative order.</div>
               <div class="btns"><button class="mini">Cancel</button>
-                <button class="mini dn" style="padding:8px 15px">Undo 4 actions</button></div>
+                <button class="mini dn" style="padding:8px 15px">Undo 3 actions</button></div>
             </div></div>`;
           if(e.edit) return `<div class="ev" style="border-color:#33566b;background:#0c1721">
             <div class="ico">${e.ico}</div>

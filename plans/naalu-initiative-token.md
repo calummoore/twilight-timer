@@ -289,14 +289,18 @@ conflict, and adapt the tests that met a rule from main.
 - [x] Run the complete gate, audit the merge, and push.
   Evidence: `.context/naalu-initiative-token/merge/check.log`.
 - [x] Open the PR and link it in the status paragraph.
-- [ ] Review the merge with the `implementation-review` skill after the
+- [x] Review the merge with the `implementation-review` skill after the
       push. Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
   - Review 5 found 1 finding. Fixed: 6, the follow-ups plan said MVP
     finding 6 stays open. Report:
     `.context/naalu-initiative-token/review-5.md`.
   - `plans/mvp-review-follow-ups.md`: the status says that PR #2 is open, but PR #2 merged into main as 7c74a07. Separate branch.
-  - `docs/mockups/index.html`: the History events follow card order, such as "Jaz → Sam", but Sam is now the Naalu and goes first with 0. Separate branch.
+  - Review 6 checked fix commit 86b2492: finding 6 is resolved. It found 2
+    findings. Fixed: 7, the History events of the mockup followed card
+    order, although Sam is the Naalu. No further fix round runs. Report:
+    `.context/naalu-initiative-token/review-6.md`.
+  - 8. Fix commit title has 51 characters. Severity Low, effort Small. Recommended: A, leave the titles of 86b2492 and df26f09, because a squash merge keeps them off `main`.
 
 ## Post-merge follow-up (non-blocking)
 
