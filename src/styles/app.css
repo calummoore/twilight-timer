@@ -35,21 +35,29 @@ select {
   cursor: default;
 }
 
-/* The app is drawn at iPad size and scaled to fit the window. */
+/*
+ * The app is drawn at iPad size and scaled to fit the window's safe area, so
+ * the status bar and the home indicator do not cover it. Stage.tsx sets the
+ * transform. Do not centre the stage with grid or flex: when the window is
+ * smaller than the stage, they pin it to the top left, and the scale then
+ * pushes it off the right and bottom edges.
+ */
 .viewport {
   position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
+  top: env(safe-area-inset-top, 0px);
+  right: env(safe-area-inset-right, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
+  left: env(safe-area-inset-left, 0px);
   overflow: hidden;
   background: var(--bg);
 }
 .stage {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 1194px;
   height: 834px;
   overflow: hidden;
-  flex: none;
 }
 
 .clock-over {
