@@ -1,0 +1,11 @@
+{
+  "name": "TI4 Tempo",
+  "short_name": "TI4 Tempo",
+  "description": "A shared-table time tracker for Twilight Imperium.",
+  "display": "standalone",
+  "orientation": "landscape",
+  "start_url": "/",
+  "background_color": "#05070b",
+  "theme_color": "#05070b",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

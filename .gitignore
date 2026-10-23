@@ -1,0 +1,21 @@
+# Scratch output
+.context/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Build and tool output
+node_modules
+dist
+dist-ssr
+.wrangler/
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.sw?

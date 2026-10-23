@@ -1,0 +1,27 @@
+/* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
+/* strategy cards */
+.cards{display:grid; grid-template-columns:repeat(4,1fr); gap:13px}
+.card{border:1px solid var(--line2); border-radius:12px; padding:15px; background:#0a0f16; position:relative; min-height:132px;
+  display:flex; flex-direction:column}
+.card .n{font-size:38px; font-weight:800; letter-spacing:-.04em; color:var(--faint); line-height:1}
+.card .nm{font-size:15px; font-weight:650; margin-top:5px}
+.card.taken{background:color-mix(in srgb,var(--pc) 12%, #0a0f16); border-color:color-mix(in srgb,var(--pc) 55%, transparent)}
+.card.taken .n{color:var(--pc)}
+.card .own{margin-top:auto; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:650}
+.card .own i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
+.card .free{margin-top:auto; font-size:12px; color:var(--faint)}
+.card .tg{position:absolute; top:12px; right:12px; background:#2a2410; border:1px solid #5e4f1c; color:#e8c95a;
+  font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:20px}
+.card.next{border-style:dashed; border-color:#33566b; background:#080e15}
+.card.next .free{color:var(--accent); font-weight:600}
+.picker{display:flex; align-items:center; gap:14px; background:#0d1620; border:1px solid #23404b;
+  border-radius:12px; padding:14px 18px; margin-bottom:16px}
+.picker .who{font-size:19px; font-weight:700; display:flex; align-items:center; gap:9px}
+.picker .who i{width:13px; height:13px; border-radius:50%; background:var(--pc); font-style:normal}
+.picker .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.picker .t{margin-left:auto; font-size:30px; font-weight:700; letter-spacing:-.02em}
+.order-strip{display:flex; gap:7px; margin-top:16px; align-items:center; flex-wrap:wrap}
+.order-strip .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-right:5px}
+.oc{display:flex; align-items:center; gap:7px; background:#0d131c; border:1px solid var(--line2); border-radius:20px; padding:5px 12px 5px 8px; font-size:13px; font-weight:600}
+.oc i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.oc b{color:var(--pc); font-weight:800; font-size:12px}

@@ -1,0 +1,29 @@
+/* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
+.ringwrap{position:relative; width:500px; height:410px; margin:0 auto}
+.ringwrap::before{content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:300px; height:230px; border-radius:50%; border:1px dashed #263544; background:#080d14}
+.ringwrap .cc{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; width:230px}
+.ringwrap .cc .l{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
+.ringwrap .cc .v{font-size:19px; font-weight:700; margin-top:7px; color:#f0cf6a}
+.ringwrap .cc .s{font-size:11.5px; color:var(--faint); margin-top:9px; line-height:1.5}
+.seatnode{position:absolute; transform:translate(-50%,-50%); width:112px; padding:11px 8px; text-align:center;
+  border:1px solid var(--line2); border-radius:12px; background:#0b111a; cursor:pointer}
+.seatnode i{width:13px; height:13px; border-radius:50%; background:var(--pc); font-style:normal; display:block; margin:0 auto}
+.seatnode .nm{font-size:15px; font-weight:700; margin-top:6px}
+.seatnode .sn2{font-size:10.5px; color:var(--faint); margin-top:2px; letter-spacing:.08em; text-transform:uppercase}
+.seatnode.isspk{border-color:#8a7530; background:#1a1509; box-shadow:0 0 0 1px #8a7530, 0 0 26px rgba(240,207,106,.14)}
+.seatnode .tok{position:absolute; top:-11px; left:50%; transform:translateX(-50%); background:#f0cf6a; color:#2a2008;
+  font-size:11px; font-weight:800; width:24px; height:24px; border-radius:50%; display:grid; place-items:center}
+.seatnode .hint{position:absolute; bottom:-9px; left:50%; transform:translateX(-50%); white-space:nowrap;
+  background:var(--accent); color:#04211f; font-size:9px; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; padding:2px 8px; border-radius:20px}
+.seatnode.cand{border-style:dashed; border-color:#33566b}
+.ordlist{display:flex; flex-direction:column; gap:5px}
+.ordrow{display:grid; grid-template-columns:24px 1fr auto; gap:11px; align-items:center; padding:7px 12px;
+  border:1px solid var(--line); border-radius:9px; background:#0a0f16; font-size:14px}
+.ordrow .n2{font-size:12px; color:var(--faint); text-align:center; font-weight:700}
+.ordrow .nm{font-weight:650; display:flex; align-items:center; gap:8px}
+.ordrow .nm i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.ordrow .tag2{font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:800;
+  padding:2px 7px; border-radius:20px; background:#2a2210; color:#f0cf6a}
+.ordrow.isspk{border-color:#5a4d22; background:#14110a}
