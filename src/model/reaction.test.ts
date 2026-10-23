@@ -31,20 +31,23 @@ describe('reaction window', () => {
     })
   })
 
-  it('shows which players have not marked done', () => {
+  it('marks every waiting player done at once', () => {
     const t = openWindow()
     t.wait(5 * SEC)
     t.act({ kind: 'reactionDone', playerId: 'jaz' })
-    const view = t.view().view
-    const tiles = view.phase === 'action' ? view.reaction?.tiles : []
-    // Seat order. A tile without a time makes Done ask first.
-    expect(tiles?.map((tile) => [tile.playerId, tile.tookMs])).toEqual([
-      ['jaz', 5 * SEC],
-      ['kira', null],
-      ['priya', null],
-      ['sam', null],
-      ['wren', null],
-    ])
+    t.wait(25 * SEC)
+    t.act({ kind: 'reactionClosed' }) // Mark all done
+    const window = t.view().entries.find((e) => e.kind === 'reaction')
+    const took = Object.fromEntries(
+      window?.reactions?.map((r) => [r.playerId, r.tookMs / SEC]) ?? [],
+    )
+    // Jaz keeps their own time. The others get the whole window.
+    expect(took).toEqual({ jaz: 5, kira: 30, priya: 30, sam: 30, wren: 30 })
+    expect(t.view().timer).toMatchObject({
+      kind: 'turn',
+      playerId: 'tom',
+      elapsedMs: 10 * SEC,
+    })
   })
 
   it('closes when every other player is done and resumes the turn', () => {
