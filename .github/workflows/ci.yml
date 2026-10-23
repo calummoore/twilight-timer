@@ -140,7 +140,7 @@ jobs:
           ${MARKER}
           **Preview:** ${ALIAS_URL}
 
-          This link opens commit ${HEAD_SHA:0:7}, the newest commit of this pull request. This comment changes after each push.
+          This link opens commit ${HEAD_SHA:0:7}. Each successful preview run updates this comment.
 
           Link to this commit only: ${VERSION_URL}
           EOF

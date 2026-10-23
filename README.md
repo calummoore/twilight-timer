@@ -68,7 +68,7 @@ deploy it, so production does not change.
 
 The preview opens at `https://pr-<number>-twilight-timer.futex.workers.dev`.
 A bot comment on the pull request gives this link and a link to the exact
-commit. The comment changes after each push.
+commit. Each successful preview run updates the comment.
 
 - Pull requests from forks get no preview, because their runs get no secrets.
   A run without the Cloudflare secrets skips the preview with a warning.
