@@ -490,7 +490,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .setup-label{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-bottom:9px}
 .setup-help{font-size:12px; color:var(--faint); line-height:1.6; margin-top:18px}
 .setup-help b{color:var(--dim)}
-.seat{grid-template-columns:26px 34px minmax(0,216px) minmax(120px,1fr) minmax(110px,170px) 44px}
+.seat{grid-template-columns:26px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,170px) 44px}
 .seat .swatches{flex-wrap:wrap}
 .seat-move{display:flex; flex-direction:column; gap:2px}
 .seat-move b{color:var(--faint); font-size:11px; font-weight:400; line-height:1; padding:3px 0; border-radius:5px; text-align:center}
@@ -576,7 +576,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .top.game .spacer{display:none}
   .content, .body, .scroll{overflow:visible; min-height:auto}
   .body{grid-template-columns:1fr; padding:14px 16px 18px}
-  .split{grid-template-columns:1fr}
+  .split{grid-template-columns:minmax(0,1fr)}
   .grow{flex:none}
   .hero{min-height:auto}
   .hero .bigclock{margin:20px 0 0; font-size:clamp(84px, 26cqw, 186px)}
@@ -713,10 +713,10 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .picker .t{grid-area:t; font-size:34px}
   .picker .picker-help{grid-area:help; margin:0; max-width:none}
   .picker .spkb{grid-area:spk; justify-self:start; margin:0; padding:9px 12px}
-  .cards{grid-template-columns:1fr 1fr; gap:8px}
+  .cards{grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px}
   .card{display:grid; grid-template-columns:34px 1fr; column-gap:8px; min-height:0; padding:11px 12px}
   .card .n{font-size:28px; grid-row:span 2}
-  .card .nm{font-size:14.5px; margin-top:1px}
+  .card .nm{font-size:14.5px; margin-top:1px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .card .own, .card .free{margin-top:4px; font-size:12.5px}
   .card .tg{top:-8px; right:10px; font-size:10px; padding:2px 7px}
   .order-strip{gap:6px}
@@ -769,7 +769,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
     padding:10px 10px 10px 8px}
   .seat .seat-move{grid-area:mv}
   .seat .sn{grid-area:sn}
-  .seat .swatches{grid-area:sw; gap:5px}
+  .seat .swatches{grid-area:sw; gap:5px; flex-wrap:nowrap}
   .seat .sw{width:26px; height:26px; border-radius:7px}
   .seat .name{grid-area:name}
   .seat .fac{grid-area:fac}
@@ -786,7 +786,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .set-row .stepper{width:128px}
 
   /* speaker and seating */
-  .ringwrap .seatnode{width:84px; padding:13px 5px 7px}
+  .ringwrap .seatnode{width:min(84px, 21cqw); padding:13px 5px 7px}
   .ringwrap .seatnode i{width:11px; height:11px}
   .ringwrap .seatnode .nm{font-size:13.5px; margin-top:4px}
   .ringwrap .seatnode .sn2{font-size:9.5px}
@@ -794,7 +794,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .ringwrap .cc .v{font-size:17px}
   .ringwrap .cc .s{font-size:10.5px; margin-top:6px}
   .ringwrap .cc br{display:none}
-  .seat-orders{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+  .seat-orders{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:9px}
   .seat-orders > .ibtn, .seat-orders > .order-help{grid-column:1 / -1}
   .seat-orders .pnl-h{padding:10px 11px; font-size:10px; letter-spacing:.12em}
   .ord-body{padding:8px}

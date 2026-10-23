@@ -139,12 +139,16 @@ Run the checks, push, and review the branch.
   - Review 1 ran on commits `3620109` and `c2205db`. Fixed: finding 3.
     Report: `.context/phone-mockups/review-1.md`.
   - Review 2 ran on the full branch after commit `866c2f5`. Fixed: 9, 10, 11, 12, 13, and 17. Report: `.context/phone-version/review-2.md`. Evidence: `.context/phone-version/reach-after-fix.log`.
+  - Review 3 re-checked the fix commit `01fb447`: findings 9 to 13 and 17 are resolved. New finding 18, colour swatches wrap and stretch the seat rows, is fixed with option B. Verification after it found the 320 and 360 px wide phones scrolled sideways on two screens; the same commit fixes that. Report: `.context/phone-version/review-3/`.
   - 4. Phone History and Join have no way in. Severity Low, effort Small. Recommended: B, add the controls.
   - 7. Up and down keys block keyboard scrolling. Severity Low, effort Small. Recommended: A, use the I and P keys.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
   - 14. Limit changes do not reach an open reaction window. Severity Low, effort Small. Recommended: A, state the current rule in `docs/concepts.md`.
   - 15. No model tests for top bar taps during a window. Severity Low, effort Small. Recommended: A, three model tests.
   - 16. Top bar defines the phase labels twice. Severity Low, effort Small. Recommended: B, one phase table.
+  - Decision: make the seat list its own size container, so that each seat row picks its form from its own width (finding 18, option C). Effort Small. Covers findings 10 and 18.
+  - `docs/product.md`: "Must have (v1, iPad only)" and "Live sync between iPad and phones" still name only the iPad. Separate branch.
+  - `src/styles/mockup/reaction.css`: with long player names, the three-column tile grid is wider than the window at about 601 to 650 px. Separate branch.
   - `docs/mockups/index.html`: the demo reaction clock counts into overtime, but the app closes the window at its limit. Separate branch.
   - Review 1 also listed three iPad mockup problems outside its scope: the reaction clock runs behind the scrim, the agenda runs two clocks, and the strategy demo picks skip Kira. Milestone 2 fixes them while it aligns the iPad layouts with the app.
   - `docs/mockups/index.html`: no iPad layout opens the Join screen. Finding 4 covers it.
