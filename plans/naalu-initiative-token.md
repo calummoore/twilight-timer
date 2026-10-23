@@ -212,7 +212,7 @@ Run the checks, push, and review the branch.
   - Review 2 checked fix commit 158a7ee: finding 1 is resolved, and it found
     no new finding. The smoke log now has 17 checks, with the name-fit
     check. Report: `.context/naalu-initiative-token/review-2.md`.
-  - 2. No test loads a player with no faction. Severity Low, effort Small. Recommended: B, a round-trip test for each faction id and for no faction.
+  - 2. No test loads a player with no faction. Severity Low, effort Small. Recommended: D, one round-trip test of a sample game with one action of every kind, every faction, and no faction.
   - 3. Rail header says the card sets initiative. Severity Low, effort Small. Recommended: A, the header "Initiative order" in the app and the mockup.
   - `src/model/commands.ts`: undo of a Naalu token move leaves the time since the move on the running clock, as open finding 1 of the MVP plan describes. Separate branch.
 
@@ -262,6 +262,10 @@ Run the checks, push, and review the branch again.
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest. Findings 2 and 3 of review 1
       stay open under Milestone 5.
+  - Review 3 found 2 findings. Fixed: 4, doc comments said a player can
+    pick no faction, and 5, the setup note said the Naalu always goes
+    first. Report: `.context/naalu-initiative-token/review-3.md`.
+  - `src/styles/app.css`: the button reset sets `text-align: inherit`, so BEGIN GAME, BEGIN ACTION PHASE, and END TURN sit at the left, but the mockup centres them. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
