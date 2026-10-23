@@ -300,7 +300,7 @@ conflict, and adapt the tests that met a rule from main.
     findings. Fixed: 7, the History events of the mockup followed card
     order, although Sam is the Naalu. No further fix round runs. Report:
     `.context/naalu-initiative-token/review-6.md`.
-  - 8. Fix commit title has 51 characters. Severity Low, effort Small. Recommended: A, leave the titles of 86b2492 and df26f09, because a squash merge keeps them off `main`.
+  - 8. Fix commit title has 51 characters. Severity Low, effort Small. Recommended: A, leave the titles of df26f09, 86b2492, and 0a019a3, because a squash merge keeps them off `main`.
 
 ## Post-merge follow-up (non-blocking)
 
