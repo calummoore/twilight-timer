@@ -73,6 +73,9 @@ commit. Each successful preview run updates the comment.
 
 - Pull requests from forks get no preview, because their runs get no secrets.
   A run without the Cloudflare secrets skips the preview with a warning.
+- Package code from a pull request runs before review in the same job as the
+  upload step, which holds `CLOUDFLARE_API_TOKEN`. Cal accepted this risk on
+  2026-10-23.
 - A preview has its own origin, so it keeps its own saved games.
 - The workflow does not delete previews. A preview stays online after its pull
   request closes.
