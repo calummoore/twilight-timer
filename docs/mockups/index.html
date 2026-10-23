@@ -471,7 +471,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .ph-stat{display:flex; justify-content:space-between; align-items:baseline; padding:14px 0; border-bottom:1px solid var(--line)}
 .ph-stat span{font-size:14px; color:var(--dim)} .ph-stat b{font-size:22px; font-weight:750}
 
-/* ─────────── overlays and small controls, as the app draws them ─────────── */
+/* ─────────── app controls that the screens share, as the app draws them ─────────── */
 .overlay{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px); display:grid; place-items:center; z-index:10}
 .dialog{width:520px; background:#121a24; border:1px solid var(--line2); border-radius:20px; padding:28px}
 .dialog h3{font-size:25px; font-weight:750}
@@ -481,250 +481,343 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .pause-card .t{font-size:120px; font-weight:800; letter-spacing:-.05em; line-height:.9}
 .pause-card .l{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin:14px 0 34px}
 .big.small{grid-column:auto; font-size:19px; padding:16px 26px}
+.big.lg{font-size:23px; padding:21px}
+.big.md{font-size:20px; padding:19px}
+.big:disabled{opacity:.45; cursor:default}
 .sec.muted .k{color:var(--warn)}
+.clock-over{color:var(--danger)}
 .pnl-note{text-transform:none; letter-spacing:0; font-weight:400; color:var(--faint)}
+.setup-label{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-bottom:9px}
+.setup-help{font-size:12px; color:var(--faint); line-height:1.6; margin-top:18px}
+.setup-help b{color:var(--dim)}
+.seat{grid-template-columns:26px 34px 216px 1fr 170px 44px}
+.seat-move{display:flex; flex-direction:column; gap:2px}
+.seat-move b{color:var(--faint); font-size:11px; font-weight:400; line-height:1; padding:3px 0; text-align:center}
+.seat-move b.off{opacity:.25}
+.picker .spkb{margin-left:6px; padding:10px 14px}
+.picker-help{font-size:12.5px; color:var(--faint); line-height:1.5; margin-left:22px; max-width:250px}
+.order-help{font-size:11.5px; color:var(--faint); margin-top:8px; line-height:1.5}
+.ord-body{padding:11px 14px}
+.tile-idle{border-style:dashed; opacity:.5; justify-content:center; align-items:center; font-size:13px; color:var(--faint);
+  text-align:center; line-height:1.5}
+.custodians{display:flex; align-items:center; gap:14px; padding:15px 18px}
+.custodians .lb{font-size:14.5px; font-weight:600}
+.custodians .ds{font-size:12px; color:var(--faint); margin-top:3px}
+.voter-now{padding:18px; display:flex; flex-direction:column; gap:14px}
+.voter-now .who{font-size:22px; font-weight:700; display:flex; align-items:center; gap:10px}
+.voter-now .who i{width:12px; height:12px; border-radius:50%; background:var(--pc); font-style:normal}
+.voter-now .t{font-size:56px; font-weight:800; letter-spacing:-.04em}
+.tabletimer .t.md{font-size:78px}
+.phase-line{display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px}
+.agenda-card.ag-card{margin-bottom:0}
+.long-turn .pl{display:flex; align-items:center; gap:8px}
+.long-turn .pl i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.join-grid{display:grid; grid-template-columns:1fr 1fr; gap:34px; align-items:center; padding:0 60px}
 
-/* ─────────── phone: the table device ─────────── */
+/* ─────────── layout helpers: the screens use these in place of inline grids ─────────── */
+.split{display:grid; grid-template-columns:1fr var(--side,420px); gap:18px}
+.col{display:flex; flex-direction:column; gap:16px; min-height:0}
+.grow{flex:1; min-height:0}
+.scroll{overflow:auto; min-height:0}
+.foot{display:flex; gap:12px; padding:0 22px 20px; flex:none}
+.foot .big{flex:1}
+.foot .ibtn{padding:18px 24px}
+.tools{display:flex; gap:16px}
+.ph-now{display:none}
+.evr{display:flex; align-items:center}
+
+/* The top bar stays above a reaction window, so the table can still pause, undo or move the speaker. */
+.top.game{position:relative; z-index:5}
+.rw{inset:calc(var(--top-h, 68px) + 16px) 60px 30px}
+
+/* The seating ring keeps its proportions at any width. */
+.ringwrap{width:100%; max-width:500px; height:auto; aspect-ratio:500/410}
+.ringwrap::before{width:60%; height:56%}
+.ringwrap .cc{width:46%}
+
+/* ─────────── designed, but not in the app yet ─────────── */
+.later{opacity:.5; outline:1px dashed #66768a; outline-offset:3px}
+.later-tag{display:inline-block; vertical-align:middle; margin-left:8px; padding:2px 7px; border-radius:20px; background:#242f3d;
+  color:#a9b8c9; font-size:9px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; font-style:normal; line-height:1.3}
+
+/* ─────────── device frames ─────────── */
+/* Each table screen is drawn once. Its frame is a size container, and the queries below arrange the screen for it. */
+.frame{container:app / size}
+.frame.tablet{width:834px; height:1194px; border-radius:20px; --safe-top:24px; --safe-bottom:20px}
+.frame.phone{--safe-top:54px; --safe-bottom:34px}
 .frame.phone::after{content:""; position:absolute; top:11px; left:50%; width:124px; height:36px; margin-left:-62px;
   border-radius:20px; background:#000; z-index:50}
-.frame.phone::before{content:""; position:absolute; bottom:8px; left:50%; width:138px; height:5px; margin-left:-69px;
-  border-radius:3px; background:#e9eff7; opacity:.45; z-index:50}
-.m{position:absolute; inset:0; display:flex; flex-direction:column; padding-top:54px}
-.m .spacer{flex:1}
-.m .ibtn{padding:9px 12px}
-.m .ibtn.ico{width:40px; justify-content:center; padding:9px 0; font-size:14px}
-.m-top .ibtn, .m-head .ibtn{height:38px; padding-top:0; padding-bottom:0}
-.m-top{flex:none; padding:2px 16px 0}
-.m-top .r1{display:flex; align-items:baseline; justify-content:space-between; gap:12px}
-.m-top .rd{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
-.m-top .rd b{color:var(--txt); font-weight:650}
-.m-top .gt{font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint)}
-.m-top .gt b{color:var(--txt); font-size:15px; font-weight:650; letter-spacing:0; margin-left:6px}
-.m-top .r2{display:flex; align-items:center; gap:7px; margin-top:8px}
-.m-ph{display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin:10px -16px 0}
-.m-ph u{display:block; height:3px; background:#17212c; text-decoration:none}
-.m-ph u.done{background:#255450} .m-ph u.on{background:var(--accent)}
-.m-head{flex:none; display:flex; align-items:center; gap:7px; padding:2px 16px 12px; border-bottom:1px solid var(--line)}
-.m-head .round{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
-.m-head .round b{color:var(--txt); font-weight:600}
-.m-body{flex:1; min-height:0; overflow-y:auto; padding:14px 16px; scrollbar-width:none}
-.m-body::-webkit-scrollbar{display:none}
-.m-body:last-child{padding-bottom:42px}
-.m-foot{flex:none; display:grid; gap:10px; padding:12px 16px 34px; border-top:1px solid var(--line); background:rgba(5,7,11,.85)}
-.m-foot .big{font-size:24px; padding:21px 16px; box-shadow:0 6px 0 #0a5f58, 0 12px 26px rgba(18,168,156,.22)}
-.m-foot .big.red{box-shadow:0 6px 0 #7d211a, 0 12px 26px rgba(214,60,48,.22)}
-.m-foot .big small{display:block; font-size:11px; letter-spacing:.14em; margin-top:5px; opacity:.75}
-.m-foot .two{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-.m-foot .two .ibtn{justify-content:center; padding:12px}
-.m-foot .sec{padding:12px 14px; font-size:14.5px}
-.m-foot .split{display:grid; grid-template-columns:auto 1fr; gap:10px}
-.m-foot .split .ibtn{justify-content:center; padding:0 18px; font-size:13px}
-.m-foot .split .big{grid-column:auto}
-.m-sec{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:10.5px; letter-spacing:.16em;
-  text-transform:uppercase; color:var(--faint); margin:14px 2px 8px}
-.m-sec span{letter-spacing:0; text-transform:none; font-size:11.5px; white-space:nowrap}
-.m-help{font-size:12px; color:var(--faint); line-height:1.5; margin:0 2px 12px}
+.frame.phone::before, .frame.tablet::before{content:""; position:absolute; bottom:8px; left:50%; width:138px; height:5px;
+  margin-left:-69px; border-radius:3px; background:#e9eff7; opacity:.45; z-index:50}
+.top{padding-top:calc(14px + var(--safe-top, env(safe-area-inset-top, 0px)))}
 
-/* phone: action phase */
-.m-pin{flex:none; padding:14px 16px 0}
-.m-hero{padding:14px 16px 16px}
-.m-hero .hero-top{gap:12px}
-.m-hero .dot{width:14px; height:14px; margin-top:8px; box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 22%, transparent)}
-.m-hero h3{font-size:28px}
-.m-hero .fac{font-size:12.5px; margin-top:3px}
-.m-hero .init .n{font-size:34px}
-.m-hero .init .l{font-size:9px; letter-spacing:.14em}
-.m-hero .bigclock{font-size:104px; margin:16px 0 0}
-.m-hero .clock-sub{font-size:12px; margin-top:7px; letter-spacing:.03em}
-.m-hero .limitbar{height:6px; margin-top:14px}
-.m-hero .limitrow{font-size:10px}
-.m-hero .alarm{padding:7px 8px 7px 12px; margin-bottom:12px}
-.m-tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:7px}
-.m-tile{position:relative; min-width:0; border:1px solid var(--line); border-radius:10px; background:#0a0f16; padding:8px 9px 7px}
-.m-tile .t1{display:flex; align-items:baseline; gap:6px}
-.m-tile .in{font-size:18px; font-weight:800; color:var(--pc); letter-spacing:-.02em}
-.m-tile .nm{font-size:14px; font-weight:650; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.m-tile .sccard{margin:4px 0 0; padding:1px 6px; font-size:10.5px; letter-spacing:0; text-transform:none}
-.m-tile .tm{font-size:12.5px; font-weight:650; color:var(--dim); margin-top:3px}
-.m-tile.active{background:color-mix(in srgb,var(--pc) 14%, #0b111a); border-color:color-mix(in srgb,var(--pc) 55%, transparent)}
-.m-tile.passed{opacity:.42}
-.m-tile.passed .nm{text-decoration:line-through; text-decoration-color:var(--faint)}
-.m-tile .chip{top:-7px; right:7px}
-.m-legend{display:flex; gap:14px; margin-top:10px; font-size:11px; color:var(--faint)}
-.m-legend .sccard{margin-right:5px}
+/* ─────────── narrow: an upright iPad or a phone ─────────── */
+@container app (max-width: 900px){
+  .lay{overflow-y:auto; scrollbar-width:none; padding-bottom:var(--safe-bottom, env(safe-area-inset-bottom, 0px))}
+  .lay::-webkit-scrollbar{display:none}
+  .lay > *{flex:none}
+  .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
+  .top.game{display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:"round pill gt" "spk extra tools";
+    column-gap:12px; row-gap:10px; align-items:center}
+  .top.game .round{grid-area:round}
+  .top.game .phase-pill{grid-area:pill; justify-self:center}
+  .top.game .gt{grid-area:gt}
+  .top.game .spkb{grid-area:spk; justify-self:start}
+  .top.game .extra{grid-area:extra; justify-self:end}
+  .top.game .tools{grid-area:tools; gap:8px}
+  .top.game .spacer{display:none}
+  .content, .body, .scroll{overflow:visible; min-height:auto}
+  .body{grid-template-columns:1fr; padding:14px 16px 18px}
+  .split{grid-template-columns:1fr}
+  .grow{flex:none}
+  .hero{min-height:auto}
+  .hero .bigclock{margin:20px 0 0; font-size:clamp(84px, 26cqw, 186px)}
+  .rail, .rail-b{overflow:visible; min-height:auto}
+  .rail-b{flex:none}
+  .rw{inset:calc(var(--top-h, 135px) + 12px) 24px calc(var(--safe-bottom, env(safe-area-inset-bottom, 0px)) + 20px)}
+  .rw-f .ibtn, .rw-f .big{white-space:nowrap; flex:none}
+  .cards{grid-template-columns:repeat(auto-fill, minmax(170px, 1fr))}
+  .card{min-height:112px}
+  .stat-grid{grid-template-columns:repeat(auto-fit, minmax(150px, 1fr))}
+  .setup-grid{grid-template-columns:1fr; height:auto}
+  .status .side, .agenda .col{display:contents}
+  .status .timer{order:-1}
+  .agenda .ag-card{order:-3}
+  .agenda .ag-disc{order:-2}
+  .agenda .ag-now{order:-1}
+  .agenda .ag-tally{order:1}
+  .agenda .ag-resolve{order:2}
+  .join-grid{grid-template-columns:1fr; padding:0 24px; gap:24px}
+}
 
-/* phone: reaction window sheet */
-.m-sheet{position:absolute; left:0; right:0; bottom:0; top:54px; z-index:4; display:flex; flex-direction:column;
-  background:linear-gradient(180deg,#0f1722,#080c12); border:1px solid #2b4a58; border-bottom:none;
-  border-radius:22px 22px 0 0; box-shadow:0 -24px 70px rgba(0,0,0,.7)}
-.m-sheet .rw-h{display:block; padding:18px 18px 0}
-.m-sheet .rw-h h3{font-size:25px; margin-top:4px}
-.m-sheet .rw-h .by{font-size:13px}
-.m-rwc{text-align:center; margin-top:14px}
-.m-rwc .t{font-size:76px; font-weight:800; letter-spacing:-.05em; line-height:.92; color:var(--accent)}
-.m-rwc .t.over{color:var(--danger)}
-.m-rwc .l{font-size:10.5px; letter-spacing:.17em; text-transform:uppercase; color:var(--faint); margin-top:7px}
-.m-sheet .rw-bar{margin:14px 18px 4px}
-.m-rlist{flex:1; min-height:0; overflow-y:auto; padding:10px 16px 6px; display:grid; gap:7px; align-content:start}
-.m-rrow{display:flex; align-items:center; gap:12px; min-height:54px; padding:8px 9px 8px 14px;
-  border:1px solid var(--line2); border-radius:12px; background:#0b111a}
-.m-rrow .nm{font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px}
-.m-rrow .nm i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal}
-.m-rrow .fc{font-size:11.5px; color:var(--faint); margin-top:2px}
-.m-rrow .pchip{font-size:9px; letter-spacing:.12em; text-transform:uppercase; background:#242f3d; color:#7c8b9d;
-  padding:2px 7px; border-radius:20px; font-weight:700}
-.m-rrow .tapme{margin-left:auto; flex:none; background:var(--panel3); border:1px solid #3c5168; color:var(--txt);
-  font-family:var(--f); font-size:13.5px; font-weight:700; letter-spacing:.04em; padding:12px 14px; border-radius:9px}
-.m-rrow .st{margin-left:auto; text-align:right; font-size:12.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ok)}
-.m-rrow .took{display:block; font-size:11.5px; font-weight:500; letter-spacing:0; text-transform:none; color:var(--faint); margin-top:3px}
-.m-rrow.done{background:#0a1c13; border-color:#2a5c3d}
-.m-rrow.idle{justify-content:center; min-height:38px; border-style:dashed; opacity:.5; font-size:12.5px; color:var(--faint)}
-.m-sheet .m-foot{background:none}
-.m-sheet .note{font-size:12.5px; color:var(--faint); line-height:1.5}
+/* ─────────── a short window, such as a phone held sideways ─────────── */
+@container app (max-width: 900px) and (max-height: 520px){
+  .hero .bigclock{font-size:clamp(64px, 28cqh, 186px)}
+}
 
-/* phone: strategy phase */
-.m-picker{gap:12px; padding:12px 14px; margin-bottom:8px}
-.m-picker .who{font-size:20px; margin-top:3px}
-.m-picker .t{font-size:34px}
-.m .cards{grid-template-columns:1fr 1fr; gap:8px}
-.m .card{display:grid; grid-template-columns:34px 1fr; column-gap:8px; min-height:0; padding:11px 12px}
-.m .card .n{font-size:28px; grid-row:span 2}
-.m .card .nm{font-size:14.5px; margin-top:1px}
-.m .card .own, .m .card .free{margin-top:4px; font-size:12.5px; display:flex; align-items:center; gap:7px}
-.m .card .tg{top:-8px; right:10px; font-size:10px; padding:2px 7px; white-space:nowrap}
-.m .order-strip{margin-top:0; gap:6px}
-.m .oc{font-size:12.5px; padding:4px 10px 4px 7px}
+/* ─────────── a phone ─────────── */
+@container app (max-width: 600px){
+  .top{flex-wrap:wrap; gap:8px; row-gap:10px; padding:calc(10px + var(--safe-top, env(safe-area-inset-top, 0px))) 16px 12px}
+  .top .round{font-size:11px}
+  .top.stack .round{flex-basis:100%}
+  .top .ibtn{padding:9px 12px}
+  .ibtn .word{display:none}
+  .top.game{grid-template-columns:1fr auto; grid-template-areas:"round gt" "spk tools" "extra extra" "pill pill";
+    column-gap:8px; row-gap:0; padding-bottom:0; border-bottom:none}
+  .top.game .spkb, .top.game .tools, .top.game .extra, .top.game .phase-pill{margin-top:10px}
+  .top.game .ph-now{display:inline}
+  .top.game .gt{font-size:10.5px}
+  .top.game .gt b{font-size:15px; margin-left:6px}
+  .top.game .tools .ibtn{min-width:40px; justify-content:center}
+  .top.game .extra{justify-self:start}
+  .top.game .phase-pill{justify-self:stretch; display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin:0 -16px;
+    padding:0; border:none; border-radius:0; background:none}
+  .top.game .phase-pill span{height:3px; padding:0; border-radius:0; font-size:0; background:#17212c}
+  .top.game .phase-pill span.done{background:#255450}
+  .top.game .phase-pill span.on{background:var(--accent)}
+  .content{padding:14px 16px}
+  .body{padding:12px 16px 16px}
+  .split, .col{gap:12px}
+  .foot{flex-wrap:wrap; gap:10px; padding:0 16px 16px}
+  .foot .ibtn{flex:1; justify-content:center; padding:13px 12px}
+  .foot .big{flex-basis:100%; font-size:20px; padding:18px 14px}
+  .big.lg, .big.md{font-size:22px; padding:19px}
+  .h1{font-size:25px}
+  .h1s{font-size:12.5px; line-height:1.5; margin-top:5px}
+  .pnl-h{padding:12px 14px; flex-wrap:wrap; gap:4px 12px}
+  .pnl-note{white-space:nowrap}
 
-/* phone: status and agenda */
-.m .tabletimer{padding:16px 0 14px}
-.m .tabletimer .t{font-size:72px}
-.m .tabletimer .l{font-size:10.5px; margin-top:8px}
-.m .steps{gap:7px}
-.m .step{padding:10px 13px; gap:12px}
-.m .step .lb{font-size:14.5px}
-.m .step .no{margin:2px 0 0; font-size:11.5px}
-.m-cust{display:flex; align-items:center; gap:12px; padding:0 2px}
-.m-cust .lb{font-size:14px; font-weight:600}
-.m-cust .ds{font-size:11.5px; color:var(--faint); margin-top:2px}
-.m-agenda{padding:13px 15px; margin-bottom:12px}
-.m-agenda .k{display:flex; justify-content:space-between; gap:10px}
-.m-agenda h4{font-size:20px; margin-top:4px}
-.m-agenda p{font-size:12.5px; margin-top:5px}
-.m-voter{display:flex; align-items:center; gap:12px; padding:13px 16px; border-radius:14px;
-  border:1px solid color-mix(in srgb,var(--pc) 50%, var(--line)); background:color-mix(in srgb,var(--pc) 10%, #0a0f16)}
-.m-voter .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
-.m-voter .who{font-size:21px; font-weight:700; display:flex; align-items:center; gap:9px; margin-top:4px}
-.m-voter .who i{width:12px; height:12px; border-radius:50%; background:var(--pc); font-style:normal}
-.m-voter .t{margin-left:auto; font-size:52px; font-weight:800; letter-spacing:-.04em; line-height:1}
-.m .vote-row{grid-template-columns:24px 1fr 80px 50px; gap:9px; padding:10px 11px; margin-bottom:6px}
-.m .vote-row .nm{font-size:15px}
-.m .vote-row .vt{font-size:14.5px}
-.m .vote-row .badge{font-size:10px; padding:5px 4px}
+  /* action phase: the hero keeps End Turn under the clock, and the rail rows become tiles */
+  .hero{padding:14px 16px 16px}
+  .hero-top{gap:12px}
+  .hero .dot{width:14px; height:14px; margin-top:8px; box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 22%, transparent)}
+  .hero h3{font-size:28px}
+  .hero .fac{font-size:12.5px; margin-top:3px}
+  .hero .init .n{font-size:34px}
+  .hero .init .l{font-size:9px; letter-spacing:.14em}
+  .hero .bigclock{margin-top:16px}
+  .hero .clock-sub{font-size:12px; letter-spacing:.03em; margin-top:6px}
+  .hero .limitbar{height:6px; margin-top:14px}
+  .hero .limitrow{font-size:10px}
+  .hero .alarm{padding:9px 10px 9px 12px; margin-bottom:12px; gap:10px}
+  .hero .alarm .s{font-size:11.5px}
+  .hero .acts{gap:10px; margin-top:16px}
+  .hero .big{font-size:24px; padding:21px 16px}
+  .hero .sec{padding:12px 14px; font-size:14.5px}
+  .rail{background:none; border:none; border-radius:0}
+  .rail-h{padding:0 2px 9px; border:none}
+  .rail-b{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; padding:0}
+  .rail .row{grid-template-columns:auto 1fr; grid-template-areas:"in nm" "fc fc" "tm tm"; gap:3px 6px; align-items:baseline;
+    min-width:0; margin:0; padding:8px 9px 7px; border:1px solid var(--line); background:#0a0f16}
+  .rail .row .who{display:contents}
+  .rail .row .in{grid-area:in; font-size:18px; text-align:left}
+  .rail .row .nm{grid-area:nm; font-size:14px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block}
+  .rail .row .nm i{display:none}
+  .rail .row .fc{grid-area:fc; display:flex; flex-direction:column; align-items:flex-start; gap:3px; min-width:0; margin:0}
+  .rail .row .sccard{margin:0; padding:1px 6px; font-size:10.5px; letter-spacing:0; text-transform:none}
+  .rail .row .fac{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .rail .row .tm{grid-area:tm; display:flex; flex-wrap:wrap; column-gap:6px; align-items:baseline; text-align:left}
+  .rail .row .tm .a{font-size:13px}
+  .rail .row .tm .b{font-size:10.5px; margin:0}
+  .rail .row.active{background:color-mix(in srgb,var(--pc) 14%, #0b111a); border-color:color-mix(in srgb,var(--pc) 55%, transparent); box-shadow:none}
+  .rail .row .chip{top:-7px; right:7px}
+  .rail-f{padding:10px 2px 0; border:none; justify-content:flex-start; gap:14px}
 
-/* phone: summaries and stats */
-.m .h1{font-size:25px}
-.m .h1s{font-size:12.5px; line-height:1.5; margin-top:5px}
-.m .stat-grid{grid-template-columns:1fr 1fr; gap:9px; margin:16px 0 14px}
-.m .stat{padding:12px 13px}
-.m .stat .l{font-size:9.5px; letter-spacing:.12em}
-.m .stat .v{font-size:24px; margin-top:5px}
-.m .stat .s{font-size:11px}
-.m .pnl-h{padding:12px 14px}
-.m .bars{gap:11px}
-.m .bar-row{grid-template-columns:62px 1fr 52px; gap:9px}
-.m .bar-row .nm{font-size:13.5px; gap:7px}
-.m .bar-row .vl{font-size:13.5px}
-.m .track{height:18px}
-.m .legend{gap:12px; margin-top:14px; font-size:11px}
-.m .kv{padding:10px 0; font-size:13.5px}
-.m-prow{padding:10px 0; border-bottom:1px solid var(--line)}
-.m-prow:last-child{border-bottom:none}
-.m-prow .a{display:flex; align-items:center; gap:8px; font-size:15px; font-weight:650}
-.m-prow .a i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
-.m-prow .a b{margin-left:auto; font-size:15px; font-weight:750}
-.m-prow .b{font-size:11.5px; color:var(--faint); margin-top:4px; line-height:1.5}
+  /* reaction window: a sheet under the top bar, one row per reacting player */
+  .rw{inset:var(--top-h, 147px) 0 0; border-bottom:none; border-radius:22px 22px 0 0;
+    padding:18px 16px calc(14px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)))}
+  .rw-h{display:block}
+  .rw-h h3{font-size:25px; margin-top:4px}
+  .rw-h .by{font-size:13px}
+  .rw-clock{margin:12px 0 0; text-align:center}
+  .rw-clock .t{font-size:68px}
+  .rw-bar{margin:12px 0 10px}
+  .tiles{grid-template-columns:1fr; gap:7px; overflow-y:auto; align-content:start; scrollbar-width:none}
+  .tile{display:grid; grid-template-columns:1fr auto; column-gap:12px; align-items:center; min-height:54px; padding:8px 9px 8px 14px}
+  .tile .nm{grid-row:1; grid-column:1; font-size:16px}
+  .tile .fc{grid-row:2; grid-column:1; margin-top:2px}
+  .tile .st{grid-row:1; grid-column:2; margin:0; text-align:right; font-size:12.5px}
+  .tile .took{grid-row:2; grid-column:2; margin:2px 0 0; text-align:right}
+  .tile .tapme{grid-row:1 / span 2; grid-column:2; margin:0; padding:12px 14px; font-size:13.5px}
+  .tile .pchip{position:static; grid-row:1; grid-column:1; justify-self:end}
+  .tile.tile-idle{display:flex; min-height:38px; font-size:12px}
+  .tile.tile-idle br{display:none}
+  .rw-f{flex-wrap:wrap; gap:10px; margin-top:12px}
+  .rw-f .note{flex-basis:100%}
+  .rw-f .spacer{display:none}
+  .rw-f .ibtn{flex:1; justify-content:center; padding:12px}
+  .rw-f .big{flex-basis:100%; font-size:22px; padding:19px}
 
-/* phone: setup and settings */
-.m .count{gap:6px}
-.m .count b{padding:10px 0}
-.m-seat{display:grid; grid-template-columns:24px 1fr; gap:10px; padding:10px 10px 10px 8px; margin-bottom:8px;
-  border:1px solid var(--line); border-radius:12px; background:#0a0f16}
-.m-seat.sp{border-color:#4d4322; background:#14110a}
-.m-seat .mv{display:flex; flex-direction:column; align-items:center; justify-content:space-between; color:var(--faint); font-size:11px; padding:3px 0}
-.m-seat .mv b{font-size:15px; font-weight:800; color:var(--pc)}
-.m-seat .r1{display:flex; align-items:center; gap:5px}
-.m-seat .sw{width:26px; height:26px; border-radius:7px}
-.m-seat .spk{margin-left:auto; width:34px; height:34px}
-.m-seat .r2{display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:9px}
-.m-seat .fld{padding:9px 10px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.m-seat .fld.sel{font-size:13px}
-.m .master{padding:14px 15px; margin-bottom:14px; gap:12px}
-.m .master .lb{font-size:15px}
-.m .master .ds{font-size:12px}
-.m-set{padding:12px 14px; border-bottom:1px solid var(--line)}
-.m-set:last-child{border-bottom:none}
-.m-set.off{opacity:.34}
-.m-set .a{display:flex; align-items:center; justify-content:space-between; gap:12px}
-.m-set .lb{font-size:15px; font-weight:600}
-.m-set .b{display:flex; align-items:center; gap:12px; margin-top:6px}
-.m-set .ds{flex:1; font-size:12px; color:var(--faint); line-height:1.45}
-.m-set .stepper{flex:none; width:128px}
-.m-set .stepper b{font-size:16px; padding:8px 0}
-.m-set .stepper i{width:34px; padding:8px 0}
-.m .tog{flex:none}
-.m-end{width:100%; justify-content:center; margin-top:16px}
-.m .ibtn.m-end{padding:14px}
+  /* strategy phase */
+  .picker{display:grid; grid-template-columns:1fr auto; grid-template-areas:"who t" "help help" "spk spk"; gap:8px 12px; padding:12px 14px}
+  .picker .who-box{grid-area:who}
+  .picker .who{font-size:20px; margin-top:3px}
+  .picker .t{grid-area:t; font-size:34px}
+  .picker .picker-help{grid-area:help; margin:0; max-width:none}
+  .picker .spkb{grid-area:spk; justify-self:start; margin:0; padding:9px 12px}
+  .cards{grid-template-columns:1fr 1fr; gap:8px}
+  .card{display:grid; grid-template-columns:34px 1fr; column-gap:8px; min-height:0; padding:11px 12px}
+  .card .n{font-size:28px; grid-row:span 2}
+  .card .nm{font-size:14.5px; margin-top:1px}
+  .card .own, .card .free{margin-top:4px; font-size:12.5px}
+  .card .tg{top:-8px; right:10px; font-size:10px; padding:2px 7px}
+  .order-strip{gap:6px}
+  .order-strip .lbl{flex-basis:100%}
+  .oc{font-size:12.5px; padding:4px 10px 4px 7px}
 
-/* phone: speaker and seating */
-.m-ring{position:relative; height:296px; margin:0 -4px 12px}
-.m-ring::before{content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:196px; height:156px;
-  border-radius:50%; border:1px dashed #263544; background:#080d14}
-.m-ring .cc{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:150px; text-align:center}
-.m-ring .cc .l{font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
-.m-ring .cc .v{font-size:17px; font-weight:700; margin-top:5px; color:#f0cf6a}
-.m-ring .cc .s{font-size:10.5px; color:var(--faint); margin-top:6px; line-height:1.45}
-.m-ring .seatnode{width:84px; padding:13px 5px 7px}
-.m-ring .seatnode i{width:11px; height:11px}
-.m-ring .seatnode .nm{font-size:13.5px; margin-top:4px}
-.m-ring .seatnode .sn2{font-size:9.5px}
-.m-ords{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:12px}
-.m-ords .pnl-h{padding:10px 11px; font-size:10px; letter-spacing:.12em}
-.m-ords .ordlist{padding:8px; gap:4px}
-.m-ords .ordrow{grid-template-columns:14px 1fr auto; gap:6px; padding:6px 8px; font-size:13px}
-.m-ords .tag2{padding:2px 5px}
-.m-ords .order-help{font-size:11px; color:var(--faint); line-height:1.45; padding:0 10px 10px}
+  /* status and agenda phases */
+  .tabletimer{padding:16px 0 14px}
+  .tabletimer .t{font-size:72px}
+  .tabletimer .t.md{font-size:52px}
+  .steps{gap:7px}
+  .step{display:grid; grid-template-columns:26px 1fr; gap:0 12px; padding:10px 13px}
+  .step .bx{grid-row:span 2}
+  .step .lb{font-size:14.5px}
+  .step .no{margin:2px 0 0; font-size:11.5px}
+  .custodians{padding:13px 14px}
+  .agenda-card{padding:13px 15px; margin-bottom:0}
+  .agenda-card h4{font-size:20px}
+  .agenda-card p{font-size:12.5px}
+  .voter-now{padding:14px; gap:10px}
+  .voter-now .t{font-size:48px}
+  .vote-row{grid-template-columns:24px 1fr 80px 50px; gap:9px; padding:10px 11px; margin-bottom:6px}
+  .vote-row .nm{font-size:15px}
+  .vote-row .vt{font-size:14.5px}
+  .vote-row .badge{font-size:10px; padding:5px 4px}
 
-/* phone: history, join, pause */
-.m-rounds{display:flex; margin-bottom:12px}
-.m-rounds span{flex:1; text-align:center; white-space:nowrap}
-.m .undo-bar{display:block; padding:14px; margin-bottom:6px}
-.m .undo-bar .v{font-size:16px}
-.m .undo-bar .s{font-size:12px; line-height:1.5}
-.m .undo-bar .big{width:100%; margin-top:12px; font-size:20px; padding:16px}
-.m .ev{grid-template-columns:30px 1fr auto; gap:10px; padding:11px 12px; margin-bottom:7px}
-.m .ev .ico{width:30px; height:30px; font-size:13px}
-.m .ev .t{font-size:14px}
-.m .ev .d{font-size:12px; flex-wrap:wrap; gap:6px}
-.m .ev .hchip{left:12px}
-.m .cascade .btns{justify-content:flex-end}
-.m-evr{text-align:right}
-.m-evr .dur2{display:block; margin:0; font-size:14px}
-.m-evr .ago{display:block; font-size:10.5px; margin-top:2px}
-.m .qr{width:206px; height:206px; padding:12px; margin:6px auto 0}
-.m .joincode{font-size:44px}
-.m .dev-row{padding:11px 13px; margin-bottom:7px}
-.m-pause{display:flex; flex-direction:column; padding:0 16px 34px}
-.m-pause .pause-card{margin:auto 0}
-.m-pause .pause-card .t{font-size:96px}
-.m-pause .pause-card .l{margin-bottom:0}
-.m-pause .big{width:100%; font-size:24px; padding:21px 16px}
+  /* round summary and post-game stats */
+  .stat-grid{grid-template-columns:1fr 1fr; gap:9px}
+  .stat{padding:12px 13px}
+  .stat .l{font-size:9.5px; letter-spacing:.12em}
+  .stat .v{font-size:24px; margin-top:5px}
+  .stat .s{font-size:11px}
+  .bars{gap:11px}
+  .bar-row{grid-template-columns:62px 1fr 52px; gap:9px}
+  .bar-row .nm{font-size:13.5px; gap:7px}
+  .bar-row .vl{font-size:13.5px}
+  .track{height:18px}
+  .legend{gap:12px; margin-top:14px; font-size:11px}
+  .tbl thead{display:none}
+  .tbl tr{display:grid; grid-template-columns:repeat(3,1fr); gap:6px 10px; padding:10px 0; border-top:1px solid var(--line)}
+  .tbl td{padding:0; border:none}
+  .tbl td:first-child{grid-column:1 / -1}
+  .tbl td[data-l]::before{content:attr(data-l); display:block; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--faint); margin-bottom:2px}
 
-/* ─────────── layout switch in the stage header ─────────── */
+  /* setup and settings */
+  .count{gap:6px}
+  .count b{padding:10px 0}
+  .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
+    padding:10px 10px 10px 8px}
+  .seat .seat-move{grid-area:mv}
+  .seat .sn{grid-area:sn}
+  .seat .swatches{grid-area:sw; gap:5px}
+  .seat .sw{width:26px; height:26px; border-radius:7px}
+  .seat .name{grid-area:name}
+  .seat .fac{grid-area:fac}
+  .seat .spk{grid-area:spk; width:34px; height:34px}
+  .seat .fld{min-width:0; padding:9px 10px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .seat .fld.sel{font-size:13px}
+  .master{padding:14px 15px; gap:12px; margin-bottom:14px}
+  .set-row{grid-template-columns:1fr auto; grid-template-areas:"lb tog" "ds ctl"; gap:6px 12px; padding:12px 14px}
+  .set-row .txt{display:contents}
+  .set-row .lb{grid-area:lb}
+  .set-row .ds{grid-area:ds; margin:0}
+  .set-row .tog{grid-area:tog}
+  .set-row .ctl{grid-area:ctl; align-self:center}
+  .set-row .stepper{width:128px}
+
+  /* speaker and seating */
+  .ringwrap .seatnode{width:84px; padding:13px 5px 7px}
+  .ringwrap .seatnode i{width:11px; height:11px}
+  .ringwrap .seatnode .nm{font-size:13.5px; margin-top:4px}
+  .ringwrap .seatnode .sn2{font-size:9.5px}
+  .ringwrap .cc{width:36%}
+  .ringwrap .cc .v{font-size:17px}
+  .ringwrap .cc .s{font-size:10.5px; margin-top:6px}
+  .ringwrap .cc br{display:none}
+  .seat-orders{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+  .seat-orders > .ibtn, .seat-orders > .order-help{grid-column:1 / -1}
+  .seat-orders .pnl-h{padding:10px 11px; font-size:10px; letter-spacing:.12em}
+  .ord-body{padding:8px}
+  .ordrow{grid-template-columns:14px 1fr auto; gap:6px; padding:6px 8px; font-size:13px}
+  .ordrow .tag2{padding:2px 5px; font-size:8.5px}
+
+  /* history */
+  .top .phase-pill{order:5; flex-basis:100%; justify-content:space-between}
+  .undo-bar{flex-wrap:wrap; gap:12px; padding:14px}
+  .undo-bar .big{flex-basis:100%; font-size:20px !important; padding:16px !important}
+  .ev{grid-template-columns:30px 1fr; gap:4px 10px; padding:11px 12px}
+  .ev .ico{width:30px; height:30px; font-size:13px}
+  .ev .t{font-size:14px}
+  .ev .d{font-size:12px; flex-wrap:wrap; gap:6px}
+  .ev .evr{grid-column:1 / -1; justify-content:flex-end; flex-wrap:wrap; gap:6px}
+  .ev .hchip{left:12px}
+
+  /* join */
+  .qr{width:206px; height:206px; padding:12px}
+  .joincode{font-size:44px}
+
+  /* dialogs open as a sheet at the bottom, and the pause overlay keeps Resume full width */
+  .overlay.ask{place-items:end stretch; padding:16px 16px calc(16px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)))}
+  .dialog{width:auto; padding:22px}
+  .dialog h3{font-size:22px}
+  .dialog .btns{flex-direction:column-reverse; gap:10px}
+  .dialog .btns > *{justify-content:center; text-align:center}
+  .dialog .big{font-size:20px; padding:18px}
+  .dialog .ibtn{padding:14px}
+  .pause-card{width:100%; padding:0 16px}
+  .pause-card .t{font-size:96px}
+  .pause-card .big{width:100%; font-size:22px; padding:19px}
+}
+
+/* ─────────── device switch in the stage header ─────────── */
 .devs{margin-left:auto; align-self:center; display:flex; gap:3px; background:#0a0e14; border:1px solid var(--line); border-radius:9px; padding:3px}
 .devs button{font-family:var(--f); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);
   background:none; border:none; padding:5px 12px; border-radius:6px; cursor:pointer}
 .devs button.on{background:var(--accent); color:#04211f; font-weight:700}
 .devs button:disabled{opacity:.3; cursor:default}
+.stage-head .tag.later-scr{color:#a9b8c9; border-color:#2a3849; background:#141b24}
 </style>
 </head>
 <body>
@@ -736,7 +829,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
     <div id="navlist"></div>
     <div class="nav-foot">
       <kbd>←</kbd> <kbd>→</kbd> to step through screens.<br>
-      <kbd>↑</kbd> <kbd>↓</kbd> to switch between iPad and phone.<br>
+      <kbd>↑</kbd> <kbd>↓</kbd> to switch the device frame.<br>
       Timers on the action &amp; reaction screens run live.
     </div>
   </aside>
@@ -745,7 +838,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
     <div class="stage-head">
       <h2 id="stitle">—</h2>
       <span class="tag" id="stag">iPad</span>
-      <div class="devs" id="devs"><button data-d="ipad">iPad</button><button data-d="phone">Phone</button></div>
+      <span class="tag later-scr" id="slater" hidden>Later</span>
+      <div class="devs" id="devs"><button data-d="ipad">iPad</button><button data-d="tablet">iPad upright</button><button data-d="phone">Phone</button></div>
     </div>
     <div class="stage-body">
       <div class="frame-wrap" id="wrap">
@@ -767,23 +861,24 @@ const P = {
   wren :{name:'Wren',  c:'orange', f:'Argent Flight',      seat:6},
 };
 const col = id => `--pc:var(--c-${P[id].c})`;
+const COLOURS = ['red','blue','green','yellow','purple','orange','pink','black'];
 
-// snapshot mid-strategy-phase: 4 picked, Sam picking now, Kira still to come
+// Mid strategy phase. Picks go in speaker order: Jaz, Kira, Tom and Priya have picked, Sam picks now, Wren picks last.
 const CARDS = [
-  {n:1, nm:'Leadership',   o:'tom'},   {n:2, nm:'Diplomacy',   o:'wren'},
+  {n:1, nm:'Leadership',   o:'tom'},   {n:2, nm:'Diplomacy',   o:null},
   {n:3, nm:'Politics',     o:'jaz'},   {n:4, nm:'Construction',o:null},
-  {n:5, nm:'Trade',        o:null},    {n:6, nm:'Warfare',     o:null, tg:true},
+  {n:5, nm:'Trade',        o:'kira'},  {n:6, nm:'Warfare',     o:null, tg:true},
   {n:7, nm:'Technology',   o:'priya'}, {n:8, nm:'Imperial',    o:null, tg:true},
 ];
 
 // Round 3 action phase — initiative order derived from card numbers
 const ORDER = [
-  {id:'tom',   init:1, state:'passed', sc:true,  total:1122},
-  {id:'wren',  init:2, state:'passed', sc:true,  total:903 },
-  {id:'jaz',   init:3, state:'wait',   sc:true,  total:1277},
-  {id:'sam',   init:4, state:'wait',   sc:false, total:775 },
-  {id:'kira',  init:5, state:'active', sc:false, total:1050},
-  {id:'priya', init:7, state:'wait',   sc:true,  total:1448},
+  {id:'tom',   init:1, state:'passed', sc:true,  total:1122, turns:4},
+  {id:'wren',  init:2, state:'passed', sc:true,  total:903,  turns:4},
+  {id:'jaz',   init:3, state:'wait',   sc:true,  total:1277, turns:3},
+  {id:'sam',   init:4, state:'wait',   sc:false, total:775,  turns:3},
+  {id:'kira',  init:5, state:'active', sc:false, total:1050, turns:3},
+  {id:'priya', init:7, state:'wait',   sc:true,  total:1448, turns:3},
 ];
 
 const fmt = s => { s=Math.max(0,Math.round(s));
@@ -794,128 +889,139 @@ const fmtL = s => { const m=Math.floor(s/60); return `${m}:${String(Math.round(s
 /* ══════════════════ fragments ══════════════════ */
 const CARDNAME = {1:'Leadership',2:'Diplomacy',3:'Politics',4:'Construction',
                   5:'Trade',6:'Warfare',7:'Technology',8:'Imperial'};
+// Marks a control that is designed but not in the app yet.
+const LATER = '<span class="later-tag">Later</span>';
+// A paused game stops every clock, so the screen behind an overlay stands still.
+const still = h => h.replace(/ data-clock="[^"]*"/g,'');
+
 const railRow = p => {
   const d=P[p.id], live = p.state==='active';
-  const chip = p.state==='active' ? '<b class="chip now">Turn</b>'
+  const chip = live ? '<b class="chip now">Turn</b>'
              : p.state==='passed' ? '<b class="chip pass">Passed</b>' : '';
   return `<div class="row ${p.state}" style="${col(p.id)}">
     ${chip}
     <div class="in num">${p.init}</div>
-    <div><div class="nm"><i></i>${d.name}</div>
-      <div class="fc"><span class="sccard ${p.sc?'used':''}">${p.sc?'✓ ':''}${CARDNAME[p.init]}</span>${d.f}</div></div>
+    <div class="who"><div class="nm"><i></i>${d.name}</div>
+      <div class="fc"><span class="sccard ${p.sc?'used':''}">${p.sc?'✓ ':''}${CARDNAME[p.init]}</span><span class="fac">${d.f}</span></div></div>
     <div class="tm">
       <div class="a num">${fmt(p.total)}</div>
-      <div class="b num">${live?'this turn 1:47':(p.state==='passed'?'4 turns':'3 turns')}</div>
+      <div class="b num">${live?'this turn 1:47':`${p.turns} ${p.turns===1?'turn':'turns'}`}</div>
     </div></div>`;
 };
 
-const topBar = (phase, extra='') => `
-  <div class="top">
-    <div class="round">Round <b>3</b></div>
-    <div class="phase-pill">
-      <span class="${phase==='str'?'on':'done'}">Strategy</span>
-      <span class="${phase==='act'?'on':(phase==='str'?'':'done')}">Action</span>
-      <span class="${phase==='sta'?'on':''}">Status</span>
-      <span class="${phase==='age'?'on':''}">Agenda</span>
-    </div>
+const PHASES = [['str','Strategy'],['act','Action'],['sta','Status'],['age','Agenda']];
+const topBar = (phase, extra='') => {
+  const at = phase==='sum' ? PHASES.length : PHASES.findIndex(p=>p[0]===phase);
+  const name = phase==='sum' ? 'Summary' : PHASES[at][1];
+  return `
+  <div class="top game">
+    <div class="round">Round <b>3</b><span class="ph-now"> · <b>${name}</b></span></div>
+    <div class="phase-pill">${PHASES.map(([,label],i)=>
+      `<span class="${i===at?'on':i<at?'done':''}">${label}</span>`).join('')}</div>
     <button class="ibtn spkb">★ Speaker: Jaz</button>
     <div class="spacer"></div>
     ${extra}
     <div class="gt">Game <b class="num" data-clock="up" data-t="9847">2:44:07</b></div>
-    <button class="ibtn">↺ Undo</button>
-    <button class="ibtn">⏸ Pause</button>
-    <button class="ibtn">⚙</button>
+    <div class="tools"><button class="ibtn">↺ Undo</button><button class="ibtn">⏸<span class="word"> Pause</span></button>
+      <button class="ibtn" aria-label="Settings">⚙</button></div>
   </div>`;
+};
 
 /* ══════════════════ screens ══════════════════ */
+// Each table screen has one template. The iPad frame draws it at 1194 × 834; the narrow frames draw the same
+// template, and the container queries in the styles arrange it. `note` explains the iPad layout, `mnote` the narrow one.
 const S = {};
 
 /* ── 1. Setup ── */
 S.setup = {t:'Setup — New Game', d:'ipad', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here and moves only when someone moves it from the speaker chip, for example after Politics (3) is played.`,
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here and moves only when someone moves it from the speaker chip, for example after Politics (3) is played. Dashed, dimmed controls marked <b>Later</b> are designed but not in the app yet: here, games with 3 or 4 players.`,
+ mnote:
+ `On a narrow screen, the Game panel moves under the seats, and the screen scrolls. On a phone, each seat row becomes a card: the arrows and the seat number on the left, the swatches and the speaker ★ on top, and the name and faction fields under them. Every control of the iPad row is still there.`,
  h:`<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
-    <button class="ibtn">Load last game</button><button class="ibtn">⚙ Settings</button></div>
+    <button class="ibtn">Load last game</button><button class="ibtn">⚙<span class="word"> Settings</span></button></div>
   <div class="content"><div class="setup-grid">
-    <div style="display:flex;flex-direction:column;min-height:0">
-      <div style="margin-bottom:16px">
-        <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:9px">Players · drag to match where people are actually sitting</div>
-        <div class="count">${[3,4,5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
+    <div class="col">
+      <div>
+        <div class="setup-label">Players · in seat order, clockwise around the table</div>
+        <div class="count">${[3,4].map(n=>`<b class="later">${n}</b>`).join('')}${[5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
       </div>
-      <div style="overflow:auto;flex:1;min-height:0">
+      <div class="scroll grow">
       ${Object.entries(P).map(([id,d])=>`
         <div class="seat ${d.speaker?'sp':''}" style="${col(id)}">
-          <div class="drag">⠿</div>
+          <div class="seat-move"><b class="${d.seat===1?'off':''}">▲</b><b class="${d.seat===6?'off':''}">▼</b></div>
           <div class="sn">Seat<br>${d.seat}</div>
-          <div class="swatches">${['red','blue','green','yellow','purple','orange'].map(c=>
+          <div class="swatches">${COLOURS.map(c=>
             `<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}</div>
-          <div class="fld">${d.name}</div>
-          <div class="fld sel">${d.f} ▾</div>
+          <div class="fld name">${d.name}</div>
+          <div class="fld sel fac">${d.f}</div>
           <div class="spk ${d.speaker?'on':''}">★</div>
         </div>`).join('')}
       </div>
     </div>
     <div class="pnl" style="display:flex;flex-direction:column">
       <div class="pnl-h">Game</div>
-      <div style="padding:16px 18px;flex:1">
+      <div class="grow" style="padding:16px 18px">
         <div class="kv"><span>Players</span><b>6</b></div>
         <div class="kv"><span>Strategy cards each</span><b>1</b></div>
         <div class="kv"><span>Speaker</span><b>Jaz</b></div>
         <div class="kv"><span>Time limits</span><b style="color:var(--warn)">Enabled</b></div>
         <div class="kv"><span>Turn limit</span><b>3:00</b></div>
         <div class="kv" style="border:none"><span>Reaction window</span><b>2:00</b></div>
-        <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:18px">
-          Seat order is the physical ring. The <b style="color:var(--dim)">speaker ★</b> is a pointer into it —
-          move it and the strategy pick order and agenda voting order both re-derive.</div>
-        <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:12px">
-          At 3–4 players each player picks <b style="color:var(--dim)">two</b> strategy cards and takes a turn at each initiative number. The app handles this automatically.</div>
+        <div class="setup-help">Seat order is the physical ring. The <b>speaker ★</b> picks first in the strategy phase and votes
+          last in the agenda phase.</div>
+        <div class="setup-help later">At 3–4 players each player picks <b>two</b> strategy cards and takes a turn at each
+          initiative number.${LATER}</div>
       </div>
-      <div style="padding:16px 18px">
-        <button class="big" style="width:100%;font-size:23px;padding:20px">BEGIN GAME</button>
-      </div>
+      <div style="padding:16px 18px"><button class="big lg" style="width:100%">BEGIN GAME</button></div>
     </div>
   </div></div></div>`};
 
 /* ── 2. Settings ── */
-const setRow = (lb,ds,val,on,off) => `<div class="set-row ${off?'off':''}">
-  <div><div class="lb">${lb}</div><div class="ds">${ds}</div></div>
-  <div class="stepper"><i>−</i><b class="num">${val}</b><i>+</i></div>
-  <div class="tog ${on?'on':''}"></div></div>`;
+const setRow = (lb,ds,ctl,tog,cls='') => `<div class="set-row ${cls}">
+  <div class="txt"><div class="lb">${lb}</div><div class="ds">${ds}</div></div>
+  <div class="ctl">${ctl}</div>${tog}</div>`;
+const tog = on => `<div class="tog ${on?'on':''}"></div>`;
+const step = v => `<div class="stepper"><i>−</i><b class="num">${v}</b><i>+</i></div>`;
+const TIMERS = [
+  ['Turn limit','A single player turn in the action phase.','3:00',true],
+  ['Reaction window','Secondary abilities after a strategy card. Closes when time is up.','2:00',true],
+  ['Agenda discussion','Per agenda, before voting opens.','4:00',true],
+  ['Vote','Per player, from the speaker’s left.','1:00',true],
+  ['Status phase','Whole table, across all seven steps.','5:00',false],
+  ['Strategy pick','Per player, choosing a card.','0:45',true],
+];
 
 S.settings = {t:'Settings — Time Limits', d:'ipad', note:
- `Limits ship <b>off</b> — tracking is the product, enforcement is opt-in. Each timer is independently switchable so a group can, say, cap the agenda phase (the usual offender) while leaving turns unlimited. Expiry is always soft: red, alarm, and the clock keeps counting <b>upward into overtime</b>, which is logged separately and shows up in the post-game stats. The app never ends a turn on its own.`,
+ `Limits ship <b>off</b> — tracking is the product, enforcement is opt-in. Each timer is independently switchable so a group can, say, cap the agenda phase (the usual offender) while leaving turns unlimited. Expiry is always soft: red, alarm, and the clock keeps counting <b>upward into overtime</b>, which is logged separately and shows up in the post-game stats. The app never ends a turn on its own. <b>End game</b> shows when settings open during a game.`,
+ mnote:
+ `The same rows in one column. On a phone, each row puts its switch next to its name, and its stepper or sound menu under the description.`,
  h:`<div class="space"></div><div class="lay">
-  <div class="top"><div class="round"><b>Settings</b></div><div class="spacer"></div><button class="ibtn">✕ Close</button></div>
+  <div class="top"><div class="round"><b>Settings</b></div><div class="spacer"></div>
+    <button class="ibtn warnish">End game</button><button class="ibtn">✕ Close</button></div>
   <div class="content">
     <div class="master"><div style="flex:1"><div class="lb">Enforce time limits</div>
-      <div class="ds">Off = pure tracking. Clocks still run and everything is recorded, but nothing ever turns red.</div></div>
-      <div class="tog on"></div></div>
+      <div class="ds">Off is pure tracking. Clocks still run and every turn is recorded.</div></div>
+      ${tog(true)}</div>
     <div class="pnl">
-      <div class="pnl-h">Timers <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">minutes : seconds</span></div>
-      ${setRow('Turn limit','A single player turn in the action phase.','3:00',true)}
-      ${setRow('Reaction window','Secondary abilities after a strategy card is played. Charged to nobody.','2:00',true)}
-      ${setRow('Agenda discussion','Per agenda, before voting opens.','4:00',true)}
-      ${setRow('Vote','Per player, in speaker order.','1:00',true)}
-      ${setRow('Status phase','Whole table, across all seven steps.','5:00',false,true)}
-      ${setRow('Strategy pick','Per player, choosing a card.','0:45',true)}
+      <div class="pnl-h">Timers</div>
+      ${TIMERS.map(([lb,ds,v,on])=>setRow(lb,ds,step(v),tog(on),on?'':'off')).join('')}
     </div>
     <div class="pnl" style="margin-top:16px">
-      <div class="pnl-h">On expiry</div>
-      <div class="set-row"><div><div class="lb">Alarm sound</div>
-        <div class="ds">Audible chime so the table notices without watching the screen.</div></div>
-        <div class="fld sel" style="text-align:center">Klaxon ▾</div><div class="tog on"></div></div>
-      <div class="set-row"><div><div class="lb">Count overtime</div>
-        <div class="ds">Clock flips to counting up. Overage is logged per turn and totalled per player.</div></div>
-        <div style="font-size:12px;color:var(--faint);text-align:center">Always on</div><div class="tog on" style="opacity:.4"></div></div>
-      <div class="set-row"><div><div class="lb">Auto-advance turn</div>
-        <div class="ds">End the turn automatically when the limit is hit. Off by design — the app is not a referee.</div></div>
-        <div></div><div class="tog"></div></div>
+      <div class="pnl-h">When time is up</div>
+      ${setRow('Alarm sound','The clock turns red and counts overtime. Nothing ends on its own.',
+        `<div style="display:flex;gap:8px"><div class="fld sel" style="flex:1">Klaxon ▾</div><button class="mini">Play</button></div>`,tog(true))}
+      ${setRow(`Count overtime${LATER}`,'Clock flips to counting up. Overage is logged per turn and totalled per player.',
+        '<div style="font-size:12px;color:var(--faint);text-align:center">Always on</div>',
+        '<div class="tog on" style="opacity:.4"></div>','later')}
+      ${setRow(`Auto-advance turn${LATER}`,'End the turn automatically when the limit is hit. Off by design — the app is not a referee.',
+        '',tog(false),'later')}
     </div>
     <div class="pnl" style="margin-top:16px">
       <div class="pnl-h">Display</div>
-      <div class="set-row"><div><div class="lb">Keep screen awake</div><div class="ds">Prevents the iPad sleeping mid-game.</div></div><div></div><div class="tog on"></div></div>
-      <div class="set-row"><div><div class="lb">Show cumulative time on rail</div><div class="ds">Off shows only the current turn, which some groups find less competitive.</div></div><div></div><div class="tog on"></div></div>
-      <div class="set-row"><div><div class="lb">Allow phone companions</div><div class="ds">Players can join on their own device and end their own turns.</div></div><div></div><div class="tog on"></div></div>
+      ${setRow('Keep screen awake','Stops the screen sleeping mid-game.','',tog(true))}
+      ${setRow('Show game time on the rail','Off shows only the current turn, which some groups find less competitive.','',tog(true))}
+      ${setRow(`Allow phone companions${LATER}`,'Players can join on their own device and end their own turns.','',tog(true),'later')}
     </div>
   </div></div>`};
 
@@ -927,14 +1033,13 @@ const rot = (a,k) => a.slice(k).concat(a.slice(0,k));
 const PICK_ORDER = rot(SEATS, SPK);        // speaker picks first, then clockwise
 const VOTE_ORDER = rot(SEATS, SPK+1);      // starts left of speaker; speaker votes last
 
+// The seats sit on an ellipse inside a 500 × 410 box, given in percent so that the ring scales with the screen.
 const ringNodes = () => SEATS.map((id,i)=>{
-  const n=SEATS.length, cx=250, cy=205, rx=190, ry=150;
-  const a=(-90 + i*360/n)*Math.PI/180;
-  return `<div class="seatnode ${i===SPK?'isspk':''} ${i===3?'cand':''}"
-      style="${col(id)};left:${cx+rx*Math.cos(a)}px;top:${cy+ry*Math.sin(a)}px">
+  const a=(-90 + i*360/SEATS.length)*Math.PI/180;
+  const x=(250+190*Math.cos(a))/500*100, y=(205+150*Math.sin(a))/410*100;
+  return `<div class="seatnode ${i===SPK?'isspk':''}" style="${col(id)};left:${x}%;top:${y}%">
     ${i===SPK?'<span class="tok">★</span>':''}
-    <i></i><div class="nm">${P[id].name}</div><div class="sn2">Seat ${i+1}</div>
-    ${i===3?'<span class="hint">Tap to make speaker</span>':''}</div>`;
+    <i></i><div class="nm">${P[id].name}</div><div class="sn2">Seat ${i+1}</div></div>`;
 }).join('');
 
 const ordList = (ids, spkIdx) => ids.map((id,i)=>
@@ -947,58 +1052,60 @@ S.seating = {t:'Speaker & Seating', d:'ipad', note:
   orders fall out automatically, so moving the token is the only thing anyone ever needs to do — and the token
   does move, via Politics (3) and certain agendas. Note the two orders differ: strategy picks start <b>with</b>
   the speaker, while agenda voting starts to their <b>left and leaves the speaker until last</b>, since they
-  break ties. Re-ordering seats is available but deliberately understated — it's a correction for a setup
+  break ties. Re-ordering seats, marked <b>Later</b>, is deliberately understated — it's a correction for a setup
   mistake, not something a round should ever need.`,
+ mnote:
+ `The ring scales down and keeps its shape, because it is a map of the real table. The two orders sit side by side under it on a phone.`,
  h:`<div class="space"></div><div class="lay">
-  <div class="top"><div class="round"><b>Speaker &amp; seating</b> · Round 3</div>
+  <div class="top stack"><div class="round"><b>Speaker &amp; seating</b> · Round 3</div>
     <div class="spacer"></div><button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
-  <div class="content" style="display:grid;grid-template-columns:1fr 400px;gap:20px">
+  <div class="content split" style="--side:400px">
     <div class="pnl" style="display:flex;flex-direction:column">
-      <div class="pnl-h">The table
-        <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">tap a seat to move the speaker token</span></div>
+      <div class="pnl-h">The table <span class="pnl-note">tap a seat to move the speaker token</span></div>
       <div style="padding:18px 0 8px">
         <div class="ringwrap">
           <div class="cc"><div class="l">Speaker</div><div class="v">★ Jaz</div>
-            <div class="s">Picks first in the strategy phase.<br>Votes last, and breaks ties.</div></div>
+            <div class="s">Picks first in the strategy phase. <br>Votes last, and breaks ties.</div></div>
           ${ringNodes()}
         </div>
       </div>
       <div style="padding:0 20px 18px;margin-top:auto">
-        <div class="note-box">Seat positions match where people are actually sitting, so "clockwise" and
-          "to the left" mean the same thing on screen as at the table.</div>
+        <div class="note-box">Seats match where people sit, so “clockwise” and “to the left” mean the same on screen as at
+          the table.</div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto">
+    <div class="col scroll seat-orders" style="gap:12px">
       <div class="pnl"><div class="pnl-h">Strategy pick order</div>
-        <div style="padding:11px 14px"><div class="ordlist">${ordList(PICK_ORDER, 0)}</div>
-          <div style="font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5">Speaker first, then clockwise.</div></div></div>
+        <div class="ord-body"><div class="ordlist">${ordList(PICK_ORDER, 0)}</div>
+          <div class="order-help">Speaker first, then clockwise.</div></div></div>
       <div class="pnl"><div class="pnl-h">Agenda voting order</div>
-        <div style="padding:11px 14px"><div class="ordlist">${ordList(VOTE_ORDER, 5)}</div>
-          <div style="font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5">Starts left of the speaker; speaker votes last.</div></div></div>
-      <button class="ibtn" style="justify-content:center;padding:13px">⠿ Re-order seats</button>
-      <div style="font-size:11.5px;color:var(--faint);line-height:1.6;text-align:center">
-        Seating is set once at game start. Re-order only to fix a mistake — it changes both orders above.</div>
+        <div class="ord-body"><div class="ordlist">${ordList(VOTE_ORDER, 5)}</div>
+          <div class="order-help">Starts left of the speaker. The speaker votes last.</div></div></div>
+      <button class="ibtn later" style="justify-content:center;padding:13px">⠿ Re-order seats${LATER}</button>
+      <div class="order-help later" style="text-align:center">Seating is set once at game start. Re-order only to fix a
+        mistake — it changes both orders above.</div>
     </div>
   </div></div>`};
 
 /* ── 4. Strategy phase ── */
 S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
  `Picks happen in <b>speaker order</b>, one at a time, with an optional per-pick timer. As cards are claimed the app builds the initiative order along the bottom — no separate ordering step, because in TI4 the card number <b>is</b> the turn order. Unchosen cards accumulate a trade good each round, shown top-right on the card, so the strip doubles as a reminder at the table.`,
+ mnote:
+ `Cards go four across on an upright iPad and two across on a phone. On a phone, the picker wraps: the pick clock stays next to the name, and the help and the speaker button go under it.`,
  h:`<div class="space"></div><div class="lay">
   ${topBar('str')}
   <div class="content" style="display:flex;flex-direction:column">
     <div class="picker" style="${col('sam')}">
-      <div><div class="lbl">Now picking · 5 of 6</div><div class="who"><i></i>Sam</div></div>
-      <div style="font-size:12.5px;color:var(--faint);line-height:1.5;margin-left:22px;max-width:250px">
-        Order derives from the speaker. Tap a card to assign it.</div>
-      <button class="ibtn spkb" style="margin-left:6px;padding:10px 14px">★ Speaker: Jaz · change</button>
+      <div class="who-box"><div class="lbl">Now picking · 5 of 6</div><div class="who"><i></i>Sam</div></div>
+      <div class="picker-help">Order follows the speaker. Tap a card to assign it.</div>
+      <button class="ibtn spkb">★ Speaker: Jaz · change</button>
       <div class="t num" data-clock="down" data-t="27" data-limit="45">0:27</div>
     </div>
-    <div class="cards" style="flex:1">
+    <div class="cards grow">
       ${CARDS.map(c=>{
         const taken=!!c.o;
         return `<div class="card ${taken?'taken':'next'}" style="${taken?col(c.o):''}">
-          ${c.tg?'<div class="tg">+1 TG</div>':''}
+          ${!taken&&c.tg?'<div class="tg">+1 TG</div>':''}
           <div class="n num">${c.n}</div><div class="nm">${c.nm}</div>
           ${taken?`<div class="own"><i></i>${P[c.o].name}</div>`:'<div class="free">Tap to assign to Sam</div>'}
         </div>`}).join('')}
@@ -1007,35 +1114,34 @@ S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
       ${ORDER.filter(p=>CARDS.some(c=>c.o===p.id)).map(p=>
         `<span class="oc" style="${col(p.id)}"><b>${p.init}</b><i></i>${P[p.id].name}</span>`).join('')}
       <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Sam</span>
-      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Kira</span></div>
+      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Wren</span></div>
   </div>
-  <div style="padding:0 22px 20px"><button class="big" style="width:100%;opacity:.45" disabled>BEGIN ACTION PHASE — 2 PICKS REMAINING</button></div>
+  <div class="foot"><button class="big" disabled>BEGIN ACTION PHASE — 2 PICKS REMAINING</button></div>
   </div>`};
 
-/* ── 4. Action phase ── */
-const actionScreen = over => `<div class="space"></div><div class="lay">
+/* ── 5. Action phase ── */
+// `held` stops the turn clock, as a reaction window does.
+const actionScreen = (over, held=false) => `<div class="space"></div><div class="lay">
   ${topBar('act')}
   <div class="body">
     <div class="hero ${over?'over':''}" style="${col('kira')}">
       ${over?`<div class="alarm"><span class="ico">🔔</span>
         <div style="flex:1"><div class="b">TURN LIMIT EXCEEDED</div>
-        <div class="s">Alarm sounded. Nothing has been ended — the clock is now counting overtime.</div></div>
+        <div class="s">The clock is counting overtime. Nothing has ended.</div></div>
         <button class="ibtn warnish">Silence</button></div>`:''}
       <div class="hero-top">
         <div class="dot"></div>
         <div><h3>Kira</h3><div class="fac">Embers of Muaat · Seat 2</div></div>
         <div class="init"><div class="n num">5</div><div class="l">Initiative</div></div>
       </div>
-      <div class="bigclock num" data-clock="up" data-t="${over?192:107}" data-limit="180" data-bar="lb${over?'2':'1'}">${over?'3:12':'1:47'}</div>
-      <div class="clock-sub">${over
-        ? 'Turn 4 · cumulative 17:30 · <b>counting overtime</b>'
-        : 'Turn 4 this round · cumulative <b>17:30</b>'}</div>
+      <div class="bigclock num" ${held?'':'data-clock="up"'} data-t="${over?192:107}" data-limit="180" data-bar="lb${over?'2':'1'}">${over?'3:12':'1:47'}</div>
+      <div class="clock-sub">Turn 4 this round · game total <b>17:30</b>${over?' · <b>counting overtime</b>':''}</div>
       <div class="limitbar"><i id="lb${over?'2':'1'}" style="width:${over?100:59}%"></i></div>
       <div class="limitrow"><span>Turn limit 3:00</span><span data-rem="lb${over?'2':'1'}">${over?'Over by 0:12':'1:13 remaining'}</span></div>
       <div class="acts">
         <button class="big ${over?'red':''}">END TURN</button>
         <button class="sec hl"><span class="k">Strategic action</span>Play Trade (5) ▸</button>
-        <button class="sec"><span class="k">Cannot pass — SC unplayed</span>Pass</button>
+        <button class="sec muted"><span class="k">Strategy card not played yet</span>Pass</button>
       </div>
     </div>
     <div class="rail">
@@ -1047,14 +1153,18 @@ const actionScreen = over => `<div class="space"></div><div class="lay">
   </div></div>`;
 
 S.action = {t:'Action Phase', d:'ipad', note:
- `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal, which is why Kira's Pass button is greyed. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
+ `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal: Kira's Pass button warns, and passing early asks first. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
+ mnote:
+ `The rail moves under the clock. End Turn, the strategic action, and Pass stay in the hero, under the clock, as on the iPad. The top bar takes two rows. On a phone, the rail rows become tiles in initiative order, so six players fit on one screen, and the phase pill becomes a thin progress line with the phase name next to the round.`,
  h:actionScreen(false)};
 
 S.overtime = {t:'Action Phase — Limit Exceeded', d:'ipad', note:
  `The same screen once the limit passes. Soft expiry: the clock goes red and <b>flips to counting overtime upward</b>, an alarm sounds so the table notices without watching, and the End Turn button turns red. Nothing has advanced and nothing is blocked — the overage is simply recorded and surfaces in the round and post-game stats.`,
+ mnote:
+ `The same screen after the turn limit, in the narrow layout. On a phone held sideways, the clock gets smaller, so that End Turn stays in reach.`,
  h:actionScreen(true)};
 
-/* ── 5. Reaction window ── */
+/* ── 6. Reaction window ── */
 const RW = [
   {id:'jaz',   done:true,  took:14},
   {id:'tom',   done:true,  took:31, passed:true},
@@ -1063,13 +1173,15 @@ const RW = [
   {id:'sam',   done:false},
 ];
 S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
- `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries.`,
- h:`${actionScreen(false)}<div class="scrim"></div>
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. The top bar stays above the window, so the table can still pause, undo, or move the speaker.`,
+ mnote:
+ `The window opens under the top bar, so Pause, Undo, and Settings stay in reach. On a phone, it is a sheet, and each reacting player gets a row with a large Mark Done button.`,
+ h:`${actionScreen(false, true)}<div class="scrim"></div>
   <div class="rw">
     <div class="rw-h" style="${col('kira')}">
       <div><div class="lbl">Strategic action · secondary abilities</div>
         <h3>Trade <span style="color:var(--faint);font-weight:600">(5)</span></h3>
-        <div class="by"><i></i>Played by Kira · her clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">1:47</b></div></div>
+        <div class="by"><i></i>Played by Kira · their clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">1:47</b></div></div>
       <div class="rw-clock"><div class="t num" data-clock="down" data-t="92" data-limit="120" data-bar="rwb">1:32</div>
         <div class="l">Window remaining · 2:00</div></div>
     </div>
@@ -1082,18 +1194,38 @@ S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
           ? `<div class="st">✓ Done</div><div class="took num">Took ${fmtL(r.took)}</div>`
           : `<button class="tapme">MARK DONE</button>`}
       </div>`).join('')}
-      <div class="tile" style="border-style:dashed;opacity:.5;justify-content:center;align-items:center">
-        <div style="font-size:13px;color:var(--faint);text-align:center;line-height:1.5">Active player<br>does not react</div></div>
+      <div class="tile tile-idle"><div>Active player<br>does not react</div></div>
     </div>
     <div class="rw-f">
-      <div class="note"><b style="color:var(--dim)">3 of 5 done.</b> Window closes automatically when the last player marks done.</div>
+      <div class="note"><b style="color:var(--dim)">3 of 5 done.</b> The window closes when the last player marks done.</div>
+      <div class="spacer"></div>
       <button class="ibtn">＋ Add 1:00</button>
       <button class="ibtn">↺ Undo last</button>
-      <button class="big" style="padding:15px 30px;font-size:18px">CLOSE WINDOW</button>
+      <button class="big small">CLOSE WINDOW</button>
     </div>
   </div>`};
 
-/* ── 6. Status phase ── */
+/* ── 7. Pass warning and pause ── */
+S.passWarn = {t:'Action Phase — Pass Warning', d:'ipad', note:
+ `Passing before the strategy card is played breaks the rules, so the app asks first. It warns and does not block, because the table is the authority and sometimes a rule is bent on purpose. End Game asks for confirmation in the same dialog.`,
+ mnote:
+ `On a phone, the dialog opens as a sheet at the bottom of the screen, with the confirm button above Cancel.`,
+ h:`${actionScreen(false)}<div class="overlay ask"><div class="dialog">
+    <h3>Pass before playing Trade?</h3>
+    <p>The rules say a player passes only after their strategic action. Pass anyway if the table agrees.</p>
+    <div class="btns"><button class="ibtn">Cancel</button><button class="big small red">Pass anyway</button></div>
+  </div></div>`};
+
+S.paused = {t:'Paused', d:'ipad', note:
+ `Pause stops every clock and charges the time to nobody. The pause time is kept on its own, so the game total still adds up. The overlay shows how long the game has been paused, and <b>Resume</b> is the only action.`,
+ mnote:
+ `The same overlay. On a phone, Resume is full width.`,
+ h:`${still(actionScreen(false))}<div class="overlay"><div class="pause-card">
+    <div class="t num" data-clock="up" data-t="42">0:42</div>
+    <div class="l">Game paused · no clock is running</div>
+    <button class="big small">RESUME</button></div></div>`};
+
+/* ── 8. Status phase ── */
 const STEPS = [
   ['Score objectives','1 public + 1 secret',1],
   ['Reveal public objective','Speaker reveals',1],
@@ -1104,24 +1236,25 @@ const STEPS = [
   ['Repair units','All damaged units',0],
 ];
 S.status = {t:'Status Phase', d:'ipad', note:
- `A whole-table timer rather than a per-player one — the status phase is procedural and mostly simultaneous. The seven steps are a checklist because they're the ones groups reliably forget (usually "remove command tokens"), and ticking them gives the timer something honest to measure. Whether the round ends here or continues into the agenda phase depends on the Custodians token, which the app tracks from setup.`,
+ `A whole-table timer rather than a per-player one — the status phase is procedural and mostly simultaneous. The seven steps are a checklist because they're the ones groups reliably forget (usually "remove command tokens"), and ticking them gives the timer something honest to measure. Whether the round ends here or continues into the agenda phase depends on the Custodians token, which the table marks here once it is removed.`,
+ mnote:
+ `The table clock moves to the top. The steps follow, then the round so far, the Custodians switch, and the button.`,
  h:`<div class="space"></div><div class="lay">
   ${topBar('sta')}
-  <div class="content" style="display:grid;grid-template-columns:1fr 420px;gap:18px">
+  <div class="content split status" style="--side:420px">
     <div class="pnl" style="display:flex;flex-direction:column">
-      <div class="pnl-h">Status phase steps <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">3 of 7</span></div>
+      <div class="pnl-h">Status phase steps <span class="pnl-note">3 of 7</span></div>
       <div style="padding:16px"><div class="steps">
-        ${STEPS.map((s,i)=>`<div class="step ${s[2]?'on':''}">
-          <div class="bx">✓</div><div><div class="lb">${s[0]}</div></div>
-          <div class="no">${s[1]}</div></div>`).join('')}
+        ${STEPS.map(s=>`<div class="step ${s[2]?'on':''}">
+          <div class="bx">✓</div><div class="lb">${s[0]}</div><div class="no">${s[1]}</div></div>`).join('')}
       </div></div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px">
-      <div class="pnl">
+    <div class="col side">
+      <div class="pnl timer">
         <div class="tabletimer"><div class="t num" data-clock="up" data-t="221">3:41</div>
           <div class="l">Status phase · no limit set</div></div>
       </div>
-      <div class="pnl" style="flex:1">
+      <div class="pnl grow">
         <div class="pnl-h">Round 3 so far</div>
         <div style="padding:14px 18px">
           <div class="kv"><span>Strategy phase</span><b class="num">2:14</b></div>
@@ -1130,64 +1263,78 @@ S.status = {t:'Status Phase', d:'ipad', note:
           <div class="kv" style="border:none"><span>Status phase</span><b class="num" data-clock="up" data-t="221">3:41</b></div>
         </div>
       </div>
-      <button class="big" style="font-size:23px;padding:21px">BEGIN AGENDA PHASE</button>
-      <div style="font-size:12px;color:var(--faint);text-align:center;line-height:1.5">
-        Custodians token removed in round 2 —<br>agenda phase is active from this round on.</div>
+      <div class="pnl custodians">
+        <div style="flex:1"><div class="lb">Custodians token removed</div>
+          <div class="ds">The agenda phase runs every round once it is gone.</div></div>
+        ${tog(true)}
+      </div>
+      <button class="big lg">BEGIN AGENDA PHASE</button>
     </div>
   </div></div>`};
 
-/* ── 7. Agenda phase ── */
+/* ── 9. Agenda phase ── */
 // clockwise starting left of the speaker; speaker (Jaz) votes last and breaks ties
 const VOTES = [
-  {id:'kira',  v:'For',     n:'12', st:'done'},
-  {id:'tom',   v:'Against', n:'8',  st:'done'},
-  {id:'priya', v:'For',     n:'15', st:'done'},
-  {id:'sam',   v:'',        n:'',   st:'now'},
-  {id:'wren',  v:'',        n:'',   st:''},
-  {id:'jaz',   v:'',        n:'',   st:'', spk:1},
+  {id:'kira',  st:'done', took:42},
+  {id:'tom',   st:'done', took:15},
+  {id:'priya', st:'done', took:62},
+  {id:'sam',   st:'now'},
+  {id:'wren',  st:''},
+  {id:'jaz',   st:'', spk:1},
 ];
 S.agenda = {t:'Agenda Phase', d:'ipad', note:
- `Two timers, because the agenda phase has two distinct failure modes. The <b>discussion timer</b> is table-wide and covers the open negotiation before voting. Then voting runs with a <b>per-player timer</b>, which is where the phase usually haemorrhages time — one player agonising over an influence count while five people wait. Voting starts to the <b>speaker's left and ends with the speaker</b>, who breaks ties — so this order is derived from the seating ring, not from initiative, and it is not the same order as the strategy phase.`,
+ `Two timers, because the agenda phase has two distinct failure modes. The <b>discussion timer</b> is table-wide and covers the open negotiation before voting; it stops when voting opens. Then voting runs with a <b>per-player timer</b>, which is where the phase usually haemorrhages time — one player agonising over an influence count while five people wait. Voting starts to the <b>speaker's left and ends with the speaker</b>, who breaks ties — so this order is derived from the seating ring, not from initiative, and it is not the same order as the strategy phase. The agenda text and the running tally are marked <b>Later</b>.`,
+ mnote:
+ `The clocks move to the top: the discussion time first, then the current voter with Vote Cast. The voting order follows, then Resolve.`,
  h:`<div class="space"></div><div class="lay">
   ${topBar('age')}
-  <div class="content" style="display:grid;grid-template-columns:1fr 430px;gap:18px">
-    <div style="display:flex;flex-direction:column;min-height:0">
-      <div class="agenda-card">
-        <div class="k">Agenda 1 of 2 · Law</div>
-        <h4>Anti-Intellectual Revolution</h4>
-        <p>For: after a player researches a technology, they must destroy one non-fighter ship. &nbsp;·&nbsp; Against: each player exhausts one planet per technology owned.</p>
+  <div class="content split agenda" style="--side:430px">
+    <div class="col">
+      <div class="agenda-card ag-card">
+        <div class="k">Agenda 1 of 2</div>
+        <h4>Voting</h4>
+        <p>Read the agenda aloud, discuss it, then vote from the speaker’s left.</p>
+        <p class="later" style="margin-top:12px"><b style="color:var(--txt)">Anti-Intellectual Revolution</b> · For: after a player
+          researches a technology, they must destroy one non-fighter ship. Against: each player exhausts one planet per
+          technology owned.${LATER}</p>
       </div>
-      <div class="pnl" style="flex:1;display:flex;flex-direction:column;min-height:0">
-        <div class="pnl-h">Voting · from speaker's left, speaker last <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">3 of 6 voted</span></div>
-        <div style="padding:14px;overflow:auto">
+      <div class="pnl grow ag-votes" style="display:flex;flex-direction:column">
+        <div class="pnl-h">Voting · from the speaker’s left, speaker last <span class="pnl-note">3 of 6 voted</span></div>
+        <div class="scroll" style="padding:14px">
           ${VOTES.map((v,i)=>`<div class="vote-row ${v.st}" style="${col(v.id)}">
             <div class="ord num">${i+1}${v.spk?' ★':''}</div>
-            <div><div class="nm"><i></i>${P[v.id].name}</div></div>
-            <div class="badge ${v.v==='For'?'f':v.v==='Against'?'a':''}">${v.v||(v.st==='now'?'Voting…':'Waiting')}</div>
-            <div class="vt num">${v.n?v.n+' votes':(v.st==='now'?'<span data-clock="down" data-t="38" data-limit="60">0:38</span>':'—')}</div>
+            <div class="nm"><i></i>${P[v.id].name}</div>
+            <div class="badge ${v.st==='done'?'f':''}">${v.st==='done'?'Voted':v.st==='now'?'Voting…':'Waiting'}</div>
+            <div class="vt num">${v.took?fmt(v.took):(v.st==='now'?'<span data-clock="down" data-t="38" data-limit="60">0:38</span>':'—')}</div>
           </div>`).join('')}
         </div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px">
-      <div class="pnl"><div class="tabletimer" style="padding:22px 0 18px">
-        <div class="t num" id="agd" style="font-size:78px" data-clock="up" data-t="266" data-limit="240">4:26</div>
-        <div class="l">Discussion · limit 4:00 · <span data-rem="agd" style="color:var(--danger)">over by 0:26</span></div></div></div>
-      <div class="pnl" style="flex:1">
-        <div class="pnl-h">Running tally</div>
+    <div class="col side">
+      <div class="pnl ag-disc"><div class="tabletimer" style="padding:22px 0 18px">
+        <div class="t num md clock-over">4:26</div>
+        <div class="l">Discussion · limit 4:00<span style="color:var(--danger)"> · over by 0:26</span></div></div></div>
+      <div class="pnl ag-now">
+        <div class="pnl-h">Now voting</div>
+        <div class="voter-now" style="${col('sam')}">
+          <div class="who"><i></i>Sam</div>
+          <div class="t num" data-clock="down" data-t="38" data-limit="60">0:38</div>
+          <button class="big small">VOTE CAST — NEXT PLAYER</button>
+        </div>
+      </div>
+      <div class="pnl grow later ag-tally">
+        <div class="pnl-h">Running tally${LATER}</div>
         <div style="padding:16px 18px">
           <div class="kv"><span>For</span><b class="num" style="color:var(--ok);font-size:19px">27</b></div>
           <div class="kv"><span>Against</span><b class="num" style="color:#ff8b80;font-size:19px">8</b></div>
           <div class="kv" style="border:none"><span>Not yet cast</span><b class="num" style="color:var(--faint)">3 players</b></div>
-          <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:16px">
-            Tally is a convenience only — the app does not resolve outcomes or apply laws.</div>
         </div>
       </div>
-      <button class="big" style="font-size:20px;padding:19px">RESOLVE → AGENDA 2</button>
+      <button class="big md ag-resolve">RESOLVE → AGENDA 2</button>
     </div>
   </div></div>`};
 
-/* ── 8. Round summary ── */
+/* ── 10. Round summary ── */
 // round 3 only — own-turn seconds sum to the 41:26 action phase
 const RS = [
   {id:'priya', ac:560, rw:120, ot:0},
@@ -1199,9 +1346,11 @@ const RS = [
 ];
 const MAXR = 700;
 S.round = {t:'Round Summary', d:'ipad', note:
- `Shown between rounds — a natural pause while the table resets. The stacked bar separates <b>own turn time</b> from <b>reaction window time</b>, because they mean different things: the first is your decision-making, the second is you holding everyone else up during someone else's strategy card. Overtime is hatched so it reads as distinct from ordinary time at a glance.`,
+ `Shown between rounds — a natural pause while the table resets. The stacked bar separates <b>own turn time</b> from <b>reaction window time</b>, because they mean different things: the first is your decision-making, the second is you holding everyone else up during someone else's strategy card. Overtime is hatched so it reads as distinct from ordinary time at a glance. Full stats and History are marked <b>Later</b>.`,
+ mnote:
+ `The four numbers go two across on a phone. The buttons wrap under the bars, and Start Round is full width.`,
  h:`<div class="space"></div><div class="lay">
-  ${topBar('sta','<button class="ibtn">📊 Full stats</button>')}
+  ${topBar('sum',`<button class="ibtn extra later">📊 Full stats${LATER}</button>`)}
   <div class="content">
     <div class="h1">Round 3 complete</div>
     <div class="h1s">58 minutes 43 seconds · game total 2 hours 44 minutes</div>
@@ -1209,7 +1358,7 @@ S.round = {t:'Round Summary', d:'ipad', note:
       <div class="stat"><div class="l">Round length</div><div class="v num">58:43</div><div class="s">+6:12 vs round 2</div></div>
       <div class="stat"><div class="l">Action phase</div><div class="v num">41:26</div><div class="s">71% of the round</div></div>
       <div class="stat"><div class="l">Reaction windows</div><div class="v num">7:52</div><div class="s">6 windows · avg 1:19</div></div>
-      <div class="stat"><div class="l">Overtime</div><div class="v num" style="color:var(--danger)">1:26</div><div class="s">2 turns over limit</div></div>
+      <div class="stat"><div class="l">Overtime</div><div class="v num" style="color:var(--danger)">1:26</div><div class="s">2 times over a limit</div></div>
     </div>
     <div class="pnl"><div class="pnl-h">Time by player · this round</div>
       <div style="padding:18px 20px"><div class="bars">
@@ -1229,12 +1378,13 @@ S.round = {t:'Round Summary', d:'ipad', note:
       </div></div>
     </div>
   </div>
-  <div style="padding:0 22px 20px;display:flex;gap:12px">
-    <button class="ibtn" style="padding:18px 24px">↺ History &amp; undo</button>
-    <button class="big" style="flex:1">START ROUND 4 — STRATEGY PHASE</button>
+  <div class="foot">
+    <button class="ibtn">End game</button>
+    <button class="ibtn later">↺ History &amp; undo${LATER}</button>
+    <button class="big">START ROUND 4 — STRATEGY PHASE</button>
   </div></div>`};
 
-/* ── 9. History & Undo ── */
+/* ── 11. History & Undo ── */
 // append-only action log, newest first. Undo pops from the top.
 const EV = [
   {ico:'▸', t:'Turn ended',             d:'Sam → Kira',             dur:'2:31', ago:'14s ago', head:1},
@@ -1248,13 +1398,15 @@ const EV = [
   {ico:'⟳', t:'Action phase began',     d:'Round 3',                            ago:'52m ago'},
 ];
 
-S.history = {t:'History & Undo', d:'ipad', note:
+S.history = {t:'History & Undo', d:'ipad', later:true, note:
  `Two operations, and deliberately no others. <b>Undo</b> pops the last action off the log — press it again to
   keep stepping back until the board matches the app, then carry on from there. It restores elapsed time as
   well as state, so a mis-tapped End Turn costs nobody their seconds. <b>Edit time</b> changes a duration and
   nothing else, because nothing is derived from a duration. Anything further — reassigning a turn, deleting an
   entry — is left out: turn order comes from initiative, so those would produce states the game can't reach.
   Undoing to an older point is the same operation repeated, so the row just says how many presses it saves.`,
+ mnote:
+ `One column. On a phone, each row puts its time and its two actions on a second line, and the round filter takes its own row in the top bar.`,
  h:`<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>History</b> · Round 3</div>
     <div class="phase-pill"><span class="on">Round 3</span><span>Round 2</span><span>Round 1</span><span>All</span></div>
@@ -1263,18 +1415,18 @@ S.history = {t:'History & Undo', d:'ipad', note:
     <div class="undo-bar">
       <div style="flex:1"><div class="k">Last action</div>
         <div class="v">Turn ended — Sam → Kira</div>
-        <div class="s">14 seconds ago · undoing returns Sam's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to him</div></div>
+        <div class="s">14 seconds ago · undoing returns Sam's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to them</div></div>
       <button class="big" style="padding:18px 34px;font-size:21px">↺ UNDO</button>
     </div>
     <div class="pnl">
       <div class="pnl-h">Everything that has happened · newest first
-        <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">press undo repeatedly to step back</span></div>
+        <span class="pnl-note">press undo repeatedly to step back</span></div>
       <div style="padding:15px 16px">
         ${EV.map(e=>{
           if(e.sel) return `<div class="ev sel">
             <div class="ico">${e.ico}</div>
             <div><div class="t">${e.t}</div><div class="d">${e.d}</div></div>
-            <div class="ago">${e.ago}</div>
+            <div class="evr"><span class="ago">${e.ago}</span></div>
             <div class="cascade">
               <div class="w"><span>↺</span>Undo back to here?</div>
               <div class="l">That's <b>4 presses of undo</b> — everything above this row comes off the log too:
@@ -1286,7 +1438,7 @@ S.history = {t:'History & Undo', d:'ipad', note:
           if(e.edit) return `<div class="ev" style="border-color:#33566b;background:#0c1721">
             <div class="ico">${e.ico}</div>
             <div><div class="t">${e.t}</div><div class="d">${e.d}</div></div>
-            <div style="display:flex;align-items:center;gap:12px">
+            <div class="evr" style="gap:12px">
               <span style="font-size:12px;color:var(--faint)">5-second steps</span>
               <div class="stepper" style="width:140px"><i>−</i><b class="num">4:12</b><i>+</i></div>
               <button class="mini">Cancel</button><button class="mini dn">Save</button></div>
@@ -1298,7 +1450,7 @@ S.history = {t:'History & Undo', d:'ipad', note:
             <div class="ico">${e.ico}</div>
             <div><div class="t">${e.t}</div>
               <div class="d">${e.d}${e.warn?`<span class="pill-note">${e.warn}</span>`:''}</div></div>
-            <div style="display:flex;align-items:center">
+            <div class="evr">
               ${e.dur?`<span class="dur2 num">${e.dur}${e.ot?`<s>${e.ot}</s>`:''}</span>`:''}
               <span class="ago" style="width:70px">${e.ago}</span>
               ${e.dur?'<button class="mini">Edit time</button>':''}
@@ -1309,7 +1461,7 @@ S.history = {t:'History & Undo', d:'ipad', note:
   </div>
   </div>`};
 
-/* ── 10. Post-game stats ── */
+/* ── 12. Post-game stats ── */
 // whole game — own-turn seconds sum to 15600 (4:20:00), 168 turns
 const PG = [
   {id:'priya', tot:3240, turns:33, worst:612, ot:3, ots:402},
@@ -1320,11 +1472,24 @@ const PG = [
   {id:'sam',   tot:1920, turns:22, worst:344, ot:0, ots:0},
 ];
 const PGTOT = 15600, PGMAX = 3400;
+// Where the game went, in seconds. The rows add up to the 7:30:00 game total.
+const WHERE = [
+  ['Action phase — own turns', 15600, 'var(--c-blue)'],
+  ['Reaction windows',          3720, '#2a4f70'],
+  ['Agenda phase',              3480, 'var(--c-purple)'],
+  ['Status phase',              2160, 'var(--c-green)'],
+  ['Strategy phase',            1560, 'var(--c-yellow)'],
+  ['Between rounds',             480, 'var(--line2)'],
+];
+const GAME = WHERE.reduce((s,x)=>s+x[1],0);
 S.stats = {t:'Post-game Stats', d:'ipad', note:
- `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Exportable as JSON or CSV so a group can build a season's worth of data.`,
+ `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Export, marked <b>Later</b>, will let a group build a season's worth of data.`,
+ mnote:
+ `One column. On a phone, each table row becomes a block: the player, then Turns, Avg turn, Worst turn, Over limit, and Share, each with its label.`,
  h:`<div class="space"></div><div class="lay">
-  <div class="top"><div class="round"><b>Game complete</b> · 8 rounds</div><div class="spacer"></div>
-    <button class="ibtn">⬇ Export CSV</button><button class="ibtn">⬇ Export JSON</button><button class="ibtn">New game</button></div>
+  <div class="top stack"><div class="round"><b>Game complete</b> · 8 rounds</div><div class="spacer"></div>
+    <button class="ibtn later">⬇ Export CSV${LATER}</button><button class="ibtn later">⬇ Export JSON${LATER}</button>
+    <button class="ibtn">↺ Reopen game</button><button class="ibtn">New game</button></div>
   <div class="content">
     <div class="h1">7 hours 30 minutes</div>
     <div class="h1s">6 players · 8 rounds · 168 turns · 41 reaction windows</div>
@@ -1332,10 +1497,10 @@ S.stats = {t:'Post-game Stats', d:'ipad', note:
       <div class="stat"><div class="l">Longest round</div><div class="v num">1:04:18</div><div class="s">Round 6</div></div>
       <div class="stat"><div class="l">Average turn</div><div class="v num">1:33</div><div class="s">across all players</div></div>
       <div class="stat"><div class="l">Agenda phase total</div><div class="v num">58:00</div><div class="s">13% of the game</div></div>
-      <div class="stat"><div class="l">Total overtime</div><div class="v num" style="color:var(--danger)">18:44</div><div class="s">10 turns over limit</div></div>
+      <div class="stat"><div class="l">Total overtime</div><div class="v num" style="color:var(--danger)">18:44</div><div class="s">10 times over a limit</div></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 400px;gap:18px">
-      <div class="pnl"><div class="pnl-h">Own-turn time by player <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)">4:20:00 total</span></div>
+    <div class="split" style="--side:400px">
+      <div class="pnl"><div class="pnl-h">Own-turn time by player <span class="pnl-note">4:20:00 total</span></div>
         <div style="padding:18px 20px"><div class="bars">
           ${PG.map(r=>`<div class="bar-row" style="${col(r.id)}">
             <div class="nm"><i></i>${P[r.id].name}</div>
@@ -1348,44 +1513,40 @@ S.stats = {t:'Post-game Stats', d:'ipad', note:
         <table class="tbl" style="margin-top:20px">
           <thead><tr><th>Player</th><th>Turns</th><th>Avg turn</th><th>Worst turn</th><th>Over limit</th><th>Share</th></tr></thead>
           <tbody>${PG.map(r=>`<tr><td><div class="pl" style="${col(r.id)}"><i></i>${P[r.id].name}</div></td>
-            <td class="num">${r.turns}</td>
-            <td class="num">${fmt(r.tot/r.turns)}</td><td class="num">${fmt(r.worst)}</td>
-            <td class="num" style="${r.ot?'color:var(--danger)':'color:var(--faint)'}">${r.ot?r.ot+' · '+fmt(r.ots):'—'}</td>
-            <td class="num">${Math.round(r.tot/PGTOT*100)}%</td></tr>`).join('')}</tbody>
+            <td class="num" data-l="Turns">${r.turns}</td>
+            <td class="num" data-l="Avg turn">${fmt(r.tot/r.turns)}</td><td class="num" data-l="Worst turn">${fmt(r.worst)}</td>
+            <td class="num" data-l="Over limit" style="${r.ot?'color:var(--danger)':'color:var(--faint)'}">${r.ot?r.ot+' · '+fmt(r.ots):'—'}</td>
+            <td class="num" data-l="Share">${Math.round(r.tot/PGTOT*100)}%</td></tr>`).join('')}</tbody>
         </table></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="col">
         <div class="pnl"><div class="pnl-h">Where the game went</div>
           <div style="padding:16px 18px">
-            ${[['Action phase — own turns','4:20:00',57,'var(--c-blue)'],
-               ['Reaction windows','1:02:00',14,'#2a4f70'],
-               ['Agenda phase','0:58:00',13,'var(--c-purple)'],
-               ['Status phase','0:44:00',10,'var(--c-green)'],
-               ['Strategy phase','0:26:00',6,'var(--c-yellow)']].map(x=>`
+            ${WHERE.map(([label,s,c])=>`
               <div style="margin-bottom:13px">
-                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
-                  <span>${x[0]}</span><b class="num">${x[1]}</b></div>
-                <div class="track" style="height:9px"><u style="width:${x[2]}%;background:${x[3]}"></u></div></div>`).join('')}
+                <div class="phase-line"><span>${label}</span><b class="num">${fmt(s)}</b></div>
+                <div class="track" style="height:9px"><u style="width:${Math.round(s/GAME*100)}%;background:${c}"></u></div></div>`).join('')}
           </div></div>
-        <div class="pnl" style="flex:1"><div class="pnl-h">Longest turns</div>
+        <div class="pnl grow"><div class="pnl-h">Longest turns</div>
           <div style="padding:8px 18px 16px">
-            ${[['priya',612,'R6 · tactical action, Mecatol'],['tom',521,'R4 · Leadership primary'],
-               ['jaz',498,'R7 · tactical action'],['kira',455,'R6 · Warfare primary']].map(x=>`
-              <div class="kv" style="${col(x[0])}"><span class="pl" style="display:flex;align-items:center;gap:8px">
-                <i style="width:9px;height:9px;border-radius:50%;background:var(--pc);font-style:normal"></i>
-                ${P[x[0]].name} <span style="color:var(--faint);font-size:11.5px">${x[2]}</span></span>
+            ${[['priya',612,'R6'],['tom',521,'R4 · Leadership primary'],
+               ['jaz',498,'R7'],['kira',455,'R6 · Warfare primary']].map(x=>`
+              <div class="kv long-turn" style="${col(x[0])}"><span class="pl"><i></i>${P[x[0]].name}
+                <span class="pnl-note">${x[2]}</span></span>
                 <b class="num" style="color:var(--danger)">${fmt(x[1])}</b></div>`).join('')}
           </div></div>
       </div>
     </div>
   </div></div>`};
 
-/* ── 11. Join ── */
-S.join = {t:'Join — Phone Companions', d:'ipad', note:
- `The bridge to the add-on. Phones are always <b>optional</b> — the tabletop device stays fully functional on its own, and a player whose phone drops off simply uses the iPad as before. That constraint is what keeps the companion an add-on rather than a dependency, and it's the reason this screen shows connection state so plainly.`,
+/* ── 13. Join ── */
+S.join = {t:'Join — Phone Companions', d:'ipad', later:true, note:
+ `The bridge to the add-on. Phones are always <b>optional</b> — the tabletop device stays fully functional on its own, and a player whose phone drops off simply uses it as before. That constraint is what keeps the companion an add-on rather than a dependency, and it's the reason this screen shows connection state so plainly.`,
+ mnote:
+ `One column: the QR code and the join code first, then the connected players. When a phone is the table device, it shows the same screen for the other phones.`,
  h:`<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>Join game</b></div><div class="spacer"></div><button class="ibtn">✕ Close</button></div>
-  <div class="content" style="display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center;padding:0 60px">
+  <div class="content join-grid">
     <div style="text-align:center">
       <div class="qr" id="qr" style="margin:0 auto"></div>
       <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:22px">Or enter the code at ti4tempo.app</div>
@@ -1394,7 +1555,7 @@ S.join = {t:'Join — Phone Companions', d:'ipad', note:
     <div>
       <div class="h1" style="font-size:25px">Play from your own phone</div>
       <div class="h1s" style="line-height:1.65">End your own turn, mark yourself done in a reaction window, and see your running time — without reaching across the table.<br><br>
-        <b style="color:var(--dim)">Entirely optional.</b> The iPad stays fully functional on its own, and anyone who doesn't join just uses it as normal.</div>
+        <b style="color:var(--dim)">Entirely optional.</b> The table device stays fully functional on its own, and anyone who doesn't join just uses it as normal.</div>
       <div style="margin-top:26px">
         <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:11px">Connected · 4 of 6</div>
         ${Object.entries(P).map(([id,d],i)=>`<div class="dev-row" style="${col(id)}">
@@ -1545,459 +1706,6 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
   <div style="margin-top:auto"><button class="ph-btn ghost">See the full table breakdown</button></div>
   </div>`};
 
-/* ══════════════════ pause and pass warning ══════════════════ */
-// A paused game stops every clock, so the screen behind the overlay stands still.
-const still = h => h.replace(/ data-clock="[^"]*"/g,'');
-
-S.passWarn = {t:'Action Phase — Pass Warning', d:'ipad', note:
- `Passing before the strategy card is played breaks the rules, so the app asks first. It warns and does not block, because the table is the authority and sometimes a rule is bent on purpose. End Game asks for confirmation in the same dialog.`,
- h:`${actionScreen(false)}<div class="overlay"><div class="dialog">
-    <h3>Pass before playing Trade?</h3>
-    <p>The rules say a player passes only after their strategic action. Pass anyway if the table agrees.</p>
-    <div class="btns"><button class="ibtn">Cancel</button><button class="big small red">Pass anyway</button></div>
-  </div></div>`};
-
-S.paused = {t:'Paused', d:'ipad', note:
- `Pause stops every clock and charges the time to nobody. The pause time is kept on its own, so the game total still adds up. The overlay shows how long the game has been paused, and <b>Resume</b> is the only action.`,
- h:`${still(actionScreen(false))}<div class="overlay"><div class="pause-card">
-    <div class="t num" data-clock="up" data-t="42">0:42</div>
-    <div class="l">Game paused · no clock is running</div>
-    <button class="big small">RESUME</button></div></div>`};
-
-/* ══════════════════ phone layouts of the table screens ══════════════════ */
-// One entry per screen: `h` is the iPad layout and `m` is the phone layout.
-const PHASES = ['str','act','sta','age'];
-const PHASE_NAME = {str:'Strategy', act:'Action', sta:'Status', age:'Agenda', sum:'Summary'};
-const COLOURS = ['red','blue','green','yellow','purple','orange','pink','black'];
-
-const mTop = phase => {
-  const at = phase==='sum' ? PHASES.length : PHASES.indexOf(phase);
-  return `<div class="m-top">
-    <div class="r1"><div class="rd">Round <b>3</b> · <b>${PHASE_NAME[phase]}</b></div>
-      <div class="gt">Game <b class="num" data-clock="up" data-t="9847">2:44:07</b></div></div>
-    <div class="r2"><button class="ibtn spkb">★ Speaker: Jaz</button><div class="spacer"></div>
-      <button class="ibtn">↺ Undo</button><button class="ibtn ico">⏸</button><button class="ibtn ico">⚙</button></div>
-    <div class="m-ph">${PHASES.map((p,i)=>`<u class="${i===at?'on':i<at?'done':''}"></u>`).join('')}</div>
-  </div>`;
-};
-
-const mTile = p => {
-  const chip = p.state==='active' ? '<b class="chip now">Turn</b>'
-             : p.state==='passed' ? '<b class="chip pass">Passed</b>' : '';
-  return `<div class="m-tile ${p.state}" style="${col(p.id)}">${chip}
-    <div class="t1"><b class="in num">${p.init}</b><span class="nm">${P[p.id].name}</span></div>
-    <div><span class="sccard ${p.sc?'used':''}">${p.sc?'✓ ':''}${CARDNAME[p.init]}</span></div>
-    <div class="tm num">${fmt(p.total)}</div></div>`;
-};
-
-const mAction = over => `<div class="space"></div><div class="m">
-  ${mTop('act')}
-  <div class="m-pin">
-    <div class="hero m-hero ${over?'over':''}" style="${col('kira')}">
-      ${over?`<div class="alarm"><span class="ico">🔔</span>
-        <div class="b" style="flex:1">TURN LIMIT EXCEEDED</div>
-        <button class="ibtn warnish">Silence</button></div>`:''}
-      <div class="hero-top">
-        <div class="dot"></div>
-        <div><h3>Kira</h3><div class="fac">Embers of Muaat · Seat 2</div></div>
-        <div class="init"><div class="n num">5</div><div class="l">Initiative</div></div>
-      </div>
-      <div class="bigclock num" data-clock="up" data-t="${over?192:107}" data-limit="180" data-bar="mlb${over?2:1}">${over?'3:12':'1:47'}</div>
-      <div class="clock-sub">Turn 4 this round · game total <b>17:30</b>${over?' · <b>counting overtime</b>':''}</div>
-      <div class="limitbar"><i id="mlb${over?2:1}" style="width:${over?100:59}%"></i></div>
-      <div class="limitrow"><span>Turn limit 3:00</span><span data-rem="mlb${over?2:1}">${over?'Over by 0:12':'1:13 remaining'}</span></div>
-    </div>
-  </div>
-  <div class="m-body">
-    <div class="m-sec" style="margin-top:0">Initiative · set by strategy card<span>2 of 6 passed</span></div>
-    <div class="m-tiles">${ORDER.map(mTile).join('')}</div>
-    <div class="m-legend"><span><span class="sccard">Card</span>still to play</span>
-      <span><span class="sccard used">✓ Card</span>already played</span></div>
-  </div>
-  <div class="m-foot">
-    <div class="two">
-      <button class="sec hl"><span class="k">Strategic action</span>Play Trade (5) ▸</button>
-      <button class="sec muted"><span class="k">Card not played yet</span>Pass</button>
-    </div>
-    <button class="big ${over?'red':''}">END TURN</button>
-  </div></div>`;
-
-/* ── phone: setup ── */
-S.setup.m = `<div class="space"></div><div class="m">
-  <div class="m-head"><div class="round"><b>New Game</b></div><div class="spacer"></div>
-    <button class="ibtn">Load last game</button><button class="ibtn ico">⚙</button></div>
-  <div class="m-body">
-    <div class="m-sec" style="margin-top:0">Seat order · clockwise around the table</div>
-    <div class="count">${[5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
-    <div style="margin-top:12px">${Object.entries(P).map(([id,d])=>`
-      <div class="m-seat ${d.speaker?'sp':''}" style="${col(id)}">
-        <div class="mv"><span style="${d.seat===1?'opacity:.25':''}">▲</span><b class="num">${d.seat}</b>
-          <span style="${d.seat===6?'opacity:.25':''}">▼</span></div>
-        <div>
-          <div class="r1">${COLOURS.map(c=>`<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}
-            <div class="spk ${d.speaker?'on':''}">★</div></div>
-          <div class="r2"><div class="fld">${d.name}</div><div class="fld sel">${d.f}</div></div>
-        </div>
-      </div>`).join('')}</div>
-    <div class="pnl" style="margin-top:6px"><div class="pnl-h">Game</div>
-      <div style="padding:2px 14px 12px">
-        <div class="kv"><span>Players</span><b>6</b></div>
-        <div class="kv"><span>Strategy cards each</span><b>1</b></div>
-        <div class="kv"><span>Speaker</span><b>Jaz</b></div>
-        <div class="kv" style="border:none"><span>Time limits</span><b>Off</b></div>
-        <div class="m-help" style="margin:8px 0 0">Seat order is the physical ring. The <b style="color:var(--dim)">speaker ★</b>
-          picks first in the strategy phase and votes last in the agenda phase.</div>
-      </div></div>
-  </div>
-  <div class="m-foot"><button class="big">BEGIN GAME</button></div>
-</div>`;
-S.setup.mnote =
- `Each seat is a card, and the cards go down the screen in seat order, so the list reads clockwise round the table. A card keeps everything in the iPad row: the seat number between ▲ and ▼, the eight colour swatches, the speaker ★, and the name and faction fields. <b>Begin Game</b> stays at the bottom of the screen while the list scrolls.`;
-
-/* ── phone: settings ── */
-const mSet = (lb,ds,val,on,off) => `<div class="m-set ${off?'off':''}">
-  <div class="a"><div class="lb">${lb}</div><div class="tog ${on?'on':''}"></div></div>
-  <div class="b"><div class="ds">${ds}</div><div class="stepper"><i>−</i><b class="num">${val}</b><i>+</i></div></div></div>`;
-
-S.settings.m = `<div class="space"></div><div class="m">
-  <div class="m-head"><div class="round"><b>Settings</b></div><div class="spacer"></div><button class="ibtn">✕ Close</button></div>
-  <div class="m-body">
-    <div class="master"><div style="flex:1"><div class="lb">Enforce time limits</div>
-      <div class="ds">Off is pure tracking. Clocks still run and every turn is recorded.</div></div><div class="tog on"></div></div>
-    <div class="pnl"><div class="pnl-h">Timers</div>
-      ${mSet('Turn limit','A single player turn in the action phase.','3:00',true)}
-      ${mSet('Reaction window','Secondary abilities after a strategy card. Closes when time is up.','2:00',true)}
-      ${mSet('Agenda discussion','Per agenda, before voting opens.','4:00',true)}
-      ${mSet('Vote','Per player, from the speaker’s left.','1:00',true)}
-      ${mSet('Status phase','Whole table, across all seven steps.','5:00',false,true)}
-      ${mSet('Strategy pick','Per player, choosing a card.','0:45',true)}
-    </div>
-    <div class="pnl" style="margin-top:14px"><div class="pnl-h">When time is up</div>
-      <div class="m-set"><div class="a"><div class="lb">Alarm sound</div><div class="tog on"></div></div>
-        <div class="b"><div class="ds">The clock turns red and counts overtime. Nothing ends on its own.</div></div>
-        <div class="b"><div class="fld sel" style="flex:1">Klaxon ▾</div><button class="mini">Play</button></div></div>
-    </div>
-    <div class="pnl" style="margin-top:14px"><div class="pnl-h">Display</div>
-      <div class="m-set"><div class="a"><div class="lb">Keep screen awake</div><div class="tog on"></div></div>
-        <div class="b"><div class="ds">Stops the screen sleeping mid-game.</div></div></div>
-      <div class="m-set"><div class="a"><div class="lb">Show game time on the rail</div><div class="tog on"></div></div>
-        <div class="b"><div class="ds">Off shows only the current turn, which some groups find less competitive.</div></div></div>
-    </div>
-    <button class="ibtn warnish m-end">End game</button>
-  </div>
-</div>`;
-S.settings.mnote =
- `The same settings as on the iPad, in one column. Each timer puts its switch next to its name and its stepper under the description. During a game, <b>End game</b> is at the end of the list, not next to <b>Close</b>. The screen-awake text names no device, so one string serves both layouts.`;
-
-/* ── phone: speaker and seating ── */
-const mRing = () => SEATS.map((id,i)=>{
-  const n=SEATS.length, cx=184, cy=152, rx=128, ry=108;
-  const a=(-90 + i*360/n)*Math.PI/180;
-  return `<div class="seatnode ${i===SPK?'isspk':''}" style="${col(id)};left:${cx+rx*Math.cos(a)}px;top:${cy+ry*Math.sin(a)}px">
-    ${i===SPK?'<span class="tok">★</span>':''}<i></i><div class="nm">${P[id].name}</div><div class="sn2">Seat ${i+1}</div></div>`;
-}).join('');
-const mOrd = (ids, spkIdx) => ids.map((id,i)=>
-  `<div class="ordrow ${i===spkIdx?'isspk':''}" style="${col(id)}">
-    <div class="n2">${i+1}</div><div class="nm"><i></i>${P[id].name}</div>
-    ${i===spkIdx?'<span class="tag2">★</span>':'<span></span>'}</div>`).join('');
-
-S.seating.m = `<div class="space"></div><div class="m">
-  <div class="m-head"><div class="round"><b>Speaker &amp; seating</b></div><div class="spacer"></div>
-    <button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
-  <div class="m-body">
-    <div class="m-sec" style="margin-top:0">The table<span>tap a seat to move the speaker token</span></div>
-    <div class="m-ring"><div class="cc" style="width:130px"><div class="l">Speaker</div><div class="v">★ Jaz</div>
-      <div class="s">Picks first in the strategy phase. Votes last, and breaks ties.</div></div>${mRing()}</div>
-    <div class="note-box">Seats match where people sit, so “clockwise” and “to the left” mean the same on screen as at the table.</div>
-    <div class="m-ords">
-      <div class="pnl"><div class="pnl-h">Strategy pick order</div><div class="ordlist">${mOrd(PICK_ORDER,0)}</div>
-        <div class="order-help">Speaker first, then clockwise.</div></div>
-      <div class="pnl"><div class="pnl-h">Agenda voting order</div><div class="ordlist">${mOrd(VOTE_ORDER,5)}</div>
-        <div class="order-help">Starts left of the speaker. The speaker votes last.</div></div>
-    </div>
-  </div></div>`;
-S.seating.mnote =
- `The ring stays, smaller, because it is a map of the real table: “clockwise” and “to the left” mean the same on screen as at the table. The two orders sit side by side under it, so one tap on a seat shows its effect on both.`;
-
-/* ── phone: strategy phase ── */
-S.strategy.m = `<div class="space"></div><div class="m">
-  ${mTop('str')}
-  <div class="m-body">
-    <div class="picker m-picker" style="${col('sam')}">
-      <div><div class="lbl">Now picking · 5 of 6</div><div class="who"><i></i>Sam</div></div>
-      <div class="t num" data-clock="down" data-t="27" data-limit="45">0:27</div>
-    </div>
-    <div class="m-help">Order follows the speaker. Tap a card to assign it.</div>
-    <div class="cards">
-      ${CARDS.map(c=>{
-        const taken=!!c.o;
-        return `<div class="card ${taken?'taken':'next'}" style="${taken?col(c.o):''}">
-          <div class="n num">${c.n}</div><div class="nm">${c.nm}</div>
-          ${!taken&&c.tg?'<span class="tg">+1 TG</span>':''}
-          ${taken?`<div class="own"><i></i>${P[c.o].name}</div>`:'<div class="free">Assign to Sam</div>'}
-        </div>`}).join('')}
-    </div>
-    <div class="m-sec">Initiative order so far</div>
-    <div class="order-strip">
-      ${ORDER.filter(p=>CARDS.some(c=>c.o===p.id)).map(p=>
-        `<span class="oc" style="${col(p.id)}"><b>${p.init}</b><i></i>${P[p.id].name}</span>`).join('')}
-      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Sam</span>
-      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Kira</span></div>
-  </div>
-  <div class="m-foot"><button class="big" style="opacity:.45" disabled>BEGIN ACTION PHASE<small>2 picks remaining</small></button></div>
-</div>`;
-S.strategy.mnote =
- `Cards go two across, in number order. The picker and the pick clock stay at the top. The speaker chip in the top bar does the work of the iPad's second speaker button. <b>Begin Action Phase</b> is at the bottom and stays disabled until every player has a card.`;
-
-/* ── phone: action phase, overtime, reaction window, pass warning, pause ── */
-S.action.m = mAction(false);
-S.action.mnote =
- `<b>The hero screen on a phone.</b> The turn clock is the largest thing on the screen. <b>End Turn</b> spans the bottom edge, under the thumb, with the strategic action and Pass directly above it. The initiative rail becomes a grid of tiles in initiative order, so six players fit without scrolling: the number in the player's colour, the card chip (blue: still to play, grey with ✓: played), and the game time. When the tiles do not fit, for example with seven or eight players or on a short phone, only the tiles scroll. The clock and the buttons stay in place. The top bar keeps the round, the phase, the game clock, the speaker chip, Undo, Pause and Settings on every in-game screen, and the line under it shows how far the round has gone.`;
-
-S.overtime.m = mAction(true);
-S.overtime.mnote =
- `The same screen after the turn limit: the clock turns red and counts overtime, a one-line alarm banner opens at the top of the hero, and <b>End Turn</b> turns red. Nothing ends on its own. On a short phone the clock gets smaller, so that End Turn always stays on the screen.`;
-
-S.reaction.m = `${still(mAction(false))}<div class="scrim"></div>
-  <div class="m-sheet">
-    <div class="rw-h" style="${col('kira')}">
-      <div class="lbl">Strategic action · secondary abilities</div>
-      <h3>Trade <span style="color:var(--faint);font-weight:600">(5)</span></h3>
-      <div class="by"><i></i>Played by Kira · their clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">1:47</b></div>
-    </div>
-    <div class="m-rwc"><div class="t num" data-clock="down" data-t="92" data-limit="120" data-bar="mrwb">1:32</div>
-      <div class="l">Window remaining · 2:00</div></div>
-    <div class="rw-bar"><i id="mrwb" style="width:77%"></i></div>
-    <div class="m-rlist">
-      ${RW.map(r=>`<div class="m-rrow ${r.done?'done':''}" style="${col(r.id)}">
-        <div><div class="nm"><i></i>${P[r.id].name}${r.passed?'<span class="pchip">Passed</span>':''}</div>
-          <div class="fc">${P[r.id].f}</div></div>
-        ${r.done?`<div class="st">✓ Done<span class="took num">Took ${fmtL(r.took)}</span></div>`
-               :'<button class="tapme">MARK DONE</button>'}
-      </div>`).join('')}
-      <div class="m-rrow idle">Active player does not react</div>
-    </div>
-    <div class="m-foot">
-      <div class="note"><b style="color:var(--dim)">3 of 5 done.</b> The window closes when the last player marks done.</div>
-      <div class="two"><button class="ibtn">＋ Add 1:00</button><button class="ibtn">↺ Undo last</button></div>
-      <button class="big">CLOSE WINDOW</button>
-    </div>
-  </div>`;
-S.reaction.mnote =
- `A sheet over the action screen, at full height. Each reacting player has a row with a large <b>Mark done</b> button, because players reach in or pass the phone round. The countdown is large and centred. <b>Close window</b> is the main action at the bottom, with Add 1:00 and Undo last above it. As on the iPad, passed players still get a row.`;
-
-S.passWarn.m = `${mAction(false)}<div class="ph-modal"><div class="ph-sheet">
-    <h3>Pass before playing Trade?</h3>
-    <p>The rules say a player passes only after their strategic action. Pass anyway if the table agrees.</p>
-    <div style="display:grid;gap:10px;margin-top:20px">
-      <button class="ph-btn red">Pass anyway</button>
-      <button class="ph-btn ghost">Cancel</button></div>
-  </div></div>`;
-S.passWarn.mnote =
- `On a phone, a confirmation opens as a sheet from the bottom, with the confirm button under the thumb, as on the phone companion. End Game uses the same sheet.`;
-
-S.paused.m = `${still(mAction(false))}<div class="overlay m-pause">
-    <div class="pause-card"><div class="t num" data-clock="up" data-t="42">0:42</div>
-      <div class="l">Game paused · no clock is running</div></div>
-    <button class="big">RESUME</button></div>`;
-S.paused.mnote =
- `The same pause overlay. <b>Resume</b> is at the bottom, under the thumb.`;
-
-/* ── phone: status phase ── */
-S.status.m = `<div class="space"></div><div class="m">
-  ${mTop('sta')}
-  <div class="m-body">
-    <div class="pnl"><div class="tabletimer"><div class="t num" data-clock="up" data-t="221">3:41</div>
-      <div class="l">Status phase · no limit set</div></div></div>
-    <div class="m-sec">Status phase steps<span>3 of 7</span></div>
-    <div class="steps">${STEPS.map(s=>`<div class="step ${s[2]?'on':''}">
-      <div class="bx">✓</div><div><div class="lb">${s[0]}</div><div class="no">${s[1]}</div></div></div>`).join('')}</div>
-    <div class="pnl" style="margin-top:14px"><div class="pnl-h">Round 3 so far</div>
-      <div style="padding:2px 14px 4px">
-        <div class="kv"><span>Strategy phase</span><b class="num">2:14</b></div>
-        <div class="kv"><span>Action phase</span><b class="num">41:26</b></div>
-        <div class="kv"><span>Reaction windows</span><b class="num">7:52</b></div>
-        <div class="kv" style="border:none"><span>Status phase</span><b class="num" data-clock="up" data-t="221">3:41</b></div>
-      </div></div>
-  </div>
-  <div class="m-foot">
-    <div class="m-cust"><div style="flex:1"><div class="lb">Custodians token removed</div>
-      <div class="ds">The agenda phase runs every round once it is gone.</div></div><div class="tog on"></div></div>
-    <button class="big">BEGIN AGENDA PHASE</button>
-  </div></div>`;
-S.status.mnote =
- `The table clock is first, then the seven steps as a checklist. The Custodians switch sits in the bottom bar next to the button, because it decides what the button does: begin the agenda phase, or end the round.`;
-
-/* ── phone: agenda phase ── */
-const VOTE_TIME = {kira:'0:42', tom:'0:15', priya:'1:02'};
-S.agenda.m = `<div class="space"></div><div class="m">
-  ${mTop('age')}
-  <div class="m-body">
-    <div class="agenda-card m-agenda">
-      <div class="k"><span>Agenda 1 of 2</span><span>Discussion <b class="num" style="color:var(--danger)">4:26</b></span></div>
-      <h4>Voting</h4>
-      <p>Read the agenda aloud, discuss it, then vote from the speaker’s left.</p>
-    </div>
-    <div class="m-voter" style="${col('sam')}">
-      <div><div class="lbl">Now voting</div><div class="who"><i></i>Sam</div></div>
-      <div class="t num" data-clock="down" data-t="38" data-limit="60">0:38</div>
-    </div>
-    <div class="m-sec">Voting order · speaker last<span>3 of 6 voted</span></div>
-    ${VOTES.map((v,i)=>`<div class="vote-row ${v.st}" style="${col(v.id)}">
-      <div class="ord num">${i+1}${v.spk?' ★':''}</div>
-      <div class="nm"><i></i>${P[v.id].name}</div>
-      <div class="badge ${v.st==='done'?'f':''}">${v.st==='done'?'Voted':v.st==='now'?'Voting…':'Waiting'}</div>
-      <div class="vt num">${VOTE_TIME[v.id] || (v.st==='now'?'<span data-clock="down" data-t="38" data-limit="60">0:38</span>':'—')}</div>
-    </div>`).join('')}
-  </div>
-  <div class="m-foot">
-    <button class="sec" style="text-align:center">Resolve → Agenda 2</button>
-    <button class="big">VOTE CAST<small>Next: Wren</small></button>
-  </div></div>`;
-S.agenda.mnote =
- `Only the running clock is large. During voting, that is the current voter's clock, and the discussion time moves to the agenda card. <b>Vote cast</b> is the main action and names the next voter. Resolve is a secondary button until every player has voted; then it becomes the main action.`;
-
-/* ── phone: round summary ── */
-S.round.m = `<div class="space"></div><div class="m">
-  ${mTop('sum')}
-  <div class="m-body">
-    <div class="h1">Round 3 complete</div>
-    <div class="h1s">58 minutes 43 seconds · game total 2 hours 44 minutes</div>
-    <div class="stat-grid">
-      <div class="stat"><div class="l">Round length</div><div class="v num">58:43</div><div class="s">+6:12 vs round 2</div></div>
-      <div class="stat"><div class="l">Action phase</div><div class="v num">41:26</div><div class="s">71% of the round</div></div>
-      <div class="stat"><div class="l">Reaction windows</div><div class="v num">7:52</div><div class="s">6 windows · avg 1:19</div></div>
-      <div class="stat"><div class="l">Overtime</div><div class="v num" style="color:var(--danger)">1:26</div><div class="s">2 times over a limit</div></div>
-    </div>
-    <div class="pnl"><div class="pnl-h">Time by player · this round</div>
-      <div style="padding:14px"><div class="bars">
-        ${RS.map(r=>`<div class="bar-row" style="${col(r.id)}">
-          <div class="nm"><i></i>${P[r.id].name}</div>
-          <div class="track"><u class="ac" style="width:${(r.ac-r.ot)/MAXR*100}%"></u>
-            ${r.ot?`<u class="ot" style="width:${r.ot/MAXR*100}%"></u>`:''}
-            <u class="win" style="width:${r.rw/MAXR*100}%"></u></div>
-          <div class="vl num">${fmt(r.ac+r.rw)}</div></div>`).join('')}
-      </div>
-      <div class="legend"><span><b style="background:var(--c-blue)"></b>Own turns</span>
-        <span><b style="background:#2a4f70"></b>Reaction windows</span>
-        <span><b style="background:var(--danger)"></b>Overtime</span></div></div></div>
-  </div>
-  <div class="m-foot"><div class="split"><button class="ibtn">End game</button>
-    <button class="big">START ROUND 4<small>Strategy phase</small></button></div></div>
-</div>`;
-S.round.mnote =
- `The four round numbers go in a 2 × 2 grid. Each bar keeps the split into own turns, overtime and reaction windows. <b>Start Round 4</b> is the main action, and End game is the smaller button beside it.`;
-
-/* ── phone: history ── */
-const mEv = e => {
-  const main = `<div class="ico">${e.ico}</div>
-    <div><div class="t">${e.t}</div><div class="d">${e.d}${e.warn?`<span class="pill-note">${e.warn}</span>`:''}</div></div>
-    <div class="m-evr">${e.dur?`<span class="dur2 num">${e.dur}${e.ot?`<s>${e.ot}</s>`:''}</span>`:''}<span class="ago">${e.ago}</span></div>`;
-  if(e.sel) return `<div class="ev sel">${main}
-    <div class="cascade"><div class="w"><span>↺</span>Undo back to here?</div>
-      <div class="l">That's <b>4 presses of undo</b> — everything above this row comes off the log too: <b>Wren's pass</b>
-        and the two turns taken since. About <b>5 minutes</b> of recorded time returns to the clocks, and Tom rejoins the initiative order.</div>
-      <div class="btns"><button class="mini">Cancel</button><button class="mini dn" style="padding:8px 15px">Undo 4 actions</button></div>
-    </div></div>`;
-  if(e.edit) return `<div class="ev" style="border-color:#33566b;background:#0c1721">${main}
-    <div class="cascade" style="border-top-color:var(--line)">
-      <div style="display:flex;align-items:center;gap:8px"><div class="stepper" style="flex:1"><i>−</i><b class="num">4:12</b><i>+</i></div>
-        <button class="mini">Cancel</button><button class="mini dn">Save</button></div>
-      <div class="l" style="color:var(--faint)">5-second steps. Changes Priya's turn length and the totals it feeds. Nothing else moves.</div>
-    </div></div>`;
-  return `<div class="ev ${e.head?'head':''}">${e.head?'<span class="hchip">Most recent</span>':''}${main}</div>`;
-};
-
-S.history.m = `<div class="space"></div><div class="m">
-  <div class="m-head"><div class="round"><b>History</b> · Round 3</div><div class="spacer"></div>
-    <button class="ibtn">⬇ Export</button><button class="ibtn">✕ Close</button></div>
-  <div class="m-body">
-    <div class="phase-pill m-rounds"><span class="on">Round 3</span><span>Round 2</span><span>Round 1</span><span>All</span></div>
-    <div class="undo-bar">
-      <div class="k">Last action</div>
-      <div class="v">Turn ended — Sam → Kira</div>
-      <div class="s">14 seconds ago · undoing returns Sam's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to them</div>
-      <button class="big">↺ UNDO</button>
-    </div>
-    <div class="m-sec">Everything that has happened<span>newest first</span></div>
-    ${EV.map(mEv).join('')}
-  </div></div>`;
-S.history.mnote =
- `Rows are compact. A tap on a row opens its actions in place, as the two open rows show: Undo to here, and Edit time. The undo card at the top keeps the most common correction one tap away.`;
-
-/* ── phone: post-game stats ── */
-S.stats.m = `<div class="space"></div><div class="m">
-  <div class="m-head"><div class="round"><b>Game complete</b></div><div class="spacer"></div>
-    <button class="ibtn">↺ Reopen game</button><button class="ibtn">New game</button></div>
-  <div class="m-body">
-    <div class="h1">7 hours 30 minutes</div>
-    <div class="h1s">6 players · 8 rounds · 168 turns · 41 reaction windows</div>
-    <div class="stat-grid">
-      <div class="stat"><div class="l">Longest round</div><div class="v num">1:04:18</div><div class="s">Round 6</div></div>
-      <div class="stat"><div class="l">Average turn</div><div class="v num">1:33</div><div class="s">across all players</div></div>
-      <div class="stat"><div class="l">Agenda phase total</div><div class="v num">58:00</div><div class="s">13% of the game</div></div>
-      <div class="stat"><div class="l">Total overtime</div><div class="v num" style="color:var(--danger)">18:44</div><div class="s">10 times over a limit</div></div>
-    </div>
-    <div class="pnl"><div class="pnl-h">Own-turn time by player<span class="pnl-note">4:20:00 total</span></div>
-      <div style="padding:14px"><div class="bars">
-        ${PG.map(r=>`<div class="bar-row" style="${col(r.id)}">
-          <div class="nm"><i></i>${P[r.id].name}</div>
-          <div class="track"><u class="ac" style="width:${(r.tot-r.ots)/PGMAX*100}%"></u>
-            ${r.ots?`<u class="ot" style="width:${r.ots/PGMAX*100}%"></u>`:''}</div>
-          <div class="vl num">${fmt(r.tot)}</div></div>`).join('')}
-      </div>
-      <div class="legend"><span><b style="background:var(--c-blue)"></b>Within limit</span>
-        <span><b style="background:var(--danger)"></b>Overtime</span></div></div></div>
-    <div class="pnl" style="margin-top:12px"><div class="pnl-h">Each player</div>
-      <div style="padding:2px 14px">
-        ${PG.map(r=>`<div class="m-prow" style="${col(r.id)}">
-          <div class="a"><i></i>${P[r.id].name}<b class="num">${fmt(r.tot)}</b></div>
-          <div class="b num">${r.turns} turns · avg ${fmt(r.tot/r.turns)} · worst ${fmt(r.worst)}${r.ot
-            ?` · <span style="color:var(--danger)">${r.ot} over a limit · ${fmt(r.ots)}</span>`:''} · ${Math.round(r.tot/PGTOT*100)}% of turn time</div>
-        </div>`).join('')}
-      </div></div>
-    <div class="pnl" style="margin-top:12px"><div class="pnl-h">Where the game went</div>
-      <div style="padding:14px 14px 4px">
-        ${[['Action phase — own turns','4:20:00',58,'var(--c-blue)'],
-           ['Reaction windows','1:02:00',14,'#2a4f70'],
-           ['Agenda phase','0:58:00',13,'var(--c-purple)'],
-           ['Status phase','0:36:00',8,'var(--c-green)'],
-           ['Strategy phase','0:26:00',6,'var(--c-yellow)'],
-           ['Between rounds','0:08:00',2,'var(--line2)']].map(x=>`
-          <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
-              <span>${x[0]}</span><b class="num">${x[1]}</b></div>
-            <div class="track" style="height:8px"><u style="width:${x[2]}%;background:${x[3]}"></u></div></div>`).join('')}
-      </div></div>
-    <div class="pnl" style="margin-top:12px"><div class="pnl-h">Longest turns</div>
-      <div style="padding:2px 14px 6px">
-        ${[['priya',612,'R6'],['tom',521,'R4 · Leadership primary'],['jaz',498,'R7'],['kira',455,'R6 · Warfare primary']].map(x=>`
-          <div class="kv" style="${col(x[0])}"><span style="display:flex;align-items:center;gap:8px;color:var(--txt)">
-            <i style="width:9px;height:9px;border-radius:50%;background:var(--pc);font-style:normal"></i>
-            ${P[x[0]].name} <span style="color:var(--faint);font-size:11.5px">${x[2]}</span></span>
-            <b class="num" style="color:var(--danger)">${fmt(x[1])}</b></div>`).join('')}
-      </div></div>
-  </div></div>`;
-S.stats.mnote =
- `One scrolling column: the total, four numbers in a 2 × 2 grid, and the bars. One line for each player replaces the six-column table. Where the game went and the longest turns come last. Scroll inside the phone to see them.`;
-
-/* ── phone: join ── */
-S.join.m = `<div class="space"></div><div class="m">
-  <div class="m-head"><div class="round"><b>Join game</b></div><div class="spacer"></div><button class="ibtn">✕ Close</button></div>
-  <div class="m-body" style="text-align:center">
-    <div class="qr" id="qr"></div>
-    <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:16px">Or enter the code at ti4tempo.app</div>
-    <div class="joincode num">7QK2</div>
-    <div class="h1" style="font-size:21px;margin-top:10px">Play from your own phone</div>
-    <div class="h1s" style="line-height:1.6">End your own turn, mark yourself done in a reaction window, and see your running time.
-      Anyone who does not join uses this phone as normal.</div>
-    <div class="m-sec" style="text-align:left">Connected · 4 of 6</div>
-    <div style="text-align:left">${Object.entries(P).map(([id,d],i)=>`<div class="dev-row" style="${col(id)}">
-      <i></i><div><div class="nm">${d.name}</div></div>
-      <div class="st ${i<4?'ok':'no'}">${i<4?'● Connected':'Table device'}</div></div>`).join('')}</div>
-  </div></div>`;
-S.join.mnote =
- `When a phone is the table device, it shows the same QR code and join code for companion phones. The companion stays an add-on: the table phone runs the game on its own.`;
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
@@ -2005,6 +1713,13 @@ const GROUPS = [
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
+// The frames: every table screen draws in each of them. Companion screens draw on the phone only.
+const DEVICES = {
+  ipad:   {W:1194, H:834,  tag:'iPad · 1194×834'},
+  tablet: {W:834,  H:1194, tag:'iPad upright · 834×1194'},
+  phone:  {W:393,  H:852,  tag:'iPhone · 393×852'},
+};
+const ORDERED = Object.keys(DEVICES);
 
 const nav = document.getElementById('navlist');
 nav.innerHTML = GROUPS.map(([g,ks])=>
@@ -2016,36 +1731,41 @@ const frame=document.getElementById('frame'), wrap=document.getElementById('wrap
 const devs=document.getElementById('devs');
 let cur=null, dev='ipad';
 
-// A table screen has an iPad and a phone layout. A companion screen has a phone layout only.
-const layouts = s => s.d==='phone' ? {phone:[s.h,s.note]} : {ipad:[s.h,s.note], phone:[s.m,s.mnote]};
+// A table screen has one template for every frame; the narrow frames show the narrow note.
+const layouts = s => s.d==='phone' ? {phone:s.note} : {ipad:s.note, tablet:s.mnote, phone:s.mnote};
 
-// `#action` opens a screen on the iPad, and `#action/phone` opens it on the phone.
+// `#action` opens a screen on the iPad, `#action/tablet` upright, and `#action/phone` on the phone.
 function show(k, want=dev){
-  const s=S[k], ls=layouts(s), d=ls[want]?want:Object.keys(ls)[0];
+  const s=S[k], ls=layouts(s), d=ls[want]!==undefined?want:Object.keys(ls)[0];
   cur=k; if(s.d!=='phone') dev=d;
   frame.className='frame '+d;
-  frame.innerHTML=`<div class="screen active">${ls[d][0]}</div>`;
+  frame.innerHTML=`<div class="screen active">${s.h}</div>`;
   document.getElementById('stitle').textContent=s.t;
-  document.getElementById('stag').textContent = d==='phone' ? 'iPhone · 393×852' : 'iPad · 1194×834';
-  document.getElementById('snote').innerHTML=ls[d][1];
-  devs.querySelectorAll('button').forEach(b=>{b.disabled=!ls[b.dataset.d]; b.classList.toggle('on',b.dataset.d===d);});
+  document.getElementById('stag').textContent=DEVICES[d].tag;
+  document.getElementById('slater').hidden=!(s.later||s.d==='phone');
+  document.getElementById('snote').innerHTML=ls[d];
+  devs.querySelectorAll('button').forEach(b=>{b.disabled=ls[b.dataset.d]===undefined; b.classList.toggle('on',b.dataset.d===d);});
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on',n.dataset.k===k));
-  try{ history.replaceState(null,'','#'+k+(d==='phone'&&s.d!=='phone'?'/phone':'')); }catch(e){}
+  try{ history.replaceState(null,'','#'+k+(d!=='ipad'&&s.d!=='phone'?'/'+d:'')); }catch(e){}
   if(k==='join') drawQR();
   fit();
+  // Overlays open under the top bar, so they need its height, as the app measures it.
+  const bar=frame.querySelector('.top.game');
+  if(bar) frame.style.setProperty('--top-h', bar.offsetHeight+'px');
+  else frame.style.removeProperty('--top-h');
 }
 nav.addEventListener('click',e=>{const n=e.target.closest('.nav-item'); if(n) show(n.dataset.k);});
 devs.addEventListener('click',e=>{const b=e.target.closest('button'); if(b&&!b.disabled) show(cur,b.dataset.d);});
 addEventListener('keydown',e=>{
-  const i=KEYS.indexOf(cur);
+  const i=KEYS.indexOf(cur), j=ORDERED.indexOf(dev);
   if(e.key==='ArrowRight') show(KEYS[(i+1)%KEYS.length]);
   if(e.key==='ArrowLeft')  show(KEYS[(i-1+KEYS.length)%KEYS.length]);
-  if(e.key==='ArrowUp'||e.key==='ArrowDown'){ e.preventDefault(); show(cur, dev==='ipad'?'phone':'ipad'); }
+  if(e.key==='ArrowDown'){ e.preventDefault(); show(cur, ORDERED[(j+1)%ORDERED.length]); }
+  if(e.key==='ArrowUp'){ e.preventDefault(); show(cur, ORDERED[(j-1+ORDERED.length)%ORDERED.length]); }
 });
 
 function fit(){
-  const isPhone=frame.classList.contains('phone');
-  const W=isPhone?393:1194, H=isPhone?852:834;
+  const {W,H}=DEVICES[ORDERED.find(d=>frame.classList.contains(d))];
   const box=wrap.parentElement.getBoundingClientRect();
   const s=Math.min((box.width-56)/W,(box.height-56)/H,1);
   frame.style.transform=`scale(${s})`;
@@ -2097,7 +1817,7 @@ setInterval(()=>{
 
 function showHash(){
   const [k, d] = decodeURIComponent(location.hash.slice(1)).split('/');
-  show(S[k] ? k : 'action', d==='phone' ? 'phone' : 'ipad');
+  show(S[k] ? k : 'action', DEVICES[d] ? d : 'ipad');
 }
 addEventListener('hashchange', showHash);
 showHash();

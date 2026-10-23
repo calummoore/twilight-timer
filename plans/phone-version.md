@@ -77,15 +77,16 @@ two layouts cannot drift.
       screens, and the device switch. Commit `c2205db`.
 - [x] Add the Between rounds row to the phone stats (review 1, finding 3).
       Commit `33608e1`.
-- [ ] Make the frame a size container. Arrange each screen with container
+- [x] Make the frame a size container. Arrange each screen with container
       queries. Remove the separate phone templates and their styles.
-- [ ] Bring the iPad layouts in line with the built app: copy, controls, and
+- [x] Bring the iPad layouts in line with the built app: copy, controls, and
       demo data. Mark each control that the app leaves out "Later".
-- [ ] Keep the top bar above the reaction window. Start the window below it.
-- [ ] Add an upright iPad frame, 834 by 1194, to the device switch.
-- [ ] Rewrite the phone notes for the shared templates.
-- [ ] Screenshot every table screen in every frame. Check for script errors
-      and sideways overflow. Evidence: `.context/phone-version/`.
+- [x] Keep the top bar above the reaction window. Start the window below it.
+- [x] Add an upright iPad frame, 834 by 1194, to the device switch.
+- [x] Rewrite the phone notes for the shared templates.
+- [x] Screenshot every table screen in every frame. Check for script errors
+      and sideways overflow. Evidence: `.context/phone-version/`, with
+      `interact.log` for the device switch, the keys, and the links.
 
 ## Milestone 3: Top bar above the reaction window
 
