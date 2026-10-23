@@ -6,39 +6,37 @@ No milestone starts before Cal answers the open decisions.
 TI4 Tempo runs on one iPad, and each game lives only in the browser storage
 of that iPad. Cal wants multiplayer: the table shares a game, and each
 player joins it with a short code or a link. The spec designs this as the
-phone companion add-on. The mockup has the iPad Join screen and seven
-phone screens. A player joins with a code or a QR code, claims a seat, and
-acts on their own turn.
+phone companion add-on, and the mockup has its iPad Join screen and seven
+phone screens.
 
 This plan adds a sync service, shared games, and the companion screens.
 The design uses the recommended option of each open decision. The plan
 does not cover push notifications, game history, a visible sign-in, play
-without a table device, or the removal of old shared games.
+without a table device, or the removal of old shared games. It starts
+after the [retry-safe actions](retry-safe-actions.md) plan merges.
 
 Decisions:
 
 - 2026-10-23, Cal: asked for multiplayer "with login" and a game code or
   link for everyone. Cal proposed the Firebase Realtime Database.
-- 2026-10-23: The join code has four characters, as the mockup shows. The
-  alphabet has no look-alike characters. Alternative: six characters.
-  Reason: the mockup goal is to join in seconds. A stranger who guesses a
-  live code can tap in that game, and the table can undo the tap.
 - 2026-10-23: The QR code holds the join link for the phone camera app.
   The app has no QR scanner, because every phone camera reads QR codes.
 
-Open decisions, proposed on 2026-10-23, each with its recommended option:
+Open decisions, proposed on 2026-10-23, each with its recommended option.
+They follow the plan review findings 1 to 8 in Milestone 8. Decision 16
+is in the retry-safe actions plan.
 
-1. Sync service. A: Firebase RTDB and Auth. B: Firestore. C: Cloudflare
+9. Sync service. A: Firebase RTDB and Auth. B: Firestore. C: Cloudflare
    Durable Objects. Recommended: A.
-2. Login. A: anonymous, with no screen. B: Google on every device. C:
-   Google on the table device only. Recommended: A.
-3. Shape. A: a table device and optional phone companions. B: remote play
-   with no table device. Recommended: A.
-4. Companion actions. A: own turn and own reaction tile. B: A, and own
-   pick and vote. C: everything. Recommended: A.
-5. Rules tests. A: none. B: emulator tests in CI. Recommended: B.
-6. Smoke test. A: none. B: a scratch browser test. Recommended: B.
-7. Rules deploy. A: by hand. B: from CI. Recommended: B.
+10. Login. A: anonymous, with no screen. B: Google on every device. C:
+    Google on the table device only. Recommended: A.
+11. Shape. A: a table device and optional phone companions. B: remote play
+    with no table device. Recommended: A.
+12. Companion actions. A: own turn and own reaction tile. B: A, and own
+    pick and vote. C: everything. Recommended: A.
+13. Rules tests. A: none. B: emulator tests in CI. Recommended: B.
+14. Smoke test. A: none. B: a scratch browser test. Recommended: B.
+15. Rules deploy. A: by hand. B: from CI. Recommended: B.
 
 Contract owners: `docs/product.md`, the new `docs/architecture.md`, the
 mockup, the [README](../README.md), and [AGENTS.md](../AGENTS.md).
@@ -49,8 +47,8 @@ Terms:
 
 - **Table device:** the iPad in the middle of the table, with the full app.
 - **Companion:** a phone that joined a shared game. It acts for one seat.
-- **Shared game:** a game that a table device published. A four-character
-  **join code** finds it.
+- **Shared game:** a game that a table device published. A short **join
+  code** finds it.
 - **Revision:** a number in a shared game that goes up with each change.
 
 ### Components
@@ -100,15 +98,19 @@ games/{gameId}/presence/{uid}     online, lastSeen, role, seat
 5. After a failure, the device waits for the next snapshot and runs step 2
    again. Meanwhile, it shows its pending changes on top of the snapshot.
 
-A retry is safe only when each action names its target. Today two devices
-that send `turnEnded` end two turns. Milestone 3 adds the targets, so the
-fold rejects a tap that another device already made.
+A retry is safe only when each change names its target. Today two devices
+that send `turnEnded` end two turns. The retry-safe actions plan makes
+each action that ends or changes a clock name that clock. Undo then names
+the action it removes, and the fold rejects a tap that another device
+already made.
 
 ### Clocks and offline play
 
-- Each device adds its offset from the RTDB server clock to `Date.now()`.
-  So all devices show the same clocks. Publishing moves every time in a
-  solo game by the offset, so the running clock does not jump.
+- Each device adds its offset from the RTDB server clock to `Date.now()`,
+  so all devices show the same clocks. Each stored game marks its time
+  base, device or server, and one helper gives `now` from that mark.
+- Publishing moves a solo game to server time, so the running clock does
+  not jump. Stop sharing needs no shift.
 - Each device keeps the shared game, its pending changes, and the last
   offset in `localStorage`. The RTDB web SDK keeps its write queue in
   memory only.
@@ -125,8 +127,10 @@ fold rejects a tap that another device already made.
   or not joined.
 - Any device can join with the code and become a table device. So a lost
   iPad does not lose the game.
-- A code uses `23456789ABCDEFGHJKMNPQRSTUVWXYZ`, and the join link is
-  `/join/{code}`. A code expires seven days after its game last changed.
+- A code has four characters from `23456789ABCDEFGHJKMNPQRSTUVWXYZ`, as
+  the mockup shows. Plan review finding 1 can change the length.
+- The join link is `/join/{code}`. A code expires seven days after its
+  game last changed.
 
 ### Security rules
 
@@ -137,14 +141,8 @@ fold rejects a tap that another device already made.
 - The first write of a game writes all of it. After that, `meta` does not
   change. Each later write under `log`, `pauses`, `voids`, or `limits` must
   step `rev` by one in the same update.
-- The rules do not check the game rules. A changed client can add any
-  action, and the table can undo it.
-
-### Code layout
-
-Pure logic goes in `src/model/` with unit tests. `src/sync/` is a thin
-Firebase layer with no game logic. The companion screens go in
-`src/ui/screens/phone/`, and the rules and their tests in `firebase/`.
+- The rules do not check the game rules. A device with the code can
+  write any change, also one that undo cannot repair.
 
 ## Milestone 1: Documentation and spec
 
@@ -156,15 +154,14 @@ architecture doc for the new components.
         notifications as an add-on.
   - [ ] Add the requirements for sharing, joining, seats, companion
         actions, simultaneous taps, shared clocks, offline play, and codes.
-  - [ ] Record the outcomes of decisions 2, 3, and 4 and the code format
-        as decisions in force.
-  - [ ] Update the data model sketch for actions that name their target.
+  - [ ] Record the outcomes of decisions 10, 11, and 12 and the code
+        format as decisions in force.
 - [ ] Add `docs/architecture.md`: the components and the flow of a tap.
-      Record decision 1 and the rejected options.
+      Record decision 9 and the rejected options.
 - [ ] Update `README.md`: the features, the Firebase setup, the emulator,
       and the key code.
 - [ ] Update `AGENTS.md`: the new commands, the rule that `src/sync/`
-      holds no game logic, and the outcomes of decisions 5 and 7.
+      holds no game logic, and the outcomes of decisions 13 and 15.
 
 ## Milestone 2: Mockups
 
@@ -187,24 +184,7 @@ the Join screen, the connection states, and most phone states.
       screen for a game that is no longer shared.
 - [ ] Update the mockup notes for the requirements of Milestone 1.
 
-## Milestone 3: Actions that name their target
-
-Make every action safe to retry on the state that another device made.
-The stored game changes shape, so the storage keys move to version 2.
-
-- [ ] Add `playerId` to `turnEnded`, `passed`, `strategyCardPlayed`, and
-      `voteCast`, and the agenda number to `agendaResolved`. Replace
-      `statusStepToggled` with `statusStepSet`. The fold rejects an action
-      whose target does not match the state.
-- [ ] Give `undo` the log length that it expects.
-- [ ] Update the parser, and pass the new fields from `GameScreen.tsx`.
-- [ ] Migrate a version 1 game on load. Replay its log, fill each new
-      field from the state before the action, and save it under the
-      version 2 key. MVP review finding 6 stays open for Cal.
-- [ ] Unit-test each new rejection, the same tap from two devices, and the
-      migration of a recorded version 1 game.
-
-## Milestone 4: Shared-game model
+## Milestone 3: Shared-game model
 
 Add the pure modules for shared games. Each has unit tests with fixed
 times and a fixed random source.
@@ -215,30 +195,32 @@ times and a fixed random source.
       multi-path update with the revision step, or a rejection.
 - [ ] Outbox: the pending changes in order, the game with them applied,
       and the next step after a write: done, retry, or drop with a notice.
-- [ ] Clock shift: move every time in a game by an offset.
+- [ ] Time base: move a game to server time, and give `now` for a game
+      from its time base.
 - [ ] Join codes: make a code, read typed input, and parse a join link.
 - [ ] Companion views: who acts now and their clock, the turns before
       mine, my totals and card, my reaction tile, and my game stats.
 
-## Milestone 5: Firebase project and rules
+## Milestone 4: Firebase project and rules
 
 Add the Firebase configuration, the security rules, and the emulator.
 
 - [ ] Cal: create the Firebase project on the free Spark plan, with the
       RTDB location nearest the players. Turn on anonymous sign-in, add
       the site domain to the authorized domains, and send the web config.
-- [ ] Add `firebase-tools`, `firebase.json`, `.firebaserc`, and the rules.
-      Add `npm run dev:sync`, which runs Vite and the emulator.
-- [ ] Decision 5: test the rules with `@firebase/rules-unit-testing` in a
+- [ ] Add `firebase-tools`, `firebase.json`, `.firebaserc`, and the rules
+      in `firebase/`. Add `npm run dev:sync` for Vite and the emulator.
+- [ ] Decision 13: test the rules with `@firebase/rules-unit-testing` in a
       separate Vitest config. Cover the revision step, two writes from one
       revision, code reservation and expiry, presence, and listing.
-- [ ] Decision 7: deploy the rules from CI after the Cloudflare deploy.
+- [ ] Decision 15: deploy the rules from CI after the Cloudflare deploy.
       Stop with a clear error when the secret is missing.
 - [ ] Add the public web config. A build without it hides sharing.
 
-## Milestone 6: Sync client
+## Milestone 5: Sync client
 
-Connect the model to Firebase. No screen uses the client yet.
+Connect the model to Firebase in `src/sync/`, a thin layer with no game
+logic. No screen uses the client yet.
 
 - [ ] Load Firebase with a dynamic import. Sign in anonymously. Track the
       clock offset and the connection state.
@@ -253,7 +235,7 @@ Connect the model to Firebase. No screen uses the client yet.
 - [ ] Scratch check, not committed: two Node clients against the emulator
       send the same tap at once, and exactly one applies.
 
-## Milestone 7: Table device screens
+## Milestone 6: Table device screens
 
 Tags: ui
 
@@ -264,33 +246,42 @@ Build the table device parts of the mockup.
       rows, Stop sharing, and Release seat.
 - [ ] Connect the "Allow phone companions" setting.
 - [ ] Show the notice for a dropped tap.
-- [ ] Open the table view on a device that joins as a table screen.
+- [ ] In a shared game, Settings shows the newest limits of the game and
+      changes only the edited timer.
 - [ ] Use the shared clock on every screen of a shared game.
 
-## Milestone 8: Companion screens
+## Milestone 7: Companion screens
 
 Tags: ui
 
 Build the companion screens of the mockup.
 
 - [ ] Add a phone stage of 393 by 852, scaled to fit, for the join route.
+      The screens go in `src/ui/screens/phone/`.
 - [ ] Build Join, Claim seat, Waiting, Your turn, Reaction window, Pass
       confirmation, and Personal stats.
+- [ ] Open the table view on a device that joins as a table screen.
 - [ ] Add the reconnecting banner, the error states, and the screen for a
       game that is no longer shared.
 
-## Milestone 9: Verification, commit, and review
+## Milestone 8: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 
 - [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Decision 6: in headless Chrome, play one round with a table device
+- [ ] Decision 14: in headless Chrome, play one round with a table device
       and two companions against the emulator. Commit nothing.
 - [ ] Commit with Conventional Commits and push the branch.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Plan review 1 of dbde952 found 8 findings. Fixed: 2, 3, 4, 5, and 7. Finding 1 got option A and stays open. The fixes of findings 2 and 5 moved to `plans/retry-safe-actions.md`. Report: `.context/multiplayer-live-sync/review-1.md`.
+  - 1. A code holder can erase the game. Severity High, effort Small. Recommended: D, narrowed rules and six-character codes.
+  - 6. CI steps for the rules are missing. Severity Low, effort Small. Recommended: A, a CI test step, the rules deploy first, and Cal's credential.
+  - 8. Join mockup names a domain the app lacks. Severity Low, effort Small. Recommended: A, show the deployed address.
+  - Follow-up: make the open game the one source of the limits in force. Effort Small. Covers finding 3. Previous examples: none.
+  - `docs/mockups/index.html`: the Waiting note says "3 turns away", but its screen says "2 turns away". Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
