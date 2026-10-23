@@ -31,6 +31,22 @@ describe('reaction window', () => {
     })
   })
 
+  it('shows which players have not marked done', () => {
+    const t = openWindow()
+    t.wait(5 * SEC)
+    t.act({ kind: 'reactionDone', playerId: 'jaz' })
+    const view = t.view().view
+    const tiles = view.phase === 'action' ? view.reaction?.tiles : []
+    // Seat order. A tile without a time makes Done ask first.
+    expect(tiles?.map((tile) => [tile.playerId, tile.tookMs])).toEqual([
+      ['jaz', 5 * SEC],
+      ['kira', null],
+      ['priya', null],
+      ['sam', null],
+      ['wren', null],
+    ])
+  })
+
   it('closes when every other player is done and resumes the turn', () => {
     const t = openWindow()
     OTHERS.forEach((id) => {

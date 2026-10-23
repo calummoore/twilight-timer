@@ -17,6 +17,13 @@ export function plural(count: number, word: string, many = `${word}s`): string {
   return `${count} ${count === 1 ? word : many}`
 }
 
+const AND = new Intl.ListFormat('en', { type: 'conjunction' })
+
+/** "Ben", "Ben and Will", or "Ben, Will, and Tom". */
+export function list(items: readonly string[]): string {
+  return AND.format(items)
+}
+
 /** "2 hours 44 minutes", or "58 minutes 43 seconds" under one hour. */
 export function words(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000))

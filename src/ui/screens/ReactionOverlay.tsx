@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { cardName } from '../../model/rules'
 import type { Player } from '../../model/types'
 import type { GameView, ReactionView, SpeakerChoice } from '../../model/view'
 import { pc } from '../colour'
-import { clock, countdown } from '../format'
+import { Dialog } from '../controls'
+import { clock, countdown, list } from '../format'
 
 const EXTEND_MS = 60_000
 
@@ -16,9 +18,17 @@ export function ReactionOverlay(props: {
   onClose: () => void
 }) {
   const { game, reaction: r } = props
+  const [confirmDone, setConfirmDone] = useState(false)
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const by = byId.get(r.byId)
   const remaining = r.limitMs === null ? null : r.limitMs - r.elapsedMs
+  const waiting = r.tiles.filter((tile) => tile.tookMs === null)
+  const waitingNames = waiting.flatMap(
+    (tile) => byId.get(tile.playerId)?.name ?? [],
+  )
+
+  const done = () =>
+    waiting.length > 0 ? setConfirmDone(true) : props.onClose()
 
   return (
     <>
@@ -124,11 +134,26 @@ export function ReactionOverlay(props: {
           <button className="ibtn" onClick={props.onUndo}>
             ↺ Undo last
           </button>
-          <button className="big small" onClick={props.onClose}>
-            CLOSE WINDOW
+          <button className="big small" onClick={done}>
+            DONE
           </button>
         </div>
       </div>
+      {confirmDone && (
+        <Dialog
+          title="Close the window early?"
+          confirm="Close anyway"
+          danger
+          onCancel={() => setConfirmDone(false)}
+          onConfirm={() => {
+            setConfirmDone(false)
+            props.onClose()
+          }}
+        >
+          {list(waitingNames)} {waitingNames.length === 1 ? 'has' : 'have'} not
+          marked done. Close anyway if they have finished.
+        </Dialog>
+      )}
     </>
   )
 }
