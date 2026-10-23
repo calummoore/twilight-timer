@@ -57,6 +57,9 @@ export function GameScreen(props: {
               dispatch({ kind: 'cardPicked', playerId, card })
             }
             onSpeaker={() => setOverlay('seating')}
+            onMoveNaaluToken={(playerId) =>
+              dispatch({ kind: 'naaluTokenMoved', playerId })
+            }
             onBegin={() => dispatch({ kind: 'phaseStepped' })}
           />
         )

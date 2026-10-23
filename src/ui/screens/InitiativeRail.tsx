@@ -1,3 +1,4 @@
+import { factionName } from '../../model/factions'
 import { cardName } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
@@ -35,7 +36,7 @@ export function InitiativeRail(props: {
             >
               {active && <b className="chip now">Turn</b>}
               {row.state === 'passed' && <b className="chip pass">Passed</b>}
-              <div className="in num">{row.card}</div>
+              <div className="in num">{row.initiative}</div>
               <div>
                 <div className="nm">
                   <i />
@@ -46,7 +47,7 @@ export function InitiativeRail(props: {
                     {row.cardPlayed ? '✓ ' : ''}
                     {cardName(row.card)}
                   </span>
-                  {player?.faction}
+                  {factionName(player?.factionId ?? null)}
                 </div>
               </div>
               <div className="tm">

@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { STRATEGY_CARDS } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
 import { timerText } from '../format'
+import { NaaluTokenPicker } from './NaaluTokenPicker'
 
 type StrategyView = Extract<PhaseView, { phase: 'strategy' }>
 
@@ -10,18 +12,20 @@ export function StrategyScreen(props: {
   view: StrategyView
   onPick: (playerId: string, card: number) => void
   onSpeaker: () => void
+  onMoveNaaluToken: (playerId: string) => void
   onBegin: () => void
 }) {
   const { game, view } = props
+  const [picking, setPicking] = useState(false)
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const picker = view.pickerId ? byId.get(view.pickerId) : undefined
   const taken = Object.keys(view.owners).length
   const remaining = game.players.length - taken
   const timer = game.timer?.kind === 'pick' ? game.timer : null
   const clock = timer ? timerText(timer.elapsedMs, timer.limitMs, true) : null
-  const ordered = Object.entries(view.owners)
-    .map(([card, id]) => ({ card: Number(card), player: byId.get(id) }))
-    .sort((a, b) => a.card - b.card)
+  // The Naalu "0" token exists only when a player has the Naalu faction.
+  const owner = byId.get(view.naaluTokenOwnerId ?? '')
+  const holder = byId.get(view.naaluTokenHolderId ?? '')
   const waiting = game.pickOrder.filter(
     (id) => !Object.values(view.owners).includes(id),
   )
@@ -91,13 +95,16 @@ export function StrategyScreen(props: {
         </div>
         <div className="order-strip">
           <span className="lbl">Initiative order so far</span>
-          {ordered.map(({ card, player }) => (
-            <span key={card} className="oc" style={pc(player?.colour)}>
-              <b>{card}</b>
-              <i />
-              {player?.name}
-            </span>
-          ))}
+          {view.order.map(({ playerId, initiative }) => {
+            const player = byId.get(playerId)
+            return (
+              <span key={playerId} className="oc" style={pc(player?.colour)}>
+                <b>{initiative}</b>
+                <i />
+                {player?.name}
+              </span>
+            )
+          })}
           {waiting.map((id) => (
             <span
               key={id}
@@ -108,6 +115,16 @@ export function StrategyScreen(props: {
               {byId.get(id)?.name}
             </span>
           ))}
+          {owner && (
+            <button
+              className="ibtn tokb"
+              style={pc(holder?.colour)}
+              onClick={() => setPicking(true)}
+            >
+              <b>0</b>
+              Naalu token: {holder?.name} · change
+            </button>
+          )}
         </div>
       </div>
       <div style={{ padding: '0 22px 20px' }}>
@@ -122,6 +139,18 @@ export function StrategyScreen(props: {
             : 'BEGIN ACTION PHASE'}
         </button>
       </div>
+      {picking && owner && (
+        <NaaluTokenPicker
+          players={game.players}
+          ownerName={owner.name}
+          holderId={view.naaluTokenHolderId}
+          onPick={(playerId) => {
+            setPicking(false)
+            props.onMoveNaaluToken(playerId)
+          }}
+          onClose={() => setPicking(false)}
+        />
+      )}
     </>
   )
 }

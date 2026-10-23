@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FACTIONS, NAALU, type FactionId } from '../../model/factions'
 import {
   COLOURS,
   DEFAULT_PLAYERS,
@@ -9,13 +10,12 @@ import {
 import type { Settings } from '../../model/settings'
 import type { Player } from '../../model/types'
 import { pc } from '../colour'
-import { FACTIONS } from '../factions'
-import { clock } from '../format'
+import { SetupGamePanel } from './SetupGamePanel'
 
 interface Row {
   name: string
   colour: Colour
-  faction: string
+  factionId: FactionId | null
 }
 
 const COUNTS = Array.from(
@@ -34,12 +34,12 @@ export function SetupScreen(props: {
 }) {
   const [count, setCount] = useState(DEFAULT_PLAYERS)
   const [rows, setRows] = useState<Row[]>(() =>
-    COLOURS.map((colour) => ({ name: '', colour, faction: '' })),
+    COLOURS.map((colour) => ({ name: '', colour, factionId: null })),
   )
   const [speaker, setSpeaker] = useState(0)
   const seats = rows.slice(0, count)
   const nameOf = (i: number) => seats[i]?.name.trim() || `Player ${i + 1}`
-  const { settings } = props
+  const naalu = seats.findIndex((row) => row.factionId === NAALU)
 
   const update = (i: number, patch: Partial<Row>) =>
     setRows((all) =>
@@ -56,6 +56,22 @@ export function SetupScreen(props: {
           ? { ...row, colour }
           : j === owner
             ? { ...row, colour: mine }
+            : row,
+      )
+    })
+
+  // Factions stay unique too: taking a faction swaps it with its holder.
+  const pickFaction = (i: number, factionId: FactionId | null) =>
+    setRows((all) => {
+      const holder = all.findIndex(
+        (row) => factionId !== null && row.factionId === factionId,
+      )
+      const mine = all[i]?.factionId ?? null
+      return all.map((row, j) =>
+        j === i
+          ? { ...row, factionId }
+          : j === holder
+            ? { ...row, factionId: mine }
             : row,
       )
     })
@@ -79,13 +95,10 @@ export function SetupScreen(props: {
       id: `p${i + 1}`,
       name: nameOf(i),
       colour: row.colour,
-      faction: row.faction.trim(),
+      factionId: row.factionId,
     }))
     props.onBegin(players, `p${speaker + 1}`)
   }
-
-  const limit = (key: 'turn' | 'reactionWindow') =>
-    settings.limits[key].on ? clock(settings.limits[key].ms) : 'Off'
 
   return (
     <div className="lay">
@@ -180,13 +193,24 @@ export function SetupScreen(props: {
                     placeholder={`Player ${i + 1}`}
                     onChange={(e) => update(i, { name: e.target.value })}
                   />
-                  <input
+                  <select
                     className="fld sel"
-                    list="factions"
-                    value={row.faction}
-                    placeholder="Faction"
-                    onChange={(e) => update(i, { faction: e.target.value })}
-                  />
+                    aria-label="Faction"
+                    value={row.factionId ?? ''}
+                    onChange={(e) => {
+                      const faction = FACTIONS.find(
+                        (f) => f.id === e.target.value,
+                      )
+                      pickFaction(i, faction?.id ?? null)
+                    }}
+                  >
+                    <option value="">Faction</option>
+                    {FACTIONS.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))}
+                  </select>
                   <button
                     className={`spk ${i === speaker ? 'on' : ''}`}
                     aria-label="Make speaker"
@@ -196,70 +220,15 @@ export function SetupScreen(props: {
                   </button>
                 </div>
               ))}
-              <datalist id="factions">
-                {FACTIONS.map((f) => (
-                  <option key={f} value={f} />
-                ))}
-              </datalist>
             </div>
           </div>
-          <div
-            className="pnl"
-            style={{ display: 'flex', flexDirection: 'column' }}
-          >
-            <div className="pnl-h">Game</div>
-            <div style={{ padding: '16px 18px', flex: 1 }}>
-              <div className="kv">
-                <span>Players</span>
-                <b>{count}</b>
-              </div>
-              <div className="kv">
-                <span>Strategy cards each</span>
-                <b>1</b>
-              </div>
-              <div className="kv">
-                <span>Speaker</span>
-                <b>{nameOf(speaker)}</b>
-              </div>
-              <div className="kv">
-                <span>Time limits</span>
-                <b
-                  style={
-                    settings.enforceLimits
-                      ? { color: 'var(--warn)' }
-                      : undefined
-                  }
-                >
-                  {settings.enforceLimits ? 'Enabled' : 'Off'}
-                </b>
-              </div>
-              {settings.enforceLimits && (
-                <>
-                  <div className="kv">
-                    <span>Turn limit</span>
-                    <b>{limit('turn')}</b>
-                  </div>
-                  <div className="kv" style={{ border: 'none' }}>
-                    <span>Reaction window</span>
-                    <b>{limit('reactionWindow')}</b>
-                  </div>
-                </>
-              )}
-              <div className="setup-help">
-                Seat order is the physical ring. The <b>speaker ★</b> picks
-                first in the strategy phase and votes last in the agenda phase.
-              </div>
-            </div>
-            <div style={{ padding: '16px 18px' }}>
-              <button
-                className="big"
-                style={{ width: '100%', fontSize: 23, padding: 20 }}
-                onClick={begin}
-              >
-                BEGIN GAME
-              </button>
-            </div>
-          </div>
+          <SetupGamePanel
+            count={count}
+            speakerName={nameOf(speaker)}
+            naaluName={naalu < 0 ? null : nameOf(naalu)}
+            settings={props.settings}
+            onBegin={begin}
+          />
         </div>
       </div>
     </div>

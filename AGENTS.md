@@ -47,7 +47,8 @@ skill at that moment instead of guessing the rule.
 - `src/styles/mockup/` is ported from `docs/mockups/index.html`, and
   Prettier skips it. Keep its class names in step with the mockup.
 - Saved games use versioned `localStorage` keys. Change the version when
-  the stored shape changes.
+  the stored shape changes. Keep reading the keys and the shapes of older
+  versions, so that a saved game from an older build still loads.
 - A push to `main` deploys to Cloudflare. CI needs the repository variable
   `CLOUDFLARE_ACCOUNT_ID` and the repository secret `CLOUDFLARE_API_TOKEN`.
 

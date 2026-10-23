@@ -1,10 +1,12 @@
+import type { FactionId } from './factions'
 import type { Colour } from './rules'
 
 export interface Player {
   id: string
   name: string
   colour: Colour
-  faction: string
+  /** The faction from the official list, or null when the player picked none. */
+  factionId: FactionId | null
 }
 
 export const TIMER_KEYS = [
@@ -52,6 +54,7 @@ export type Action =
   | { kind: 'voteCast'; at: number }
   | { kind: 'agendaResolved'; at: number }
   | { kind: 'speakerMoved'; at: number; playerId: string }
+  | { kind: 'naaluTokenMoved'; at: number; playerId: string }
   | { kind: 'gameEnded'; at: number }
 
 /** An action before it gets its timestamp. */
@@ -66,11 +69,17 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 1
+  version: 2
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
   firstSpeakerId: string
+  /**
+   * The player who holds the Naalu "0" token each round: the Naalu player,
+   * or null. A game from an older build has null, because its log follows
+   * card order.
+   */
+  naaluTokenOwnerId: string | null
   actions: Action[]
   pauses: Interval[]
   voids: Interval[]

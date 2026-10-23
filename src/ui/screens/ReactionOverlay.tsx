@@ -1,3 +1,4 @@
+import { factionName } from '../../model/factions'
 import { cardName } from '../../model/rules'
 import type { GameView, ReactionView } from '../../model/view'
 import { pc } from '../colour'
@@ -74,7 +75,7 @@ export function ReactionOverlay(props: {
                   <i />
                   {p?.name}
                 </div>
-                <div className="fc">{p?.faction}</div>
+                <div className="fc">{factionName(p?.factionId ?? null)}</div>
                 {tile.tookMs !== null ? (
                   <>
                     <div className="st">✓ Done</div>
