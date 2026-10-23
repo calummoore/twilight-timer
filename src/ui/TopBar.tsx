@@ -17,6 +17,10 @@ const ORDER: Phase[] = [
   'ended',
 ]
 
+/** A solid gear with eight teeth and a round hole, in a 24 by 24 box. */
+const GEAR_PATH =
+  'M9.9 4L10.1 1.2L13.9 1.2L14.1 4L16.2 4.8L18.3 3L21 5.7L19.2 7.8L20 9.9L22.8 10.1L22.8 13.9L20 14.1L19.2 16.2L21 18.3L18.3 21L16.2 19.2L14.1 20L13.9 22.8L10.1 22.8L9.9 20L7.8 19.2L5.7 21L3 18.3L4.8 16.2L4 14.1L1.2 13.9L1.2 10.1L4 9.9L4.8 7.8L3 5.7L5.7 3L7.8 4.8ZM15.3 12a3.3 3.3 0 1 0 -6.6 0a3.3 3.3 0 1 0 6.6 0Z'
+
 export interface TopBarProps {
   round: number
   phase: Phase
@@ -60,8 +64,14 @@ export function TopBar(props: TopBarProps) {
       <button className="ibtn" onClick={props.onPause}>
         ⏸ Pause
       </button>
-      <button className="ibtn" onClick={props.onSettings} aria-label="Settings">
-        ⚙
+      <button
+        className="ibtn icon"
+        onClick={props.onSettings}
+        aria-label="Settings"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fillRule="evenodd" d={GEAR_PATH} />
+        </svg>
       </button>
     </div>
   )
