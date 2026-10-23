@@ -35,7 +35,9 @@ select {
   cursor: default;
 }
 
-/* The app is drawn at iPad size and scaled to fit the window. */
+/* The app is drawn at iPad size and scaled to fit the window. A transform
+   does not change the layout size, so `.stage-wrap` takes the scaled size
+   and the viewport centres the wrapper. The mockup's `fit()` does the same. */
 .viewport {
   position: fixed;
   inset: 0;
@@ -44,12 +46,17 @@ select {
   overflow: hidden;
   background: var(--bg);
 }
-.stage {
+.stage-wrap {
   position: relative;
+}
+.stage {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 1194px;
   height: 834px;
   overflow: hidden;
-  flex: none;
+  transform-origin: top left;
 }
 
 .clock-over {
