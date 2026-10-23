@@ -6,7 +6,8 @@ enough of the round structure to know whose turn it is. The repository is
 `twilight-timer`.
 
 Each push to `main` deploys the app to the Cloudflare Worker `twilight-timer`
-in the futex account, at https://twilight-timer.futex.workers.dev.
+in the futex account, at https://twilight-timer.futex.workers.dev. Each pull
+request gets a preview link; see [Pull request previews](#pull-request-previews).
 
 ## Key features
 
@@ -56,6 +57,25 @@ the workflow.
 
 To deploy by hand, run `npx wrangler login`, then `npm run build` and
 `npm run deploy`.
+
+### Pull request previews
+
+The same workflow gives each pull request a preview. Its `preview` job builds
+the newest commit of the pull request. Then it runs `wrangler versions upload`
+with the alias `pr-<number>`. This adds a version of the Worker but does not
+deploy it, so production does not change.
+
+The preview opens at `https://pr-<number>-twilight-timer.futex.workers.dev`.
+A bot comment on the pull request gives this link and a link to the exact
+commit. The comment changes after each push.
+
+- Pull requests from forks get no preview, because their runs get no secrets.
+  A run without the Cloudflare secrets skips the preview with a warning.
+- A preview has its own origin, so it keeps its own saved games.
+- The workflow does not delete previews. A preview stays online after its pull
+  request closes.
+- Previews need Preview URLs on the Worker. `"preview_urls": true` in
+  `wrangler.jsonc` keeps them on at each deploy.
 
 ## Key code
 
