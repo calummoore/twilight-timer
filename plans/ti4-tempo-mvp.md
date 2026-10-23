@@ -1,7 +1,8 @@
 # TI4 Tempo MVP and Cloudflare deploy
 
-Status: Active. [PR #1](https://github.com/calummoore/twilight-timer/pull/1) is open.
-The plan closes when its PR merges.
+Status: Completed. [PR #1](https://github.com/calummoore/twilight-timer/pull/1)
+merged on 2026-10-23. Review findings 1, 3, 5, 6, 10, and 11 and one
+follow-up stay open for Cal, as the review TODO lists.
 
 TI4 Tempo is a shared-table time tracker for Twilight Imperium 4th Edition.
 It runs on one iPad in the middle of the table. It is a chess clock for the
