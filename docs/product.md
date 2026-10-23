@@ -74,15 +74,16 @@ The speaker votes last because they break ties.
 
 Because both are derived, **moving the speaker token is the only action needed** —
 the app never asks anyone to re-order anything. This matters because the token
-genuinely moves during play: the Politics (3) primary ability hands it to another
-player, and some agendas elect a new speaker. The token is editable from the
-speaker chip in the top bar, visible on every in-game screen.
+genuinely moves during play: the Politics (3) primary ability hands it to a
+player who does not hold it, and some agendas elect a new speaker. The token is
+editable from the speaker chip in the top bar, visible on every in-game screen.
 
-The token never moves on its own, also not at the start of a round. In the MVP,
-a player moves it by hand from the speaker chip. Rejected: passing the token
+The token never moves on its own, also not at the start of a round. A player
+moves it in one of two places: the Speaker & Seating screen, which the speaker
+chip opens, or the new speaker choice in a Politics reaction window (see
+[The reaction window](#the-reaction-window)). Rejected: passing the token
 automatically each round, because the TI4 rules move it only through Politics
-and a few other cards. A later version can open the speaker picker when Politics
-is played.
+and a few other cards.
 
 Re-ordering the seats themselves is possible but deliberately understated. It is
 a correction for a setup mistake — people do not swap chairs mid-game — so it
@@ -127,6 +128,16 @@ So: playing a strategy card **stops the active player's clock** and opens a
 individual player. Each other player gets a tile they tap to mark themselves
 done (whether they resolved the secondary or declined it).
 
+When the card is **Politics (3)**, the window also asks for the **new speaker**,
+because the primary ability hands the token to a player who does not hold it.
+It offers every player except the one who held the token when the window
+opened, the Politics player included. One tap moves the token, and a tap on
+another player changes the choice. The choice is optional: the window closes as
+usual without it, and the speaker chip still moves the token afterwards.
+Rejected: opening the Speaker & Seating screen when Politics is played, because
+it hides the window and takes two taps. Rejected: requiring the choice before
+the window opens, because a forced step blocks the table after a mis-tap.
+
 The window closes when **either**:
 - every other player has marked themselves done, **or**
 - the window timer expires
@@ -138,8 +149,8 @@ Only one strategic action per player per round, so at most one window per player
 per action phase.
 
 The top bar stays usable while the window is open, so the table can pause, undo,
-or move the speaker. Rejected: covering the top bar with the window, because a
-break or a Politics speaker change can come during a window.
+or move the speaker. Rejected: covering the top bar with the window, because the
+table can need a break during a window.
 
 ### Time limits and overtime
 
@@ -206,7 +217,7 @@ the totals stay honest.
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
 | ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
-| **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles                   |
+| **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles, new speaker for Politics |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
 | **Agenda Phase**    | Discussion timer, speaker-order voting with per-player timers            |
 | **Round Summary**   | Per-player time this round, split by phase                               |

@@ -254,7 +254,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .scrim{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px)}
 /* The top bar stays above the scrim: Pause, Undo, Settings, and the speaker chip work during a window. */
 .top{position:relative; z-index:2}
-.rw{position:absolute; inset:80px 60px 32px; background:linear-gradient(180deg,#0f1722,#080c12);
+.rw{position:absolute; inset:74px 60px 24px; background:linear-gradient(180deg,#0f1722,#080c12);
   border:1px solid #2b4a58; border-radius:20px; padding:26px 32px; display:flex; flex-direction:column;
   box-shadow:0 40px 110px rgba(0,0,0,.8)}
 .rw-h{display:flex; align-items:center; gap:16px; flex:none}
@@ -284,6 +284,19 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   background:#242f3d; color:#7c8b9d; padding:2px 7px; border-radius:20px; font-weight:700}
 .rw-f{display:flex; align-items:center; gap:12px; margin-top:20px; flex:none}
 .rw-f .note{font-size:12.5px; color:var(--faint); line-height:1.5}
+/* Politics: the new speaker */
+.rw-spk{display:flex; align-items:center; gap:16px; padding:12px 14px; margin-bottom:16px; flex:none;
+  border:1px solid #3a3218; border-radius:13px; background:#0f0d08}
+.rw-spk .l{flex:none; width:190px}
+.rw-spk .l b{display:block; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:#f0cf6a}
+.rw-spk .l span{display:block; font-size:12.5px; color:var(--dim); margin-top:4px; line-height:1.4}
+.rw-spk .opts{display:flex; gap:8px; flex:1; min-width:0}
+.spkopt{flex:1; min-width:0; display:flex; align-items:center; justify-content:center; gap:7px; padding:11px 8px;
+  border:1px solid var(--line2); border-radius:10px; background:#0b111a; color:var(--txt);
+  font-family:var(--f); font-size:14px; font-weight:700; cursor:pointer}
+.spkopt i{width:10px; height:10px; border-radius:50%; background:var(--pc); font-style:normal; flex:none}
+.spkopt .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.spkopt.on{border-color:#8a7530; background:#1a1509; color:#f0cf6a; box-shadow:0 0 0 1px #8a7530; cursor:default}
 
 /* status phase */
 .steps{display:grid; gap:9px}
@@ -577,7 +590,7 @@ const S = {};
 
 /* ── 1. Setup ── */
 S.setup = {t:'Setup — New Game', d:'ipad', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here and moves only when someone moves it from the speaker chip, for example after Politics (3) is played.`,
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played.`,
  h:`<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">Load last game</button><button class="ibtn">⚙ Settings</button></div>
@@ -807,20 +820,36 @@ const RW = [
   {id:'wren',  done:false, passed:true},
   {id:'sam',   done:false},
 ];
-S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
- `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
- h:`${actionScreen(false)}<div class="scrim"></div>
+// earlier in round 3: Jaz, the speaker, plays Politics and hands the token to Tom
+const RW_POL = [
+  {id:'kira',  done:false},
+  {id:'tom',   done:true,  took:9},
+  {id:'priya', done:false},
+  {id:'sam',   done:false},
+  {id:'wren',  done:false},
+];
+const WINDOWS = {
+  trade:{by:'kira', card:5, pron:'her',   paused:'1:47', t:92,  tiles:RW},
+  pol:  {by:'jaz',  card:3, pron:'their', paused:'0:52', t:101, tiles:RW_POL, from:'jaz', to:'tom'},
+};
+// everyone but the speaker when the window opened can take the token
+const speakerRow = (from, to) => `
+    <div class="rw-spk">
+      <div class="l"><b>★ New speaker</b><span>${P[to].name} is the new speaker.</span></div>
+      <div class="opts">${Object.keys(P).filter(id=>id!==from).map(id=>`<button class="spkopt ${id===to?'on':''}" style="${col(id)}"><i></i><span class="n">${P[id].name}</span>${id===to?'<span>★</span>':''}</button>`).join('')}</div>
+    </div>`;
+const reactionScreen = w => `${actionScreen(false)}<div class="scrim"></div>
   <div class="rw">
-    <div class="rw-h" style="${col('kira')}">
+    <div class="rw-h" style="${col(w.by)}">
       <div><div class="lbl">Strategic action · secondary abilities</div>
-        <h3>Trade <span style="color:var(--faint);font-weight:600">(5)</span></h3>
-        <div class="by"><i></i>Played by Kira · her clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">1:47</b></div></div>
-      <div class="rw-clock"><div class="t num" data-clock="down" data-t="92" data-limit="120" data-bar="rwb">1:32</div>
+        <h3>${CARDNAME[w.card]} <span style="color:var(--faint);font-weight:600">(${w.card})</span></h3>
+        <div class="by"><i></i>Played by ${P[w.by].name} · ${w.pron} clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">${w.paused}</b></div></div>
+      <div class="rw-clock"><div class="t num" data-clock="down" data-t="${w.t}" data-limit="120" data-bar="rwb">${fmtL(w.t)}</div>
         <div class="l">Window remaining · 2:00</div></div>
     </div>
-    <div class="rw-bar"><i id="rwb" style="width:77%"></i></div>
+    <div class="rw-bar"><i id="rwb" style="width:${Math.round(w.t/120*100)}%"></i></div>${w.to?speakerRow(w.from, w.to):''}
     <div class="tiles">
-      ${RW.map(r=>`<div class="tile ${r.done?'done':'wait'}" style="${col(r.id)}">
+      ${w.tiles.map(r=>`<div class="tile ${r.done?'done':'wait'}" style="${col(r.id)}">
         ${r.passed?'<span class="pchip">Passed</span>':''}
         <div class="nm"><i></i>${P[r.id].name}</div><div class="fc">${P[r.id].f}</div>
         ${r.done
@@ -831,12 +860,20 @@ S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
         <div style="font-size:13px;color:var(--faint);text-align:center;line-height:1.5">Active player<br>does not react</div></div>
     </div>
     <div class="rw-f">
-      <div class="note"><b style="color:var(--dim)">3 of 5 done.</b> Window closes automatically when the last player marks done.</div>
+      <div class="note"><b style="color:var(--dim)">${w.tiles.filter(r=>r.done).length} of ${w.tiles.length} done.</b> Window closes automatically when the last player marks done.</div>
       <button class="ibtn">＋ Add 1:00</button>
       <button class="ibtn">↺ Undo last</button>
       <button class="big" style="padding:15px 30px;font-size:18px">CLOSE WINDOW</button>
     </div>
-  </div>`};
+  </div>`;
+
+S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
+ h:reactionScreen(WINDOWS.trade)};
+
+S.politics = {t:'Reaction Window — Politics', d:'ipad', note:
+ `Politics (3) is the one strategy card that moves the speaker token: its primary ability hands the token to any player who does not hold it, the Politics player included. So its window adds a <b>new speaker</b> row above the tiles, listing everyone except the speaker when the window opened. One tap moves the token, a tap on another player changes the choice, and <b>Undo last</b> reverts it. Before the first tap the row reads "Tap the player who takes the token from Jaz." The choice is optional: the window still closes when the last player marks done, and the speaker chip still works afterwards.`,
+ h:reactionScreen(WINDOWS.pol)};
 
 /* ── 6. Status phase ── */
 const STEPS = [
@@ -1292,7 +1329,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['iPad — table device', ['setup','settings','seating','strategy','action','overtime','reaction','status','agenda','round','history','stats','join']],
+  ['iPad — table device', ['setup','settings','seating','strategy','action','overtime','reaction','politics','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
