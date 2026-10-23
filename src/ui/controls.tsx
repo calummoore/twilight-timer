@@ -66,7 +66,12 @@ export function Dialog({
   danger?: boolean
 }) {
   return (
-    <div className="overlay" role="dialog" aria-modal="true" aria-label={title}>
+    <div
+      className="overlay ask"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
       <div className="dialog">
         <h3>{title}</h3>
         <p>{children}</p>

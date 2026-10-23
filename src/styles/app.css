@@ -35,26 +35,28 @@ select {
   cursor: default;
 }
 
-/* The app is drawn at iPad size and scaled to fit the window. */
+/* The app fills the window. The stage is a size container, and the container
+   queries in mockup/responsive.css arrange each screen for its size. */
 .viewport {
   position: fixed;
   inset: 0;
   overflow: hidden;
   background: var(--bg);
 }
-/* Centred by its position, not by a grid: a grid track keeps the unscaled
-   size, so a window smaller than the stage pushed it off screen. */
 .stage {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 1194px;
-  height: 834px;
+  inset: 0;
   overflow: hidden;
+  container: app / size;
 }
 
 .clock-over {
   color: var(--danger);
+}
+/* The reset above makes buttons inherit text-align; the mockup centres the
+   big buttons. */
+.big {
+  text-align: center;
 }
 .big:disabled {
   opacity: 0.45;
@@ -119,9 +121,10 @@ select.fld {
   margin-left: auto;
 }
 
-/* Full-stage overlays: pause and confirmation. */
+/* Full-stage overlays: pause and confirmation. Fixed, so that they stay put
+   while a narrow screen scrolls under them. */
 .overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(2, 4, 7, 0.87);
   backdrop-filter: blur(7px);

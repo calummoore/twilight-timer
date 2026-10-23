@@ -36,7 +36,7 @@ export function InitiativeRail(props: {
               {active && <b className="chip now">Turn</b>}
               {row.state === 'passed' && <b className="chip pass">Passed</b>}
               <div className="in num">{row.card}</div>
-              <div>
+              <div className="who">
                 <div className="nm">
                   <i />
                   {player?.name}
@@ -46,7 +46,7 @@ export function InitiativeRail(props: {
                     {row.cardPlayed ? '✓ ' : ''}
                     {cardName(row.card)}
                   </span>
-                  {player?.faction}
+                  <span className="fac">{player?.faction}</span>
                 </div>
               </div>
               <div className="tm">

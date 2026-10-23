@@ -1,9 +1,9 @@
 # TI4 Tempo
 
 A shared-table time tracker for Twilight Imperium 4th Edition. It runs on one
-iPad in the middle of the table. It is a chess clock for the action phase, with
-enough of the round structure to know whose turn it is. The repository is
-`twilight-timer`.
+iPad or phone in the middle of the table. It is a chess clock for the action
+phase, with enough of the round structure to know whose turn it is. The
+repository is `twilight-timer`.
 
 Each push to `main` deploys the app to the Cloudflare Worker `twilight-timer`
 in the futex account, at https://twilight-timer.futex.workers.dev.
@@ -18,6 +18,7 @@ in the futex account, at https://twilight-timer.futex.workers.dev.
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause, a round summary, and game stats.
 - The game saves in the browser after every tap, and the screen stays awake.
+- The same screens on a phone, an iPad, and a computer, arranged for the space.
 
 ## Docs
 
@@ -71,5 +72,9 @@ To deploy by hand, run `npx wrangler login`, then `npm run build` and
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
 - `src/ui/GameScreen.tsx` connects the model to the screens.
 - `src/ui/screens/` has one component per screen.
+- `src/ui/Stage.tsx` is the app root: it fills the window and is a CSS size
+  container.
 - `src/styles/mockup/` holds the CSS ported from the mockup.
-  `src/styles/app.css` and `src/styles/screens.css` hold app-only styles.
+  `responsive.css` holds the container queries that arrange each screen for
+  the space. `src/styles/app.css` and `src/styles/screens.css` hold app-only
+  styles.

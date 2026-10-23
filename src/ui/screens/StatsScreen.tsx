@@ -52,7 +52,7 @@ export function StatsScreen(props: {
 
   return (
     <div className="lay">
-      <div className="top">
+      <div className="top stack">
         <div className="round">
           <b>Game complete</b> · {stats.rounds}{' '}
           {stats.rounds === 1 ? 'round' : 'rounds'}
@@ -106,9 +106,7 @@ export function StatsScreen(props: {
             <div className="s">{stats.overLimitCount} times over a limit</div>
           </div>
         </div>
-        <div
-          style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 18 }}
-        >
+        <div className="split" style={{ '--side': '400px' }}>
           <div className="pnl">
             <div className="pnl-h">
               Own-turn time by player{' '}
@@ -171,11 +169,18 @@ export function StatsScreen(props: {
                           {byId.get(p.playerId)?.name}
                         </div>
                       </td>
-                      <td className="num">{p.turns}</td>
-                      <td className="num">{clock(p.averageMs)}</td>
-                      <td className="num">{clock(p.worstMs)}</td>
+                      <td className="num" data-l="Turns">
+                        {p.turns}
+                      </td>
+                      <td className="num" data-l="Avg turn">
+                        {clock(p.averageMs)}
+                      </td>
+                      <td className="num" data-l="Worst turn">
+                        {clock(p.worstMs)}
+                      </td>
                       <td
                         className="num"
+                        data-l="Over limit"
                         style={{
                           color: p.overLimitCount
                             ? 'var(--danger)'
@@ -186,14 +191,16 @@ export function StatsScreen(props: {
                           ? `${p.overLimitCount} · ${clock(p.limitOvertimeMs)}`
                           : '—'}
                       </td>
-                      <td className="num">{percent(p.share, 1)}</td>
+                      <td className="num" data-l="Share">
+                        {percent(p.share, 1)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="col">
             <div className="pnl">
               <div className="pnl-h">Where the game went</div>
               <div style={{ padding: '16px 18px' }}>
@@ -215,7 +222,7 @@ export function StatsScreen(props: {
                 ))}
               </div>
             </div>
-            <div className="pnl" style={{ flex: 1 }}>
+            <div className="pnl grow">
               <div className="pnl-h">Longest turns</div>
               <div style={{ padding: '8px 18px 16px' }}>
                 {stats.longestTurns.map((t) => (

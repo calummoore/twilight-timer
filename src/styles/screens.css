@@ -59,8 +59,10 @@
   color: var(--dim);
 }
 
-/* Full-screen screens cover the in-game top bar. */
+/* Full-screen screens cover the in-game top bar, and stay put while the game
+   screen under them scrolls. */
 .settings-screen {
+  position: fixed;
   z-index: 6;
   background: var(--bg);
 }

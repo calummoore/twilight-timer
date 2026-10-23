@@ -1,6 +1,10 @@
 import type { Player } from '../../model/types'
 import { pc } from '../colour'
 
+// The seats sit on an ellipse inside a 500 by 410 box. Positions are in
+// percent, so that the ring scales with the screen.
+const W = 500
+const H = 410
 const CX = 250
 const CY = 205
 const RX = 190
@@ -44,7 +48,7 @@ export function SeatingScreen(props: {
 
   return (
     <div className="lay settings-screen">
-      <div className="top">
+      <div className="top stack">
         <div className="round">
           <b>Speaker &amp; seating</b> · Round {props.round}
         </div>
@@ -60,10 +64,7 @@ export function SeatingScreen(props: {
           ✕ Close
         </button>
       </div>
-      <div
-        className="content"
-        style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 20 }}
-      >
+      <div className="content split" style={{ '--side': '400px', gap: 20 }}>
         <div
           className="pnl"
           style={{ display: 'flex', flexDirection: 'column' }}
@@ -80,8 +81,7 @@ export function SeatingScreen(props: {
                 <div className="l">Speaker</div>
                 <div className="v">★ {speaker?.name}</div>
                 <div className="s">
-                  Picks first in the strategy phase.
-                  <br />
+                  Picks first in the strategy phase. <br />
                   Votes last, and breaks ties.
                 </div>
               </div>
@@ -94,8 +94,8 @@ export function SeatingScreen(props: {
                     className={`seatnode ${isSpeaker ? 'isspk' : ''}`}
                     style={{
                       ...pc(p.colour),
-                      left: CX + RX * Math.cos(angle),
-                      top: CY + RY * Math.sin(angle),
+                      left: `${((CX + RX * Math.cos(angle)) / W) * 100}%`,
+                      top: `${((CY + RY * Math.sin(angle)) / H) * 100}%`,
                     }}
                     onClick={() => props.onSpeaker(p.id)}
                   >
@@ -115,25 +115,17 @@ export function SeatingScreen(props: {
             </div>
           </div>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-            minHeight: 0,
-            overflow: 'auto',
-          }}
-        >
+        <div className="col scroll seat-orders" style={{ gap: 12 }}>
           <div className="pnl">
             <div className="pnl-h">Strategy pick order</div>
-            <div style={{ padding: '11px 14px' }}>
+            <div className="ord-body">
               <div className="ordlist">{orderList(props.pickOrder)}</div>
               <div className="order-help">Speaker first, then clockwise.</div>
             </div>
           </div>
           <div className="pnl">
             <div className="pnl-h">Agenda voting order</div>
-            <div style={{ padding: '11px 14px' }}>
+            <div className="ord-body">
               <div className="ordlist">{orderList(props.voteOrder)}</div>
               <div className="order-help">
                 Starts left of the speaker. The speaker votes last.

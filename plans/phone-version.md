@@ -106,17 +106,25 @@ Tags: ui
 
 Replace the scaled stage with the responsive layout from the mockups.
 
-- [ ] Replace the stage with a full-window root that is a size container.
-- [ ] Port the mockup's container queries to `src/styles/mockup/`.
-- [ ] Move layout styles from the screen components into classes. Add the
+- [x] Replace the stage with a full-window root that is a size container.
+- [x] Port the mockup's container queries to `src/styles/mockup/`.
+- [x] Move layout styles from the screen components into classes. Add the
       markup that the responsive CSS needs.
-- [ ] Respect the safe areas of phones with a notch.
-- [ ] Use device-neutral copy: "Stops the screen sleeping mid-game."
-- [ ] Let the web app manifest open in any orientation.
-- [ ] Update the Product section of `AGENTS.md` and the key code in
+- [x] Respect the safe areas of phones with a notch.
+- [x] Use device-neutral copy: "Stops the screen sleeping mid-game."
+- [x] Let the web app manifest open in any orientation.
+- [x] Update the Product section of `AGENTS.md` and the key code in
       `README.md`.
-- [ ] Smoke test on the dev server at phone, upright iPad, iPad, sideways
+- [x] Smoke test on the dev server at phone, upright iPad, iPad, sideways
       phone, and desktop sizes.
+  - A scripted game ran from setup to the post-game stats at eight window
+    sizes, from 375 by 667 to 1440 by 900, with no script error and no
+    sideways overflow. The production build passed the same run at 393 by
+    852. Evidence: `.context/phone-version/app/`.
+  - `responsive.css` matches the mockup word for word. Evidence:
+    `.context/phone-version/css-sync.log`.
+- [x] Centre the text of the big buttons, as the mockup does. The app's
+      button reset had aligned it to the left since the first release.
 
 ## Milestone 5: Verification, commit, and review
 

@@ -99,15 +99,17 @@ export function SetupScreen(props: {
             Load last game
           </button>
         )}
-        <button className="ibtn" onClick={props.onSettings}>
-          ⚙ Settings
+        <button
+          className="ibtn"
+          onClick={props.onSettings}
+          aria-label="Settings"
+        >
+          ⚙<span className="word"> Settings</span>
         </button>
       </div>
       <div className="content">
         <div className="setup-grid">
-          <div
-            style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}
-          >
+          <div className="col">
             {props.notice && (
               <div className="notice">
                 {props.notice}
@@ -116,7 +118,7 @@ export function SetupScreen(props: {
                 </button>
               </div>
             )}
-            <div style={{ marginBottom: 16 }}>
+            <div>
               <div className="setup-label">
                 Players · in seat order, clockwise around the table
               </div>
@@ -135,7 +137,7 @@ export function SetupScreen(props: {
                 ))}
               </div>
             </div>
-            <div style={{ overflow: 'auto', flex: 1, minHeight: 0 }}>
+            <div className="scroll grow">
               {seats.map((row, i) => (
                 <div
                   key={i}
@@ -175,13 +177,13 @@ export function SetupScreen(props: {
                     ))}
                   </div>
                   <input
-                    className="fld"
+                    className="fld name"
                     value={row.name}
                     placeholder={`Player ${i + 1}`}
                     onChange={(e) => update(i, { name: e.target.value })}
                   />
                   <input
-                    className="fld sel"
+                    className="fld sel fac"
                     list="factions"
                     value={row.faction}
                     placeholder="Faction"
@@ -208,7 +210,7 @@ export function SetupScreen(props: {
             style={{ display: 'flex', flexDirection: 'column' }}
           >
             <div className="pnl-h">Game</div>
-            <div style={{ padding: '16px 18px', flex: 1 }}>
+            <div className="grow" style={{ padding: '16px 18px' }}>
               <div className="kv">
                 <span>Players</span>
                 <b>{count}</b>
@@ -252,8 +254,8 @@ export function SetupScreen(props: {
             </div>
             <div style={{ padding: '16px 18px' }}>
               <button
-                className="big"
-                style={{ width: '100%', fontSize: 23, padding: 20 }}
+                className="big lg"
+                style={{ width: '100%' }}
                 onClick={begin}
               >
                 BEGIN GAME

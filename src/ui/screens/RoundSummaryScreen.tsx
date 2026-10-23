@@ -119,15 +119,11 @@ export function RoundSummaryScreen(props: {
           </div>
         </div>
       </div>
-      <div style={{ padding: '0 22px 20px', display: 'flex', gap: 12 }}>
-        <button
-          className="ibtn"
-          style={{ padding: '18px 24px' }}
-          onClick={props.onEndGame}
-        >
+      <div className="foot">
+        <button className="ibtn" onClick={props.onEndGame}>
           End game
         </button>
-        <button className="big" style={{ flex: 1 }} onClick={props.onNextRound}>
+        <button className="big" onClick={props.onNextRound}>
           START ROUND {game.round + 1} — STRATEGY PHASE
         </button>
       </div>

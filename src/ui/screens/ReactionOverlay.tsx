@@ -93,8 +93,7 @@ export function ReactionOverlay(props: {
           })}
           <div className="tile tile-idle">
             <div>
-              Active player
-              <br />
+              Active player <br />
               does not react
             </div>
           </div>

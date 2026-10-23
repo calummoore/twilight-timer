@@ -472,7 +472,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .ph-stat span{font-size:14px; color:var(--dim)} .ph-stat b{font-size:22px; font-weight:750}
 
 /* ─────────── app controls that the screens share, as the app draws them ─────────── */
-.overlay{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px); display:grid; place-items:center; z-index:10}
+.overlay{position:fixed; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px); display:grid; place-items:center; z-index:10}
 .dialog{width:520px; background:#121a24; border:1px solid var(--line2); border-radius:20px; padding:28px}
 .dialog h3{font-size:25px; font-weight:750}
 .dialog p{font-size:14.5px; color:var(--dim); margin-top:10px; line-height:1.55}
@@ -529,6 +529,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 /* The top bar stays above a reaction window, so the table can still pause, undo or move the speaker. */
 .top.game{position:relative; z-index:5}
 .rw{inset:calc(var(--top-h, 68px) + 16px) 60px 30px}
+/* Overlays stay put while a narrow screen scrolls under them. */
+.scrim, .rw{position:fixed}
 
 /* The seating ring keeps its proportions at any width. */
 .ringwrap{width:100%; max-width:500px; height:auto; aspect-ratio:500/410}
@@ -553,7 +555,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 
 /* ─────────── narrow: an upright iPad or a phone ─────────── */
 @container app (max-width: 900px){
-  .lay{overflow-y:auto; scrollbar-width:none; padding-bottom:var(--safe-bottom, env(safe-area-inset-bottom, 0px))}
+  .lay{overflow-y:auto; scrollbar-width:none; padding-bottom:var(--safe-bottom, env(safe-area-inset-bottom, 0px));
+    padding-left:env(safe-area-inset-left, 0px); padding-right:env(safe-area-inset-right, 0px)}
   .lay::-webkit-scrollbar{display:none}
   .lay > *{flex:none}
   .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
@@ -590,9 +593,18 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .join-grid{grid-template-columns:1fr; padding:0 24px; gap:24px}
 }
 
-/* ─────────── a short window, such as a phone held sideways ─────────── */
-@container app (max-width: 900px) and (max-height: 520px){
-  .hero .bigclock{font-size:clamp(64px, 28cqh, 186px)}
+/* ─────────── a short window, such as a phone held sideways or a small laptop ─────────── */
+@container app (max-height: 700px){
+  .lay{overflow-y:auto; scrollbar-width:none}
+  .lay > *{flex:none}
+  .content, .body, .scroll{overflow:visible; min-height:auto}
+  .hero{min-height:auto}
+  .hero .bigclock{margin-top:20px; font-size:clamp(64px, min(24cqh, 26cqw), 186px)}
+  .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
+}
+/* A phone held sideways: the two-row top bar scrolls away, so the clock and End Turn fit on the screen. */
+@container app (max-height: 500px){
+  .top.game{position:relative}
 }
 
 /* ─────────── a phone ─────────── */
@@ -732,7 +744,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .stat .v{font-size:24px; margin-top:5px}
   .stat .s{font-size:11px}
   .bars{gap:11px}
-  .bar-row{grid-template-columns:62px 1fr 52px; gap:9px}
+  .bar-row{grid-template-columns:78px 1fr 52px; gap:9px}
   .bar-row .nm{font-size:13.5px; gap:7px}
   .bar-row .vl{font-size:13.5px}
   .track{height:18px}
@@ -1059,7 +1071,7 @@ S.seating = {t:'Speaker & Seating', d:'ipad', note:
  h:`<div class="space"></div><div class="lay">
   <div class="top stack"><div class="round"><b>Speaker &amp; seating</b> · Round 3</div>
     <div class="spacer"></div><button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
-  <div class="content split" style="--side:400px">
+  <div class="content split" style="--side:400px;gap:20px">
     <div class="pnl" style="display:flex;flex-direction:column">
       <div class="pnl-h">The table <span class="pnl-note">tap a seat to move the speaker token</span></div>
       <div style="padding:18px 0 8px">
@@ -1194,7 +1206,7 @@ S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
           ? `<div class="st">✓ Done</div><div class="took num">Took ${fmtL(r.took)}</div>`
           : `<button class="tapme">MARK DONE</button>`}
       </div>`).join('')}
-      <div class="tile tile-idle"><div>Active player<br>does not react</div></div>
+      <div class="tile tile-idle"><div>Active player <br>does not react</div></div>
     </div>
     <div class="rw-f">
       <div class="note"><b style="color:var(--dim)">3 of 5 done.</b> The window closes when the last player marks done.</div>
@@ -1314,7 +1326,7 @@ S.agenda = {t:'Agenda Phase', d:'ipad', note:
       <div class="pnl ag-disc"><div class="tabletimer" style="padding:22px 0 18px">
         <div class="t num md clock-over">4:26</div>
         <div class="l">Discussion · limit 4:00<span style="color:var(--danger)"> · over by 0:26</span></div></div></div>
-      <div class="pnl ag-now">
+      <div class="pnl grow ag-now">
         <div class="pnl-h">Now voting</div>
         <div class="voter-now" style="${col('sam')}">
           <div class="who"><i></i>Sam</div>
@@ -1322,7 +1334,7 @@ S.agenda = {t:'Agenda Phase', d:'ipad', note:
           <button class="big small">VOTE CAST — NEXT PLAYER</button>
         </div>
       </div>
-      <div class="pnl grow later ag-tally">
+      <div class="pnl later ag-tally">
         <div class="pnl-h">Running tally${LATER}</div>
         <div style="padding:16px 18px">
           <div class="kv"><span>For</span><b class="num" style="color:var(--ok);font-size:19px">27</b></div>

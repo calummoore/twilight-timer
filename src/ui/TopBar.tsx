@@ -9,6 +9,16 @@ const PILLS = [
   { phase: 'agenda', label: 'Agenda' },
 ] as const
 
+/** The phase name that a phone shows next to the round, in place of the pill. */
+const NAMES: Record<Phase, string> = {
+  strategy: 'Strategy',
+  action: 'Action',
+  status: 'Status',
+  agenda: 'Agenda',
+  summary: 'Summary',
+  ended: 'Game over',
+}
+
 const ORDER: Phase[] = [
   'strategy',
   'action',
@@ -38,6 +48,10 @@ export function TopBar({ ref, ...props }: TopBarProps) {
     <div className="top game" ref={ref}>
       <div className="round">
         Round <b>{props.round}</b>
+        <span className="ph-now">
+          {' · '}
+          <b>{NAMES[props.phase]}</b>
+        </span>
       </div>
       <div className="phase-pill">
         {PILLS.map((pill) => {
@@ -57,15 +71,25 @@ export function TopBar({ ref, ...props }: TopBarProps) {
       <div className="gt">
         Game <b className="num">{clock(props.gameMs)}</b>
       </div>
-      <button className="ibtn" onClick={props.onUndo} disabled={!props.canUndo}>
-        ↺ Undo
-      </button>
-      <button className="ibtn" onClick={props.onPause}>
-        ⏸ Pause
-      </button>
-      <button className="ibtn" onClick={props.onSettings} aria-label="Settings">
-        ⚙
-      </button>
+      <div className="tools">
+        <button
+          className="ibtn"
+          onClick={props.onUndo}
+          disabled={!props.canUndo}
+        >
+          ↺ Undo
+        </button>
+        <button className="ibtn" onClick={props.onPause} aria-label="Pause">
+          ⏸<span className="word"> Pause</span>
+        </button>
+        <button
+          className="ibtn"
+          onClick={props.onSettings}
+          aria-label="Settings"
+        >
+          ⚙
+        </button>
+      </div>
     </div>
   )
 }

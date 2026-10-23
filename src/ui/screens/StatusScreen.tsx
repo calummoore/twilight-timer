@@ -21,10 +21,7 @@ export function StatusScreen(props: {
   const done = view.steps.filter(Boolean).length
 
   return (
-    <div
-      className="content"
-      style={{ display: 'grid', gridTemplateColumns: '1fr 420px', gap: 18 }}
-    >
+    <div className="content split status" style={{ '--side': '420px' }}>
       <div className="pnl" style={{ display: 'flex', flexDirection: 'column' }}>
         <div className="pnl-h">
           Status phase steps{' '}
@@ -48,8 +45,8 @@ export function StatusScreen(props: {
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div className="pnl">
+      <div className="col side">
+        <div className="pnl timer">
           <div className="tabletimer">
             <div className={`t num ${over ? 'clock-over' : ''}`}>
               {clock(timer?.elapsedMs ?? 0)}
@@ -62,7 +59,7 @@ export function StatusScreen(props: {
             </div>
           </div>
         </div>
-        <div className="pnl" style={{ flex: 1 }}>
+        <div className="pnl grow">
           <div className="pnl-h">Round {game.round} so far</div>
           <div style={{ padding: '14px 18px' }}>
             <div className="kv">
@@ -96,11 +93,7 @@ export function StatusScreen(props: {
             onChange={props.onCustodians}
           />
         </div>
-        <button
-          className="big"
-          style={{ fontSize: 23, padding: 21 }}
-          onClick={props.onNext}
-        >
+        <button className="big lg" onClick={props.onNext}>
           {game.custodiansRemoved ? 'BEGIN AGENDA PHASE' : 'END ROUND'}
         </button>
       </div>

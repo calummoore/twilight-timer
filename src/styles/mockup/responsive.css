@@ -1,5 +1,307 @@
-/* Ported from docs/mockups/index.html: the layout helpers and the container queries that arrange each screen for the space. Prettier skips this folder, so it stays easy to compare with the mockup. */
+/* Ported from docs/mockups/index.html: the layout helpers and the container queries that arrange each screen for the
+   space. Prettier skips this folder, so it stays easy to compare with the mockup. The mockup sets --safe-top and
+   --safe-bottom on its device frames; the app falls back to the browser's safe areas. */
+
+/* app controls that the screens share */
+.big.lg{font-size:23px; padding:21px}
+.big.md{font-size:20px; padding:19px}
+.picker .spkb{margin-left:6px; padding:10px 14px}
+.ord-body{padding:11px 14px}
+.tabletimer .t.md{font-size:78px}
+.agenda-card.ag-card{margin-bottom:0}
+
+/* ─────────── layout helpers: the screens use these in place of inline grids ─────────── */
+.split{display:grid; grid-template-columns:1fr var(--side,420px); gap:18px}
+.col{display:flex; flex-direction:column; gap:16px; min-height:0}
+.grow{flex:1; min-height:0}
+.scroll{overflow:auto; min-height:0}
+.foot{display:flex; gap:12px; padding:0 22px 20px; flex:none}
+.foot .big{flex:1}
+.foot .ibtn{padding:18px 24px}
+.tools{display:flex; gap:16px}
+.ph-now{display:none}
+.evr{display:flex; align-items:center}
 
 /* The top bar stays above a reaction window, so the table can still pause, undo or move the speaker. */
 .top.game{position:relative; z-index:5}
 .rw{inset:calc(var(--top-h, 68px) + 16px) 60px 30px}
+/* Overlays stay put while a narrow screen scrolls under them. */
+.scrim, .rw{position:fixed}
+
+/* The seating ring keeps its proportions at any width. */
+.ringwrap{width:100%; max-width:500px; height:auto; aspect-ratio:500/410}
+.ringwrap::before{width:60%; height:56%}
+.ringwrap .cc{width:46%}
+
+/* The top bar clears the status bar of a phone with a notch. */
+.top{padding-top:calc(14px + var(--safe-top, env(safe-area-inset-top, 0px)))}
+
+/* ─────────── narrow: an upright iPad or a phone ─────────── */
+@container app (max-width: 900px){
+  .lay{overflow-y:auto; scrollbar-width:none; padding-bottom:var(--safe-bottom, env(safe-area-inset-bottom, 0px));
+    padding-left:env(safe-area-inset-left, 0px); padding-right:env(safe-area-inset-right, 0px)}
+  .lay::-webkit-scrollbar{display:none}
+  .lay > *{flex:none}
+  .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
+  .top.game{display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:"round pill gt" "spk extra tools";
+    column-gap:12px; row-gap:10px; align-items:center}
+  .top.game .round{grid-area:round}
+  .top.game .phase-pill{grid-area:pill; justify-self:center}
+  .top.game .gt{grid-area:gt}
+  .top.game .spkb{grid-area:spk; justify-self:start}
+  .top.game .extra{grid-area:extra; justify-self:end}
+  .top.game .tools{grid-area:tools; gap:8px}
+  .top.game .spacer{display:none}
+  .content, .body, .scroll{overflow:visible; min-height:auto}
+  .body{grid-template-columns:1fr; padding:14px 16px 18px}
+  .split{grid-template-columns:1fr}
+  .grow{flex:none}
+  .hero{min-height:auto}
+  .hero .bigclock{margin:20px 0 0; font-size:clamp(84px, 26cqw, 186px)}
+  .rail, .rail-b{overflow:visible; min-height:auto}
+  .rail-b{flex:none}
+  .rw{inset:calc(var(--top-h, 135px) + 12px) 24px calc(var(--safe-bottom, env(safe-area-inset-bottom, 0px)) + 20px)}
+  .rw-f .ibtn, .rw-f .big{white-space:nowrap; flex:none}
+  .cards{grid-template-columns:repeat(auto-fill, minmax(170px, 1fr))}
+  .card{min-height:112px}
+  .stat-grid{grid-template-columns:repeat(auto-fit, minmax(150px, 1fr))}
+  .setup-grid{grid-template-columns:1fr; height:auto}
+  .status .side, .agenda .col{display:contents}
+  .status .timer{order:-1}
+  .agenda .ag-card{order:-3}
+  .agenda .ag-disc{order:-2}
+  .agenda .ag-now{order:-1}
+  .agenda .ag-tally{order:1}
+  .agenda .ag-resolve{order:2}
+  .join-grid{grid-template-columns:1fr; padding:0 24px; gap:24px}
+}
+
+/* ─────────── a short window, such as a phone held sideways or a small laptop ─────────── */
+@container app (max-height: 700px){
+  .lay{overflow-y:auto; scrollbar-width:none}
+  .lay > *{flex:none}
+  .content, .body, .scroll{overflow:visible; min-height:auto}
+  .hero{min-height:auto}
+  .hero .bigclock{margin-top:20px; font-size:clamp(64px, min(24cqh, 26cqw), 186px)}
+  .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
+}
+/* A phone held sideways: the two-row top bar scrolls away, so the clock and End Turn fit on the screen. */
+@container app (max-height: 500px){
+  .top.game{position:relative}
+}
+
+/* ─────────── a phone ─────────── */
+@container app (max-width: 600px){
+  .top{flex-wrap:wrap; gap:8px; row-gap:10px; padding:calc(10px + var(--safe-top, env(safe-area-inset-top, 0px))) 16px 12px}
+  .top .round{font-size:11px}
+  .top.stack .round{flex-basis:100%}
+  .top .ibtn{padding:9px 12px}
+  .ibtn .word{display:none}
+  .top.game{grid-template-columns:1fr auto; grid-template-areas:"round gt" "spk tools" "extra extra" "pill pill";
+    column-gap:8px; row-gap:0; padding-bottom:0; border-bottom:none}
+  .top.game .spkb, .top.game .tools, .top.game .extra, .top.game .phase-pill{margin-top:10px}
+  .top.game .ph-now{display:inline}
+  .top.game .gt{font-size:10.5px}
+  .top.game .gt b{font-size:15px; margin-left:6px}
+  .top.game .tools .ibtn{min-width:40px; justify-content:center}
+  .top.game .extra{justify-self:start}
+  .top.game .phase-pill{justify-self:stretch; display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin:0 -16px;
+    padding:0; border:none; border-radius:0; background:none}
+  .top.game .phase-pill span{height:3px; padding:0; border-radius:0; font-size:0; background:#17212c}
+  .top.game .phase-pill span.done{background:#255450}
+  .top.game .phase-pill span.on{background:var(--accent)}
+  .content{padding:14px 16px}
+  .body{padding:12px 16px 16px}
+  .split, .col{gap:12px}
+  .foot{flex-wrap:wrap; gap:10px; padding:0 16px 16px}
+  .foot .ibtn{flex:1; justify-content:center; padding:13px 12px}
+  .foot .big{flex-basis:100%; font-size:20px; padding:18px 14px}
+  .big.lg, .big.md{font-size:22px; padding:19px}
+  .h1{font-size:25px}
+  .h1s{font-size:12.5px; line-height:1.5; margin-top:5px}
+  .pnl-h{padding:12px 14px; flex-wrap:wrap; gap:4px 12px}
+  .pnl-note{white-space:nowrap}
+
+  /* action phase: the hero keeps End Turn under the clock, and the rail rows become tiles */
+  .hero{padding:14px 16px 16px}
+  .hero-top{gap:12px}
+  .hero .dot{width:14px; height:14px; margin-top:8px; box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 22%, transparent)}
+  .hero h3{font-size:28px}
+  .hero .fac{font-size:12.5px; margin-top:3px}
+  .hero .init .n{font-size:34px}
+  .hero .init .l{font-size:9px; letter-spacing:.14em}
+  .hero .bigclock{margin-top:16px}
+  .hero .clock-sub{font-size:12px; letter-spacing:.03em; margin-top:6px}
+  .hero .limitbar{height:6px; margin-top:14px}
+  .hero .limitrow{font-size:10px}
+  .hero .alarm{padding:9px 10px 9px 12px; margin-bottom:12px; gap:10px}
+  .hero .alarm .s{font-size:11.5px}
+  .hero .acts{gap:10px; margin-top:16px}
+  .hero .big{font-size:24px; padding:21px 16px}
+  .hero .sec{padding:12px 14px; font-size:14.5px}
+  .rail{background:none; border:none; border-radius:0}
+  .rail-h{padding:0 2px 9px; border:none}
+  .rail-b{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; padding:0}
+  .rail .row{grid-template-columns:auto 1fr; grid-template-areas:"in nm" "fc fc" "tm tm"; gap:3px 6px; align-items:baseline;
+    min-width:0; margin:0; padding:8px 9px 7px; border:1px solid var(--line); background:#0a0f16}
+  .rail .row .who{display:contents}
+  .rail .row .in{grid-area:in; font-size:18px; text-align:left}
+  .rail .row .nm{grid-area:nm; font-size:14px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block}
+  .rail .row .nm i{display:none}
+  .rail .row .fc{grid-area:fc; display:flex; flex-direction:column; align-items:flex-start; gap:3px; min-width:0; margin:0}
+  .rail .row .sccard{margin:0; padding:1px 6px; font-size:10.5px; letter-spacing:0; text-transform:none}
+  .rail .row .fac{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .rail .row .tm{grid-area:tm; display:flex; flex-wrap:wrap; column-gap:6px; align-items:baseline; text-align:left}
+  .rail .row .tm .a{font-size:13px}
+  .rail .row .tm .b{font-size:10.5px; margin:0}
+  .rail .row.active{background:color-mix(in srgb,var(--pc) 14%, #0b111a); border-color:color-mix(in srgb,var(--pc) 55%, transparent); box-shadow:none}
+  .rail .row .chip{top:-7px; right:7px}
+  .rail-f{padding:10px 2px 0; border:none; justify-content:flex-start; gap:14px}
+
+  /* reaction window: a sheet under the top bar, one row per reacting player */
+  .rw{inset:var(--top-h, 147px) 0 0; border-bottom:none; border-radius:22px 22px 0 0;
+    padding:18px 16px calc(14px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)))}
+  .rw-h{display:block}
+  .rw-h h3{font-size:25px; margin-top:4px}
+  .rw-h .by{font-size:13px}
+  .rw-clock{margin:12px 0 0; text-align:center}
+  .rw-clock .t{font-size:68px}
+  .rw-bar{margin:12px 0 10px}
+  .tiles{grid-template-columns:1fr; gap:7px; overflow-y:auto; align-content:start; scrollbar-width:none}
+  .tile{display:grid; grid-template-columns:1fr auto; column-gap:12px; align-items:center; min-height:54px; padding:8px 9px 8px 14px}
+  .tile .nm{grid-row:1; grid-column:1; font-size:16px}
+  .tile .fc{grid-row:2; grid-column:1; margin-top:2px}
+  .tile .st{grid-row:1; grid-column:2; margin:0; text-align:right; font-size:12.5px}
+  .tile .took{grid-row:2; grid-column:2; margin:2px 0 0; text-align:right}
+  .tile .tapme{grid-row:1 / span 2; grid-column:2; margin:0; padding:12px 14px; font-size:13.5px}
+  .tile .pchip{position:static; grid-row:1; grid-column:1; justify-self:end}
+  .tile.tile-idle{display:flex; min-height:38px; font-size:12px}
+  .tile.tile-idle br{display:none}
+  .rw-f{flex-wrap:wrap; gap:10px; margin-top:12px}
+  .rw-f .note{flex-basis:100%}
+  .rw-f .spacer{display:none}
+  .rw-f .ibtn{flex:1; justify-content:center; padding:12px}
+  .rw-f .big{flex-basis:100%; font-size:22px; padding:19px}
+
+  /* strategy phase */
+  .picker{display:grid; grid-template-columns:1fr auto; grid-template-areas:"who t" "help help" "spk spk"; gap:8px 12px; padding:12px 14px}
+  .picker .who-box{grid-area:who}
+  .picker .who{font-size:20px; margin-top:3px}
+  .picker .t{grid-area:t; font-size:34px}
+  .picker .picker-help{grid-area:help; margin:0; max-width:none}
+  .picker .spkb{grid-area:spk; justify-self:start; margin:0; padding:9px 12px}
+  .cards{grid-template-columns:1fr 1fr; gap:8px}
+  .card{display:grid; grid-template-columns:34px 1fr; column-gap:8px; min-height:0; padding:11px 12px}
+  .card .n{font-size:28px; grid-row:span 2}
+  .card .nm{font-size:14.5px; margin-top:1px}
+  .card .own, .card .free{margin-top:4px; font-size:12.5px}
+  .card .tg{top:-8px; right:10px; font-size:10px; padding:2px 7px}
+  .order-strip{gap:6px}
+  .order-strip .lbl{flex-basis:100%}
+  .oc{font-size:12.5px; padding:4px 10px 4px 7px}
+
+  /* status and agenda phases */
+  .tabletimer{padding:16px 0 14px}
+  .tabletimer .t{font-size:72px}
+  .tabletimer .t.md{font-size:52px}
+  .steps{gap:7px}
+  .step{display:grid; grid-template-columns:26px 1fr; gap:0 12px; padding:10px 13px}
+  .step .bx{grid-row:span 2}
+  .step .lb{font-size:14.5px}
+  .step .no{margin:2px 0 0; font-size:11.5px}
+  .custodians{padding:13px 14px}
+  .agenda-card{padding:13px 15px; margin-bottom:0}
+  .agenda-card h4{font-size:20px}
+  .agenda-card p{font-size:12.5px}
+  .voter-now{padding:14px; gap:10px}
+  .voter-now .t{font-size:48px}
+  .vote-row{grid-template-columns:24px 1fr 80px 50px; gap:9px; padding:10px 11px; margin-bottom:6px}
+  .vote-row .nm{font-size:15px}
+  .vote-row .vt{font-size:14.5px}
+  .vote-row .badge{font-size:10px; padding:5px 4px}
+
+  /* round summary and post-game stats */
+  .stat-grid{grid-template-columns:1fr 1fr; gap:9px}
+  .stat{padding:12px 13px}
+  .stat .l{font-size:9.5px; letter-spacing:.12em}
+  .stat .v{font-size:24px; margin-top:5px}
+  .stat .s{font-size:11px}
+  .bars{gap:11px}
+  .bar-row{grid-template-columns:78px 1fr 52px; gap:9px}
+  .bar-row .nm{font-size:13.5px; gap:7px}
+  .bar-row .vl{font-size:13.5px}
+  .track{height:18px}
+  .legend{gap:12px; margin-top:14px; font-size:11px}
+  .tbl thead{display:none}
+  .tbl tr{display:grid; grid-template-columns:repeat(3,1fr); gap:6px 10px; padding:10px 0; border-top:1px solid var(--line)}
+  .tbl td{padding:0; border:none}
+  .tbl td:first-child{grid-column:1 / -1}
+  .tbl td[data-l]::before{content:attr(data-l); display:block; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--faint); margin-bottom:2px}
+
+  /* setup and settings */
+  .count{gap:6px}
+  .count b{padding:10px 0}
+  .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
+    padding:10px 10px 10px 8px}
+  .seat .seat-move{grid-area:mv}
+  .seat .sn{grid-area:sn}
+  .seat .swatches{grid-area:sw; gap:5px}
+  .seat .sw{width:26px; height:26px; border-radius:7px}
+  .seat .name{grid-area:name}
+  .seat .fac{grid-area:fac}
+  .seat .spk{grid-area:spk; width:34px; height:34px}
+  .seat .fld{min-width:0; padding:9px 10px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .seat .fld.sel{font-size:13px}
+  .master{padding:14px 15px; gap:12px; margin-bottom:14px}
+  .set-row{grid-template-columns:1fr auto; grid-template-areas:"lb tog" "ds ctl"; gap:6px 12px; padding:12px 14px}
+  .set-row .txt{display:contents}
+  .set-row .lb{grid-area:lb}
+  .set-row .ds{grid-area:ds; margin:0}
+  .set-row .tog{grid-area:tog}
+  .set-row .ctl{grid-area:ctl; align-self:center}
+  .set-row .stepper{width:128px}
+
+  /* speaker and seating */
+  .ringwrap .seatnode{width:84px; padding:13px 5px 7px}
+  .ringwrap .seatnode i{width:11px; height:11px}
+  .ringwrap .seatnode .nm{font-size:13.5px; margin-top:4px}
+  .ringwrap .seatnode .sn2{font-size:9.5px}
+  .ringwrap .cc{width:36%}
+  .ringwrap .cc .v{font-size:17px}
+  .ringwrap .cc .s{font-size:10.5px; margin-top:6px}
+  .ringwrap .cc br{display:none}
+  .seat-orders{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+  .seat-orders > .ibtn, .seat-orders > .order-help{grid-column:1 / -1}
+  .seat-orders .pnl-h{padding:10px 11px; font-size:10px; letter-spacing:.12em}
+  .ord-body{padding:8px}
+  .ordrow{grid-template-columns:14px 1fr auto; gap:6px; padding:6px 8px; font-size:13px}
+  .ordrow .tag2{padding:2px 5px; font-size:8.5px}
+
+  /* history */
+  .top .phase-pill{order:5; flex-basis:100%; justify-content:space-between}
+  .undo-bar{flex-wrap:wrap; gap:12px; padding:14px}
+  .undo-bar .big{flex-basis:100%; font-size:20px !important; padding:16px !important}
+  .ev{grid-template-columns:30px 1fr; gap:4px 10px; padding:11px 12px}
+  .ev .ico{width:30px; height:30px; font-size:13px}
+  .ev .t{font-size:14px}
+  .ev .d{font-size:12px; flex-wrap:wrap; gap:6px}
+  .ev .evr{grid-column:1 / -1; justify-content:flex-end; flex-wrap:wrap; gap:6px}
+  .ev .hchip{left:12px}
+
+  /* join */
+  .qr{width:206px; height:206px; padding:12px}
+  .joincode{font-size:44px}
+
+  /* dialogs open as a sheet at the bottom, and the pause overlay keeps Resume full width */
+  .overlay.ask{place-items:end stretch; padding:16px 16px calc(16px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)))}
+  .dialog{width:auto; padding:22px}
+  .dialog h3{font-size:22px}
+  .dialog .btns{flex-direction:column-reverse; gap:10px}
+  .dialog .btns > *{justify-content:center; text-align:center}
+  .dialog .big{font-size:20px; padding:18px}
+  .dialog .ibtn{padding:14px}
+  .pause-card{width:100%; padding:0 16px}
+  .pause-card .t{font-size:96px}
+  .pause-card .big{width:100%; font-size:22px; padding:19px}
+}
