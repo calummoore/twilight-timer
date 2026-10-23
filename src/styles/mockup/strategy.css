@@ -25,3 +25,14 @@
 .oc{display:flex; align-items:center; gap:7px; background:#0d131c; border:1px solid var(--line2); border-radius:20px; padding:5px 12px 5px 8px; font-size:13px; font-weight:600}
 .oc i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
 .oc b{color:var(--pc); font-weight:800; font-size:12px}
+
+/* naalu 0 token: the strip button and the picker dialog */
+.order-strip .tokb{margin-left:auto}
+.tokb b{color:var(--pc); font-weight:800; font-size:13px}
+.tokopts{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:18px}
+.tokopt{display:flex; align-items:center; gap:9px; padding:13px 14px; border:1px solid var(--line2); border-radius:11px;
+  background:#0b111a; color:var(--txt); font-family:var(--f); font-size:15px; font-weight:650; cursor:pointer; text-align:left}
+.tokopt i{width:10px; height:10px; border-radius:50%; background:var(--pc); flex:none; font-style:normal}
+.tokopt .tag{margin-left:auto; font-size:9px; letter-spacing:.12em; text-transform:uppercase; padding:2px 7px;
+  border-radius:20px; font-weight:700; background:var(--accent); color:#04211f}
+.tokopt.on{background:color-mix(in srgb,var(--pc) 14%, #0b111a); border-color:color-mix(in srgb,var(--pc) 55%, transparent)}

@@ -6,7 +6,9 @@ closes when its PR merges.
 [PR #1](https://github.com/calummoore/twilight-timer/pull/1) shipped the TI4
 Tempo MVP, and its review left six findings open. On 2026-10-23, Cal answered
 four of them, and this change applies those answers. Finding 6, the versioned
-storage key, stays open. Finding 11 no longer applies, because the answer to
+storage key, stays open. Decision 1 of the
+[Naalu token plan](naalu-initiative-token.md) later resolved finding 6.
+Finding 11 no longer applies, because the answer to
 finding 1 replaces the recommendation that it questioned. The findings and
 their options are in the [MVP plan](ti4-tempo-mvp.md).
 

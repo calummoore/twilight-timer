@@ -89,11 +89,45 @@ Re-ordering the seats themselves is possible but deliberately understated. It is
 a correction for a setup mistake — people do not swap chairs mid-game — so it
 lives behind a secondary control rather than in the main flow.
 
+### Factions
+
+Each player picks their faction at setup from the list of official factions.
+The list holds every faction of the base game, its expansions, and the codices.
+The game cannot begin until every seat has a faction. The app stores the faction
+itself, not a typed name, so a rule that depends on a faction can find its
+player. Two players cannot hold the same faction: taking a faction that another
+seat holds swaps the two, as colours do.
+
+Rejected: a free-text faction field, because the app cannot apply a faction rule
+to a name that a player typed. A faction outside the official list cannot be
+entered. Rejected: an optional faction, because a forgotten Naalu faction would
+put the Naalu player in card order for the whole game, with no fix after the
+start.
+
+A game saved by an older build can hold a player without a faction, because
+those builds did not require one.
+
 ### Initiative order
 
-Strategy card number **is** turn order. The app takes the card assignments from
-the strategy phase and derives the action phase running order from them — no
-separate ordering step.
+Strategy card number **is** turn order, with one exception: the Naalu "0" token
+below. The app takes the card assignments from the strategy phase and derives
+the action phase running order from them — no separate ordering step.
+
+At the end of each strategy phase, the Naalu Collective player puts the "0"
+token on their strategy card. Their initiative becomes 0, so they go first in
+the action phase. The rail and the active player's card show initiative 0. The
+strategy card keeps its number and its name everywhere else, for example on the
+strategic action.
+
+The Naalu promissory note, Gift of Prescience, gives the token to its holder for
+one round instead. The table moves the token from the strategy screen before the
+action phase begins, and undo takes the move back. The token returns to the
+Naalu player when the next round starts. Rejected: leaving the note out, because
+a round with the note would then have the wrong turn order and charge the wrong
+clocks.
+
+A game without a Naalu player has no token. A game saved by a build without the
+token keeps card order for every player, because its log follows that rule.
 
 - **5–6 players (and 7–8 with PoK):** one card each
 - **3–4 players:** two cards each; a player takes a turn at each of their
@@ -175,9 +209,9 @@ under a master "enforce time limits" switch.
 Game state is a fold over an **append-only log of actions**. The log records
 every game tap: card picks, turns ended, passes, strategy cards played,
 reaction marks and window changes, phase steps, status steps, the Custodians
-switch, votes, agenda resolutions, speaker moves, and the game end. So undo can
-take back any tap. Pauses and time-limit changes are kept beside the log, not in
-it.
+switch, votes, agenda resolutions, speaker moves, Naalu token moves, and the
+game end. So undo can take back any tap. Pauses and time-limit changes are kept
+beside the log, not in it.
 
 Because state is *derived*, it is never edited directly. There are exactly two
 correction operations, and deliberately no others:
@@ -306,8 +340,8 @@ From the should-have list, the MVP adds the pause.
 - [ ] Setup: 3–8 players with name, colour, faction, seat order, speaker
 - [ ] Speaker movable at any time; strategy pick and agenda voting orders derive
       from it automatically. Seats re-orderable as a correction.
-- [ ] Strategy phase: assign cards 1–8, derive initiative order, handle
-      two-cards-each at 3–4 players
+- [ ] Strategy phase: assign cards 1–8, derive initiative order with the Naalu
+      "0" token, handle two-cards-each at 3–4 players
 - [ ] Action phase chess clock with one-tap End Turn
 - [ ] Pass tracking with skip-on-pass and illegal-pass warning
 - [ ] Reaction window with per-player done marking

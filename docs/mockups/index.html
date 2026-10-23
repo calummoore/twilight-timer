@@ -208,6 +208,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .count b.on{background:var(--accent); border-color:var(--accent); color:#04211f}
 .kv{display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line); font-size:13.5px}
 .kv span{color:var(--dim)} .kv b{font-weight:600}
+.fld.sel.none{color:var(--faint)}
+.setup-need{font-size:12.5px; color:var(--warn); text-align:center; margin-bottom:10px}
 
 /* settings */
 .set-row{display:grid; grid-template-columns:1fr 200px 62px; gap:14px; align-items:center; padding:15px 18px;
@@ -252,6 +254,22 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .oc{display:flex; align-items:center; gap:7px; background:#0d131c; border:1px solid var(--line2); border-radius:20px; padding:5px 12px 5px 8px; font-size:13px; font-weight:600}
 .oc i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
 .oc b{color:var(--pc); font-weight:800; font-size:12px}
+
+/* naalu 0 token: the strip button and the picker dialog */
+.order-strip .tokb{margin-left:auto}
+.tokb b{color:var(--pc); font-weight:800; font-size:13px}
+.overlay{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px); display:grid; place-items:center; z-index:10}
+.dialog{width:520px; background:#121a24; border:1px solid var(--line2); border-radius:20px; padding:28px}
+.dialog h3{font-size:25px; font-weight:750}
+.dialog p{font-size:14.5px; color:var(--dim); margin-top:10px; line-height:1.55}
+.dialog .btns{display:flex; gap:12px; margin-top:24px; justify-content:flex-end}
+.tokopts{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:18px}
+.tokopt{display:flex; align-items:center; gap:9px; padding:13px 14px; border:1px solid var(--line2); border-radius:11px;
+  background:#0b111a; color:var(--txt); font-family:var(--f); font-size:15px; font-weight:650; cursor:pointer; text-align:left}
+.tokopt i{width:10px; height:10px; border-radius:50%; background:var(--pc); flex:none; font-style:normal}
+.tokopt .tag{margin-left:auto; font-size:9px; letter-spacing:.12em; text-transform:uppercase; padding:2px 7px;
+  border-radius:20px; font-weight:700; background:var(--accent); color:#04211f}
+.tokopt.on{background:color-mix(in srgb,var(--pc) 14%, #0b111a); border-color:color-mix(in srgb,var(--pc) 55%, transparent)}
 
 /* reaction window */
 .scrim{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px)}
@@ -524,7 +542,7 @@ const P = {
   kira :{name:'Kira',  c:'red',    f:'Embers of Muaat',    seat:2},
   tom  :{name:'Tom',   c:'green',  f:'Arborec',            seat:3},
   priya:{name:'Priya', c:'yellow', f:'Emirates of Hacan',  seat:4},
-  sam  :{name:'Sam',   c:'purple', f:'Nekro Virus',        seat:5},
+  sam  :{name:'Sam',   c:'purple', f:'Naalu Collective',   seat:5},
   wren :{name:'Wren',  c:'orange', f:'Argent Flight',      seat:6},
 };
 const col = id => `--pc:var(--c-${P[id].c})`;
@@ -537,14 +555,15 @@ const CARDS = [
   {n:7, nm:'Technology',   o:'priya'}, {n:8, nm:'Imperial',    o:null, tg:true},
 ];
 
-// Round 3 action phase — initiative order derived from card numbers
+// Round 3 action phase — initiative order derived from card numbers.
+// Sam plays the Naalu, so the "0" token puts Sam first with card 4.
 const ORDER = [
-  {id:'tom',   init:1, state:'passed', sc:true,  total:1122},
-  {id:'wren',  init:2, state:'passed', sc:true,  total:903 },
-  {id:'jaz',   init:3, state:'wait',   sc:true,  total:1277},
-  {id:'sam',   init:4, state:'wait',   sc:false, total:775 },
-  {id:'kira',  init:5, state:'active', sc:false, total:1050},
-  {id:'priya', init:7, state:'wait',   sc:true,  total:1448},
+  {id:'sam',   init:0, card:4, state:'wait',   sc:false, total:775 },
+  {id:'tom',   init:1, card:1, state:'passed', sc:true,  total:1122},
+  {id:'wren',  init:2, card:2, state:'passed', sc:true,  total:903 },
+  {id:'jaz',   init:3, card:3, state:'wait',   sc:true,  total:1277},
+  {id:'kira',  init:5, card:5, state:'active', sc:false, total:1050},
+  {id:'priya', init:7, card:7, state:'wait',   sc:true,  total:1448},
 ];
 
 const fmt = s => { s=Math.max(0,Math.round(s));
@@ -563,7 +582,7 @@ const railRow = p => {
     ${chip}
     <div class="in num">${p.init}</div>
     <div><div class="nm"><i></i>${d.name}</div>
-      <div class="fc"><span class="sccard ${p.sc?'used':''}">${p.sc?'✓ ':''}${CARDNAME[p.init]}</span>${d.f}</div></div>
+      <div class="fc"><span class="sccard ${p.sc?'used':''}">${p.sc?'✓ ':''}${CARDNAME[p.card]}</span>${d.f}</div></div>
     <div class="tm">
       <div class="a num">${fmt(p.total)}</div>
       <div class="b num">${live?'this turn 1:47':(p.state==='passed'?'4 turns':'3 turns')}</div>
@@ -595,9 +614,8 @@ const topBar = (phase, extra='') => `
 const S = {};
 
 /* ── 1. Setup ── */
-S.setup = {t:'Setup — New Game', d:'ipad', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played.`,
- h:`<div class="space"></div><div class="lay">
+// missing: Wren has not picked a faction yet, so BEGIN GAME is off.
+const setupScreen = missing => `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">Load last game</button><button class="ibtn">⚙ Settings</button></div>
   <div class="content"><div class="setup-grid">
@@ -607,16 +625,18 @@ S.setup = {t:'Setup — New Game', d:'ipad', note:
         <div class="count">${[3,4,5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
       </div>
       <div style="overflow:auto;flex:1;min-height:0">
-      ${Object.entries(P).map(([id,d])=>`
+      ${Object.entries(P).map(([id,d])=>{
+        const none = missing && id==='wren';
+        return `
         <div class="seat ${d.speaker?'sp':''}" style="${col(id)}">
           <div class="drag">⠿</div>
           <div class="sn">Seat<br>${d.seat}</div>
           <div class="swatches">${['red','blue','green','yellow','purple','orange'].map(c=>
             `<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}</div>
           <div class="fld">${d.name}</div>
-          <div class="fld sel">${d.f} ▾</div>
+          <div class="fld sel ${none?'none':''}">${none?'Faction':d.f} ▾</div>
           <div class="spk ${d.speaker?'on':''}">★</div>
-        </div>`).join('')}
+        </div>`}).join('')}
       </div>
     </div>
     <div class="pnl" style="display:flex;flex-direction:column">
@@ -625,6 +645,7 @@ S.setup = {t:'Setup — New Game', d:'ipad', note:
         <div class="kv"><span>Players</span><b>6</b></div>
         <div class="kv"><span>Strategy cards each</span><b>1</b></div>
         <div class="kv"><span>Speaker</span><b>Jaz</b></div>
+        <div class="kv"><span>Naalu 0 token</span><b>Sam</b></div>
         <div class="kv"><span>Time limits</span><b style="color:var(--warn)">Enabled</b></div>
         <div class="kv"><span>Turn limit</span><b>3:00</b></div>
         <div class="kv" style="border:none"><span>Reaction window</span><b>2:00</b></div>
@@ -635,10 +656,19 @@ S.setup = {t:'Setup — New Game', d:'ipad', note:
           At 3–4 players each player picks <b style="color:var(--dim)">two</b> strategy cards and takes a turn at each initiative number. The app handles this automatically.</div>
       </div>
       <div style="padding:16px 18px">
-        <button class="big" style="width:100%;font-size:23px;padding:20px">BEGIN GAME</button>
+        ${missing?'<div class="setup-need">Pick a faction for every seat to begin.</div>':''}
+        <button class="big" style="width:100%;font-size:23px;padding:20px${missing?';opacity:.45':''}" ${missing?'disabled':''}>BEGIN GAME</button>
       </div>
     </div>
-  </div></div></div>`};
+  </div></div></div>`;
+
+S.setup = {t:'Setup — New Game', d:'ipad', note:
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the list of official factions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round.`,
+ h:setupScreen(false)};
+
+S.setupMissing = {t:'Setup — Faction Missing', d:'ipad', note:
+ `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet.`,
+ h:setupScreen(true)};
 
 /* ── 2. Settings ── */
 const setRow = (lb,ds,val,on,off) => `<div class="set-row ${off?'off':''}">
@@ -746,9 +776,7 @@ S.seating = {t:'Speaker & Seating', d:'ipad', note:
   </div></div>`};
 
 /* ── 4. Strategy phase ── */
-S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
- `Picks happen in <b>speaker order</b>, one at a time, with an optional per-pick timer. As cards are claimed the app builds the initiative order along the bottom — no separate ordering step, because in TI4 the card number <b>is</b> the turn order. Unchosen cards accumulate a trade good each round, shown top-right on the card, so the strip doubles as a reminder at the table.`,
- h:`<div class="space"></div><div class="lay">
+const strategyScreen = () => `<div class="space"></div><div class="lay">
   ${topBar('str')}
   <div class="content" style="display:flex;flex-direction:column">
     <div class="picker" style="${col('sam')}">
@@ -771,10 +799,25 @@ S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
       ${ORDER.filter(p=>CARDS.some(c=>c.o===p.id)).map(p=>
         `<span class="oc" style="${col(p.id)}"><b>${p.init}</b><i></i>${P[p.id].name}</span>`).join('')}
       <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Sam</span>
-      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Kira</span></div>
+      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Kira</span>
+      <button class="ibtn tokb" style="${col('sam')}"><b>0</b>Naalu token: Sam · change</button></div>
   </div>
   <div style="padding:0 22px 20px"><button class="big" style="width:100%;opacity:.45" disabled>BEGIN ACTION PHASE — 2 PICKS REMAINING</button></div>
-  </div>`};
+  </div>`;
+
+S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
+ `Picks happen in <b>speaker order</b>, one at a time, with an optional per-pick timer. As cards are claimed the app builds the initiative order along the bottom — no separate ordering step, because in TI4 the card number <b>is</b> the turn order. The one exception is the <b>Naalu "0" token</b>: its holder goes first whatever card they pick, and the strip shows them with 0 once they pick. The token button at the end of the strip only appears when a player has the Naalu faction. Unchosen cards accumulate a trade good each round, shown top-right on the card, so the strip doubles as a reminder at the table.`,
+ h:strategyScreen()};
+
+S.token = {t:'Strategy Phase — Naalu 0 Token', d:'ipad', note:
+ `The Naalu player holds the <b>"0" token</b> every round, so they need no tap. When another player plays <b>Gift of Prescience</b>, the table moves the token here before the action phase begins, and that player goes first instead. The move lasts one round: the token returns to the Naalu player when the next round starts. The move is logged like every other tap, so Undo takes it back.`,
+ h:`${strategyScreen()}
+  <div class="overlay"><div class="dialog">
+    <h3>Who has the Naalu 0 token?</h3>
+    <p>Move it when a player plays Gift of Prescience. The holder goes first this round, and the token returns to Sam next round.</p>
+    <div class="tokopts">${SEATS.map(id=>`<button class="tokopt ${id==='sam'?'on':''}" style="${col(id)}"><i></i>${P[id].name}${id==='sam'?'<span class="tag">0 token</span>':''}</button>`).join('')}</div>
+    <div class="btns"><button class="ibtn">Cancel</button></div>
+  </div></div>`};
 
 /* ── 4. Action phase ── */
 const actionScreen = over => `<div class="space"></div><div class="lay">
@@ -811,7 +854,7 @@ const actionScreen = over => `<div class="space"></div><div class="lay">
   </div></div>`;
 
 S.action = {t:'Action Phase', d:'ipad', note:
- `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal, which is why Kira's Pass button is greyed. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
+ `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal, which is why Kira's Pass button is greyed. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
  h:actionScreen(false)};
 
 S.overtime = {t:'Action Phase — Limit Exceeded', d:'ipad', note:
@@ -1025,11 +1068,11 @@ S.round = {t:'Round Summary', d:'ipad', note:
 /* ── 9. History & Undo ── */
 // append-only action log, newest first. Undo pops from the top.
 const EV = [
-  {ico:'▸', t:'Turn ended',             d:'Sam → Kira',             dur:'2:31', ago:'14s ago', head:1},
-  {ico:'▸', t:'Turn ended',             d:'Jaz → Sam',              dur:'0:14', ago:'1m ago', warn:'Unusually short'},
-  {ico:'⊘', t:'Wren passed',            d:'Initiative 2',                       ago:'4m ago'},
+  {ico:'▸', t:'Turn ended',             d:'Jaz → Kira',             dur:'2:31', ago:'14s ago', head:1},
+  {ico:'⊘', t:'Wren passed',            d:'Initiative 2',                       ago:'3m ago'},
   {ico:'⊘', t:'Tom passed',             d:'Initiative 1',                       ago:'5m ago', sel:1},
-  {ico:'▸', t:'Turn ended',             d:'Priya → Tom',            dur:'4:12', ot:'+1:12', ago:'9m ago', edit:1},
+  {ico:'▸', t:'Turn ended',             d:'Sam → Tom',              dur:'0:14', ago:'9m ago', warn:'Unusually short'},
+  {ico:'▸', t:'Turn ended',             d:'Priya → Sam',            dur:'4:12', ot:'+1:12', ago:'9m ago', edit:1},
   {ico:'◷', t:'Reaction window closed', d:'Technology (7)',         dur:'1:38', ago:'11m ago'},
   {ico:'★', t:'Strategy card played',   d:'Priya — Technology (7)',             ago:'13m ago'},
   {ico:'▸', t:'Turn ended',             d:'Kira → Priya',           dur:'3:20', ago:'13m ago'},
@@ -1050,8 +1093,8 @@ S.history = {t:'History & Undo', d:'ipad', note:
   <div class="content">
     <div class="undo-bar">
       <div style="flex:1"><div class="k">Last action</div>
-        <div class="v">Turn ended — Sam → Kira</div>
-        <div class="s">14 seconds ago · undoing returns Sam's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to him</div></div>
+        <div class="v">Turn ended — Jaz → Kira</div>
+        <div class="s">14 seconds ago · undoing returns Jaz's clock to <b style="color:var(--txt)">2:31</b> and hands the turn back to Jaz</div></div>
       <button class="big" style="padding:18px 34px;font-size:21px">↺ UNDO</button>
     </div>
     <div class="pnl">
@@ -1065,11 +1108,11 @@ S.history = {t:'History & Undo', d:'ipad', note:
             <div class="ago">${e.ago}</div>
             <div class="cascade">
               <div class="w"><span>↺</span>Undo back to here?</div>
-              <div class="l">That's <b>4 presses of undo</b> — everything above this row comes off the log too:
-                <b>Wren's pass</b> and the two turns taken since. About <b>5 minutes</b> of recorded time returns
+              <div class="l">That's <b>3 presses of undo</b> — everything above this row comes off the log too:
+                <b>Wren's pass</b> and Jaz's turn after it. About <b>5 minutes</b> of recorded time returns
                 to the clocks, and Tom rejoins the initiative order.</div>
               <div class="btns"><button class="mini">Cancel</button>
-                <button class="mini dn" style="padding:8px 15px">Undo 4 actions</button></div>
+                <button class="mini dn" style="padding:8px 15px">Undo 3 actions</button></div>
             </div></div>`;
           if(e.edit) return `<div class="ev" style="border-color:#33566b;background:#0c1721">
             <div class="ico">${e.ico}</div>
@@ -1335,7 +1378,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['iPad — table device', ['setup','settings','seating','strategy','action','overtime','reaction','politics','status','agenda','round','history','stats','join']],
+  ['iPad — table device', ['setup','setupMissing','settings','seating','strategy','token','action','overtime','reaction','politics','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);

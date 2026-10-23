@@ -1,4 +1,9 @@
-import { pickOrder, voteOrder, initiativeOrder } from './orders'
+import {
+  initiativeOrder,
+  pickOrder,
+  voteOrder,
+  type InitiativeSlot,
+} from './orders'
 import { STATUS_STEPS } from './rules'
 import { limitAt } from './settings'
 import type { Entry, EntryKind, Game, Phase, TimerKey } from './types'
@@ -41,6 +46,8 @@ export interface FoldState {
   round: number
   phase: Phase
   speakerId: string
+  /** The holder of the Naalu "0" token this round, or null. */
+  naaluTokenHolderId: string | null
   custodiansRemoved: boolean
   /** Player id to strategy card, this round. */
   picks: Map<string, number>
@@ -67,6 +74,7 @@ export function createState(game: Game): FoldState {
     round: 1,
     phase: 'strategy',
     speakerId: game.firstSpeakerId,
+    naaluTokenHolderId: game.naaluTokenOwnerId,
     custodiansRemoved: false,
     picks: new Map(),
     pickHistory: [],
@@ -197,9 +205,14 @@ export function currentVoter(s: FoldState): string | null {
   )
 }
 
+/** This round's initiative order, with the Naalu "0" token. */
+export function turnOrder(s: FoldState): InitiativeSlot[] {
+  return initiativeOrder(s.picks, s.naaluTokenHolderId)
+}
+
 /** The next player in initiative order who has not passed, or null. */
 export function nextActive(s: FoldState): string | null {
-  const order = initiativeOrder(s.picks)
+  const order = turnOrder(s).map((slot) => slot.playerId)
   const from = s.activeId === null ? -1 : order.indexOf(s.activeId)
   for (let k = 1; k <= order.length; k++) {
     const id = order[(from + k) % order.length]

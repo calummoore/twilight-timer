@@ -87,11 +87,16 @@ select {
 }
 select.fld {
   appearance: none;
+  padding-right: 26px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238e9bad'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 
-/* Setup rows: up and down buttons replace the drag handle. */
+/* Setup rows: up and down buttons replace the drag handle. The faction
+   column fits the longest faction name. */
 .seat {
-  grid-template-columns: 26px 34px 216px 1fr 170px 44px;
+  grid-template-columns: 26px 34px 216px 1fr max-content 44px;
 }
 .seat-move {
   display: flex;

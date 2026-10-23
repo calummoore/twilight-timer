@@ -1,9 +1,10 @@
 # TI4 Tempo MVP and Cloudflare deploy
 
 Status: Completed. [PR #1](https://github.com/calummoore/twilight-timer/pull/1)
-merged on 2026-10-23. Review finding 6 and one follow-up stay open for
-Cal. Findings 1, 3, 5, and 10 moved to the
-[MVP review follow-ups](mvp-review-follow-ups.md) plan.
+merged on 2026-10-23. One follow-up stays open for Cal. Findings 1, 3, 5,
+and 10 moved to the [MVP review follow-ups](mvp-review-follow-ups.md) plan.
+Decision 1 of [the Naalu token plan](naalu-initiative-token.md) resolves
+finding 6.
 
 TI4 Tempo is a shared-table time tracker for Twilight Imperium 4th Edition.
 It runs on one iPad in the middle of the table. It is a chess clock for the
@@ -220,7 +221,7 @@ Run the checks, push, and review the branch.
   - 1. Undo does not restore clocks after some taps. Severity Medium, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
   - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
   - 5. Model tests skip key undo and attribution paths. Severity Low, effort Medium. Decided 2026-10-23: A, example tests, in [MVP review follow-ups](mvp-review-follow-ups.md).
-  - 6. A version bump would hide saved games silently. Severity Low, effort Small. Recommended: B, one unversioned key and the version field.
+  - 6. A version bump would hide saved games silently. Resolved on 2026-10-23: Cal kept versioned keys, and load reads the keys of older versions. See decision 1 of `plans/naalu-initiative-token.md`.
   - 10. Stats screen prints "1 rounds" and "1 times". Severity Low, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
   - 11. Plan misrecords the recommendation for finding 1. Severity Low, effort Small. No longer applies: the decision on finding 1 replaced the recommendation.
   - Follow-up: add an unused-export check such as knip to `npm run check`. Effort Large. Covers finding 9. Previous examples: none.

@@ -1,3 +1,4 @@
+import { NAALU } from './factions'
 import { foldGame } from './fold'
 import type { Settings } from './settings'
 import type { ActionInput, Game, Limits, Player } from './types'
@@ -9,10 +10,11 @@ export function startGame(
   now: number,
 ): Game {
   return {
-    version: 1,
+    version: 2,
     startedAt: now,
     players,
     firstSpeakerId: speakerId,
+    naaluTokenOwnerId: players.find((p) => p.factionId === NAALU)?.id ?? null,
     actions: [],
     pauses: [],
     voids: [],

@@ -5,10 +5,11 @@ import {
   expireReaction,
   reactionEntry,
   toEntry,
+  turnOrder,
   type FoldState,
   type Reaction,
 } from './fold-state'
-import { initiativeOrder, pickOrder, voteOrder } from './orders'
+import { pickOrder, voteOrder } from './orders'
 import { POLITICS, STRATEGY_CARDS } from './rules'
 import { gameClock, mergeIntervals } from './time'
 import type { Entry, Game } from './types'
@@ -89,6 +90,9 @@ function phaseView(s: FoldState, entries: Entry[], ms: number): PhaseView {
           [...s.picks].map(([id, card]) => [card, id]),
         ),
         tradeGoods: tradeGoods(s),
+        order: turnOrder(s),
+        naaluTokenOwnerId: s.game.naaluTokenOwnerId,
+        naaluTokenHolderId: s.naaluTokenHolderId,
       }
     case 'action':
       return actionView(s, entries, ms)
@@ -132,8 +136,10 @@ function phaseView(s: FoldState, entries: Entry[], ms: number): PhaseView {
 
 function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
   const activeId = s.activeId ?? s.reaction?.byId ?? ''
-  const rail: RailRow[] = initiativeOrder(s.picks).map((playerId) => ({
+  const order = turnOrder(s)
+  const rail: RailRow[] = order.map(({ playerId, initiative }) => ({
     playerId,
+    initiative,
     card: s.picks.get(playerId) ?? 0,
     state:
       playerId === activeId
@@ -154,6 +160,8 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
     turnNumber: s.turnCounts.get(activeId) ?? 0,
     rail,
     passedCount: s.passed.size,
+    activeInitiative:
+      order.find((slot) => slot.playerId === activeId)?.initiative ?? 0,
     activeCard: s.picks.get(activeId) ?? 0,
     cardPlayed: s.scPlayed.has(activeId),
     reaction: r && {

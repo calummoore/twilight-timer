@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { factionName } from '../../model/factions'
 import { cardName } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
@@ -32,6 +33,7 @@ export function ActionScreen(props: {
   const totalMs =
     view.rail.find((r) => r.playerId === view.activeId)?.totalMs ?? 0
   const card = cardName(view.activeCard)
+  const faction = factionName(player?.factionId ?? null)
 
   const pass = () => (view.cardPlayed ? props.onPass() : setConfirmPass(true))
 
@@ -57,11 +59,11 @@ export function ActionScreen(props: {
           <div>
             <h3>{player?.name}</h3>
             <div className="fac">
-              {player?.faction ? `${player.faction} · ` : ''}Seat {seat + 1}
+              {faction ? `${faction} · ` : ''}Seat {seat + 1}
             </div>
           </div>
           <div className="init">
-            <div className="n num">{view.activeCard}</div>
+            <div className="n num">{view.activeInitiative}</div>
             <div className="l">Initiative</div>
           </div>
         </div>

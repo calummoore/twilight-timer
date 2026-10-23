@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { initiativeOrder, pickOrder, rotate, voteOrder } from './orders'
 
 const SEATS = ['jaz', 'kira', 'tom', 'priya', 'sam', 'wren']
+const PICKS = new Map([
+  ['jaz', 3],
+  ['kira', 8],
+  ['tom', 1],
+])
 
 describe('orders', () => {
   it('starts strategy picks with the speaker and goes clockwise', () => {
@@ -28,12 +33,22 @@ describe('orders', () => {
   })
 
   it('orders the action phase by strategy card number', () => {
-    const picks = new Map([
-      ['jaz', 3],
-      ['kira', 8],
-      ['tom', 1],
+    expect(initiativeOrder(PICKS, null)).toEqual([
+      { playerId: 'tom', initiative: 1 },
+      { playerId: 'jaz', initiative: 3 },
+      { playerId: 'kira', initiative: 8 },
     ])
-    expect(initiativeOrder(picks)).toEqual(['tom', 'jaz', 'kira'])
+  })
+
+  it('puts the Naalu token holder first with initiative 0', () => {
+    expect(initiativeOrder(PICKS, 'kira')).toEqual([
+      { playerId: 'kira', initiative: 0 },
+      { playerId: 'tom', initiative: 1 },
+      { playerId: 'jaz', initiative: 3 },
+    ])
+    // A holder who has not picked a card yet is not in the order.
+    const order = initiativeOrder(PICKS, 'sam').map((slot) => slot.playerId)
+    expect(order).toEqual(['tom', 'jaz', 'kira'])
   })
 
   it('rotates by any offset', () => {

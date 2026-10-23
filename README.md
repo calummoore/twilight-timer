@@ -11,9 +11,12 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 
 ## Key features
 
-- Setup for 5 to 8 players: name, colour, faction, seat, and the speaker.
+- Setup for 5 to 8 players: name, colour, faction from the official list, seat,
+  and the speaker.
 - Strategy picks in speaker order, with trade goods on unpicked cards.
 - The action-phase chess clock: End Turn, the strategic action, and Pass.
+- The Naalu "0" token puts the Naalu player first. Gift of Prescience can move
+  it for one round.
 - A reaction window for secondary abilities that is charged to nobody. For
   Politics, it also asks for the new speaker.
 - The status checklist, and clocks for agenda discussion and each vote.
@@ -86,11 +89,13 @@ commit. Each successful preview run updates the comment.
 
 - `src/model/` holds the game as a pure fold over an append-only action log.
   - `types.ts`: the actions, the stored game, and the timed entries.
+  - `factions.ts`: the official factions and the ids that saved games store.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
   - `commands.ts`: start, act, undo, pause, resume, and limit changes.
   - `stats.ts`: round and game stats.
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
+    The parser also reads games saved by older builds.
 - `src/ui/GameScreen.tsx` connects the model to the screens.
 - `src/ui/screens/` has one component per screen.
 - `src/styles/mockup/` holds the CSS ported from the mockup.
