@@ -71,6 +71,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    # An explicit bash adds pipefail, so a failed command in a pipe fails the
+    # step.
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Check out the pull request head
         uses: actions/checkout@v7
