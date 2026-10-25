@@ -258,7 +258,7 @@ and move this branch to version 5.
   Evidence: `.context/three-and-four-player-games/merge-15/check.log` and
   `smoke.log`. The gate passed with 152 tests, and 34 of 34 browser checks
   passed.
-- [ ] Review the merge with the `implementation-review` skill after the
+- [x] Review the merge with the `implementation-review` skill after the
       push. Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
   - Review 3 found 3 findings. Fixed: 1, a test row of `main` lost
@@ -269,6 +269,12 @@ and move this branch to version 5.
   - `plans/strategic-action-ends-turn.md`: the status says that PR #12 is open, but it merged as 046492d. Separate branch.
   - `docs/mockups/index.html`: the History screen logs "Turn ended — Priya → Sam" after a window, the rule that PR #12 replaced. Separate branch.
   - `docs/mockups/index.html`: the rail rows show fixed turn counts that do not match the hero's turn number. Separate branch.
+  - Review 4 checked fix commit 73c90a0 and the merge with PR #15: findings
+    1, 2, and 3 of review 3 are resolved. Finding 4, the PR description
+    missed the merge with PR #15, is resolved by an update of the
+    description. No further fix round runs. Report:
+    `.context/three-and-four-player-games/review-4.md`.
+  - `plans/random-factions.md`: the status says that PR #15 is open, but it merged as 0bcabe7. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
