@@ -1,6 +1,5 @@
-import { gameTimeMs } from '../../model/pauses'
 import { cardName } from '../../model/rules'
-import { gameStats } from '../../model/stats'
+import { postGameStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
 import { pc } from '../colour'
 import { clock, percent, plural, words } from '../format'
@@ -14,11 +13,7 @@ export function StatsScreen(props: {
   const { game } = props
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const leftIn = new Map(game.departures.map((d) => [d.playerId, d.round]))
-  const stats = gameStats(
-    game.entries,
-    game.players.map((p) => p.id),
-    gameTimeMs(game.reasonTotals),
-  )
+  const stats = postGameStats(game)
   const widest = Math.max(1, ...stats.players.map((p) => p.turnMs))
   const width = (ms: number) => `${(ms / widest) * 100}%`
   const phases = [

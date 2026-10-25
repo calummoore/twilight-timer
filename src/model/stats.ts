@@ -1,4 +1,6 @@
+import { gameTimeMs } from './pauses'
 import type { Departure, Entry, Player } from './types'
+import type { GameView } from './view'
 
 export interface PlayerRoundStats {
   playerId: string
@@ -115,6 +117,18 @@ export function roundStats(
       })
       .sort((a, b) => b.turnMs + b.reactionMs - (a.turnMs + a.reactionMs)),
   }
+}
+
+/**
+ * The post-game stats of a derived game. Their total is the game clock,
+ * because they add the rule-check time to the entries.
+ */
+export function postGameStats(game: GameView): GameStats {
+  return gameStats(
+    game.entries,
+    game.players.map((p) => p.id),
+    gameTimeMs(game.reasonTotals),
+  )
 }
 
 /** Stats for the whole game. `ruleCheckMs` is the rule-check time, also game time. */

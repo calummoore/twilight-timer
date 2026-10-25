@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gameStats, playersOfRound, roundStats } from './stats'
+import { gameStats, playersOfRound, postGameStats, roundStats } from './stats'
 import {
   LIMITS_ON,
   MIN,
@@ -29,6 +29,22 @@ function playedRound() {
 }
 
 describe('rule checks in the stats', () => {
+  it('gives post-game stats whose total is the game clock', () => {
+    const t = table()
+    playStrategy(t) // six picks, one minute
+    t.wait(MIN)
+    t.pause()
+    t.pauseReason('ruleCheck')
+    t.wait(5 * MIN)
+    t.resume()
+    passAll(t)
+    t.act({ kind: 'gameEnded' })
+    const view = t.view()
+    const stats = postGameStats(view)
+    expect(stats.totalMs).toBe(view.gameMs)
+    expect(stats.phases.ruleCheckMs).toBe(5 * MIN)
+  })
+
   it('adds rule checks to the game time as their own part', () => {
     const t = playedRound()
     t.act({ kind: 'gameEnded' })
