@@ -29,6 +29,28 @@ function playedRound() {
 }
 
 describe('rule checks in the stats', () => {
+  it('lists every player in the post-game stats, also one who left', () => {
+    const t = table()
+    playStrategy(t) // six picks, one minute: Tom has card 1, Wren card 2
+    t.wait(MIN)
+    t.act({ kind: 'turnEnded' }) // Tom's turn took 1:00
+    t.wait(2 * MIN)
+    t.act({ kind: 'playerRemoved', playerId: 'wren' }) // Wren leaves mid-turn
+    t.act({ kind: 'gameEnded' })
+    const stats = postGameStats(t.view())
+    expect(stats.players.map((p) => p.playerId).toSorted()).toEqual(
+      IDS.toSorted(),
+    )
+    expect(stats.players.find((p) => p.playerId === 'wren')).toMatchObject({
+      turnMs: 2 * MIN,
+      turns: 1,
+    })
+    expect(stats.players.find((p) => p.playerId === 'tom')).toMatchObject({
+      turnMs: MIN,
+      turns: 1,
+    })
+  })
+
   it('gives post-game stats whose total is the game clock', () => {
     const t = table()
     playStrategy(t) // six picks, one minute

@@ -2,7 +2,7 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review findings 2, 4, 10, and 13 wait for Cal. Milestones 7
+on 2026-10-25. Review findings 2, 4, and 10 wait for Cal. Milestones 7
 to 11 make rule checks count as game time, and Milestone 14 applies
 findings 6 and 8.
 
@@ -114,6 +114,10 @@ Decisions:
   card. Main's version 5 games keep their cards. So main's test row that
   rejected a version 4 game with no window rule and no card now loads that
   game, because a preview of this branch saved that shape.
+- 2026-10-25, Cal: review finding 13, option A. A unit test checks that the
+  post-game stats list every player, also one who left, with their turn
+  time. Alternative: B, also make `gameStats` private, so that every caller
+  passes the view.
 
 Contract owners:
 
@@ -504,7 +508,7 @@ Apply Cal's answers to review findings 6 and 8. Both keep the behaviour.
   - Review 6 checked fix commit 745a54a: finding 12 is resolved, and it
     found no new finding. No further fix round runs. Report:
     `.context/pause-reasons/review-6.md`.
-  - 13. Post-game player list has no test. Severity Low, effort Small. Recommended: A, a unit test that removes a player, ends the game, and checks that `postGameStats` lists every player.
+  - 13. Post-game player list has no test. Severity Low, effort Small. Recommended: A, a unit test that removes a player, ends the game, and checks that `postGameStats` lists every player. Cal chose A on 2026-10-25: Milestone 16.
   - `src/ui/screens/ActionScreen.tsx`, `src/ui/screens/SettingsScreen.tsx`, and `src/model/settings.ts`: the app calls a player's own-turn total "game total" and "game time", but the mockup calls it "cumulative". Separate branch.
 
 ## Milestone 15: Merge origin/main a fourth time
@@ -529,6 +533,26 @@ free version.
   copies them. Evidence beside it: `verify-spec.log`, `tests.log`,
   `audit-merge.log`, `check.log`, and `smoke/smoke.log` with 43 of 43
   checks.
+
+## Milestone 16: Review finding 13
+
+Apply Cal's answer to review finding 13. Only a test changes.
+
+- [x] A unit test in `stats.test.ts` removes a player, ends the game, and
+      checks that `postGameStats` lists every player, also the player who
+      left, with their turn time.
+- [x] Check that the test fails when `postGameStats` lists only the seated
+      players, or no player.
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+- Evidence: `.context/pause-reasons/finding-13/mutation.log`: the new test
+  fails when `postGameStats` lists only the seated players, or no player.
+  `check.log` beside it.
+- [x] Commit with Conventional Commits, push the branch, and update the
+      pull request description.
+- [ ] Review the complete local diff against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 
