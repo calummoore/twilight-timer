@@ -131,7 +131,8 @@ function moveSpeaker(s: FoldState, id: string, ms: number, wall: number) {
 
 /**
  * Gift of Prescience: another player holds the token for this round. The
- * token returns to its owner when the next round starts.
+ * token returns to its owner when the next round starts, if the owner is
+ * still in the game.
  */
 function moveNaaluToken(s: FoldState, id: string): boolean {
   if (s.phase !== 'strategy' || tokenOwner(s) === null) return false
