@@ -10,7 +10,7 @@ import type {
   TimerKey,
 } from './types'
 
-/** The open timed unit. Times are game ms. */
+/** The open timed unit. Times are entry ms. */
 export interface Segment {
   kind: EntryKind
   phase: Exclude<Phase, 'ended'>

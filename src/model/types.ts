@@ -41,6 +41,23 @@ export interface Interval {
   to: number | null
 }
 
+/** Why the table paused. A pause without a reason is a plain pause. */
+export const PAUSE_REASONS = ['ruleCheck'] as const
+export type PauseReason = (typeof PAUSE_REASONS)[number]
+
+/** A part of a pause with a reason, such as one rule check. */
+export interface ReasonRange extends Interval {
+  reason: PauseReason
+}
+
+/**
+ * A pause, with its reason ranges, oldest first, each inside the pause. The
+ * time outside every range is plain pause time, which no stat counts.
+ */
+export interface Pause extends Interval {
+  reasons: ReasonRange[]
+}
+
 /** One tap at the table. `at` is the wall-clock time in ms. */
 export type Action =
   | { kind: 'cardPicked'; at: number; playerId: string; card: number }
@@ -74,7 +91,7 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 5
+  version: 6
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
@@ -90,11 +107,12 @@ export interface Game {
    * window then stays open past its limit, so that only a tap ends a turn.
    * A version 1 to 3 game, from an older build, has false: its window close
    * resumed the turn, and its window closed itself at its limit. A version 3
-   * game that stores the field keeps it.
+   * game that stores the field keeps it. So does a version 4 game from main,
+   * but a version 4 game without the field, from a preview, has false.
    */
   windowEndsTurn: boolean
   actions: Action[]
-  pauses: Interval[]
+  pauses: Pause[]
   voids: Interval[]
   limitsLog: LimitsChange[]
 }
@@ -118,7 +136,7 @@ export interface ReactionTime {
   marked: boolean
 }
 
-/** One timed unit of the game. Times are game time: pauses do not count. */
+/** One timed unit of the game. Its times leave out every pause and undone range. */
 export interface Entry {
   kind: EntryKind
   phase: Exclude<Phase, 'ended'>

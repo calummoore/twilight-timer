@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { act, pause, resume, undo } from '../model/commands'
+import { act, pause, resume, setPauseReason, undo } from '../model/commands'
 import { derive } from '../model/derive'
 import type { Settings } from '../model/settings'
 import type { ActionInput, Game } from '../model/types'
 import { Dialog } from './controls'
-import { clock } from './format'
 import { useAlarm, useClock, useHeight, useWakeLock } from './hooks'
 import { ActionScreen } from './screens/ActionScreen'
 import { AgendaScreen } from './screens/AgendaScreen'
+import { PauseOverlay } from './screens/PauseOverlay'
 import { ReactionOverlay } from './screens/ReactionOverlay'
 import { RoundSummaryScreen } from './screens/RoundSummaryScreen'
 import { SeatingScreen } from './screens/SeatingScreen'
@@ -115,7 +115,6 @@ export function GameScreen(props: {
   })()
 
   const reaction = g.view.phase === 'action' ? g.view.reaction : null
-  const pausedAt = props.game.pauses.find((p) => p.to === null)?.from
 
   return (
     <div
@@ -187,16 +186,14 @@ export function GameScreen(props: {
           game from there.
         </Dialog>
       )}
-      {pausedAt !== undefined && (
-        <div className="overlay">
-          <div className="pause-card">
-            <div className="t num">{clock(now - pausedAt)}</div>
-            <div className="l">Game paused · no clock is running</div>
-            <button className="big small" onClick={() => update(resume)}>
-              RESUME
-            </button>
-          </div>
-        </div>
+      {g.pause && (
+        <PauseOverlay
+          pause={g.pause}
+          onReason={(reason) =>
+            update((game, at) => setPauseReason(game, reason, at))
+          }
+          onResume={() => update(resume)}
+        />
       )}
     </div>
   )

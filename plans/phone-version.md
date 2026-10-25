@@ -67,8 +67,9 @@ Decisions:
 
 Contract owners:
 
-- The [product spec](../docs/product.md) and the
-  [core concepts](../docs/concepts.md).
+- The [product spec](../docs/product.md), with its pages
+  [Rounds and turn order](../docs/product/rounds.md) and
+  [Clocks and corrections](../docs/product/clocks.md).
 - The [mockup](../docs/mockups/index.html).
 - The [workspace README](../README.md) and `AGENTS.md`.
 
@@ -178,6 +179,10 @@ Run the checks, push, and review the branch.
       The mockup no longer marks them as Later, and a phone shows both
       cards of each player. Justifications:
       `.context/phone-version/merge-notes.md`.
+- [x] Merge `origin/main` again for PR #13, timed rule checks during a
+      pause. Main's split of the product spec replaces the branch's
+      `docs/concepts.md`. Justifications:
+      `.context/phone-version/merge-notes.md`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
@@ -203,7 +208,7 @@ Run the checks, push, and review the branch.
   - 4. Phone History and Join have no way in. Severity Low, effort Small. Recommended: B, add the controls.
   - 7. Up and down keys block keyboard scrolling. Severity Low, effort Small. Recommended: A, use the I and P keys.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
-  - 14. Limit changes do not reach an open reaction window. Severity Low, effort Small. Recommended: A, state the current rule in `docs/concepts.md`.
+  - 14. Limit changes do not reach an open reaction window. Severity Low, effort Small. Recommended: A, state the current rule in `docs/product/clocks.md`.
   - 15. No model tests for top bar taps during a window. Severity Low, effort Small. Recommended: A, three model tests.
   - 16. Top bar defines the phase labels twice. Decided 2026-10-25 with finding 25: one phase table.
   - 25. Stats column labels are defined twice. Decided 2026-10-25: B, one list for each label set. The app and the mockup render the same labels as before. Evidence: `.context/phone-version/finding-25/`.

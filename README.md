@@ -26,14 +26,14 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 - The table can remove a player who leaves mid-game. Their recorded time
   stays in the stats.
 - Optional time limits with overtime and an alarm.
-- Undo that also restores time, a pause, a round summary, and game stats.
+- Undo that also restores time, a pause that can time rule checks, a round
+  summary, and game stats.
 - The game saves in the browser after every tap, and the screen stays awake.
 - The same screens on a phone, an iPad, and a computer, arranged for the space.
 
 ## Docs
 
 - [Product spec](docs/product.md): requirements, decisions, and the MVP scope.
-- [Core concepts](docs/concepts.md): the game rules that the app models.
 - [Mockup](docs/mockups/index.html): open it in a browser. It draws each table
   screen once, in an iPad, an upright iPad, and a phone frame. A link such as
   `#action/phone` opens one frame. **Later** marks a control that is not built.
@@ -106,8 +106,11 @@ commit. Each successful preview run updates the comment.
     `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
     player who leaves.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
-  - `commands.ts`: start, act, undo, pause, resume, and limit changes.
+  - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
+    limit changes.
   - `stats.ts`: round and game stats.
+  - `pauses.ts`: the open pause, and the time and the count of rule checks,
+    which count as game time.
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
     The parser also reads games saved by older builds.
 - `src/ui/GameScreen.tsx` connects the model to the screens.

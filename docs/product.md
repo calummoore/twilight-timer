@@ -44,9 +44,13 @@ round structure to know whose turn it is and when it's legal to pass.
 
 ## Core concepts
 
-The round structure, seating and the speaker, factions, initiative order,
-passing, players who leave, the reaction window, time limits and overtime, and
-corrections are in [Core concepts](concepts.md).
+The core concepts have their own pages:
+
+- [Rounds and turn order](product/rounds.md): the round structure, seating
+  and the speaker, factions, initiative order, passing, and players who
+  leave.
+- [Clocks and corrections](product/clocks.md): the reaction window, time
+  limits and overtime, pauses, and corrections.
 
 ---
 
@@ -65,7 +69,7 @@ its text and buttons are too small to read or tap. Rejected: separate phone and
 iPad layouts, chosen by window size, because the two drift apart.
 
 The top bar stays usable while a reaction window is open, as
-[The reaction window](concepts.md#the-reaction-window) says. The pause overlay
+[The reaction window](product/clocks.md#the-reaction-window) says. The pause overlay
 and the confirmation dialogs cover the top bar, because they freeze the game or
 wait for an answer.
 
@@ -79,11 +83,12 @@ wait for an answer.
 | ↳ *rail rows*       | Show each player's strategy cards; blue = still to play, grey ✓ = used   |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
 | **Reaction Window** | Overlay: window countdown, per-player done tiles, new speaker for Politics |
+| **Game Paused**     | Overlay: pause clock, Pause or Rule check, rule-check time, Resume       |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
 | **Agenda Phase**    | Discussion timer, speaker-order voting with per-player timers            |
 | **Round Summary**   | Per-player time this round, split by phase                               |
 | **History & Undo**  | Action log; undo repeatedly to rewind, or edit any duration               |
-| **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count         |
+| **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count, rule-check time |
 | **Join**            | QR + join code for phone companions                                      |
 
 ### Phone (companion — add-on)
@@ -180,7 +185,8 @@ From the should-have list, the MVP adds the pause.
 
 - [ ] The same screens on a phone, an iPad, and a computer, with a layout that
       follows the space
-- [ ] Pause the whole game (food, rules argument, someone's on the phone)
+- [ ] Pause the whole game (food, rules argument, someone's on the phone), and
+      time rule checks during a pause
 - [ ] Export a game as JSON / CSV
 - [ ] Game history across sessions
 
@@ -204,10 +210,11 @@ From the should-have list, the MVP adds the pause.
 - **Pausing the clock.** A pause charges nobody. The pause duration is logged
   separately, so the total game time still reconciles. Rejected: keeping the
   active player's clock running, because a break is not their turn.
+  [Pauses](product/clocks.md#pauses) gives the rules, with rule checks.
 - **Component actions during another player's turn.** Not tracked. The time is
   real, but attributing it costs more taps than it's worth.
 - **7–8 player games.** Each player takes one card from the normal set of eight,
-  as the initiative table says. No tie-breaking rule is needed.
+  as the [initiative table](product/rounds.md#initiative-order) says. No tie-breaking rule is needed.
 
 ---
 

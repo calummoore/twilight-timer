@@ -329,6 +329,14 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .spkopt .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .spkopt.on{border-color:#8a7530; background:#1a1509; color:#f0cf6a; box-shadow:0 0 0 1px #8a7530; cursor:default}
 
+/* pause: the reason buttons on the pause card, and the time of the chosen reason */
+.reasons{display:flex; gap:8px; width:440px; margin:0 auto}
+.reasons button{flex:1; padding:16px 0; border:1px solid var(--line2); border-radius:11px; background:var(--panel2);
+  font-family:var(--f); font-size:17px; font-weight:650; color:var(--dim); cursor:pointer}
+.reasons button.on{background:var(--accent); border-color:var(--accent); color:#04211f; cursor:default}
+.reason-time{height:20px; margin:14px 0 30px; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent)}
+.reason-time b{font-size:16px; font-weight:700; letter-spacing:0; margin-left:8px}
+
 /* status phase */
 .steps{display:grid; gap:9px}
 .step{display:flex; align-items:center; gap:14px; padding:15px 17px; border:1px solid var(--line); border-radius:11px; background:#0a0f16}
@@ -374,6 +382,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .legend{display:flex; gap:18px; margin-top:18px; font-size:11.5px; color:var(--faint); flex-wrap:wrap}
 .legend b{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:7px; vertical-align:-1px}
 .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:13px; margin-bottom:20px}
+.stat-grid.five{grid-template-columns:repeat(5,1fr)}
 .stat{background:#0a0f16; border:1px solid var(--line); border-radius:12px; padding:16px 17px}
 .stat .l{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
 .stat .v{font-size:31px; font-weight:800; letter-spacing:-.03em; margin-top:7px}
@@ -653,7 +662,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .spkopt{flex:1 1 110px}
   .cards{grid-template-columns:repeat(auto-fill, minmax(170px, 1fr))}
   .card{min-height:112px}
-  .stat-grid{grid-template-columns:repeat(auto-fit, minmax(150px, 1fr))}
+  .stat-grid, .stat-grid.five{grid-template-columns:repeat(auto-fit, minmax(150px, 1fr))}
   .setup-grid{grid-template-columns:1fr; height:auto}
   .status .side, .agenda .col{display:contents}
   .status .timer{order:-1}
@@ -827,7 +836,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .vote-row .badge{font-size:10px; padding:5px 4px}
 
   /* round summary and post-game stats */
-  .stat-grid{grid-template-columns:1fr 1fr; gap:9px}
+  .stat-grid, .stat-grid.five{grid-template-columns:1fr 1fr; gap:9px}
   .stat{padding:12px 13px}
   .stat .l{font-size:9.5px; letter-spacing:.12em}
   .stat .v{font-size:24px; margin-top:5px}
@@ -910,6 +919,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .dialog .big{font-size:20px; padding:18px}
   .dialog .ibtn{padding:14px}
   .pause-card{width:100%; padding:0 16px}
+  .reasons{width:auto}
   .pause-card .t{font-size:96px}
   .pause-card .big{width:100%; font-size:22px; padding:19px}
 }
@@ -1492,14 +1502,32 @@ S.passWarn = {t:'Action Phase — Pass Warning', d:'ipad', note:
     <div class="btns"><button class="ibtn">Cancel</button><button class="big small red">Pass anyway</button></div>
   </div></div>`};
 
-S.paused = {t:'Paused', d:'ipad', note:
- `Pause stops every clock and charges the time to nobody. The pause time is kept on its own, so the game total still adds up. The overlay shows how long the game has been paused, and <b>Resume</b> is the only action.`,
+// The table paused 4:12 ago. A pause stops every clock behind the card, so the action screen drops its live clocks.
+// A rule check is game time, so during one the game clock in the top bar keeps running.
+const behindCard = rule => {
+  const h = still(actionScreen(false));
+  return rule ? h.replace(' data-t="9847"', ' data-clock="up" data-t="9847"') : h;
+};
+const pauseScreen = rule => `${behindCard(rule)}
+  <div class="overlay"><div class="pause-card">
+    <div class="t num" data-clock="up" data-t="252">4:12</div>
+    <div class="l">${rule?'Game paused · only the game clock is running':'Game paused · no clock is running'}</div>
+    <div class="reasons"><button${rule?'':' class="on"'}>Pause</button><button${rule?' class="on"':''}>Rule check</button></div>
+    <div class="reason-time">${rule?'Rule check <b class="num" data-clock="up" data-t="83">1:23</b>':''}</div>
+    <button class="big small">RESUME</button>
+  </div></div>`;
+
+S.paused = {t:'Game Paused', d:'ipad', note:
+ `Pause stops every clock, so a break costs nobody any time. The card covers the whole table, top bar included, and its clock counts up from the tap. A new pause is always a plain <b>Pause</b>: food, a phone call, a stretch. Its time counts nowhere, not even in the game time. When the table stops to settle a rule, one tap on <b>Rule check</b> starts timing the discussion.`,
  mnote:
- `The same overlay. On a phone, Resume is full width.`,
- h:`${still(actionScreen(false))}<div class="overlay"><div class="pause-card">
-    <div class="t num" data-clock="up" data-t="42">0:42</div>
-    <div class="l">Game paused · no clock is running</div>
-    <button class="big small">RESUME</button></div></div>`};
+ `The same card. On a phone, the reason buttons and Resume take the full width.`,
+ h:pauseScreen(false)};
+
+S.pausedRule = {t:'Game Paused — Rule Check', d:'ipad', note:
+ `The table paused, and later tapped <b>Rule check</b> to settle a rule. The line under the choice counts this rule check from that tap: 1:23 of the 4:12 pause. The time before the tap stays a plain pause. A rules discussion is part of playing the game, so rule-check time counts as <b>game time</b>: the game clock runs again, but every player clock stays stopped, and nobody is charged. A tap on <b>Pause</b> ends the rule check and keeps the game paused, so the table can settle a rule and then take a break. Resume also ends it. One pause can hold several rule checks, and the post-game stats show their total time and their number.`,
+ mnote:
+ `The same rule check in the narrow layout. The game clock in the top bar runs behind the card.`,
+ h:pauseScreen(true)};
 
 /* ── 8. Status phase ── */
 const STEPS = [
@@ -1750,18 +1778,19 @@ const PG = [
 const PGTOT = 15600, PGMAX = 3400;
 // The table columns after Player. A phone shows each name next to its value.
 const PG_COLS = {turns:'Turns', average:'Avg turn', worst:'Worst turn', overLimit:'Over limit', share:'Share'};
-// Where the game went, in seconds. The rows add up to the 7:30:00 game total.
+// Where the game went, in seconds. The rows add up to the 8:12:18 game total.
 const WHERE = [
   ['Action phase — own turns', 15600, 'var(--c-blue)'],
   ['Reaction windows',          3720, '#2a4f70'],
   ['Agenda phase',              3480, 'var(--c-purple)'],
   ['Status phase',              2160, 'var(--c-green)'],
   ['Strategy phase',            1560, 'var(--c-yellow)'],
+  ['Rule checks',               2538, 'var(--accent)'],
   ['Between rounds',             480, 'var(--line2)'],
 ];
 const GAME = WHERE.reduce((s,x)=>s+x[1],0);
 S.stats = {t:'Post-game Stats', d:'ipad', note:
- `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Export, marked <b>Later</b>, will let a group build a season's worth of data. A player who left the game keeps their time, and the table names the round in which they left.`,
+ `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. <b>Rule checks</b> get their own figure and their own row: the time the table spent settling rules, and how many times it stopped to do so. That time is part of the game time, though no player is charged for it. Plain pauses are not counted at all. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Export, marked <b>Later</b>, will let a group build a season's worth of data. A player who left the game keeps their time, and the table names the round in which they left.`,
  mnote:
  `One column. On a phone, each table row becomes a block: the player, then Turns, Avg turn, Worst turn, Over limit, and Share, each with its label.`,
  h:`<div class="space"></div><div class="lay">
@@ -1769,13 +1798,14 @@ S.stats = {t:'Post-game Stats', d:'ipad', note:
     <button class="ibtn later">⬇ Export CSV${LATER}</button><button class="ibtn later">⬇ Export JSON${LATER}</button>
     <button class="ibtn">↺ Reopen game</button><button class="ibtn">New game</button></div>
   <div class="content">
-    <div class="h1">7 hours 30 minutes</div>
+    <div class="h1">8 hours 12 minutes</div>
     <div class="h1s">6 players · 8 rounds · 168 turns · 41 reaction windows</div>
-    <div class="stat-grid" style="margin-top:22px">
+    <div class="stat-grid five" style="margin-top:22px">
       <div class="stat"><div class="l">Longest round</div><div class="v num">1:04:18</div><div class="s">Round 6</div></div>
       <div class="stat"><div class="l">Average turn</div><div class="v num">1:33</div><div class="s">across all players</div></div>
-      <div class="stat"><div class="l">Agenda phase total</div><div class="v num">58:00</div><div class="s">13% of the game</div></div>
+      <div class="stat"><div class="l">Agenda phase total</div><div class="v num">58:00</div><div class="s">12% of the game</div></div>
       <div class="stat"><div class="l">Total overtime</div><div class="v num" style="color:var(--danger)">18:44</div><div class="s">10 times over a limit</div></div>
+      <div class="stat"><div class="l">Rule checks</div><div class="v num">42:18</div><div class="s">7 rule checks · 9% of the game</div></div>
     </div>
     <div class="split" style="--side:400px">
       <div class="pnl"><div class="pnl-h">Own-turn time by player <span class="pnl-note">4:20:00 total</span></div>
@@ -1987,7 +2017,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Table device · iPad and phone', ['setup','setupMissing','setupDeal','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','strategyFour','action','overtime','actionFour','reaction','reactionOver','politics','passWarn','paused','status','agenda','round','history','stats','join']],
+  ['Table device · iPad and phone', ['setup','setupMissing','setupDeal','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','strategyFour','action','overtime','actionFour','paused','pausedRule','reaction','reactionOver','politics','passWarn','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);

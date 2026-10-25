@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gameStats, playersOfRound, roundStats } from './stats'
+import { gameStats, playersOfRound, postGameStats, roundStats } from './stats'
 import {
   LIMITS_ON,
   MIN,
@@ -27,6 +27,50 @@ function playedRound() {
   t.act({ kind: 'phaseStepped' })
   return t
 }
+
+describe('rule checks in the stats', () => {
+  it('gives post-game stats whose total is the game clock', () => {
+    const t = table()
+    playStrategy(t) // six picks, one minute
+    t.wait(MIN)
+    t.pause()
+    t.pauseReason('ruleCheck')
+    t.wait(5 * MIN)
+    t.resume()
+    passAll(t)
+    t.act({ kind: 'gameEnded' })
+    const view = t.view()
+    const stats = postGameStats(view)
+    expect(stats.totalMs).toBe(view.gameMs)
+    expect(stats.phases.ruleCheckMs).toBe(5 * MIN)
+  })
+
+  it('adds rule checks to the game time as their own part', () => {
+    const t = playedRound()
+    t.act({ kind: 'gameEnded' })
+    const entries = t.view().entries
+    const without = gameStats(entries, IDS)
+    const stats = gameStats(entries, IDS, 2 * MIN)
+    expect(without.phases.ruleCheckMs).toBe(0)
+    expect(stats.phases.ruleCheckMs).toBe(2 * MIN)
+    expect(stats.totalMs).toBe(without.totalMs + 2 * MIN)
+  })
+
+  it('leaves rule checks out of the round length, and adds them to the game', () => {
+    const t = table()
+    playStrategy(t) // six picks, one minute
+    t.wait(MIN)
+    t.pause()
+    t.pauseReason('ruleCheck')
+    t.wait(5 * MIN)
+    t.resume()
+    passAll(t)
+    t.act({ kind: 'gameEnded' })
+    const view = t.view()
+    expect(roundStats(view.entries, 1, IDS).lengthMs).toBe(2 * MIN)
+    expect(view.gameMs).toBe(7 * MIN)
+  })
+})
 
 describe('stats', () => {
   it('splits a round into phases and players', () => {
@@ -107,5 +151,34 @@ describe('stats', () => {
     expect(playersOfRound(PLAYERS, departures, 3)).toEqual(
       IDS.filter((id) => id !== 'wren'),
     )
+  })
+
+  it('lists every player in the post-game stats, also one who left', () => {
+    const t = table()
+    playStrategy(t) // six picks, one minute: Tom has card 1, Wren card 2
+    t.wait(MIN)
+    t.act({ kind: 'turnEnded' }) // Tom's turn took 1:00
+    t.wait(2 * MIN)
+    // Wren leaves mid-turn in round 1, and the game goes on to round 2.
+    expect(t.act({ kind: 'playerRemoved', playerId: 'wren' })).toBe(true)
+    passAll(t) // Tom passes in a second turn
+    t.act({ kind: 'phaseStepped' }) // the status phase ends
+    t.act({ kind: 'phaseStepped' }) // round 2 begins
+    t.act({ kind: 'gameEnded' })
+    const view = t.view()
+    expect(view.round).toBe(2)
+    expect(view.departures).toEqual([{ playerId: 'wren', round: 1 }])
+    const stats = postGameStats(view)
+    expect(stats.players.map((p) => p.playerId).toSorted()).toEqual(
+      IDS.toSorted(),
+    )
+    expect(stats.players.find((p) => p.playerId === 'wren')).toMatchObject({
+      turnMs: 2 * MIN,
+      turns: 1,
+    })
+    expect(stats.players.find((p) => p.playerId === 'tom')).toMatchObject({
+      turnMs: MIN,
+      turns: 2,
+    })
   })
 })

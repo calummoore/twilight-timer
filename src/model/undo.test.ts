@@ -166,7 +166,7 @@ describe('pause', () => {
     t.wait(MIN)
     t.pause()
     t.wait(10 * MIN)
-    expect(t.view()).toMatchObject({ paused: true, canUndo: false })
+    expect(t.view()).toMatchObject({ pause: { reason: null }, canUndo: false })
     expect(t.view().timer).toMatchObject({ elapsedMs: MIN })
     t.resume()
     t.wait(MIN)

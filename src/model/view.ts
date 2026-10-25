@@ -1,4 +1,5 @@
 import type { InitiativeSlot } from './orders'
+import type { PauseView, ReasonTotal } from './pauses'
 import type { Departure, EntryKind, Entry, Player } from './types'
 
 /** The clock that runs now. `key` stays the same while one entry runs. */
@@ -128,9 +129,15 @@ export interface GameView {
   pickOrder: string[]
   voteOrder: string[]
   custodiansRemoved: boolean
-  /** Game time: wall time since the start, without pauses and undone time. */
+  /**
+   * Game time: the time of the entries and of every rule check, also one in
+   * an undone range. Other pause time and undone time do not count.
+   */
   gameMs: number
-  paused: boolean
+  /** The open pause, or null while the game runs. */
+  pause: PauseView | null
+  /** The time and the count of each pause reason, such as rule checks. */
+  reasonTotals: ReasonTotal[]
   canUndo: boolean
   timer: TimerView | null
   /** Closed entries and snapshots of the running ones. */

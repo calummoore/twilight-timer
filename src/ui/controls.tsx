@@ -61,6 +61,31 @@ export interface DialogConfirm {
 }
 
 /**
+ * A full-stage overlay. Screen readers stay inside it until it closes. An
+ * overlay that asks a question opens as a sheet at the bottom of a phone.
+ */
+export function Overlay({
+  label,
+  ask = false,
+  children,
+}: {
+  label: string
+  ask?: boolean
+  children: ReactNode
+}) {
+  return (
+    <div
+      className={`overlay ${ask ? 'ask' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+    >
+      {children}
+    </div>
+  )
+}
+
+/**
  * The shell of every modal dialog: a title, a line of text, optional
  * controls, and Cancel. A dialog without `confirm` acts in its controls.
  */
@@ -80,12 +105,7 @@ export function Dialog({
   onCancel: () => void
 }) {
   return (
-    <div
-      className="overlay ask"
-      role="dialog"
-      aria-modal="true"
-      aria-label={title}
-    >
+    <Overlay label={title} ask>
       <div className="dialog">
         <h3>{title}</h3>
         <p>{children}</p>
@@ -105,7 +125,7 @@ export function Dialog({
           )}
         </div>
       </div>
-    </div>
+    </Overlay>
   )
 }
 

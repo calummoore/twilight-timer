@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { startGame } from './commands'
 import { derive } from './derive'
-import { factionName } from './factions'
 import { DEFAULT_SETTINGS } from './settings'
 import { archiveGame, loadGame, loadLastGame, saveGame } from './storage'
 import { gameOf, memoryStore } from './test-store'
+import {
+  asVersion1,
+  asVersion2,
+  asVersion3,
+  asVersion4,
+  asVersion5,
+  cardlessLog,
+  withNullCards,
+} from './test-shapes'
 import {
   FOUR_PICKS,
   FOUR_PLAYERS,
@@ -17,66 +25,6 @@ import {
   playStrategy,
   table,
 } from './test-table'
-import type { Game } from './types'
-
-/** Main's builds before version 5 gave each player one card and logged no card. */
-function cardlessLog(game: Game) {
-  return game.actions.map((a) =>
-    a.kind === 'strategyCardPlayed' ? { kind: a.kind, at: a.at } : a,
-  )
-}
-
-/** The game that an older save loads as: each strategic action has no card. */
-function withNullCards(game: Game): Game {
-  const actions = game.actions.map((a) =>
-    a.kind === 'strategyCardPlayed' ? { ...a, card: null } : a,
-  )
-  return { ...game, actions }
-}
-
-/** The shape that builds before the Naalu token saved: typed factions. */
-function asVersion1(game: Game) {
-  return {
-    version: 1,
-    startedAt: game.startedAt,
-    players: game.players.map((p) => ({
-      id: p.id,
-      name: p.name,
-      colour: p.colour,
-      faction: factionName(p.factionId),
-    })),
-    firstSpeakerId: game.firstSpeakerId,
-    actions: cardlessLog(game),
-    pauses: game.pauses,
-    voids: game.voids,
-    limitsLog: game.limitsLog,
-  }
-}
-
-/** The shape that builds before the window rule saved: no window rule. */
-function asVersion2(game: Game) {
-  return {
-    version: 2,
-    startedAt: game.startedAt,
-    players: game.players,
-    firstSpeakerId: game.firstSpeakerId,
-    naaluTokenOwnerId: game.naaluTokenOwnerId,
-    actions: cardlessLog(game),
-    pauses: game.pauses,
-    voids: game.voids,
-    limitsLog: game.limitsLog,
-  }
-}
-
-/** Version 3 has the version 2 shape. Its log can remove a player. */
-function asVersion3(game: Game) {
-  return { ...asVersion2(game), version: 3 }
-}
-
-/** Main's version 4 stores the window rule, but no card for a strategic action. */
-function asVersion4(game: Game) {
-  return { ...game, version: 4, actions: cardlessLog(game) }
-}
 
 describe('saved games of older versions', () => {
   it('loads a version 1 game with its typed factions and no token', () => {
@@ -92,7 +40,7 @@ describe('saved games of older versions', () => {
     store.data.set('ti4tempo.game.v1', JSON.stringify(old))
     const game = gameOf(loadGame(store))
     expect(game).toMatchObject({
-      version: 5,
+      version: 6,
       naaluTokenOwnerId: null,
       windowEndsTurn: false,
     })
@@ -112,7 +60,7 @@ describe('saved games of older versions', () => {
     ])
   })
 
-  it('loads a version 2 game as it was saved and moves it to the version 5 keys', () => {
+  it('loads a version 2 game as it was saved and moves it to the version 6 keys', () => {
     const store = memoryStore()
     const t = table(DEFAULT_SETTINGS, 'jaz', NAALU_PLAYERS)
     playStrategy(t)
@@ -127,7 +75,7 @@ describe('saved games of older versions', () => {
     expect(gameOf(loadLastGame(store))).toEqual(saved)
     saveGame(store, saved)
     archiveGame(store)
-    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v5'])
+    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v6'])
   })
 
   it.each([
@@ -146,7 +94,7 @@ describe('saved games of older versions', () => {
       t.act({ kind: 'turnEnded' })
       store.data.set(`ti4tempo.game.v${version}`, JSON.stringify(shape(t.game)))
       const game = gameOf(loadGame(store))
-      expect(game).toMatchObject({ version: 5, windowEndsTurn: false })
+      expect(game).toMatchObject({ version: 6, windowEndsTurn: false })
       // The old build resumed Tom's turn after the window, so he ended it.
       const view = derive(game, T0 + 2 * MIN)
       expect(view.entries.filter((e) => e.kind === 'turn')).toMatchObject([
@@ -187,7 +135,8 @@ describe('saved games of older versions', () => {
     ['2', asVersion2],
     ['3', asVersion3],
     ['4', asVersion4],
-  ])('moves a version %s game to the version 5 keys', (version, shape) => {
+    ['5', asVersion5],
+  ])('moves a version %s game to the version 6 keys', (version, shape) => {
     const store = memoryStore()
     const old = JSON.stringify(shape(olderTable().game))
     store.data.set(`ti4tempo.game.v${version}`, old)
@@ -198,11 +147,11 @@ describe('saved games of older versions', () => {
     expect(store.data.has(`ti4tempo.game.v${version}`)).toBe(false)
     expect(gameOf(loadGame(store))).toEqual(game)
     archiveGame(store)
-    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v5'])
+    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v6'])
     expect(gameOf(loadLastGame(store))).toEqual(game)
   })
 
-  it('rejects a version 4 or 5 game without a valid window rule', () => {
+  it('rejects a version 4 to 6 game without a valid window rule', () => {
     const store = memoryStore()
     const t = table()
     playStrategy(t)
@@ -212,10 +161,10 @@ describe('saved games of older versions', () => {
     const broken = [
       ['4', { ...asVersion4(empty), windowEndsTurn: 'yes' }],
       ['4', { ...asVersion4(game), windowEndsTurn: 'yes' }],
-      // With no window rule and no card, it is from neither version 4 build.
-      ['4', { ...asVersion2(game), version: 4 }],
-      ['5', { ...game, windowEndsTurn: 'yes' }],
+      ['5', { ...asVersion5(game), windowEndsTurn: 'yes' }],
       ['5', { ...asVersion2(game), version: 5 }],
+      ['6', { ...game, windowEndsTurn: 'yes' }],
+      ['6', { ...asVersion2(game), version: 6 }],
     ] as const
     for (const [version, data] of broken) {
       store.data.clear()
@@ -245,12 +194,12 @@ describe('saved games of older versions', () => {
     t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
     saveGame(store, t.game)
     expect(gameOf(loadGame(store))).toEqual(t.game)
-    // A version 5 strategic action needs a card field. Only an upgraded game
+    // A version 6 strategic action needs a card field. Only an upgraded game
     // from an older build holds a null card.
     const actions = cardlessLog(t.game)
-    store.data.set('ti4tempo.game.v5', JSON.stringify({ ...t.game, actions }))
+    store.data.set('ti4tempo.game.v6', JSON.stringify({ ...t.game, actions }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
-    store.data.delete('ti4tempo.game.v5')
+    store.data.delete('ti4tempo.game.v6')
     store.data.set('ti4tempo.game.v4', JSON.stringify(asVersion4(t.game)))
     const game = gameOf(loadGame(store))
     expect(game).toEqual(withNullCards(t.game))
@@ -270,6 +219,7 @@ describe('saved games of older versions', () => {
       ['v2', asVersion2(t.game)],
       ['v3', asVersion3(t.game)],
       ['v4', asVersion4(t.game)],
+      ['v5', asVersion5(t.game)],
     ] as const
     for (const [key, old] of older) {
       const store = memoryStore()

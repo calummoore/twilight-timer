@@ -34,7 +34,7 @@
   .spkopt{flex:1 1 110px}
   .cards{grid-template-columns:repeat(auto-fill, minmax(170px, 1fr))}
   .card{min-height:112px}
-  .stat-grid{grid-template-columns:repeat(auto-fit, minmax(150px, 1fr))}
+  .stat-grid, .stat-grid.five{grid-template-columns:repeat(auto-fit, minmax(150px, 1fr))}
   .setup-grid{grid-template-columns:1fr; height:auto}
   .status .side, .agenda .col{display:contents}
   .status .timer{order:-1}
@@ -208,7 +208,7 @@
   .vote-row .badge{font-size:10px; padding:5px 4px}
 
   /* round summary and post-game stats */
-  .stat-grid{grid-template-columns:1fr 1fr; gap:9px}
+  .stat-grid, .stat-grid.five{grid-template-columns:1fr 1fr; gap:9px}
   .stat{padding:12px 13px}
   .stat .l{font-size:9.5px; letter-spacing:.12em}
   .stat .v{font-size:24px; margin-top:5px}
@@ -291,6 +291,7 @@
   .dialog .big{font-size:20px; padding:18px}
   .dialog .ibtn{padding:14px}
   .pause-card{width:100%; padding:0 16px}
+  .reasons{width:auto}
   .pause-card .t{font-size:96px}
   .pause-card .big{width:100%; font-size:22px; padding:19px}
 }
