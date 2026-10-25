@@ -2,8 +2,8 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review findings 2, 4, 6, and 8 wait for Cal. Milestones 7
-to 11 make rule checks count as game time.
+on 2026-10-25. Review findings 2, 4, 6, 8, 10, and 11 wait for Cal.
+Milestones 7 to 11 make rule checks count as game time.
 
 The table can pause the game from the top bar. A pause stops every clock
 and charges nobody. The app stores each pause as a start time and an end
@@ -66,7 +66,9 @@ Decisions:
 - 2026-10-25: a rule check counts in full also when a later undo takes back
   the tap before the pause. Reason: the table really spent that time,
   often on the rule check that led to the undo. The game clock does not
-  change, because it already leaves out both ranges.
+  change, because it already leaves out both ranges. A later decision
+  replaces this last sentence: after such an undo, the game clock keeps the
+  rule check.
 - 2026-10-25, Cal: rule-check time counts as game time. Cal: "the rule
   check pause should be included in game time". This replaces the rule
   that no pause time is game time. Plain pause time stays out of game
@@ -387,16 +389,22 @@ Show rule checks as game time as the mockup shows them.
 - [x] Commit with Conventional Commits, push the branch, and update the
       pull request description. Commits 729e575, b45e850, e7e1385, and
       656bf48.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
   - Review 3 found 5 findings. Fixed: 5, texts that kept pauses out of game
     time, and 7, the rule-check mockup froze the game clock. Report:
     `.context/pause-reasons/review-3.md`.
+  - Review 4 checked fix commit 6ab9dcf: findings 5 and 7 are resolved. It
+    found 3 findings. Fixed: 9, a plan decision still stated the old undo
+    rule. No further fix round runs. Report:
+    `.context/pause-reasons/review-4.md`.
   - 4. Round summary game total now counts rule checks. Severity Low, effort Small. Recommended: A, the spec says that the round summary game total is the game clock, with rule checks.
   - 6. Post-game rule-check total has no test. Severity Low, effort Small. Recommended: B, a model function that gives the post-game stats from the view, with a unit test.
   - 8. `gameClock` no longer gives the game clock. Severity Low, effort Medium. Recommended: B, rename it to `entryClock` and say "entry ms" in the comments.
+  - 10. Review focus excludes rule checks in undone ranges. Severity Low, effort Small. Recommended: A, "Plain pause time, and undone time outside rule checks, are not game time." in `AGENTS.md`.
+  - 11. Fix commit title passes 50 characters. Severity Low, effort Small. Recommended: A, keep the commit and squash-merge PR #13.
   - `docs/mockups/index.html`: "Where the game went" has no "Between rounds" row, but the app has one. Separate branch.
   - `docs/mockups/index.html`: "Where the game went" writes times under an hour as "0:58:00", but the app writes "58:00". Separate branch.
 
