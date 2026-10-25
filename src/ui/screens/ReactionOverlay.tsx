@@ -19,6 +19,7 @@ export function ReactionOverlay(props: {
   const { game, reaction: r } = props
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const by = byId.get(r.byId)
+  const seated = game.seated.includes(r.byId)
   const time = timerText(r.elapsedMs, r.limitMs, true)
 
   return (
@@ -37,10 +38,19 @@ export function ReactionOverlay(props: {
             <div className="by">
               <i />
               Played by {by?.name} ·{' '}
-              {r.endsTurn ? 'their turn took' : 'their clock is paused at'}{' '}
-              <b className="num" style={{ color: 'var(--dim)', marginLeft: 4 }}>
-                {clock(r.turnMs)}
-              </b>
+              {seated ? (
+                <>
+                  {r.endsTurn ? 'their turn took' : 'their clock is paused at'}{' '}
+                  <b
+                    className="num"
+                    style={{ color: 'var(--dim)', marginLeft: 4 }}
+                  >
+                    {clock(r.turnMs)}
+                  </b>
+                </>
+              ) : (
+                'left the game'
+              )}
             </div>
           </div>
           <div className="rw-clock">
@@ -76,7 +86,11 @@ export function ReactionOverlay(props: {
                 className={`tile ${done ? 'done' : 'wait'}`}
                 style={pc(p?.colour)}
               >
-                {tile.passed && <span className="pchip">Passed</span>}
+                {tile.left ? (
+                  <span className="pchip">Left</span>
+                ) : (
+                  tile.passed && <span className="pchip">Passed</span>
+                )}
                 <div className="nm">
                   <i />
                   {p?.name}
@@ -111,7 +125,7 @@ export function ReactionOverlay(props: {
             <b style={{ color: 'var(--dim)' }}>
               {r.doneCount} of {r.tiles.length} done.
             </b>{' '}
-            {r.endsTurn ? (
+            {r.endsTurn && seated ? (
               <>
                 The window closes and {by?.name}’s turn ends when the last
                 player marks done.

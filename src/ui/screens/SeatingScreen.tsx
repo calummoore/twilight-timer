@@ -1,24 +1,35 @@
-import type { Player } from '../../model/types'
+import { useState } from 'react'
+import type { Departure, Player } from '../../model/types'
 import { pc } from '../colour'
+import { RemovePlayerDialog } from './RemovePlayerDialog'
 
 const CX = 250
 const CY = 205
 const RX = 190
 const RY = 150
 
-/** The table ring. Tapping a seat moves the speaker token there. */
+/**
+ * The table ring. Tapping a seat moves the speaker token there. A player who
+ * left keeps an empty seat, so the other seats keep their places.
+ */
 export function SeatingScreen(props: {
   round: number
+  /** Every player, also those who left. */
   players: Player[]
+  seated: string[]
+  departures: Departure[]
   speakerId: string
   pickOrder: string[]
   voteOrder: string[]
   canUndo: boolean
   onSpeaker: (playerId: string) => void
+  onRemove: (playerId: string) => void
   onUndo: () => void
   onClose: () => void
 }) {
+  const [removing, setRemoving] = useState(false)
   const byId = new Map(props.players.map((p) => [p.id, p]))
+  const leftIn = new Map(props.departures.map((d) => [d.playerId, d.round]))
   const speaker = byId.get(props.speakerId)
   const n = props.players.length
 
@@ -49,6 +60,13 @@ export function SeatingScreen(props: {
           <b>Speaker &amp; seating</b> · Round {props.round}
         </div>
         <div className="spacer" />
+        <button
+          className="ibtn"
+          disabled={props.seated.length < 2}
+          onClick={() => setRemoving(true)}
+        >
+          Remove a player
+        </button>
         <button
           className="ibtn"
           onClick={props.onUndo}
@@ -88,21 +106,27 @@ export function SeatingScreen(props: {
               {props.players.map((p, i) => {
                 const angle = ((-90 + (i * 360) / n) * Math.PI) / 180
                 const isSpeaker = p.id === props.speakerId
+                const left = leftIn.get(p.id)
                 return (
                   <button
                     key={p.id}
-                    className={`seatnode ${isSpeaker ? 'isspk' : ''}`}
+                    className={`seatnode ${isSpeaker ? 'isspk' : ''} ${left === undefined ? '' : 'out'}`}
                     style={{
                       ...pc(p.colour),
                       left: CX + RX * Math.cos(angle),
                       top: CY + RY * Math.sin(angle),
                     }}
+                    disabled={left !== undefined}
                     onClick={() => props.onSpeaker(p.id)}
                   >
                     {isSpeaker && <span className="tok">★</span>}
                     <i />
                     <div className="nm">{p.name}</div>
-                    <div className="sn2">Seat {i + 1}</div>
+                    <div className="sn2">
+                      {left === undefined
+                        ? `Seat ${i + 1}`
+                        : `Left · round ${left}`}
+                    </div>
                   </button>
                 )
               })}
@@ -142,6 +166,17 @@ export function SeatingScreen(props: {
           </div>
         </div>
       </div>
+      {removing && (
+        <RemovePlayerDialog
+          players={props.players.filter((p) => props.seated.includes(p.id))}
+          speakerId={props.speakerId}
+          onRemove={(playerId) => {
+            setRemoving(false)
+            props.onRemove(playerId)
+          }}
+          onClose={() => setRemoving(false)}
+        />
+      )}
     </div>
   )
 }

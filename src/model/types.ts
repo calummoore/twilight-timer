@@ -58,6 +58,7 @@ export type Action =
   | { kind: 'agendaResolved'; at: number }
   | { kind: 'speakerMoved'; at: number; playerId: string }
   | { kind: 'naaluTokenMoved'; at: number; playerId: string }
+  | { kind: 'playerRemoved'; at: number; playerId: string }
   | { kind: 'gameEnded'; at: number }
 
 /** An action before it gets its timestamp. */
@@ -72,22 +73,22 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 3
+  version: 4
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
   firstSpeakerId: string
   /**
-   * The player who holds the Naalu "0" token each round: the Naalu player,
-   * or null. A game from an older build has null, because its log follows
-   * card order.
+   * The Naalu player, who gets the Naalu "0" token back each round while
+   * they are in the game, or null. A version 1 game, from a build before
+   * the Naalu token, has null, because its log follows card order.
    */
   naaluTokenOwnerId: string | null
   /**
    * True when a tap that closes a reaction window also ends the turn. The
    * window then stays open past its limit, so that only a tap ends a turn.
-   * A game from an older build has false: its window close resumed the
-   * turn, and its window closed itself at its limit.
+   * A version 1 to 3 game, from an older build, has false: its window close
+   * resumed the turn, and its window closed itself at its limit.
    */
   windowEndsTurn: boolean
   actions: Action[]
@@ -101,6 +102,12 @@ export type Phase =
 
 export type EntryKind =
   'pick' | 'turn' | 'reaction' | 'status' | 'discussion' | 'vote' | 'table'
+
+/** A player who left the game, and the round in which they left. */
+export interface Departure {
+  playerId: string
+  round: number
+}
 
 export interface ReactionTime {
   playerId: string

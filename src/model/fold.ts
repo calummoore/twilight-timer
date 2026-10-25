@@ -1,17 +1,23 @@
 import {
+  currentPicker,
+  currentVoter,
+  tokenOwner,
+  turnOrder,
+} from './fold-orders'
+import { removePlayer } from './fold-removal'
+import {
   close,
   closeReaction,
   createState,
-  currentPicker,
-  currentVoter,
+  endReaction,
   expireReaction,
-  nextActive,
+  followOrder,
+  nextTurn,
   open,
   openStrategySegment,
   openVoteSegment,
   startAgenda,
   startTurn,
-  turnOrder,
   type FoldState,
 } from './fold-state'
 import { AGENDAS_PER_ROUND, STATUS_STEPS, isStrategyCard } from './rules'
@@ -50,6 +56,8 @@ function step(s: FoldState, a: Action, ms: number): boolean {
       return moveSpeaker(s, a.playerId, ms, a.at)
     case 'naaluTokenMoved':
       return moveNaaluToken(s, a.playerId)
+    case 'playerRemoved':
+      return removePlayer(s, a.playerId, ms, a.at)
     case 'custodiansSet':
       if (s.custodiansRemoved === a.removed) return false
       s.custodiansRemoved = a.removed
@@ -105,7 +113,7 @@ function step(s: FoldState, a: Action, ms: number): boolean {
       else startSummary(s, ms)
       return true
     case 'gameEnded':
-      closeReaction(s, ms)
+      closeReaction(s, ms, false)
       close(s, ms, a.at)
       s.phase = 'ended'
       s.endedMs = ms
@@ -118,25 +126,17 @@ function step(s: FoldState, a: Action, ms: number): boolean {
 function moveSpeaker(s: FoldState, id: string, ms: number, wall: number) {
   if (!s.seats.includes(id) || id === s.speakerId) return false
   s.speakerId = id
-  // The pick or vote order re-derives, so the clock follows the new player.
-  const seg = s.segment
-  if (s.phase === 'strategy' && seg && seg.playerId !== currentPicker(s)) {
-    close(s, ms, wall)
-    openStrategySegment(s, ms)
-  }
-  if (s.agenda?.stage === 'voting' && seg && seg.playerId !== currentVoter(s)) {
-    close(s, ms, wall)
-    openVoteSegment(s, ms)
-  }
+  followOrder(s, ms, wall)
   return true
 }
 
 /**
  * Gift of Prescience: another player holds the token for this round. The
- * token returns to its owner when the next round starts.
+ * token returns to its owner when the next round starts, if the owner is
+ * still in the game.
  */
 function moveNaaluToken(s: FoldState, id: string): boolean {
-  if (s.phase !== 'strategy' || s.game.naaluTokenOwnerId === null) return false
+  if (s.phase !== 'strategy' || tokenOwner(s) === null) return false
   if (!s.seats.includes(id) || id === s.naaluTokenHolderId) return false
   s.naaluTokenHolderId = id
   return true
@@ -182,7 +182,7 @@ function stepPhase(s: FoldState, ms: number, wall: number): boolean {
       s.passed = new Set()
       s.scPlayed = new Set()
       s.turnCounts = new Map()
-      s.naaluTokenHolderId = s.game.naaluTokenOwnerId
+      s.naaluTokenHolderId = tokenOwner(s)
       s.round += 1
       s.phase = 'strategy'
       openStrategySegment(s, ms)
@@ -196,16 +196,7 @@ function endTurn(s: FoldState, pass: boolean, ms: number, wall: number) {
   if (s.phase !== 'action' || s.reaction || !s.activeId) return false
   close(s, ms, wall)
   if (pass) s.passed.add(s.activeId)
-  const next = nextActive(s)
-  if (next) {
-    startTurn(s, next, ms)
-    return true
-  }
-  // The last unpassed player passed: the status phase begins.
-  s.activeId = null
-  s.phase = 'status'
-  s.statusSteps = STATUS_STEPS.map(() => false)
-  open(s, 'status', null, 'statusPhase', ms)
+  nextTurn(s, ms)
   return true
 }
 
@@ -234,15 +225,6 @@ function playStrategyCard(s: FoldState, ms: number, wall: number): boolean {
     others: s.seats.filter((other) => other !== id),
   }
   return true
-}
-
-/**
- * A tap closes the reaction window. The strategic action was the action of
- * the turn, so the turn ends too, except in a game from an older build.
- */
-function endReaction(s: FoldState, ms: number, wall: number): void {
-  closeReaction(s, ms)
-  if (s.game.windowEndsTurn) endTurn(s, false, ms, wall)
 }
 
 function startSummary(s: FoldState, ms: number): void {

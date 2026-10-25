@@ -160,3 +160,65 @@ describe('the Naalu "0" token', () => {
     expect(t.game.voids).toEqual([{ from: T0 + 5 * SEC, to: T0 + 8 * SEC }])
   })
 })
+
+describe('the Naalu "0" token when a player leaves', () => {
+  function rail(t: Table): string[] {
+    const view = t.view().view
+    return view.phase === 'action' ? view.rail.map((row) => row.playerId) : []
+  }
+
+  it('leaves the game with the Naalu player', () => {
+    const t = naaluTable()
+    playStrategy(t)
+    t.act({ kind: 'playerRemoved', playerId: 'sam' }) // during Sam's turn
+    expect(activeId(t)).toBe('tom')
+    nextRound(t)
+    expect(t.view().view).toMatchObject({
+      phase: 'strategy',
+      naaluTokenOwnerId: null,
+      naaluTokenHolderId: null,
+    })
+    expect(t.act({ kind: 'naaluTokenMoved', playerId: 'kira' })).toBe(false)
+    playStrategy(t)
+    expect(rail(t)).toEqual(['tom', 'wren', 'jaz', 'kira', 'priya'])
+  })
+
+  it('stays with a Gift of Prescience holder until the round ends', () => {
+    const t = naaluTable()
+    t.act({ kind: 'naaluTokenMoved', playerId: 'kira' })
+    t.act({ kind: 'playerRemoved', playerId: 'sam' })
+    expect(t.view().view).toMatchObject({
+      naaluTokenOwnerId: null,
+      naaluTokenHolderId: 'kira',
+    })
+    playStrategy(t)
+    expect(rail(t)).toEqual(['kira', 'tom', 'wren', 'jaz', 'priya'])
+    nextRound(t)
+    expect(t.view().view).toMatchObject({ naaluTokenHolderId: null })
+  })
+
+  it('returns to the Naalu player when the holder leaves in the strategy phase', () => {
+    const t = naaluTable()
+    t.act({ kind: 'naaluTokenMoved', playerId: 'kira' })
+    t.act({ kind: 'playerRemoved', playerId: 'kira' })
+    expect(t.view().view).toMatchObject({
+      naaluTokenOwnerId: 'sam',
+      naaluTokenHolderId: 'sam',
+    })
+    playStrategy(t)
+    expect(activeId(t)).toBe('sam')
+  })
+
+  it('returns to the Naalu player next round when the holder leaves later', () => {
+    const t = naaluTable()
+    t.act({ kind: 'naaluTokenMoved', playerId: 'kira' })
+    playStrategy(t)
+    t.act({ kind: 'playerRemoved', playerId: 'kira' }) // during Kira's turn
+    expect(activeId(t)).toBe('tom')
+    nextRound(t)
+    expect(t.view().view).toMatchObject({
+      naaluTokenOwnerId: 'sam',
+      naaluTokenHolderId: 'sam',
+    })
+  })
+})

@@ -61,16 +61,17 @@ describe('Politics reaction window', () => {
     t.act({ kind: 'reactionClosed' }) // Jaz's turn ends
     const view = t.view()
     const closed = view.entries.filter((e) => !e.running)
+    // Jaz's turn ends where the window began, then the window closes.
     expect(closed.at(-2)).toMatchObject({
+      kind: 'turn',
+      playerId: 'jaz',
+      durationMs: 20 * SEC,
+    })
+    expect(closed.at(-1)).toMatchObject({
       kind: 'reaction',
       playerId: null,
       durationMs: 10 * SEC,
       card: 3,
-    })
-    expect(closed.at(-1)).toMatchObject({
-      kind: 'turn',
-      playerId: 'jaz',
-      durationMs: 20 * SEC,
     })
     // Initiative still follows the cards, so Sam goes next.
     expect(view.view).toMatchObject({ activeId: 'sam' })

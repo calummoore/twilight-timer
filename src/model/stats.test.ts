@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gameStats, roundStats } from './stats'
+import { gameStats, playersOfRound, roundStats } from './stats'
 import {
   LIMITS_ON,
   MIN,
@@ -98,5 +98,14 @@ describe('stats', () => {
       statusMs: 2 * MIN,
       betweenMs: 0,
     })
+  })
+
+  it('lists a player who left only in the rounds that they played', () => {
+    const departures = [{ playerId: 'wren', round: 2 }]
+    expect(playersOfRound(PLAYERS, departures, 1)).toEqual(IDS)
+    expect(playersOfRound(PLAYERS, departures, 2)).toEqual(IDS)
+    expect(playersOfRound(PLAYERS, departures, 3)).toEqual(
+      IDS.filter((id) => id !== 'wren'),
+    )
   })
 })

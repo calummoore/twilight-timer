@@ -26,7 +26,7 @@
 .oc i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
 .oc b{color:var(--pc); font-weight:800; font-size:12px}
 
-/* naalu 0 token: the strip button and the picker dialog */
+/* naalu 0 token: the strip button and the picker dialog. The remove-player dialog uses the same player options. */
 .order-strip .tokb{margin-left:auto}
 .tokb b{color:var(--pc); font-weight:800; font-size:13px}
 .tokopts{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:18px}
