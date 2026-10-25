@@ -12,7 +12,8 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 ## Key features
 
 - Setup for 3 to 8 players: name, colour, faction from the official list, seat,
-  and the speaker.
+  and the speaker. The table chooses its expansions, and one tap deals random
+  factions to the empty seats.
 - Strategy picks in speaker order, with trade goods on unpicked cards. With 3
   or 4 players, each player picks two cards, and the lower card sets their
   place in the turn order.
@@ -93,7 +94,10 @@ commit. Each successful preview run updates the comment.
 
 - `src/model/` holds the game as a pure fold over an append-only action log.
   - `types.ts`: the actions, the stored game, and the timed entries.
-  - `factions.ts`: the official factions and the ids that saved games store.
+  - `factions.ts`: the official factions and the ids that saved games store,
+    and the expansion of each faction.
+  - `deal.ts`: the factions in play for the chosen expansions, the choices
+    of one seat, and the random deal for the empty seats.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
     `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
     player who leaves.
