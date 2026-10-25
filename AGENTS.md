@@ -58,7 +58,8 @@ skill at that moment instead of guessing the rule.
   `CLOUDFLARE_ACCOUNT_ID` and the repository secret `CLOUDFLARE_API_TOKEN`.
 - Each pull request from this repository gets a preview at
   `https://pr-<number>-twilight-timer.futex.workers.dev`. A bot comment on
-  the pull request gives the link.
+  the pull request gives the link. CI deletes the preview when the pull
+  request closes.
 
 ## Product
 

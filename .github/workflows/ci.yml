@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+    # The first three are the default types. A closed pull request runs only
+    # the cleanup job.
+    types: [opened, synchronize, reopened, closed]
   push:
     branches:
       - main
@@ -9,15 +12,25 @@ on:
 permissions:
   contents: read
 
-# One run per branch at a time. Pull request runs cancel older runs; main
-# runs queue, so that two deploys never overlap.
+# One run per pull request and one run for main at a time. Pull request runs
+# cancel older runs; main runs queue, so that two deploys never overlap. The
+# run for a closed pull request cancels its preview run, so the preview does
+# not come back after the cleanup. The group uses the pull request number,
+# not github.ref, because a close by a merge sets github.ref to the base
+# branch.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # The marker finds the comment of an earlier run, so that each pull request
+  # keeps one preview comment.
+  PREVIEW_COMMENT_MARKER: '<!-- preview-deploy -->'
 
 jobs:
   check:
     name: Check and deploy
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -66,6 +79,7 @@ jobs:
     # get no preview.
     if: >-
       github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
@@ -96,14 +110,18 @@ jobs:
       - name: Build
         run: npm run build
 
-      # The upload adds a Worker version with an alias. It does not deploy the
-      # version, so production traffic does not change.
+      # The upload makes or updates the Workers Preview pr-<number> under the
+      # same Worker. A preview is not a production deployment, so production
+      # traffic does not change.
       - name: Upload preview to Cloudflare
         id: upload
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          # Not PR_NUMBER: Wrangler reads PR_NUMBER, and then it skips the
+          # GitHub event file, which also gives the URL and the title of the
+          # pull request.
+          PULL_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.json
         run: |
@@ -111,45 +129,124 @@ jobs:
             echo "::warning title=No preview::This run has no Cloudflare credentials, so it skips the preview."
             exit 0
           fi
-          npx wrangler versions upload \
-            --preview-alias "pr-${PR_NUMBER}" \
-            --message "Preview of pull request #${PR_NUMBER} at ${HEAD_SHA:0:7}"
-          result=$(jq -c 'select(.type == "version-upload")' "${WRANGLER_OUTPUT_FILE_PATH}")
-          alias_url=$(jq -r '.preview_alias_url // empty' <<< "${result}")
-          version_url=$(jq -r '.preview_url // empty' <<< "${result}")
-          if [ -z "${alias_url}" ]; then
-            echo "::error title=No preview URL::Cloudflare returned no preview URL. Turn on Preview URLs for the Worker."
+          # Wrangler records GITHUB_SHA as the commit of the deployment. In a
+          # pull request run, that is the test merge commit, but this job
+          # builds the head commit.
+          GITHUB_SHA="${HEAD_SHA}" npx wrangler preview \
+            --name "pr-${PULL_NUMBER}" \
+            --message "Preview of pull request #${PULL_NUMBER} at ${HEAD_SHA:0:7}"
+          result=$(jq -c 'select(.type == "preview")' "${WRANGLER_OUTPUT_FILE_PATH}")
+          preview_url=$(jq -r '.preview_urls[0] // empty' <<< "${result}")
+          deployment_url=$(jq -r '.deployment_urls[0] // empty' <<< "${result}")
+          if [ -z "${preview_url}" ]; then
+            echo "::error title=No preview URL::Cloudflare returned no preview URL. Workers Previews need preview_urls set to true in wrangler.jsonc."
             exit 1
           fi
-          echo "alias_url=${alias_url}" >> "${GITHUB_OUTPUT}"
-          echo "version_url=${version_url}" >> "${GITHUB_OUTPUT}"
+          echo "preview_url=${preview_url}" >> "${GITHUB_OUTPUT}"
+          echo "deployment_url=${deployment_url}" >> "${GITHUB_OUTPUT}"
 
       - name: Comment the preview link
-        if: steps.upload.outputs.alias_url != ''
+        if: steps.upload.outputs.preview_url != ''
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          ALIAS_URL: ${{ steps.upload.outputs.alias_url }}
-          VERSION_URL: ${{ steps.upload.outputs.version_url }}
-          # The marker finds the comment of an earlier run, so that each pull
-          # request keeps one preview comment.
-          MARKER: '<!-- preview-deploy -->'
+          PREVIEW_URL: ${{ steps.upload.outputs.preview_url }}
+          DEPLOYMENT_URL: ${{ steps.upload.outputs.deployment_url }}
         run: |
           body=$(cat <<EOF
-          ${MARKER}
-          **Preview:** ${ALIAS_URL}
+          ${PREVIEW_COMMENT_MARKER}
+          **Preview:** ${PREVIEW_URL}
 
-          This comment was last updated for commit ${HEAD_SHA:0:7}. Each successful preview run updates it.
-
-          Link to commit ${HEAD_SHA:0:7} only: ${VERSION_URL}
+          This comment was last updated for commit ${HEAD_SHA:0:7}. Each successful preview run updates it. When this pull request closes, CI deletes the preview.
           EOF
           )
+          if [ -n "${DEPLOYMENT_URL}" ]; then
+            body+=$'\n\n'"Link to commit ${HEAD_SHA:0:7} only: ${DEPLOYMENT_URL}"
+          fi
           comments="repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments"
-          comment_id=$(gh api --paginate "${comments}?per_page=100" | jq -rn --arg marker "${MARKER}" \
+          comment_id=$(gh api --paginate "${comments}?per_page=100" | jq -rn --arg marker "${PREVIEW_COMMENT_MARKER}" \
             '[inputs | .[] | select(.user.login == "github-actions[bot]" and (.body | startswith($marker))) | .id] | first // empty')
           if [ -n "${comment_id}" ]; then
             gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" -f body="${body}" > /dev/null
           else
             gh api --method POST "${comments}" -f body="${body}" > /dev/null
+          fi
+
+  cleanup:
+    name: Delete preview
+    # A pull request from a fork has no preview to delete.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # A closed pull request can lose its merge ref. The job needs only
+      # Wrangler, so it installs from the default branch, and no pull request
+      # code runs with the token.
+      - name: Check out the default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          # The delete step holds a Cloudflare token, so skip the shared cache.
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Delete preview from Cloudflare
+        id: delete
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ -z "${CLOUDFLARE_ACCOUNT_ID}" ] || [ -z "${CLOUDFLARE_API_TOKEN}" ]; then
+            echo "::warning title=Preview not deleted::This run has no Cloudflare credentials, so it skips the cleanup."
+            exit 0
+          fi
+          name="pr-${PR_NUMBER}"
+          if output=$(npx wrangler preview delete --name "${name}" --skip-confirmation 2>&1); then
+            echo "${output}"
+            echo "deleted=true" >> "${GITHUB_OUTPUT}"
+          # Cloudflare gives code 10025 when it has no preview with this name.
+          elif grep -qF '[code: 10025]' <<< "${output}"; then
+            echo "${output}"
+            echo "::notice title=No preview::Cloudflare has no preview ${name}, so there is nothing to delete."
+          else
+            echo "${output}"
+            exit 1
+          fi
+
+      - name: Mark the preview comment as deleted
+        if: steps.delete.outputs.deleted == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          body=$(cat <<EOF
+          ${PREVIEW_COMMENT_MARKER}
+          **Preview:** deleted
+
+          CI deleted the preview when this pull request closed. If the pull request opens again, CI makes a new preview.
+          EOF
+          )
+          comments="repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments"
+          comment_id=$(gh api --paginate "${comments}?per_page=100" | jq -rn --arg marker "${PREVIEW_COMMENT_MARKER}" \
+            '[inputs | .[] | select(.user.login == "github-actions[bot]" and (.body | startswith($marker))) | .id] | first // empty')
+          if [ -n "${comment_id}" ]; then
+            gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" -f body="${body}" > /dev/null
           fi
