@@ -1,4 +1,4 @@
-import type { PauseView } from '../../model/pauses'
+import { inGameTime, type PauseView } from '../../model/pauses'
 import { PAUSE_REASONS, type PauseReason } from '../../model/types'
 import { Overlay } from '../controls'
 import { clock } from '../format'
@@ -18,7 +18,11 @@ export function PauseOverlay(props: {
     <Overlay label="Game paused">
       <div className="pause-card">
         <div className="t num">{clock(pause.elapsedMs)}</div>
-        <div className="l">Game paused · no clock is running</div>
+        <div className="l">
+          {pause.reason !== null && inGameTime(pause.reason)
+            ? 'Game paused · only the game clock is running'
+            : 'Game paused · no clock is running'}
+        </div>
         <div className="reasons" role="group" aria-label="Pause reason">
           {CHOICES.map((reason) => {
             const on = reason === pause.reason

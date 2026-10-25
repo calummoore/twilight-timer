@@ -1,3 +1,4 @@
+import { gameTimeMs } from '../../model/pauses'
 import { cardName } from '../../model/rules'
 import { gameStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
@@ -16,6 +17,7 @@ export function StatsScreen(props: {
   const stats = gameStats(
     game.entries,
     game.players.map((p) => p.id),
+    gameTimeMs(game.reasonTotals),
   )
   const widest = Math.max(1, ...stats.players.map((p) => p.turnMs))
   const width = (ms: number) => `${(ms / widest) * 100}%`
@@ -44,6 +46,11 @@ export function StatsScreen(props: {
       label: 'Strategy phase',
       ms: stats.phases.strategyMs,
       colour: 'var(--c-yellow)',
+    },
+    {
+      label: 'Rule checks',
+      ms: stats.phases.ruleCheckMs,
+      colour: 'var(--accent)',
     },
     {
       label: 'Between rounds',
@@ -112,7 +119,7 @@ export function StatsScreen(props: {
               {plural(stats.overLimitCount, 'time')} over a limit
             </div>
           </div>
-          <ReasonTiles totals={game.reasonTotals} />
+          <ReasonTiles totals={game.reasonTotals} gameMs={stats.totalMs} />
         </div>
         <div
           style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 18 }}
