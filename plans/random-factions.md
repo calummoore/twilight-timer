@@ -213,11 +213,11 @@ Tags: ui
 
 Show the chips, the faction lists, and the deal as the mockup shows them.
 
-- [ ] The chips in the Game panel. A tap saves the settings.
-- [ ] The button "Random factions for empty seats", shown while a seat
+- [x] The chips in the Game panel. A tap saves the settings.
+- [x] The button "Random factions for empty seats", shown while a seat
       has no faction. It calls the deal with `Math.random`.
-- [ ] Each faction list shows the choices of its seat.
-- [ ] Keep one faction column width in every seat row with CSS subgrid,
+- [x] Each faction list shows the choices of its seat.
+- [x] Keep one faction column width in every seat row with CSS subgrid,
       also while a seat keeps a faction outside the chosen expansions.
   - Give the seat list `align-content: start`, so that its rows do not
     stretch to fill the list.
@@ -227,25 +227,31 @@ Show the chips, the faction lists, and the deal as the mockup shows them.
   - Give the seat list the column gap of a seat row, 11 pixels. A
     different gap takes room from the fixed columns, and the swatch
     column then overflows.
-- [ ] Let the Game panel shrink and its summary rows scroll, as the
+- [x] Let the Game panel shrink and its summary rows scroll, as the
       mockup does.
-- [ ] Move the new mockup classes to `src/styles/mockup/setup.css`.
-- [ ] Keep `SetupScreen.tsx` near 200 lines. Move the seat row to its own
+- [x] Move the new mockup classes to `src/styles/mockup/setup.css`.
+- [x] Keep `SetupScreen.tsx` near 200 lines. Move the seat row to its own
       component if the screen passes 250 lines.
-- [ ] Scratch smoke test, not committed: build, serve the preview, and
+  - The seat row moved to `SetupSeat.tsx`. `SetupScreen.tsx` has 194 lines.
+- [x] Scratch smoke test, not committed: build, serve the preview, and
       drive headless Chrome. Save the log and the screenshots under
       `.context/random-factions/smoke/`.
-  - [ ] The deal fills every empty seat with a different faction, and
+  - [x] The deal fills every empty seat with a different faction, and
         BEGIN GAME turns on. A hand pick stays.
-  - [ ] With Thunder's Edge off, the list of each seat without a Thunder's
+  - [x] With Thunder's Edge off, the list of each seat without a Thunder's
         Edge faction shows none of its factions. The deal gives none of
         them.
-  - [ ] A seat that holds a Thunder's Edge faction keeps it when Thunder's
+  - [x] A seat that holds a Thunder's Edge faction keeps it when Thunder's
         Edge turns off, and its list still shows that faction.
-  - [ ] The deal button goes away when every seat has a faction.
-  - [ ] Every seat row keeps one faction column width while a seat keeps
+  - [x] The deal button goes away when every seat has a faction.
+  - [x] Every seat row keeps one faction column width while a seat keeps
         a faction outside the chosen expansions.
-  - [ ] The chips keep their state after a reload.
+  - [x] The chips keep their state after a reload.
+- Evidence: `.context/random-factions/smoke/smoke.log`, `results.json`,
+  and the screenshots beside them. All 26 checks passed, with no console
+  error or warning. A control check without subgrid gives the row that
+  keeps Deepwrought Scholarate a 191 px faction column and the other rows
+  171 px. With subgrid, every row has 191 px.
 
 ## Milestone 5: Verification, commit, and review
 
@@ -263,8 +269,9 @@ Run the checks, push, and review the branch.
     and `src/model/parse.ts`. PR #11 also changes
     `src/ui/screens/SetupGamePanel.tsx`. Expect conflicts when they
     merge.
-- [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits and push the branch.
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+  Evidence: `.context/random-factions/check-final.log`.
+- [x] Commit with Conventional Commits and push the branch.
 - [x] Open the PR and link it in the status paragraph.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,

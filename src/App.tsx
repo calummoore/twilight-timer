@@ -113,6 +113,7 @@ export function App() {
             onDismissNotice={() => setNotice(null)}
             onLoadLast={loadLast}
             onSettings={() => setSetupSettings(true)}
+            onSettingsChange={changeSettings}
             onBegin={(players, speakerId) => {
               setNotice(null)
               setGame(startGame(players, speakerId, settings, Date.now()))
