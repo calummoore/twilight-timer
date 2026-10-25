@@ -196,8 +196,10 @@ Run the checks, push, and review the branch.
   - 31. Phone phase line gap is set twice. Severity Low, effort Small. Recommended: B, side margins in place of the shorthand.
   - Review 7 checked the merge `3951140` of PRs #12 and #15. Fixed: 32, the reaction footer note may break inside a long word in the narrow layout; 33, the Random Factions note says the chips wrap on a phone; and 34, PR #12 settled the recorded line about the demo reaction clock, which now counts overtime as the app does. Report: `.context/phone-version/review-7.md`.
   - Review 8 checked `3d141dc` and the merge `9a1bfe9` of PR #11: findings 32 to 34 are resolved. Fixed: 35, on a phone, Pass takes its own row when the three buttons of a two-card turn do not fit; and 36, the decision line below names only what it covers. Report: `.context/phone-version/review-8.md`.
+  - Review 9 checked `88ce738`, option D of finding 28. The phone layout and the other top bars do not change. Fixed: 40, the decision line on the phone layout band names finding 28 only as a previous example. Report: `.context/phone-version/review-9.md`.
+  - 39. Short sideways windows still cut the clocks. Severity Medium, effort Small. Recommended: B, the phone sizes for the hero and the agenda screen on windows 360 px tall or less.
   - Decision: one shared wrapping row for rows of controls, such as the hero buttons, the reaction footer, and the top bar tools, so that the last controls move to a new line when they do not fit. Effort Medium. Covers finding 35. Previous examples: `7fa480d` for review 3, findings 28 and 32, and the reaction tile grid line.
-  - Decision: use the phone layout up to about 700 to 760 px wide, in place of 600 px. Effort Small. Covers findings 28 and 32 and the tile grid line below. Previous example: the 320 and 360 px phones of review 3, fixed in `7fa480d`.
+  - Decision: use the phone layout up to about 700 to 760 px wide, in place of 600 px. Effort Small. Covers finding 32 and the tile grid line below. A new phone limit must move the 740 px limit of the compact top bar too. Previous examples: finding 28, fixed in `88ce738`, and the 320 and 360 px phones of review 3, fixed in `7fa480d`.
   - 4. Phone History and Join have no way in. Severity Low, effort Small. Recommended: B, add the controls.
   - 7. Up and down keys block keyboard scrolling. Severity Low, effort Small. Recommended: A, use the I and P keys.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
@@ -219,6 +221,8 @@ Run the checks, push, and review the branch.
   - `docs/mockups/index.html`: the History log shows a turn that ends after "Reaction window closed", which PR #12 no longer allows. origin/main has the same log. Separate branch.
   - `src/styles/mockup/responsive.css`: the phone rule `.count b{padding:10px 0}` does not reach the app's count buttons, so they are 2 px taller than in the mockup. Separate branch.
   - `docs/mockups/index.html`: the setup note says that the iPad keeps the expansion choice, but any table device keeps it. origin/main has the same note. Separate branch.
+  - `src/styles/mockup/responsive.css`: from 901 to 948 px wide, the one-row top bar wraps onto two lines, so it is 81 px tall, not 68 px. Separate branch.
+  - `src/styles/mockup/responsive.css`: from 741 to about 824 px wide, a long speaker name wraps in the speaker chip, so the two-row top bar is 124 to 141 px tall. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
