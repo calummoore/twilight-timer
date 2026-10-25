@@ -92,7 +92,10 @@ commit. Each successful preview run updates the comment.
 
 - `src/model/` holds the game as a pure fold over an append-only action log.
   - `types.ts`: the actions, the stored game, and the timed entries.
-  - `factions.ts`: the official factions and the ids that saved games store.
+  - `factions.ts`: the official factions and the ids that saved games store,
+    and the expansion of each faction.
+  - `deal.ts`: the factions in play for the chosen expansions, the choices
+    of one seat, and the random deal for the empty seats.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
     `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
     player who leaves.

@@ -179,30 +179,33 @@ screens change.
 
 Give each faction its game set, store the expansions, and add the deal.
 
-- [ ] `factions.ts`: the game set of each faction and the list of
+- [x] `factions.ts`: the game set of each faction and the list of
       expansions.
-- [ ] `settings.ts` and `parse.ts`: the `expansions` setting, all on by
+- [x] `settings.ts` and `parse.ts`: the `expansions` setting, all on by
       default.
-- [ ] `deal.ts`: the factions in play, the choices of one seat, and the
+- [x] `deal.ts`: the factions in play, the choices of one seat, and the
       deal.
-- [ ] Add `deal.ts` to the key code in `README.md`.
-- [ ] Unit tests:
-  - [ ] The factions in play: 30 with every expansion on, the 17 of the
+- [x] Add `deal.ts` to the key code in `README.md`.
+- [x] Unit tests:
+  - [x] The factions in play: 30 with every expansion on, the 17 of the
         base game with every expansion off, and each expansion adds only
         its own factions.
-  - [ ] The choices of a seat add its faction when its expansion is off,
+  - [x] The choices of a seat add its faction when its expansion is off,
         in name order. They add nothing for an empty seat.
-  - [ ] The deal fills only the empty seats inside the seat count and
+  - [x] The deal fills only the empty seats inside the seat count and
         keeps every held faction. No faction repeats across all rows,
         also the rows past the count.
-  - [ ] The deal gives only factions in play. When the pool runs out,
+  - [x] The deal gives only factions in play. When the pool runs out,
         the remaining seats stay empty.
-  - [ ] The deal takes its picks from the random source. A fixed
+  - [x] The deal takes its picks from the random source. A fixed
         sequence gives a fixed deal.
-  - [ ] Stored settings without `expansions`, or with a broken value,
+  - [x] Stored settings without `expansions`, or with a broken value,
         load with every expansion on. A saved choice loads as saved.
-  - [ ] A broken value for one expansion falls back for that expansion
+  - [x] A broken value for one expansion falls back for that expansion
         only. The other values load as saved.
+- The tests are in `src/model/deal.test.ts` and `src/model/storage.test.ts`.
+  Evidence: each of 5 mutations of `deal.ts` and `parse.ts` fails at least
+  one test. `.context/random-factions/mutations/results.log`.
 
 ## Milestone 4: Setup screen
 
