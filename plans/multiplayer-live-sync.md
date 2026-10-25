@@ -409,6 +409,7 @@ Run the checks, push, and review the branch.
   - Plan review 3 of 9850502 found 8 findings, 22 to 29. Fixed: 22, 23, 25, 26, 27, and 29. Decision 30 is the wider fix of finding 23. Report: `.context/multiplayer-live-sync/review-3.md`.
   - Plan review 4 of 4128a52 found 4 findings, 31 to 34. Fixed: 31 and 32. Report: `.context/multiplayer-live-sync/review-4.md`.
   - Plan review 5 of 4564413 found 2 findings, 37 and 38. Fixed: 37 and 38. Report: `.context/multiplayer-live-sync/review-5.md`.
+  - Plan review 6 of 58d1471 found no new findings. Report: `.context/multiplayer-live-sync/review-6.md`.
   - 1. A code holder can erase the game. Severity High, effort Small. Recommended: close it, because decision 21 covers it: the join code opens player mode only, and table mode needs the table link.
   - 24. A lost table device cannot recover. Severity Medium, effort Small. Recommended: A, the Join screen asks the host to save the table link, and the docs state the limit.
   - 6. CI steps for the rules are missing. Severity Low, effort Small. Recommended: A, a CI test step, the rules deploy first, and Cal's credential. It applies only if decision 9 picks A.
@@ -423,6 +424,7 @@ Run the checks, push, and review the branch.
   - `plans/multiplayer-live-sync.md`: a second reaction extension from another table device names a clock that still runs, so it applies twice. Separate branch.
   - `plans/multiplayer-live-sync.md`: Phone Join has no state for a code try that the Worker rate limit refuses. Separate branch.
   - `plans/multiplayer-live-sync.md`: no TODO says what the object and the devices show when a stored shared-game record does not parse. Separate branch.
+  - `plans/multiplayer-live-sync.md`: the option A section names no limit on code tries, and the Worker limit does not apply to RTDB. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
