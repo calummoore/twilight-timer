@@ -48,8 +48,18 @@ export function table(
   speakerId = 'jaz',
   players: Player[] = PLAYERS,
 ) {
-  let now = T0
-  let game: Game = startGame(players, speakerId, settings, now)
+  return tableOf(startGame(players, speakerId, settings, T0))
+}
+
+/** The table as an older build saved it: a closed window resumes the turn. */
+export function olderTable(settings: Settings = DEFAULT_SETTINGS) {
+  const game = startGame(PLAYERS, 'jaz', settings, T0)
+  return tableOf({ ...game, windowEndsTurn: false })
+}
+
+function tableOf(start: Game) {
+  let now = start.startedAt
+  let game = start
   return {
     get game() {
       return game
@@ -85,7 +95,7 @@ export function table(
   }
 }
 
-export type Table = ReturnType<typeof table>
+export type Table = ReturnType<typeof tableOf>
 
 /** Every player picks in pick order, `ms` apart, then the action phase starts. */
 export function playStrategy(t: Table, picks = PICKS, ms = 10 * SEC): void {

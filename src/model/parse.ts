@@ -17,13 +17,18 @@ import {
 type Fields = Record<string, unknown>
 
 /** The stored versions that this build reads. Older versions load as the newest. */
-const VERSIONS: readonly unknown[] = [1, 2, 3, 4]
+const VERSIONS: readonly unknown[] = [1, 2, 3, 4, 5]
 
 /**
  * Narrows stored data to a game, or returns null when it is not valid.
  * Version 1, from builds before the Naalu token, loads with no token owner.
  * Version 2, from builds before player removal, has the shape of version 3.
- * Version 3, from builds before pause reasons, has no rule checks.
+ * Versions 1 to 3, from builds before a window close ended the turn, load
+ * with the window rule of those builds, unless they store the rule.
+ * Versions 1 to 4, from builds before pause reasons, have no rule checks.
+ * The exception is a version 4 game that the pause-reasons branch saved
+ * before main took version 4: it keeps its rule checks, and it has the old
+ * window rule of its build.
  */
 export function parseGame(raw: unknown): Game | null {
   if (!isFields(raw) || !VERSIONS.includes(raw.version)) return null
@@ -42,17 +47,32 @@ export function parseGame(raw: unknown): Game | null {
   if (owner !== null && (typeof owner !== 'string' || !isPlayer(owner))) {
     return null
   }
+  const windowEndsTurn = windowRule(raw.version, raw.windowEndsTurn)
+  if (windowEndsTurn === null) return null
   return {
-    version: 4,
+    version: 5,
     startedAt,
     players,
     firstSpeakerId,
     naaluTokenOwnerId: owner,
+    windowEndsTurn,
     actions,
     pauses,
     voids,
     limitsLog,
   }
+}
+
+/**
+ * A version 5 game must store the window rule. An older game has the old
+ * rule, unless it stores the rule: a version 4 game from main, and a game
+ * that the window change saved as version 3 before main took that version.
+ * A version 4 game from the pause-reasons branch stores no rule, so it has
+ * the old rule of its build.
+ */
+function windowRule(version: unknown, stored: unknown): boolean | null {
+  if (typeof stored === 'boolean') return stored
+  return version === 5 ? null : false
 }
 
 /** Reads stored settings. Missing or broken fields fall back to defaults. */
@@ -137,9 +157,10 @@ function parseInterval(raw: unknown): Interval | null {
 }
 
 /**
- * A pause and its reason ranges. A pause from before version 4 has no
- * ranges. A range that cannot be read is dropped, so its time counts as a
- * plain pause and the game still loads.
+ * A pause and its reason ranges. A pause from before version 5 has no
+ * ranges, except in a version 4 game from the pause-reasons branch. A range
+ * that cannot be read is dropped, so its time counts as a plain pause and
+ * the game still loads.
  */
 function parsePause(raw: unknown): Pause | null {
   const range = parseInterval(raw)

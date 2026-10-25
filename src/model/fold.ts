@@ -9,6 +9,7 @@ import {
   close,
   closeReaction,
   createState,
+  endReaction,
   expireReaction,
   followOrder,
   nextTurn,
@@ -76,7 +77,7 @@ function step(s: FoldState, a: Action, ms: number): boolean {
         return false
       }
       r.done.set(a.playerId, ms - r.startMs)
-      if (r.done.size === r.others.length) closeReaction(s, ms)
+      if (r.done.size === r.others.length) endReaction(s, ms, a.at)
       return true
     }
     case 'reactionExtended':
@@ -85,7 +86,7 @@ function step(s: FoldState, a: Action, ms: number): boolean {
       return true
     case 'reactionClosed':
       if (!s.reaction) return false
-      closeReaction(s, ms)
+      endReaction(s, ms, a.at)
       return true
     case 'statusStepToggled':
       if (s.phase !== 'status') return false

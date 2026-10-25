@@ -14,7 +14,7 @@ export function InitiativeRail(props: {
   const { game, view } = props
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const turnMs =
-    view.reaction?.pausedTurnMs ??
+    view.reaction?.turnMs ??
     (game.timer?.kind === 'turn' ? game.timer.elapsedMs : 0)
   return (
     <div className="rail">

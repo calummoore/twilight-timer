@@ -958,9 +958,16 @@ const RW_POL = [
   {id:'wren',  done:false},
 ];
 const WINDOWS = {
-  trade:{by:'kira', card:5, pron:'her',   paused:'1:47', t:92,  tiles:RW},
-  pol:  {by:'jaz',  card:3, pron:'their', paused:'0:52', t:101, tiles:RW_POL, from:'jaz', to:'tom'},
+  trade:{by:'kira', card:5, pron:'her',   turn:'1:47', t:92,  tiles:RW},
+  over: {by:'kira', card:5, pron:'her',   turn:'1:47', over:18, tiles:RW},
+  pol:  {by:'jaz',  card:3, pron:'their', turn:'0:52', t:101, tiles:RW_POL, from:'jaz', to:'tom'},
 };
+// past its limit the window stays open and counts overtime
+const rwClock = w => w.over
+  ? `<div class="t num over" data-clock="over" data-t="${w.over}">+${fmtL(w.over)}</div>
+        <div class="l">Over the 2:00 window limit</div>`
+  : `<div class="t num" data-clock="down" data-t="${w.t}" data-limit="120" data-bar="rwb">${fmtL(w.t)}</div>
+        <div class="l">Window remaining · 2:00</div>`;
 // everyone but the speaker when the window opened can take the token
 const speakerRow = (from, to) => `
     <div class="rw-spk">
@@ -972,11 +979,10 @@ const reactionScreen = w => `${actionScreen(false)}<div class="scrim"></div>
     <div class="rw-h" style="${col(w.by)}">
       <div><div class="lbl">Strategic action · secondary abilities</div>
         <h3>${CARDNAME[w.card]} <span style="color:var(--faint);font-weight:600">(${w.card})</span></h3>
-        <div class="by"><i></i>Played by ${P[w.by].name} · ${w.pron} clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">${w.paused}</b></div></div>
-      <div class="rw-clock"><div class="t num" data-clock="down" data-t="${w.t}" data-limit="120" data-bar="rwb">${fmtL(w.t)}</div>
-        <div class="l">Window remaining · 2:00</div></div>
+        <div class="by"><i></i>Played by ${P[w.by].name} · ${w.pron} turn took <b class="num" style="color:var(--dim);margin-left:4px">${w.turn}</b></div></div>
+      <div class="rw-clock">${rwClock(w)}</div>
     </div>
-    <div class="rw-bar"><i id="rwb" style="width:${Math.round(w.t/120*100)}%"></i></div>${w.to?speakerRow(w.from, w.to):''}
+    <div class="rw-bar"><i id="rwb" style="width:${w.over?0:Math.round(w.t/120*100)}%"></i></div>${w.to?speakerRow(w.from, w.to):''}
     <div class="tiles">
       ${w.tiles.map(r=>`<div class="tile ${r.done?'done':'wait'}" style="${col(r.id)}">
         ${r.passed?'<span class="pchip">Passed</span>':''}
@@ -989,7 +995,7 @@ const reactionScreen = w => `${actionScreen(false)}<div class="scrim"></div>
         <div style="font-size:13px;color:var(--faint);text-align:center;line-height:1.5">Active player<br>does not react</div></div>
     </div>
     <div class="rw-f">
-      <div class="note"><b style="color:var(--dim)">${w.tiles.filter(r=>r.done).length} of ${w.tiles.length} done.</b> Window closes automatically when the last player marks done.</div>
+      <div class="note"><b style="color:var(--dim)">${w.tiles.filter(r=>r.done).length} of ${w.tiles.length} done.</b> The window closes and ${P[w.by].name}'s turn ends when the last player marks done.</div>
       <button class="ibtn">＋ Add 1:00</button>
       <button class="ibtn">↺ Undo last</button>
       <button class="big" style="padding:15px 30px;font-size:18px">MARK ALL DONE</button>
@@ -997,11 +1003,15 @@ const reactionScreen = w => `${actionScreen(false)}<div class="scrim"></div>
   </div>`;
 
 S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
- `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. A player who leaves the game during the window counts as done, and their tile shows <b>Left</b>. When the player who played the card leaves, their turn ends, and the next turn starts when the window closes. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Closing the window <b>ends Kira's turn</b>, because the strategic action was her action for the turn, and the next player's clock starts at once. Her turn keeps the 1:47 before she played the card. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. A player who leaves the game during the window counts as done, and their tile shows <b>Left</b>. When the player who played the card leaves, their turn ends, and the next turn starts when the window closes. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
  h:reactionScreen(WINDOWS.trade)};
 
+S.reactionOver = {t:'Reaction Window — Over Limit', d:'ipad', note:
+ `The same window once its limit passes. As with every limit, expiry is soft: the window clock turns red and <b>counts overtime upward</b>, and an alarm sounds. The window stays open and nothing advances, so Sam and Wren can still mark done, and the overtime goes into the round and post-game stats. Only a tap closes the window and ends Kira's turn, so undo can always take the close back. <b>＋ Add 1:00</b> moves the limit.`,
+ h:reactionScreen(WINDOWS.over)};
+
 S.politics = {t:'Reaction Window — Politics', d:'ipad', note:
- `Politics (3) is the one strategy card that moves the speaker token: its primary ability hands the token to any player who does not hold it, the Politics player included. So its window adds a <b>new speaker</b> row above the tiles, listing everyone except the speaker when the window opened. One tap moves the token, a tap on another player changes the choice, and <b>Undo last</b> reverts it. Before the first tap the row reads "Tap the player who takes the token from Jaz." The choice is optional: the window still closes when the last player marks done, and the speaker chip still works afterwards.`,
+ `Politics (3) is the one strategy card that moves the speaker token: its primary ability hands the token to any player who does not hold it, the Politics player included. So its window adds a <b>new speaker</b> row above the tiles, listing everyone except the speaker when the window opened. One tap moves the token, a tap on another player changes the choice, and <b>Undo last</b> reverts it. Before the first tap the row reads "Tap the player who takes the token from Jaz." The choice is optional: the window still closes, and Jaz's turn still ends, when the last player marks done. The speaker chip still works afterwards.`,
  h:reactionScreen(WINDOWS.pol)};
 
 /* ── 6. Status phase ── */
@@ -1460,7 +1470,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['iPad — table device', ['setup','setupMissing','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','paused','pausedRule','reaction','politics','status','agenda','round','history','stats','join']],
+  ['iPad — table device', ['setup','setupMissing','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','paused','pausedRule','reaction','reactionOver','politics','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);

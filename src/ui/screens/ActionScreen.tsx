@@ -25,9 +25,7 @@ export function ActionScreen(props: {
   const seat = game.players.findIndex((p) => p.id === view.activeId)
   const player = game.players[seat]
   const turn = game.timer?.kind === 'turn' ? game.timer : null
-  const turnMs = view.reaction
-    ? view.reaction.pausedTurnMs
-    : (turn?.elapsedMs ?? 0)
+  const turnMs = view.reaction ? view.reaction.turnMs : (turn?.elapsedMs ?? 0)
   const limitMs = turn?.limitMs ?? null
   const over = isOver(turn)
   const totalMs =
@@ -40,7 +38,7 @@ export function ActionScreen(props: {
   return (
     <div className="body">
       <div className={`hero ${over ? 'over' : ''}`} style={pc(player?.colour)}>
-        {props.alarming && (
+        {props.alarming && turn && (
           <div className="alarm">
             <span className="ico">🔔</span>
             <div style={{ flex: 1 }}>

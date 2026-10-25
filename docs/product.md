@@ -67,7 +67,7 @@ The core concepts have their own pages:
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
 | ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
-| **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles, new speaker for Politics |
+| **Reaction Window** | Overlay: window countdown, per-player done tiles, new speaker for Politics |
 | **Game Paused**     | Overlay: pause clock, Pause or Rule check, rule-check time, Resume       |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
 | **Agenda Phase**    | Discussion timer, speaker-order voting with per-player timers            |
