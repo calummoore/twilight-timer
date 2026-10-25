@@ -56,6 +56,10 @@ skill at that moment instead of guessing the rule.
   states the old rule.
 - A push to `main` deploys to Cloudflare. CI needs the repository variable
   `CLOUDFLARE_ACCOUNT_ID` and the repository secret `CLOUDFLARE_API_TOKEN`.
+- Production opens at `https://ti4.nexus`, a Custom Domain in
+  `wrangler.jsonc`. While `wrangler.jsonc` names a Custom Domain, each
+  deploy removes the Custom Domains that it does not name, so keep every
+  domain there.
 - Each pull request from this repository gets a preview at
   `https://pr-<number>-twilight-timer.futex.workers.dev`. A bot comment on
   the pull request gives the link. CI deletes the preview when the pull

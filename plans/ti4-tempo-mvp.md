@@ -232,6 +232,6 @@ Run the checks, push, and review the branch.
 ## Post-merge follow-up (non-blocking)
 
 - [x] Check that the deploy step passed on `main`. CI run 39954026174 deployed version `d5df20a4`.
-- [ ] Open https://twilight-timer.futex.workers.dev on the iPad, add it
-      to the home screen, and play one round.
+- [ ] Open https://ti4.nexus on the iPad, add it to the home screen, and
+      play one round.
 - [ ] Write the next plan for the spec items that the MVP leaves out.
