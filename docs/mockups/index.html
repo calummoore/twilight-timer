@@ -220,7 +220,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .exp.on{border-color:#2b6b66; background:#0b1c1f; color:var(--txt)}
 .exp.on::before{content:"✓"; color:var(--accent)}
 .deal{width:100%; margin-bottom:12px; padding:13px; border:1px solid var(--line2); border-radius:11px; background:var(--panel2);
-  color:var(--txt); font-family:var(--f); font-size:15px; font-weight:650; cursor:pointer}
+  color:var(--txt); font-family:var(--f); font-size:15px; font-weight:650; text-align:center; cursor:pointer}
 .deal:hover{border-color:#3d5168; background:var(--panel3)}
 
 /* settings */
@@ -688,7 +688,7 @@ S.setup = {t:'Setup — New Game', d:'ipad', note:
  h:setupScreen()};
 
 S.setupMissing = {t:'Setup — Faction Missing', d:'ipad', note:
- `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the chosen expansions that no other seat holds. The other five seats keep their picks.`,
+ `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
  h:setupScreen(['wren'])};
 
 S.setupDeal = {t:'Setup — Random Factions', d:'ipad', note:

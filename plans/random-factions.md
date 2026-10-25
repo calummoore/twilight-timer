@@ -101,6 +101,11 @@ Contract owners:
   - The summary rows of the Game panel scroll when the panel is full. So
     the chips, the deal, and BEGIN GAME always stay in view.
   - Each faction list shows the choices of its seat.
+  - Every seat row keeps one faction column width. The seat list becomes
+    one grid, and each row takes its columns from it with CSS subgrid.
+    So a seat that keeps a faction outside the chosen expansions does not
+    shift its row. A browser without subgrid keeps the current columns of
+    each row.
   - The setup screen gets a callback that saves changed settings.
     `App.tsx` passes its settings change handler.
   - The new mockup classes move to `src/styles/mockup/setup.css`.
@@ -185,6 +190,8 @@ Show the chips, the faction lists, and the deal as the mockup shows them.
 - [ ] The button "Random factions for empty seats", shown while a seat
       has no faction. It calls the deal with `Math.random`.
 - [ ] Each faction list shows the choices of its seat.
+- [ ] Keep one faction column width in every seat row with CSS subgrid,
+      also while a seat keeps a faction outside the chosen expansions.
 - [ ] Let the Game panel shrink and its summary rows scroll, as the
       mockup does.
 - [ ] Move the new mockup classes to `src/styles/mockup/setup.css`.
@@ -197,6 +204,8 @@ Show the chips, the faction lists, and the deal as the mockup shows them.
         BEGIN GAME turns on. A hand pick stays.
   - [ ] With Thunder's Edge off, no faction list shows its factions, and
         the deal gives none of them.
+  - [ ] Every seat row keeps one faction column width while a seat keeps
+        a faction outside the chosen expansions.
   - [ ] The chips keep their state after a reload.
 
 ## Milestone 5: Verification, commit, and review
@@ -210,6 +219,16 @@ Run the checks, push, and review the branch.
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 1 checked the plan and the mockup at 9944bb9. It found 5
+    findings. Fixed: 2, a mockup note left out the base game, 3, the deal
+    button rule set no text alignment for the CSS port, and 4, a faction
+    list for each seat could shift its seat row. Report:
+    `.context/random-factions/review-1.md`.
+  - 1. Spec does not state the chips or deal. Severity Medium, effort Small. Recommended: B, write Milestone 1 now.
+  - 5. Tests miss three decided behaviours. Severity Low, effort Small. Recommended: A, add the three checks to the plan.
+  - Follow-up: give the app button reset a centred label default, and set left alignment only in the rules that need it. Effort Medium. Covers finding 3. Previous examples: the left BEGIN GAME in `plans/naalu-initiative-token.md`, Milestone 9.
+  - `docs/mockups/index.html`: the setup seat rows show a drag handle and six colour swatches, but the app has move buttons and eight colours. Separate branch.
+  - `src/styles/app.css`: the button reset puts BEGIN GAME, BEGIN ACTION PHASE, and END TURN at the left, but the mockup centres them. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
