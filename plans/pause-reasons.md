@@ -438,6 +438,22 @@ sides, and move this branch to the next free version.
   `audit-merge.log`, `check.log`, and `smoke/smoke.log` with 36 of 36
   checks.
 
+## Milestone 13: Merge origin/main a third time
+
+Main added PR #15 while Milestone 12 ran: the random faction deal plan and
+the expansion choice. It does not change the saved game.
+
+- [x] Merge `origin/main` at 0bcabe7. Split main's spec again, so the
+      rounds page holds main's new Factions text. Keep main's setupDeal
+      screen and this branch's pause screens in the mockup navigation.
+- [x] Check the merge: the spec pages hold main's text word for word,
+      every test of main is in the merge, the mockup renders with no script
+      error, the complete gate passes, and the smoke test passes.
+- Merge commit d301ded. Justifications:
+  `.context/pause-reasons/merge-3/justifications.md`. Evidence beside it:
+  `verify-spec.log`, `tests.log`, `audit-merge.log`, `check.log`, and
+  `smoke/smoke.log` with 36 of 36 checks.
+
 ## Post-merge follow-up (non-blocking)
 
 - [ ] Check that the deploy step passed on `main`.
