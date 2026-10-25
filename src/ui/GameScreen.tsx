@@ -168,13 +168,15 @@ export function GameScreen(props: {
       {overlay === 'endGame' && (
         <Dialog
           title="End the game?"
-          confirm="End game"
-          danger
-          onCancel={() => setOverlay(null)}
-          onConfirm={() => {
-            setOverlay(null)
-            dispatch({ kind: 'gameEnded' })
+          confirm={{
+            label: 'End game',
+            danger: true,
+            onConfirm: () => {
+              setOverlay(null)
+              dispatch({ kind: 'gameEnded' })
+            },
           }}
+          onCancel={() => setOverlay(null)}
         >
           Every clock stops and the post-game stats open. You can reopen the
           game from there.

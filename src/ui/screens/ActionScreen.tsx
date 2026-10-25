@@ -138,13 +138,15 @@ export function ActionScreen(props: {
       {confirmPass && (
         <Dialog
           title={`Pass before playing ${unplayed.join(' and ')}?`}
-          confirm="Pass anyway"
-          danger
-          onCancel={() => setConfirmPass(false)}
-          onConfirm={() => {
-            setConfirmPass(false)
-            props.onPass()
+          confirm={{
+            label: 'Pass anyway',
+            danger: true,
+            onConfirm: () => {
+              setConfirmPass(false)
+              props.onPass()
+            },
           }}
+          onCancel={() => setConfirmPass(false)}
         >
           {unplayed.length > 1
             ? 'The rules say a player passes only after both strategic actions.'
