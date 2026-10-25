@@ -1,4 +1,5 @@
 import { EXPANSIONS } from '../../model/factions'
+import { cardsEach } from '../../model/rules'
 import type { Expansions, Settings } from '../../model/settings'
 import { clock } from '../format'
 
@@ -45,7 +46,7 @@ export function SetupGamePanel(props: {
         </div>
         <div className="kv">
           <span>Strategy cards each</span>
-          <b>1</b>
+          <b>{cardsEach(props.count)}</b>
         </div>
         <div className="kv">
           <span>Speaker</span>
@@ -82,6 +83,10 @@ export function SetupGamePanel(props: {
         <div className="setup-help">
           Seat order is the physical ring. The <b>speaker ★</b> picks first in
           the strategy phase and votes last in the agenda phase.
+        </div>
+        <div className="setup-help">
+          At 3–4 players each player picks <b>two</b> strategy cards, and the
+          lower card sets their place in the turn order.
         </div>
       </div>
       <div style={{ padding: '16px 18px' }}>

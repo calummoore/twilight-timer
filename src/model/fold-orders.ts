@@ -5,11 +5,21 @@ import {
   voteOrder,
   type InitiativeSlot,
 } from './orders'
+import { cardsEach } from './rules'
 
 /** Who acts next: readers of the fold state that change nothing. */
 
+/**
+ * The picks go round the pick order once for each card, so the next picker
+ * is the first player in pick order with the fewest cards, or null when
+ * every player has their cards.
+ */
 export function currentPicker(s: FoldState): string | null {
-  return pickOrder(s.seats, s.speakerId).find((id) => !s.picks.has(id)) ?? null
+  const order = pickOrder(s.seats, s.speakerId)
+  const held = (id: string) => s.picks.get(id)?.length ?? 0
+  const fewest = Math.min(...order.map(held))
+  if (fewest >= cardsEach(s.game.players.length)) return null
+  return order.find((id) => held(id) === fewest) ?? null
 }
 
 export function currentVoter(s: FoldState): string | null {

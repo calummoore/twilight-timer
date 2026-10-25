@@ -64,7 +64,8 @@ export type Action =
   | { kind: 'phaseStepped'; at: number }
   | { kind: 'turnEnded'; at: number }
   | { kind: 'passed'; at: number }
-  | { kind: 'strategyCardPlayed'; at: number }
+  /** `card` is null in a game from an older build, which gave each player one. */
+  | { kind: 'strategyCardPlayed'; at: number; card: number | null }
   | { kind: 'reactionDone'; at: number; playerId: string }
   | { kind: 'reactionExtended'; at: number; ms: number }
   | { kind: 'reactionClosed'; at: number }
@@ -90,7 +91,7 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 5
+  version: 6
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
@@ -107,7 +108,7 @@ export interface Game {
    * A version 1 to 3 game, from an older build, has false: its window close
    * resumed the turn, and its window closed itself at its limit. A version 3
    * game that stores the field keeps it. So does a version 4 game from main,
-   * but a version 4 game from the pause-reasons branch has false.
+   * but a version 4 game without the field, from a preview, has false.
    */
   windowEndsTurn: boolean
   actions: Action[]

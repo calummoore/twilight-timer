@@ -3,9 +3,9 @@ import { initiativeOrder, leftOf, pickOrder, rotate, voteOrder } from './orders'
 
 const SEATS = ['jaz', 'kira', 'tom', 'priya', 'sam', 'wren']
 const PICKS = new Map([
-  ['jaz', 3],
-  ['kira', 8],
-  ['tom', 1],
+  ['jaz', [3]],
+  ['kira', [8]],
+  ['tom', [1]],
 ])
 
 describe('orders', () => {
@@ -44,6 +44,25 @@ describe('orders', () => {
       { playerId: 'jaz', initiative: 3 },
       { playerId: 'kira', initiative: 8 },
     ])
+  })
+
+  it('gives a player with two cards one place, at the lower card', () => {
+    const picks = new Map([
+      ['jaz', [8, 3]],
+      ['kira', [5, 6]],
+      ['tom', [1, 7]],
+      ['priya', [2, 4]],
+    ])
+    expect(initiativeOrder(picks, null)).toEqual([
+      { playerId: 'tom', initiative: 1 },
+      { playerId: 'priya', initiative: 2 },
+      { playerId: 'jaz', initiative: 3 },
+      { playerId: 'kira', initiative: 5 },
+    ])
+    expect(initiativeOrder(picks, 'kira')[0]).toEqual({
+      playerId: 'kira',
+      initiative: 0,
+    })
   })
 
   it('puts the Naalu token holder first with initiative 0', () => {

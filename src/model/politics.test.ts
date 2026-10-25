@@ -11,7 +11,7 @@ function playPolitics(speakerId = 'jaz') {
   t.act({ kind: 'turnEnded' }) // Tom, Leadership
   t.act({ kind: 'turnEnded' }) // Wren, Diplomacy
   t.wait(20 * SEC)
-  t.act({ kind: 'strategyCardPlayed' })
+  t.act({ kind: 'strategyCardPlayed', card: 3 })
   return t
 }
 
@@ -127,7 +127,7 @@ describe('Politics reaction window', () => {
   it('offers no speaker choice for other cards', () => {
     const t = table()
     playStrategy(t)
-    t.act({ kind: 'strategyCardPlayed' }) // Tom plays Leadership
+    t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
     expect(reaction(t)).toMatchObject({ card: 1, speakerChoice: null })
   })
 })

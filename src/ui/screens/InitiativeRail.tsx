@@ -43,11 +43,18 @@ export function InitiativeRail(props: {
                   {player?.name}
                 </div>
                 <div className="fc">
-                  <span className={`sccard ${row.cardPlayed ? 'used' : ''}`}>
-                    {row.cardPlayed ? '✓ ' : ''}
-                    {cardName(row.card)}
+                  {row.cards.map(({ card, played }) => (
+                    <span
+                      key={card}
+                      className={`sccard ${played ? 'used' : ''}`}
+                    >
+                      {played ? '✓ ' : ''}
+                      {cardName(card)}
+                    </span>
+                  ))}
+                  <span className="fn">
+                    {factionName(player?.factionId ?? null)}
                   </span>
-                  {factionName(player?.factionId ?? null)}
                 </div>
               </div>
               <div className="tm">

@@ -77,7 +77,7 @@ describe('status, agenda, and the next round', () => {
     const t = table(LIMITS_ON)
     playStrategy(t)
     t.wait(30 * SEC)
-    t.act({ kind: 'strategyCardPlayed' })
+    t.act({ kind: 'strategyCardPlayed', card: 1 })
     t.wait(20 * SEC)
     t.act({ kind: 'reactionClosed' })
     t.wait(15 * SEC)

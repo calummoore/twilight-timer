@@ -10,11 +10,12 @@ import {
 } from './fold-state'
 import { pickOrder, voteOrder } from './orders'
 import { gameTimeMs, openPause, reasonTotals } from './pauses'
-import { POLITICS, STRATEGY_CARDS } from './rules'
+import { POLITICS, STRATEGY_CARDS, cardsEach } from './rules'
 import { entryClock, mergeIntervals } from './time'
 import type { Entry, Game } from './types'
 import type {
   GameView,
+  HeldCard,
   PhaseView,
   RailRow,
   SpeakerChoice,
@@ -36,6 +37,7 @@ export function derive(game: Game, now: number): GameView {
     players: game.players,
     seated: [...s.seats],
     departures: [...s.departures],
+    cardsEach: cardsEach(game.players.length),
     speakerId: s.speakerId,
     pickOrder: pickOrder(s.seats, s.speakerId),
     voteOrder: voteOrder(s.seats, s.speakerId),
@@ -91,7 +93,7 @@ function phaseView(s: FoldState, entries: Entry[], ms: number): PhaseView {
         phase: 'strategy',
         pickerId: currentPicker(s),
         owners: Object.fromEntries(
-          [...s.picks].map(([id, card]) => [card, id]),
+          [...s.picks].flatMap(([id, cards]) => cards.map((c) => [c, id])),
         ),
         tradeGoods: tradeGoods(s),
         order: turnOrder(s),
@@ -144,14 +146,13 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
   const rail: RailRow[] = order.map(({ playerId, initiative }) => ({
     playerId,
     initiative,
-    card: s.picks.get(playerId) ?? 0,
+    cards: heldCards(s, playerId),
     state:
       playerId === activeId
         ? 'active'
         : s.passed.has(playerId)
           ? 'passed'
           : 'waiting',
-    cardPlayed: s.scPlayed.has(playerId),
     totalMs: sum(
       entries.filter((e) => e.kind === 'turn' && e.playerId === playerId),
     ),
@@ -166,8 +167,7 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
     passedCount: rail.filter((row) => row.state === 'passed').length,
     activeInitiative:
       order.find((slot) => slot.playerId === activeId)?.initiative ?? 0,
-    activeCard: s.picks.get(activeId) ?? 0,
-    cardPlayed: s.scPlayed.has(activeId),
+    activeCards: heldCards(s, activeId),
     reaction: r && {
       card: r.card,
       byId: r.byId,
@@ -187,6 +187,13 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
   }
 }
 
+/** The strategy cards of a player this round, lowest first. */
+function heldCards(s: FoldState, playerId: string): HeldCard[] {
+  return (s.picks.get(playerId) ?? [])
+    .toSorted((a, b) => a - b)
+    .map((card) => ({ card, played: s.cardsPlayed.has(card) }))
+}
+
 function speakerChoice(s: FoldState, r: Reaction): SpeakerChoice | null {
   if (r.card !== POLITICS) return null
   const fromId = r.speakerAtStart
@@ -203,7 +210,7 @@ function tradeGoods(s: FoldState): Record<number, number> {
   for (const { number } of STRATEGY_CARDS) {
     let goods = 0
     for (let i = s.pickHistory.length - 1; i >= 0; i--) {
-      if ([...(s.pickHistory[i]?.values() ?? [])].includes(number)) break
+      if ([...(s.pickHistory[i]?.values() ?? [])].flat().includes(number)) break
       goods += 1
     }
     out[number] = goods

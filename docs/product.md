@@ -65,7 +65,7 @@ The core concepts have their own pages:
 | **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive; remove a player who leaves |
 | **Strategy Phase**  | Card selection in speaker order; sets initiative                         |
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
-| ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
+| ↳ *rail rows*       | Show each player's strategy cards; blue = still to play, grey ✓ = used   |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
 | **Reaction Window** | Overlay: window countdown, per-player done tiles, new speaker for Politics |
 | **Game Paused**     | Overlay: pause clock, Pause or Rule check, rule-check time, Resume       |
@@ -140,7 +140,6 @@ Two rules make corrections tractable:
 
 The first release builds the must-have list below, with these exceptions:
 
-- 5–8 players only. Games with 3–4 players wait for the turn-order rule.
 - No history list and no duration editing. Undo stays in the top bar.
 - No seat re-ordering after setup.
 - No agenda vote tally.

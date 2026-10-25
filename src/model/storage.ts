@@ -16,6 +16,7 @@ export interface KeyValueStore {
 type Slot = readonly [current: string, ...older: string[]]
 
 const GAME: Slot = [
+  'ti4tempo.game.v6',
   'ti4tempo.game.v5',
   'ti4tempo.game.v4',
   'ti4tempo.game.v3',
@@ -23,6 +24,7 @@ const GAME: Slot = [
   'ti4tempo.game.v1',
 ]
 const LAST_GAME: Slot = [
+  'ti4tempo.lastGame.v6',
   'ti4tempo.lastGame.v5',
   'ti4tempo.lastGame.v4',
   'ti4tempo.lastGame.v3',

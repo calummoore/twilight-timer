@@ -54,12 +54,13 @@ export interface FoldState {
   /** The holder of the Naalu "0" token this round, or null. */
   naaluTokenHolderId: string | null
   custodiansRemoved: boolean
-  /** Player id to strategy card, this round. */
-  picks: Map<string, number>
+  /** Player id to their strategy cards this round, in pick order. */
+  picks: Map<string, number[]>
   /** The picks of earlier rounds, oldest first. */
-  pickHistory: Map<string, number>[]
+  pickHistory: Map<string, number[]>[]
   passed: Set<string>
-  scPlayed: Set<string>
+  /** The strategy cards played this round. */
+  cardsPlayed: Set<number>
   turnCounts: Map<string, number>
   activeId: string | null
   reaction: Reaction | null
@@ -85,7 +86,7 @@ export function createState(game: Game): FoldState {
     picks: new Map(),
     pickHistory: [],
     passed: new Set(),
-    scPlayed: new Set(),
+    cardsPlayed: new Set(),
     turnCounts: new Map(),
     activeId: null,
     reaction: null,

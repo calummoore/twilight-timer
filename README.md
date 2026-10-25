@@ -11,10 +11,12 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 
 ## Key features
 
-- Setup for 5 to 8 players: name, colour, faction from the official list, seat,
+- Setup for 3 to 8 players: name, colour, faction from the official list, seat,
   and the speaker. The table chooses its expansions, and one tap deals random
   factions to the empty seats.
-- Strategy picks in speaker order, with trade goods on unpicked cards.
+- Strategy picks in speaker order, with trade goods on unpicked cards. With 3
+  or 4 players, each player picks two cards, and the lower card sets their
+  place in the turn order.
 - The action-phase chess clock: End Turn, the strategic action, and Pass.
 - The Naalu "0" token puts the Naalu player first. Gift of Prescience can move
   it for one round.

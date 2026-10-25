@@ -20,9 +20,11 @@ export function StrategyScreen(props: {
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const picker = view.pickerId ? byId.get(view.pickerId) : undefined
   const taken = Object.keys(view.owners).length
-  // Every player still in the game picks one card.
-  const pickers = game.pickOrder.length
-  const remaining = pickers - taken
+  // Every player still in the game picks one card, or two at 3 or 4 players.
+  const picks = game.pickOrder.length * game.cardsEach
+  const remaining = picks - taken
+  // With two cards each, the picker already holds one in the second round.
+  const second = !!picker && Object.values(view.owners).includes(picker.id)
   const timer = game.timer?.kind === 'pick' ? game.timer : null
   const clock = timer ? timerText(timer.elapsedMs, timer.limitMs, true) : null
   // The token button shows only while the Naalu player is in the game.
@@ -42,7 +44,7 @@ export function StrategyScreen(props: {
           <div>
             <div className="lbl">
               {picker
-                ? `Now picking · ${taken + 1} of ${pickers}`
+                ? `Now picking · ${taken + 1} of ${picks}${second ? ' · second card' : ''}`
                 : 'Every card is picked'}
             </div>
             <div className="who">

@@ -70,7 +70,7 @@ function step(s: FoldState, a: Action, ms: number): boolean {
     case 'passed':
       return endTurn(s, a.kind === 'passed', ms, a.at)
     case 'strategyCardPlayed':
-      return playStrategyCard(s, ms, a.at)
+      return playStrategyCard(s, a.card, ms, a.at)
     case 'reactionDone': {
       const r = s.reaction
       if (!r || !r.others.includes(a.playerId) || r.done.has(a.playerId)) {
@@ -150,11 +150,11 @@ function pickCard(
   wall: number,
 ) {
   if (s.phase !== 'strategy' || currentPicker(s) !== id) return false
-  if (!isStrategyCard(card) || [...s.picks.values()].includes(card)) {
+  if (!isStrategyCard(card) || [...s.picks.values()].flat().includes(card)) {
     return false
   }
   close(s, ms, wall)
-  s.picks.set(id, card)
+  s.picks.set(id, [...(s.picks.get(id) ?? []), card])
   openStrategySegment(s, ms)
   return true
 }
@@ -162,7 +162,8 @@ function pickCard(
 function stepPhase(s: FoldState, ms: number, wall: number): boolean {
   switch (s.phase) {
     case 'strategy': {
-      if (s.picks.size < s.seats.length) return false
+      // Nobody is left to pick when every player has their cards.
+      if (currentPicker(s) !== null) return false
       const first = turnOrder(s)[0]
       if (!first) return false
       close(s, ms, wall)
@@ -180,7 +181,7 @@ function stepPhase(s: FoldState, ms: number, wall: number): boolean {
       s.pickHistory.push(s.picks)
       s.picks = new Map()
       s.passed = new Set()
-      s.scPlayed = new Set()
+      s.cardsPlayed = new Set()
       s.turnCounts = new Map()
       s.naaluTokenHolderId = tokenOwner(s)
       s.round += 1
@@ -200,13 +201,24 @@ function endTurn(s: FoldState, pass: boolean, ms: number, wall: number) {
   return true
 }
 
-function playStrategyCard(s: FoldState, ms: number, wall: number): boolean {
+/**
+ * The active player plays one of their cards that is not played yet. A game
+ * from an older build logs no card, because each player had one: the fold
+ * plays the lowest card that is not played.
+ */
+function playStrategyCard(
+  s: FoldState,
+  chosen: number | null,
+  ms: number,
+  wall: number,
+): boolean {
   const id = s.activeId
   const seg = s.segment
-  const card = id === null ? undefined : s.picks.get(id)
-  if (s.phase !== 'action' || s.reaction || !id || !seg || !card) return false
-  if (s.scPlayed.has(id)) return false
-  s.scPlayed.add(id)
+  if (s.phase !== 'action' || s.reaction || !id || !seg) return false
+  const unplayed = (s.picks.get(id) ?? []).filter((c) => !s.cardsPlayed.has(c))
+  const card = chosen ?? Math.min(...unplayed)
+  if (!unplayed.includes(card)) return false
+  s.cardsPlayed.add(card)
   // The active clock stops. The window is charged to nobody.
   s.suspended = {
     ...seg,

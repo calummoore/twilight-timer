@@ -141,7 +141,7 @@ describe('pause reasons', () => {
 
   it('stops the reaction window during a rule check', () => {
     const t = actionTable()
-    t.act({ kind: 'strategyCardPlayed' })
+    t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
     t.wait(30 * SEC)
     t.pause()
     t.pauseReason('ruleCheck')
