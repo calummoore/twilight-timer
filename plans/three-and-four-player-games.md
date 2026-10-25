@@ -252,6 +252,12 @@ and move this branch to version 5.
   34 checks passed, also a main version 4 save that loads twice.
 - [x] Commit, push, and copy the merge justifications into the PR
       description.
+- [x] Merge `origin/main` again at 0bcabe7, the random faction deal of
+      PR #15. Resolve the conflicts in `README.md`, the mockup screen list,
+      `src/model/parse.ts`, and the setup panel imports.
+  Evidence: `.context/three-and-four-player-games/merge-15/check.log` and
+  `smoke.log`. The gate passed with 152 tests, and 34 of 34 browser checks
+  passed.
 - [ ] Review the merge with the `implementation-review` skill after the
       push. Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
