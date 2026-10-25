@@ -1,7 +1,8 @@
 # Pause reasons
 
-Status: Active. Branch `calummoore/pause-reason-tracking-plan` has no pull
-request yet. Cal answered decisions 1 to 3 on 2026-10-25.
+Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
+is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
+on 2026-10-25.
 
 The table can pause the game from the top bar. A pause stops every clock
 and charges nobody. The app stores each pause as a start time and an end
@@ -271,8 +272,9 @@ Show the reason control and the rule-check time as the mockup shows them.
 
 Run the checks, push, and review the branch.
 
-- [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits, push the branch, and open the pull
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+  Evidence: `.context/pause-reasons/check.log`.
+- [x] Commit with Conventional Commits, push the branch, and open the pull
       request. Link it in the status paragraph.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
