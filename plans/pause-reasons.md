@@ -2,7 +2,8 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review findings 2 and 3 wait for Cal.
+on 2026-10-25. Review finding 2 waits for Cal. Milestones 7 to 11 make
+rule checks count as game time.
 
 The table can pause the game from the top bar. A pause stops every clock
 and charges nobody. The app stores each pause as a start time and an end
@@ -65,6 +66,25 @@ Decisions:
   the tap before the pause. Reason: the table really spent that time,
   often on the rule check that led to the undo. The game clock does not
   change, because it already leaves out both ranges.
+- 2026-10-25, Cal: rule-check time counts as game time. Cal: "the rule
+  check pause should be included in game time". This replaces the rule
+  that no pause time is game time. Plain pause time stays out of game
+  time.
+- 2026-10-25: a rule check still stops every player clock and every table
+  clock, such as the reaction window, so nobody is charged for it. Only the
+  game clock and the game totals count it. Reason: Cal asked to change
+  game time, not the clocks of a pause.
+- 2026-10-25: after an undo, the game clock keeps the rule checks since the
+  undone tap. Reason: the earlier rule that a rule check counts in full
+  after an undo. Every player and table clock still returns to its value
+  at the undone tap.
+- 2026-10-25: the post-game stats show rule checks as their own row of
+  "Where the game went", and the rule-check tile gives their share of the
+  game. The round summary stays without pause time, as decision 2 says, so
+  its round length leaves rule checks out.
+- 2026-10-25: during a rule check, the pause card says "Game paused · only
+  the game clock is running", because "no clock is running" is no longer
+  true then. This resolves review finding 3.
 
 Contract owners:
 
@@ -290,8 +310,82 @@ Run the checks, push, and review the branch.
     25 of 25 passed. Its log replaced the first run in
     `.context/pause-reasons/smoke/smoke.log`.
   - 2. New clock-step rules have no test. Severity Low, effort Small. Recommended: A, example tests that step the fake clock back during a rule check.
-  - 3. Pause card says no clock runs. Severity Low, effort Small. Recommended: B, "Game paused · no game clock is running" in the app and the mockup.
+  - 3. Pause card says no clock runs. Severity Low, effort Small. Recommended: B, "Game paused · no game clock is running" in the app and the mockup. Resolved by Milestones 7 to 10: during a rule check, the card says that only the game clock runs.
   - `src/ui/screens/SettingsScreen.tsx` and `src/ui/screens/SeatingScreen.tsx`: the Settings and Seating screens cover the game screen without a dialog role, so VoiceOver can reach the hidden game buttons. Separate branch.
+
+## Milestone 7: Rule checks in game time, in the spec
+
+State that rule-check time is game time before the code changes.
+
+- [x] "Pauses" in `docs/product/clocks.md`: rule-check time is game time,
+      with the rejected rule. Plain pause time is not. A rule check stops
+      every player and table clock. The post-game stats show rule checks
+      as their own part of the game time. The round length leaves them out.
+- [x] "Corrections": after an undo, the game clock keeps the rule checks
+      since the undone tap.
+- [x] `AGENTS.md`: the time attribution and undo items of the review focus.
+
+## Milestone 8: Rule checks in game time, in the mockup
+
+Tags: mockup
+
+Show rule checks as game time before the screens change.
+
+- [x] "Game Paused — Rule Check": the line "Game paused · only the game
+      clock is running".
+- [x] Post-game stats: the "Rule checks" row in "Where the game went", the
+      share of the game on the tile, and a headline and percentages that
+      include the rule checks.
+- [x] Update the notes of the two pause screens and the post-game stats.
+- [x] Render the changed screens in headless Chrome. Save the screenshots
+      under `.context/pause-reasons/game-time/mockup/`.
+- Evidence: `.context/pause-reasons/game-time/mockup/*.png` and
+  `render.log`. No screen has a script error.
+
+## Milestone 9: Rule checks in game time, in the model
+
+Add the rule-check time to the game clock and the game stats.
+
+- [x] `pauses.ts`: which reasons count as game time, and their time.
+- [x] `derive.ts`: the game clock adds the rule-check time. Every other
+      clock keeps the time of the entries.
+- [x] `stats.ts`: the game total adds the rule-check time, and the phases
+      get a rule-check part. The round stats stay as they are.
+- [x] Unit tests with the fake clock:
+  - [x] The game clock runs during a rule check and stops during a plain
+        pause. The turn clock stops during both.
+  - [x] After an undo across a rule check, the game clock keeps the rule
+        check, and the turn clock returns to the tap.
+  - [x] The game stats add the rule checks to the total and give their
+        part. The round length leaves them out.
+- Evidence: `.context/pause-reasons/game-time/mutations.log`: each of five
+  broken game-time rules makes at least one test fail.
+
+## Milestone 10: Rule checks in game time, on the screens
+
+Tags: ui
+
+Show rule checks as game time as the mockup shows them.
+
+- [x] The pause card line during a rule check.
+- [x] Post-game stats: the "Rule checks" row and the share on the tile.
+- [x] Scratch smoke test, not committed: the pause card lines, the row,
+      and the tile. Save the log under
+      `.context/pause-reasons/game-time/smoke/`.
+- Evidence: `.context/pause-reasons/game-time/smoke/smoke.log` and the
+  screenshots beside it. All 29 checks passed, with no console error.
+
+## Milestone 11: Verification, commit, and review of game time
+
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+  Evidence: `.context/pause-reasons/game-time/check.log`.
+- [x] Commit with Conventional Commits, push the branch, and update the
+      pull request description. Commits 729e575, b45e850, e7e1385, and
+      656bf48.
+- [ ] Review the complete local diff against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 
