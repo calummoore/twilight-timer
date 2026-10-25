@@ -1,12 +1,14 @@
-import {
-  initiativeOrder,
-  pickOrder,
-  voteOrder,
-  type InitiativeSlot,
-} from './orders'
+import { currentPicker, currentVoter, nextActive } from './fold-orders'
 import { STATUS_STEPS } from './rules'
 import { limitAt } from './settings'
-import type { Entry, EntryKind, Game, Phase, TimerKey } from './types'
+import type {
+  Departure,
+  Entry,
+  EntryKind,
+  Game,
+  Phase,
+  TimerKey,
+} from './types'
 
 /** The open timed unit. Times are game ms. */
 export interface Segment {
@@ -42,7 +44,10 @@ export interface AgendaState {
 
 export interface FoldState {
   game: Game
+  /** The players still in the game, in seat order. */
   seats: string[]
+  /** The players who left the game, oldest first. */
+  departures: Departure[]
   round: number
   phase: Phase
   speakerId: string
@@ -71,6 +76,7 @@ export function createState(game: Game): FoldState {
   const s: FoldState = {
     game,
     seats: game.players.map((p) => p.id),
+    departures: [],
     round: 1,
     phase: 'strategy',
     speakerId: game.firstSpeakerId,
@@ -177,12 +183,17 @@ export function reactionEntry(
   }
 }
 
-/** Closes the reaction window and resumes the suspended turn. */
-export function closeReaction(s: FoldState, ms: number): void {
+/**
+ * Closes the reaction window and resumes the suspended turn. When the player
+ * who opened the window has left, the next turn starts instead, unless
+ * `advance` is false.
+ */
+export function closeReaction(s: FoldState, ms: number, advance = true): void {
   if (!s.reaction) return
   s.entries.push(reactionEntry(s, s.reaction, ms, false))
   s.reaction = null
   if (s.suspended) s.segment = { ...s.suspended, startMs: ms }
+  else if (advance) nextTurn(s, ms)
   s.suspended = null
 }
 
@@ -194,31 +205,30 @@ export function expireReaction(s: FoldState, ms: number): void {
   if (ms >= end) closeReaction(s, end)
 }
 
-export function currentPicker(s: FoldState): string | null {
-  return pickOrder(s.seats, s.speakerId).find((id) => !s.picks.has(id)) ?? null
-}
-
-export function currentVoter(s: FoldState): string | null {
-  const voted = s.agenda?.voted ?? []
-  return (
-    voteOrder(s.seats, s.speakerId).find((id) => !voted.includes(id)) ?? null
-  )
-}
-
-/** This round's initiative order, with the Naalu "0" token. */
-export function turnOrder(s: FoldState): InitiativeSlot[] {
-  return initiativeOrder(s.picks, s.naaluTokenHolderId)
-}
-
-/** The next player in initiative order who has not passed, or null. */
-export function nextActive(s: FoldState): string | null {
-  const order = turnOrder(s).map((slot) => slot.playerId)
-  const from = s.activeId === null ? -1 : order.indexOf(s.activeId)
-  for (let k = 1; k <= order.length; k++) {
-    const id = order[(from + k) % order.length]
-    if (id !== undefined && !s.passed.has(id)) return id
+/** The next turn starts, or the status phase when nobody is left to play. */
+export function nextTurn(s: FoldState, ms: number): void {
+  const next = nextActive(s)
+  if (next) {
+    startTurn(s, next, ms)
+    return
   }
-  return null
+  s.activeId = null
+  s.phase = 'status'
+  s.statusSteps = STATUS_STEPS.map(() => false)
+  open(s, 'status', null, 'statusPhase', ms)
+}
+
+/** The pick or vote order re-derives, so the clock follows the new player. */
+export function followOrder(s: FoldState, ms: number, wall: number): void {
+  const seg = s.segment
+  if (s.phase === 'strategy' && seg && seg.playerId !== currentPicker(s)) {
+    close(s, ms, wall)
+    openStrategySegment(s, ms)
+  }
+  if (s.agenda?.stage === 'voting' && seg && seg.playerId !== currentVoter(s)) {
+    close(s, ms, wall)
+    openVoteSegment(s, ms)
+  }
 }
 
 export function openStrategySegment(s: FoldState, ms: number): void {

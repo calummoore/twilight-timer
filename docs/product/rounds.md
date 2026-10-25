@@ -36,12 +36,14 @@ genuinely moves during play: the Politics (3) primary ability hands it to a
 player who does not hold it, and some agendas elect a new speaker. The token is
 editable from the speaker chip in the top bar, visible on every in-game screen.
 
-The token never moves on its own, also not at the start of a round. A player
-moves it in one of two places: the Speaker & Seating screen, which the speaker
-chip opens, or the new speaker choice in a Politics reaction window (see
-[The reaction window](clocks.md#the-reaction-window)). Rejected: passing the token
-automatically each round, because the TI4 rules move it only through Politics
-and a few other cards.
+The token does not move at the start of a round. A player moves it in one of
+two places: the Speaker & Seating screen, which the speaker chip opens, or the
+new speaker choice in a Politics reaction window (see
+[The reaction window](clocks.md#the-reaction-window)). The one other move follows the
+TI4 rules: when the speaker leaves the game, the token passes to the player on
+their left (see [Players who leave](#players-who-leave)). Rejected: passing the
+token automatically each round, because the TI4 rules move it only through
+Politics, a few other cards, and a speaker who leaves the game.
 
 Re-ordering the seats themselves is possible but deliberately understated. It is
 a correction for a setup mistake — people do not swap chairs mid-game — so it
@@ -106,3 +108,48 @@ not block — on an illegal pass. (The table is the authority; sometimes a rule 
 being bent deliberately.)
 
 The action phase ends when the last unpassed player passes.
+
+## Players who leave
+
+A player can leave before the game ends, for example when they are
+eliminated or when they go home. The table removes the player on the
+Speaker & Seating screen. The removal is a tap in the log, so undo brings
+the player back.
+
+A removed player takes no more strategy picks, turns, reactions, or votes.
+The pick order, the voting order, and the initiative order derive again
+without them. Their seat stays on the table ring, empty. Their recorded time
+stays in the round and game stats. The game stats name the round in which
+they left.
+
+A removal applies at once, in any phase:
+
+- When the player's clock runs, it stops, and the clock of the next player
+  starts. When nobody is left to act in the action phase, the status phase
+  begins.
+- In the strategy phase, the card that they picked returns to the common
+  play area, and another player can take it.
+- After the strategy phase, nobody plays their card for the rest of the
+  round.
+- In a reaction window, a player who leaves counts as done. When the player
+  who played the card leaves, their turn ends. The next turn starts when the
+  window closes.
+- When the speaker leaves, the token passes to the next player clockwise, the
+  player on their left, as the TI4 rules say. The remove dialog names that
+  player before the table confirms. Rejected: asking the table for the new
+  speaker, because the rules name the player and the speaker chip can still
+  move the token. Rejected: blocking the removal of the speaker, because it
+  adds two taps.
+- When the Naalu player leaves, the "0" token leaves the game. A player who
+  holds the token through Gift of Prescience keeps it for the rest of the
+  round.
+- When another holder leaves in the strategy phase, the Naalu player gets the
+  token back, if they are still in the game.
+
+The other players keep one strategy card each, also when four or fewer
+players remain, as the TI4 rules say. The table can remove players until one
+player remains.
+
+Rejected: deleting the entries of a removed player, because the record is
+what the app exists to keep. Rejected: keeping the player in the round as a
+passed player, because they would still get a reaction tile and a vote.

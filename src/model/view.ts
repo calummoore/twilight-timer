@@ -1,5 +1,5 @@
 import type { InitiativeSlot } from './orders'
-import type { EntryKind, Entry, Player } from './types'
+import type { Departure, EntryKind, Entry, Player } from './types'
 
 /** The clock that runs now. `key` stays the same while one entry runs. */
 export interface TimerView {
@@ -26,6 +26,8 @@ export interface RailRow {
 export interface ReactionTile {
   playerId: string
   passed: boolean
+  /** The player left the game while the window was open. */
+  left: boolean
   /** Time to mark done, or null while the player has not marked done. */
   tookMs: number | null
 }
@@ -71,7 +73,7 @@ export type PhaseView =
       tradeGoods: Record<number, number>
       /** The players who picked, in initiative order. */
       order: InitiativeSlot[]
-      /** The Naalu player, or null when the game has no Naalu token. */
+      /** The Naalu player while they are in the game, or null. */
       naaluTokenOwnerId: string | null
       /** The player who holds the Naalu token this round. */
       naaluTokenHolderId: string | null
@@ -101,7 +103,12 @@ export type PhaseView =
 
 export interface GameView {
   round: number
+  /** Every player of the game, in seat order, also those who left. */
   players: Player[]
+  /** The players still in the game, in seat order. */
+  seated: string[]
+  /** The players who left the game, oldest first. */
+  departures: Departure[]
   speakerId: string
   pickOrder: string[]
   voteOrder: string[]

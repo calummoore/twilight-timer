@@ -255,13 +255,14 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .oc i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
 .oc b{color:var(--pc); font-weight:800; font-size:12px}
 
-/* naalu 0 token: the strip button and the picker dialog */
+/* naalu 0 token: the strip button and the picker dialog. The remove-player dialog uses the same player options. */
 .order-strip .tokb{margin-left:auto}
 .tokb b{color:var(--pc); font-weight:800; font-size:13px}
 .overlay{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px); display:grid; place-items:center; z-index:10}
 .dialog{width:520px; background:#121a24; border:1px solid var(--line2); border-radius:20px; padding:28px}
 .dialog h3{font-size:25px; font-weight:750}
 .dialog p{font-size:14.5px; color:var(--dim); margin-top:10px; line-height:1.55}
+.dialog .heir{margin-top:16px; color:#f0cf6a}
 .dialog .btns{display:flex; gap:12px; margin-top:24px; justify-content:flex-end}
 .tokopts{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:18px}
 .tokopt{display:flex; align-items:center; gap:9px; padding:13px 14px; border:1px solid var(--line2); border-radius:11px;
@@ -441,6 +442,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   background:var(--accent); color:#04211f; font-size:9px; font-weight:800; letter-spacing:.1em;
   text-transform:uppercase; padding:2px 8px; border-radius:20px}
 .seatnode.cand{border-style:dashed; border-color:#33566b}
+/* the empty seat of a player who left the game */
+.seatnode.out{opacity:.38; cursor:default}
+.seatnode.out .nm{text-decoration:line-through; text-decoration-color:var(--faint)}
 .ordlist{display:flex; flex-direction:column; gap:5px}
 .ordrow{display:grid; grid-template-columns:24px 1fr auto; gap:11px; align-items:center; padding:7px 12px;
   border:1px solid var(--line); border-radius:9px; background:#0a0f16; font-size:14px}
@@ -734,31 +738,27 @@ const rot = (a,k) => a.slice(k).concat(a.slice(0,k));
 const PICK_ORDER = rot(SEATS, SPK);        // speaker picks first, then clockwise
 const VOTE_ORDER = rot(SEATS, SPK+1);      // starts left of speaker; speaker votes last
 
-const ringNodes = () => SEATS.map((id,i)=>{
+// out: the player who left the game, or null. Their seat stays in the ring, empty.
+const ringNodes = out => SEATS.map((id,i)=>{
   const n=SEATS.length, cx=250, cy=205, rx=190, ry=150;
   const a=(-90 + i*360/n)*Math.PI/180;
-  return `<div class="seatnode ${i===SPK?'isspk':''} ${i===3?'cand':''}"
+  return `<div class="seatnode ${i===SPK?'isspk':''} ${i===3?'cand':''} ${id===out?'out':''}"
       style="${col(id)};left:${cx+rx*Math.cos(a)}px;top:${cy+ry*Math.sin(a)}px">
     ${i===SPK?'<span class="tok">★</span>':''}
-    <i></i><div class="nm">${P[id].name}</div><div class="sn2">Seat ${i+1}</div>
+    <i></i><div class="nm">${P[id].name}</div><div class="sn2">${id===out?'Left · round 3':`Seat ${i+1}`}</div>
     ${i===3?'<span class="hint">Tap to make speaker</span>':''}</div>`;
 }).join('');
 
-const ordList = (ids, spkIdx) => ids.map((id,i)=>
-  `<div class="ordrow ${i===spkIdx?'isspk':''}" style="${col(id)}">
+const ordList = ids => ids.map((id,i)=>{
+  const spk = id===SEATS[SPK];
+  return `<div class="ordrow ${spk?'isspk':''}" style="${col(id)}">
     <div class="n2">${i+1}</div><div class="nm"><i></i>${P[id].name}</div>
-    ${i===spkIdx?'<span class="tag2">★ Speaker</span>':'<span></span>'}</div>`).join('');
+    ${spk?'<span class="tag2">★ Speaker</span>':'<span></span>'}</div>`;
+}).join('');
 
-S.seating = {t:'Speaker & Seating', d:'ipad', note:
- `Seating is a <b>fixed ring</b> set at game start; the speaker is just a <b>pointer into it</b>. Both derived
-  orders fall out automatically, so moving the token is the only thing anyone ever needs to do — and the token
-  does move, via Politics (3) and certain agendas. Note the two orders differ: strategy picks start <b>with</b>
-  the speaker, while agenda voting starts to their <b>left and leaves the speaker until last</b>, since they
-  break ties. Re-ordering seats is available but deliberately understated — it's a correction for a setup
-  mistake, not something a round should ever need.`,
- h:`<div class="space"></div><div class="lay">
+const seatingScreen = (out=null) => `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>Speaker &amp; seating</b> · Round 3</div>
-    <div class="spacer"></div><button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
+    <div class="spacer"></div><button class="ibtn">Remove a player</button><button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
   <div class="content" style="display:grid;grid-template-columns:1fr 400px;gap:20px">
     <div class="pnl" style="display:flex;flex-direction:column">
       <div class="pnl-h">The table
@@ -767,7 +767,7 @@ S.seating = {t:'Speaker & Seating', d:'ipad', note:
         <div class="ringwrap">
           <div class="cc"><div class="l">Speaker</div><div class="v">★ Jaz</div>
             <div class="s">Picks first in the strategy phase.<br>Votes last, and breaks ties.</div></div>
-          ${ringNodes()}
+          ${ringNodes(out)}
         </div>
       </div>
       <div style="padding:0 20px 18px;margin-top:auto">
@@ -777,16 +777,58 @@ S.seating = {t:'Speaker & Seating', d:'ipad', note:
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto">
       <div class="pnl"><div class="pnl-h">Strategy pick order</div>
-        <div style="padding:11px 14px"><div class="ordlist">${ordList(PICK_ORDER, 0)}</div>
+        <div style="padding:11px 14px"><div class="ordlist">${ordList(PICK_ORDER.filter(id=>id!==out))}</div>
           <div style="font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5">Speaker first, then clockwise.</div></div></div>
       <div class="pnl"><div class="pnl-h">Agenda voting order</div>
-        <div style="padding:11px 14px"><div class="ordlist">${ordList(VOTE_ORDER, 5)}</div>
+        <div style="padding:11px 14px"><div class="ordlist">${ordList(VOTE_ORDER.filter(id=>id!==out))}</div>
           <div style="font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5">Starts left of the speaker; speaker votes last.</div></div></div>
       <button class="ibtn" style="justify-content:center;padding:13px">⠿ Re-order seats</button>
       <div style="font-size:11.5px;color:var(--faint);line-height:1.6;text-align:center">
         Seating is set once at game start. Re-order only to fix a mistake — it changes both orders above.</div>
     </div>
-  </div></div>`};
+  </div></div>`;
+
+S.seating = {t:'Speaker & Seating', d:'ipad', note:
+ `Seating is a <b>fixed ring</b> set at game start; the speaker is just a <b>pointer into it</b>. Both derived
+  orders fall out automatically, so moving the token is the only thing anyone ever needs to do — and the token
+  does move, via Politics (3) and certain agendas. Note the two orders differ: strategy picks start <b>with</b>
+  the speaker, while agenda voting starts to their <b>left and leaves the speaker until last</b>, since they
+  break ties. Re-ordering seats is available but deliberately understated — it's a correction for a setup
+  mistake, not something a round should ever need. <b>Remove a player</b> in the top bar is for a player who
+  is eliminated or goes home.`,
+ h:seatingScreen()};
+
+// chosen: the player picked in the dialog. A speaker passes the token to their left.
+const removeDialog = chosen => {
+  const heir = chosen===SEATS[SPK] ? SEATS[(SPK+1)%SEATS.length] : null;
+  return `<div class="overlay"><div class="dialog">
+    <h3>Who leaves the game?</h3>
+    <p>They take no more picks, turns, reactions, or votes. Their time so far stays in the stats.</p>
+    <div class="tokopts">${SEATS.map(id=>`<button class="tokopt ${id===chosen?'on':''}" style="${col(id)}"><i></i>${P[id].name}</button>`).join('')}</div>
+    ${heir?`<p class="heir">★ The speaker token passes to ${P[heir].name}, on ${P[chosen].name}’s left.</p>`:''}
+    <div class="btns"><button class="ibtn">Cancel</button>
+      <button class="big red" style="padding:16px 26px;font-size:19px">Remove ${P[chosen].name}</button></div>
+  </div></div>`;
+};
+
+S.remove = {t:'Speaker & Seating — Remove a Player', d:'ipad', note:
+ `The table removes a player who is <b>eliminated or goes home</b>. The dialog lists the players still in the
+  game: one tap chooses, and a second tap confirms. The player leaves every order at once. A clock that runs for
+  them stops and moves to the next player, and a card they picked in the strategy phase returns to the common
+  play area. Their recorded time stays in the stats, and Undo brings them back.`,
+ h:`${seatingScreen()}${removeDialog('tom')}`};
+
+S.removeSpeaker = {t:'Speaker & Seating — Remove the Speaker', d:'ipad', note:
+ `When the speaker leaves, the token passes to the player on their <b>left</b>, the next player clockwise, as
+  the TI4 rules say. The dialog names that player before the table confirms. The speaker chip can still move
+  the token afterwards, for example for a house rule.`,
+ h:`${seatingScreen()}${removeDialog('jaz')}`};
+
+S.seatingOut = {t:'Speaker & Seating — After a Player Leaves', d:'ipad', note:
+ `Tom left in round 3. Tom's seat <b>stays in the ring, empty</b>, so the other seats keep their places and
+  their numbers. A tap on the empty seat does nothing. Both orders and the initiative order skip Tom, and
+  Tom's recorded time stays in the round and game stats.`,
+ h:seatingScreen('tom')};
 
 /* ── 4. Strategy phase ── */
 const strategyScreen = () => `<div class="space"></div><div class="lay">
@@ -950,7 +992,7 @@ const reactionScreen = w => `${actionScreen(false)}<div class="scrim"></div>
   </div>`;
 
 S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
- `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. A player who leaves the game during the window counts as done, and their tile shows <b>Left</b>. When the player who played the card leaves, their turn ends, and the next turn starts when the window closes. The top bar stays above the window, so the table can <b>pause</b> for a break or move the speaker during it.`,
  h:reactionScreen(WINDOWS.trade)};
 
 S.politics = {t:'Reaction Window — Politics', d:'ipad', note:
@@ -1181,11 +1223,11 @@ const PG = [
   {id:'kira',  tot:2760, turns:30, worst:455, ot:2, ots:192},
   {id:'tom',   tot:2520, turns:28, worst:521, ot:4, ots:388},
   {id:'wren',  tot:2220, turns:25, worst:389, ot:0, ots:0},
-  {id:'sam',   tot:1920, turns:22, worst:344, ot:0, ots:0},
+  {id:'sam',   tot:1920, turns:22, worst:344, ot:0, ots:0, left:6}, // Sam left the game in round 6
 ];
 const PGTOT = 15600, PGMAX = 3400;
 S.stats = {t:'Post-game Stats', d:'ipad', note:
- `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. <b>Rule checks</b> get their own figure: the time the table spent settling rules while paused, and how many times it stopped to do so. That time is not part of the game time, and plain pauses are not counted at all. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Exportable as JSON or CSV so a group can build a season's worth of data.`,
+ `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. <b>Rule checks</b> get their own figure: the time the table spent settling rules while paused, and how many times it stopped to do so. That time is not part of the game time, and plain pauses are not counted at all. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Exportable as JSON or CSV so a group can build a season's worth of data. A player who left the game keeps their time, and the table names the round in which they left.`,
  h:`<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>Game complete</b> · 8 rounds</div><div class="spacer"></div>
     <button class="ibtn">⬇ Export CSV</button><button class="ibtn">⬇ Export JSON</button><button class="ibtn">New game</button></div>
@@ -1212,7 +1254,7 @@ S.stats = {t:'Post-game Stats', d:'ipad', note:
           <span><b style="background:var(--danger)"></b>Overtime</span></div>
         <table class="tbl" style="margin-top:20px">
           <thead><tr><th>Player</th><th>Turns</th><th>Avg turn</th><th>Worst turn</th><th>Over limit</th><th>Share</th></tr></thead>
-          <tbody>${PG.map(r=>`<tr><td><div class="pl" style="${col(r.id)}"><i></i>${P[r.id].name}</div></td>
+          <tbody>${PG.map(r=>`<tr><td><div class="pl" style="${col(r.id)}"><i></i>${P[r.id].name}${r.left?`<span style="font-weight:400;font-size:11.5px;color:var(--faint)">Left in round ${r.left}</span>`:''}</div></td>
             <td class="num">${r.turns}</td>
             <td class="num">${fmt(r.tot/r.turns)}</td><td class="num">${fmt(r.worst)}</td>
             <td class="num" style="${r.ot?'color:var(--danger)':'color:var(--faint)'}">${r.ot?r.ot+' · '+fmt(r.ots):'—'}</td>
@@ -1412,7 +1454,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['iPad — table device', ['setup','setupMissing','settings','seating','strategy','token','action','overtime','paused','pausedRule','reaction','politics','status','agenda','round','history','stats','join']],
+  ['iPad — table device', ['setup','setupMissing','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','paused','pausedRule','reaction','politics','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);

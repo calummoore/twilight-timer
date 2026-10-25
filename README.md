@@ -20,6 +20,8 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 - A reaction window for secondary abilities that is charged to nobody. For
   Politics, it also asks for the new speaker.
 - The status checklist, and clocks for agenda discussion and each vote.
+- The table can remove a player who leaves mid-game. Their recorded time
+  stays in the stats.
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.
@@ -92,6 +94,8 @@ commit. Each successful preview run updates the comment.
   - `types.ts`: the actions, the stored game, and the timed entries.
   - `factions.ts`: the official factions and the ids that saved games store.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
+    `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
+    player who leaves.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
   - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
     limit changes.
