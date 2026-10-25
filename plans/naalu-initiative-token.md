@@ -1,7 +1,9 @@
 # Naalu "0" initiative token
 
-Status: Active. [PR #7](https://github.com/calummoore/twilight-timer/pull/7)
-is open. The plan closes when its PR merges.
+Status: Completed. [PR #7](https://github.com/calummoore/twilight-timer/pull/7)
+merged on 2026-10-23. Review findings 2, 3, and 8 stay open for Cal, as the
+review TODOs list. The iPad play test in the post-merge follow-up also waits
+for Cal. Three problems outside the scope wait for separate branches.
 
 In TI4, the Naalu Collective faction has the ability Telepathic. At the end
 of each strategy phase, it puts the Naalu "0" token on the Naalu player's
@@ -304,5 +306,6 @@ conflict, and adapt the tests that met a rule from main.
 
 ## Post-merge follow-up (non-blocking)
 
-- [ ] Check that the deploy step passed on `main`.
+- [x] Check that the deploy step passed on `main`. Evidence:
+      `.context/naalu-initiative-token/post-merge.log`.
 - [ ] Play one round with a Naalu player on the iPad.
