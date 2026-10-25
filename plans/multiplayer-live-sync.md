@@ -264,7 +264,8 @@ the Join screen, the roles, the connection states, and most phone states.
 - [ ] Phone Join: an unknown code, a game that is no longer shared, and no
       connection. The QR card tells the player to use the phone camera.
 - [ ] Show six-character codes on the iPad Join screen and in the phone
-      code boxes, as decision 36 sets.
+      code boxes, as decision 36 sets. Update the phone Join prompt and its
+      note, which say four characters.
 - [ ] Phone Claim seat: claim a free seat, or ask the table to move a held
       seat and wait for approval.
 - [ ] Phone Waiting for the other phases, a reconnecting banner, and a
@@ -413,6 +414,7 @@ Run the checks, push, and review the branch.
   - Plan review 4 of 4128a52 found 4 findings, 31 to 34. Fixed: 31 and 32. Report: `.context/multiplayer-live-sync/review-4.md`.
   - Plan review 5 of 4564413 found 2 findings, 37 and 38. Fixed: 37 and 38. Report: `.context/multiplayer-live-sync/review-5.md`.
   - Plan review 6 of 58d1471 found no new findings. Report: `.context/multiplayer-live-sync/review-6.md`.
+  - Plan review 7 of 4b8b1e8 found 1 finding, 39. Fixed: 39. Report: `.context/multiplayer-live-sync/review-7.md`.
   - 1. A code holder can erase the game. Severity High, effort Small. Recommended: close it, because decision 21 covers it: the join code opens player mode only, and table mode needs the table link.
   - 24. A lost table device cannot recover. Severity Medium, effort Small. Recommended: A, the Join screen asks the host to save the table link, and the docs state the limit.
   - 6. CI steps for the rules are missing. Severity Low, effort Small. Recommended: A, a CI test step, the rules deploy first, and Cal's credential. It applies only if decision 9 picks A.
