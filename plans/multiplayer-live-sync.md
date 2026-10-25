@@ -40,6 +40,10 @@ Decisions:
   last change, and C, after 7 days. Reason: storage is small, and deletion
   can come later. This replaces the plan rule that a code expires 7 days
   after its game last changed.
+- 2026-10-25, Cal: decision 36 is C. A join code has six letters and
+  digits. Alternatives: A, four letters and digits, as the mockup shows,
+  and B, six digits, which was recommended for faster typing. Reason: with
+  about 890 million codes, a guessed code almost never matches a game.
 
 Open decisions, proposed on 2026-10-23 and 2026-10-25, each with its
 recommended option. Their numbers follow the plan review findings.
@@ -64,9 +68,6 @@ recommended option. Their numbers follow the plan review findings.
     keeps A until Cal answers.
 30. Old pages after a deploy. A: no check. B: a protocol version check
     makes an older page reload. Recommended: B.
-36. Join code format. A: four letters and digits, as the mockup shows. B:
-    six digits. C: six letters and digits. Recommended: B. The design
-    keeps A until Cal answers.
 
 Contract owners: `docs/product.md`, the new `docs/architecture.md`, the
 mockup at `docs/mockups/index.html`, the [README](../README.md), and
@@ -83,8 +84,8 @@ Terms:
   today. It never gets private player data.
 - **Player mode:** a device role that acts only for its own seat. It sees
   the public game and the private data of that seat.
-- **Join code:** a short code that opens player mode for a shared game.
-  The join link and the QR code hold the same code.
+- **Join code:** six letters and digits that open player mode for a shared
+  game. The join link and the QR code hold the same code.
 - **Table link:** a link with a long secret that opens table mode.
 - **Change:** one request from a device: an action, an undo, a pause, a
   resume, a limits change, or a seat request.
@@ -192,8 +193,8 @@ second tap names a target that no longer runs, so the model rejects it.
 - Any device with the table link can become a table device. If no device
   has the link, the game cannot get a new table device. Finding 24 is open
   on this risk.
-- A code has four characters from `23456789ABCDEFGHJKMNPQRSTUVWXYZ`, as the
-  mockup shows. Decision 36 can change the format. The join link is
+- A code has six characters from `23456789ABCDEFGHJKMNPQRSTUVWXYZ`, as
+  decision 36 sets. Typed input ignores case. The join link is
   `/join/{code}`. The table link adds the secret.
 - Sharing picks a random code. The object of that code refuses it when it
   already holds a game, and the device tries another. A code never
@@ -262,6 +263,8 @@ the Join screen, the roles, the connection states, and most phone states.
 - [ ] A notice on every device for a tap that another device made first.
 - [ ] Phone Join: an unknown code, a game that is no longer shared, and no
       connection. The QR card tells the player to use the phone camera.
+- [ ] Show six-character codes on the iPad Join screen and in the phone
+      code boxes, as decision 36 sets.
 - [ ] Phone Claim seat: claim a free seat, or ask the table to move a held
       seat and wait for approval.
 - [ ] Phone Waiting for the other phases, a reconnecting banner, and a
