@@ -81,6 +81,10 @@ select.fld {
   background-repeat: no-repeat;
   background-position: right 10px center;
 }
+/* The phone seat rows set their own padding. Keep the room for the arrow. */
+.seat select.fld {
+  padding-right: 26px;
+}
 
 .notice {
   display: flex;

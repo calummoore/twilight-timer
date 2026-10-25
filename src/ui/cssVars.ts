@@ -3,7 +3,7 @@ declare module 'react' {
   interface CSSProperties {
     /** A player colour, which the mockup styles read. */
     '--pc'?: string
-    /** The height of the in-game top bar. Overlays open under it. */
+    /** The height of the in-game top bar. The reaction window opens under it. */
     '--top-h'?: string
     /** The width of the side column of a two-column screen. */
     '--side'?: string

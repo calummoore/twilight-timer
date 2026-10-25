@@ -42,7 +42,7 @@ export interface TopBarProps {
   onUndo: () => void
   onPause: () => void
   onSettings: () => void
-  /** Measures the bar, so that overlays can open under it. */
+  /** Measures the bar, so that the reaction window can open under it. */
   ref?: Ref<HTMLDivElement>
 }
 

@@ -601,6 +601,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 
 /* ─────────── narrow: an upright iPad or a phone ─────────── */
 @container app (max-width: 900px){
+  /* iPhone Safari zooms in on a field with text under 16 px, and it does not zoom back out. */
+  .fld, .fld.sel{font-size:16px}
   .lay{overflow-y:auto; scrollbar-width:none}
   .lay::-webkit-scrollbar{display:none}
   .lay > *{flex:none}
@@ -651,9 +653,11 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .hero .bigclock{margin-top:20px; font-size:clamp(64px, min(24cqh, 26cqw), 186px)}
   .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
 }
-/* A phone held sideways: the two-row top bar scrolls away, so the clock and End Turn fit on the screen. */
+/* A phone held sideways: the two-row top bar scrolls away, so the clock and End Turn fit on the screen. A phone wider than
+   900 px gets the wide layout, so its fields get the 16 px text here. */
 @container app (max-height: 500px){
   .top.game{position:relative}
+  .fld, .fld.sel{font-size:16px}
 }
 
 /* ─────────── a phone ─────────── */
@@ -821,8 +825,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .seat .name{grid-area:name}
   .seat .fac{grid-area:fac}
   .seat .spk{grid-area:spk; width:34px; height:34px}
-  .seat .fld{min-width:0; padding:9px 10px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .seat .fld.sel{font-size:13px}
+  .seat .fld{min-width:0; padding:9px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .master{padding:14px 15px; gap:12px; margin-bottom:14px}
   .set-row{grid-template-columns:1fr auto; grid-template-areas:"lb tog" "ds ctl"; gap:6px 12px; padding:12px 14px}
   .set-row .txt{display:contents}

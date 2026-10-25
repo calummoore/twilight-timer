@@ -110,5 +110,5 @@ commit. Each successful preview run updates the comment.
   CSS size container.
 - `src/styles/mockup/` holds the CSS ported from the mockup.
   `responsive.css` holds the container queries that arrange each screen for
-  the space. `src/styles/app.css` and `src/styles/screens.css` hold app-only
-  styles.
+  the space, and `layout.css` holds the layout helpers that the screens use.
+  `src/styles/app.css` and `src/styles/screens.css` hold app-only styles.
