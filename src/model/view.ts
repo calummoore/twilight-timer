@@ -115,8 +115,8 @@ export interface GameView {
   voteOrder: string[]
   custodiansRemoved: boolean
   /**
-   * Game time: the time of the entries and of the rule checks. Plain pauses
-   * and undone time do not count.
+   * Game time: the time of the entries and of every rule check, also one in
+   * an undone range. Other pause time and undone time do not count.
    */
   gameMs: number
   /** The open pause, or null while the game runs. */

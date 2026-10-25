@@ -917,9 +917,14 @@ S.overtime = {t:'Action Phase — Limit Exceeded', d:'ipad', note:
  h:actionScreen(true)};
 
 /* ── Game paused ── */
-// The table paused 4:12 ago. Every clock stops, so the action screen behind the card drops its live clocks.
+// The table paused 4:12 ago. A pause stops every clock behind the card, so the action screen drops its live clocks.
+// A rule check is game time, so during one the game clock in the top bar keeps running.
 const still = h => h.replace(/ data-clock="[^"]*"/g, '');
-const pauseScreen = rule => `${still(actionScreen(false))}
+const behindCard = rule => {
+  const h = still(actionScreen(false));
+  return rule ? h.replace(' data-t="9847"', ' data-clock="up" data-t="9847"') : h;
+};
+const pauseScreen = rule => `${behindCard(rule)}
   <div class="overlay"><div class="pause-card">
     <div class="t num" data-clock="up" data-t="252">4:12</div>
     <div class="l">${rule?'Game paused · only the game clock is running':'Game paused · no clock is running'}</div>

@@ -47,7 +47,8 @@ export function act(game: Game, input: ActionInput, now: number): Game {
 
 /**
  * Pops the last action. The time since the action is charged to nobody,
- * so every clock returns to its value at the moment of the action.
+ * so every clock returns to its value at the moment of the action. The
+ * game clock also keeps the rule checks in between.
  */
 export function undo(game: Game, now: number): Game {
   const last = game.actions.at(-1)

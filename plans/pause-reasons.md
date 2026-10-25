@@ -2,8 +2,8 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review finding 2 waits for Cal. Milestones 7 to 11 make
-rule checks count as game time.
+on 2026-10-25. Review findings 2, 4, 6, and 8 wait for Cal. Milestones 7
+to 11 make rule checks count as game time.
 
 The table can pause the game from the top bar. A pause stops every clock
 and charges nobody. The app stores each pause as a start time and an end
@@ -18,8 +18,9 @@ While the game is paused, one tap selects Rule check, and the rule check
 starts at that tap. A tap on Pause ends the rule check, and the game stays
 paused. Resume also ends it. One pause can hold several rule checks. The
 post-game stats show the time and the count of rule checks. Plain pause
-time is not tracked. Game time does not change: pauses stay outside every
-clock and every phase total.
+time is not tracked. Rule-check time counts as game time, which nobody is
+charged for: every player and table clock stops during the whole pause,
+and only the game clock and the game totals add the rule checks.
 
 The change does not cover other reasons, a change of reason after the game
 resumes, edits to pause or rule-check times, pause time on the round
@@ -108,8 +109,12 @@ Contract owners:
   pause is open or when the reason does not change.
 - `resume` ends the open range together with its pause. Undo does not
   touch pauses, as before.
-- The reason moves no clock. Game time, the entries, and the action clock
-  in `fold.ts` read only the `from` and `to` of each pause.
+- The reason moves no player or table clock. The entries and the action
+  clock in `fold.ts` read only the `from` and `to` of each pause.
+- Rule checks are game time (Milestones 7 to 11). `pauses.ts` says which
+  reasons count as game time, `derive` adds their time to the game clock,
+  and `gameStats` adds it to the game total as its own part. The round
+  stats stay entry-based.
 - `derive` gives the open pause: its running time since the pause began,
   its reason or null, and the running time of its open range. The pause
   overlay reads it from the view, not from the stored game.
@@ -386,6 +391,14 @@ Show rule checks as game time as the mockup shows them.
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 3 found 5 findings. Fixed: 5, texts that kept pauses out of game
+    time, and 7, the rule-check mockup froze the game clock. Report:
+    `.context/pause-reasons/review-3.md`.
+  - 4. Round summary game total now counts rule checks. Severity Low, effort Small. Recommended: A, the spec says that the round summary game total is the game clock, with rule checks.
+  - 6. Post-game rule-check total has no test. Severity Low, effort Small. Recommended: B, a model function that gives the post-game stats from the view, with a unit test.
+  - 8. `gameClock` no longer gives the game clock. Severity Low, effort Medium. Recommended: B, rename it to `entryClock` and say "entry ms" in the comments.
+  - `docs/mockups/index.html`: "Where the game went" has no "Between rounds" row, but the app has one. Separate branch.
+  - `docs/mockups/index.html`: "Where the game went" writes times under an hour as "0:58:00", but the app writes "58:00". Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
