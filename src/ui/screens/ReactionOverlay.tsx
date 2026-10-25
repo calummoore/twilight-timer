@@ -13,7 +13,6 @@ export function ReactionOverlay(props: {
   onDone: (playerId: string) => void
   onExtend: (ms: number) => void
   onSpeaker: (playerId: string) => void
-  onUndo: () => void
   onClose: () => void
 }) {
   const { game, reaction: r } = props
@@ -139,9 +138,6 @@ export function ReactionOverlay(props: {
               ＋ Add 1:00
             </button>
           )}
-          <button className="ibtn" onClick={props.onUndo}>
-            ↺ Undo last
-          </button>
           <button className="big small" onClick={props.onClose}>
             MARK ALL DONE
           </button>
