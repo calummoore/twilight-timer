@@ -184,7 +184,7 @@ Run the checks, push, open the stacked PR, and review it.
 - [x] Merge the two newer commits of the PR #9 branch, 61483f8 and 5648ce2.
       The merge had no conflict, and the gate passed again.
 - [x] Open the PR on the PR #9 branch, and link it in the status paragraph.
-- [ ] Review the complete local diff against the PR #9 branch, the base of
+- [x] Review the complete local diff against the PR #9 branch, the base of
       this stacked PR, with the `implementation-review` skill after the
       push. Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
@@ -200,6 +200,13 @@ Run the checks, push, open the stacked PR, and review it.
   - `src/model/parse.ts`: PR #9 and the turn-end branch both save version 3 under `ti4tempo.game.v3` with different shapes. Separate branch.
   - `docs/mockups/index.html`: the hero clock line says "cumulative", but the app says "game total". Separate branch.
   - `src/ui/screens/StrategyScreen.tsx`: "Every card is picked" shows while cards stay unpicked at 3, 5, 6, or 7 players. Separate branch.
+  - Review 2 checked fix commit 662916d and merge 7c04191: findings 1, 2,
+    and 4 are resolved. It found 2 findings. Fixed: 6, a test comment
+    misstated the version 4 card rule. Finding 7, the PR description
+    missed the fix round, is resolved by an update of the description. No
+    further fix round runs. Report:
+    `.context/three-and-four-player-games/review-2.md`.
+  - `docs/mockups/index.html`: the phone "Your Turn" screen still greys Pass as "PASS — strategy card unplayed", but Pass only warns. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 

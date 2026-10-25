@@ -176,7 +176,8 @@ describe('storage', () => {
     const actions = t.game.actions.map((a) =>
       a.kind === 'strategyCardPlayed' ? { kind: a.kind, at: a.at } : a,
     )
-    // A version 4 game must log the card.
+    // A version 4 strategic action needs a card field. Only an upgraded game
+    // from an older build holds a null card.
     store.data.set('ti4tempo.game.v4', JSON.stringify({ ...t.game, actions }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
     store.data.delete('ti4tempo.game.v4')
