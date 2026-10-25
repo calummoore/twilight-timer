@@ -138,6 +138,11 @@ Run the checks, push, and review the branch.
       the responsive stage, and the stage contains the fixed overlays inside
       the safe area. The mockup and the ported CSS carry main's screens.
       Justifications for each path: `.context/phone-version/merge-notes.md`.
+- [x] Let a dialog that is taller than a short window scroll inside its
+      overlay. The checks after the merge found the Naalu token dialog cut
+      off on a phone held sideways, with its Cancel button out of reach.
+      Evidence: `.context/phone-version/merge/safe/dialog-before.log` and
+      `dialog-after.log`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
