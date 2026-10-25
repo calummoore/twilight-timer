@@ -61,11 +61,12 @@ Decisions:
   when a merge from main brings the saved-game version that the branch
   also took, the branch moves to the next free version, and it keeps
   loading the games that it saved under the old number. Alternatives: A,
-  no rule; C, remove this change's version change, so that a new field
-  with a default needs no new version; D, only the move to the next free
-  version. Reason: wrong clocks in a preview game would mislead the person
-  who tests the PR, and the version change keeps an older build from
-  damaging a new game.
+  no rule. C, go back to version 3 and the `.v3` keys, keep
+  `windowEndsTurn` as a field that a game can lack, and change the
+  saved-game rule so that a new field with a default needs no new version.
+  D, only the move to the next free version. Reason: wrong clocks in a
+  preview game would mislead the person who tests the PR, and the version
+  change keeps an older build from damaging a new game.
 
 Contract owners:
 
@@ -278,10 +279,18 @@ Apply Cal's answer to review decision 7.
 - [x] Add the rule for a saved-game version clash in a merge to
       "Repository rules" in `AGENTS.md`.
 - [x] Validate the changed Markdown, commit, and push.
-- [ ] Review the commit against `origin/main` with the
+- [x] Review the commit against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 6 of b749273: the rule matches Cal's option B word for word. It
+    found 3 findings, all `Auto-fix: no`. Findings 10 and 11 correct the
+    agent's own records under standing rules, so they are fixed: the
+    decision 7 entry now gives the whole option C without semicolons, and
+    the PR description is updated. Report:
+    `.context/strategic-action-ends-turn/review-6.md`. Review 6 numbers
+    them 1 to 3.
+  - 12. The commit message of b749273 calls the Naalu case "the same clash with version 2". Severity Low, effort Small. Recommended: A, keep the commit and delete that sentence from the squash message at the merge.
 
 ## Post-merge follow-up (non-blocking)
 
