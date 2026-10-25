@@ -26,12 +26,6 @@ function action(t: Table) {
   return view
 }
 
-/** Closes the open reaction window, then ends the turn. */
-function endWindowAndTurn(t: Table): void {
-  t.act({ kind: 'reactionClosed' })
-  t.act({ kind: 'turnEnded' })
-}
-
 describe('action phase with two cards each', () => {
   it('gives each player one turn in each cycle, at their lowest card', () => {
     const t = fourTable()
@@ -65,7 +59,7 @@ describe('action phase with two cards each', () => {
     expect(action(t).rail.map((row) => row.initiative)).toEqual([0, 1, 2, 3])
   })
 
-  it('plays the chosen card, and each card once in a round', () => {
+  it('plays one chosen card a turn, and each card once in a round', () => {
     const t = fourTable()
     expect(t.act({ kind: 'strategyCardPlayed', card: 2 })).toBe(false)
     expect(t.act({ kind: 'strategyCardPlayed', card: 7 })).toBe(true)
@@ -74,16 +68,34 @@ describe('action phase with two cards each', () => {
       { card: 1, played: false },
       { card: 7, played: true },
     ])
-    endWindowAndTurn(t)
+    // The strategic action was Tom's turn, so his other card waits.
+    t.act({ kind: 'reactionClosed' })
+    expect(action(t).activeId).toBe('priya')
     for (let i = 0; i < 3; i++) t.act({ kind: 'turnEnded' }) // to Tom
     expect(t.act({ kind: 'strategyCardPlayed', card: 7 })).toBe(false)
     expect(t.act({ kind: 'strategyCardPlayed', card: 1 })).toBe(true)
-    endWindowAndTurn(t)
+    t.act({ kind: 'reactionClosed' })
     const turns = t.view().entries.filter((e) => e.playerId === 'tom')
     expect(turns.filter((e) => e.kind === 'turn').map((e) => e.card)).toEqual([
       7, 1,
     ])
     expect(action(t).rail[0]?.cards.every((c) => c.played)).toBe(true)
+  })
+
+  it('gives the last player the second card in a new turn', () => {
+    const t = fourTable()
+    for (let i = 0; i < 3; i++) t.act({ kind: 'passed' }) // Tom, Priya, Jaz
+    t.act({ kind: 'strategyCardPlayed', card: 6 }) // Kira plays Warfare
+    t.act({ kind: 'reactionClosed' })
+    expect(action(t)).toMatchObject({
+      activeId: 'kira',
+      turnNumber: 2,
+      activeCards: [
+        { card: 5, played: false },
+        { card: 6, played: true },
+      ],
+    })
+    expect(t.act({ kind: 'strategyCardPlayed', card: 5 })).toBe(true)
   })
 
   it('offers the new speaker when Politics is the second card', () => {
@@ -92,7 +104,7 @@ describe('action phase with two cards each', () => {
     t.act({ kind: 'turnEnded' }) // Priya
     t.act({ kind: 'strategyCardPlayed', card: 8 }) // Jaz plays Imperial
     expect(action(t).reaction).toMatchObject({ card: 8, speakerChoice: null })
-    endWindowAndTurn(t)
+    t.act({ kind: 'reactionClosed' })
     for (let i = 0; i < 3; i++) t.act({ kind: 'turnEnded' }) // to Jaz
     t.act({ kind: 'strategyCardPlayed', card: 3 })
     expect(action(t).reaction?.speakerChoice).toEqual({
@@ -105,7 +117,7 @@ describe('action phase with two cards each', () => {
   it('accepts a pass before both cards are played', () => {
     const t = fourTable()
     t.act({ kind: 'strategyCardPlayed', card: 1 })
-    endWindowAndTurn(t)
+    t.act({ kind: 'reactionClosed' })
     for (let i = 0; i < 3; i++) t.act({ kind: 'turnEnded' }) // to Tom
     expect(action(t).activeCards.filter((c) => !c.played)).toEqual([
       { card: 7, played: false },
@@ -116,15 +128,15 @@ describe('action phase with two cards each', () => {
   it('charges every moment of a four-player round to one entry', () => {
     const t = fourTable(LIMITS_ON)
     t.wait(30 * SEC)
-    t.act({ kind: 'strategyCardPlayed', card: 7 })
+    t.act({ kind: 'strategyCardPlayed', card: 7 }) // Tom
     t.wait(20 * SEC)
     t.act({ kind: 'reactionClosed' })
     t.wait(15 * SEC)
-    t.act({ kind: 'turnEnded' })
-    t.wait(10 * SEC)
     t.act({ kind: 'strategyCardPlayed', card: 4 }) // Priya
-    t.wait(3 * MIN) // the window closes itself at 2:00
-    t.act({ kind: 'turnEnded' })
+    t.wait(3 * MIN) // the window passes its 2:00 limit and counts overtime
+    t.act({ kind: 'reactionClosed' })
+    t.wait(10 * SEC)
+    t.act({ kind: 'turnEnded' }) // Jaz
     t.wait(5 * SEC)
     t.undo()
     t.wait(25 * SEC)

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_SETTINGS } from './settings'
-import { LIMITS_ON, MIN, SEC, passAll, playStrategy, table } from './test-table'
+import { LIMITS_ON, MIN, SEC, playStrategy, table } from './test-table'
 
 const OTHERS = ['wren', 'jaz', 'sam', 'kira', 'priya']
 
@@ -27,7 +27,13 @@ describe('reaction window', () => {
       phase: 'action',
       activeId: 'tom',
       activeCards: [{ card: 1, played: true }],
-      reaction: { card: 1, byId: 'tom', pausedTurnMs: 10 * SEC, doneCount: 1 },
+      reaction: {
+        card: 1,
+        byId: 'tom',
+        turnMs: 10 * SEC,
+        endsTurn: true,
+        doneCount: 1,
+      },
     })
   })
 
@@ -43,39 +49,28 @@ describe('reaction window', () => {
     )
     // Jaz keeps their own time. The others get the whole window.
     expect(took).toEqual({ jaz: 5, kira: 30, priya: 30, sam: 30, wren: 30 })
-    expect(t.view().timer).toMatchObject({
-      kind: 'turn',
-      playerId: 'tom',
-      elapsedMs: 10 * SEC,
-    })
+    expect(window).toMatchObject({ durationMs: 30 * SEC, running: false })
   })
 
-  it('closes when every other player is done and resumes the turn', () => {
+  it('closes when every other player is done', () => {
     const t = openWindow()
     OTHERS.forEach((id) => {
       t.wait(6 * SEC)
       t.act({ kind: 'reactionDone', playerId: id })
     })
-    t.wait(20 * SEC)
-    t.act({ kind: 'turnEnded' })
-    const closed = t.view().entries.filter((e) => !e.running && e.round === 1)
-    const window = closed.find((e) => e.kind === 'reaction')
+    expect(t.view().view).toMatchObject({ reaction: null })
+    const window = t.view().entries.find((e) => e.kind === 'reaction')
     expect(window).toMatchObject({
       playerId: null,
       durationMs: 30 * SEC,
       card: 1,
+      running: false,
     })
     // Tiles follow seat order. Wren marked first, Priya last.
     const took = Object.fromEntries(
       window?.reactions?.map((r) => [r.playerId, r.tookMs / SEC]) ?? [],
     )
     expect(took).toEqual({ wren: 6, jaz: 12, sam: 18, kira: 24, priya: 30 })
-    expect(closed.at(-1)).toMatchObject({
-      kind: 'turn',
-      playerId: 'tom',
-      durationMs: 30 * SEC,
-      card: 1,
-    })
   })
 
   it('gives passed players a tile and closes by hand', () => {
@@ -96,19 +91,24 @@ describe('reaction window', () => {
     ).toBe(true)
   })
 
-  it('closes itself when its limit passes, and an extension delays that', () => {
-    const t = openWindow()
+  it('stays open past its limit and counts overtime from the extension', () => {
+    const t = openWindow() // the window limit is 2:00
     t.wait(MIN)
     expect(t.act({ kind: 'reactionExtended', ms: MIN })).toBe(true)
-    t.wait(150 * SEC) // the window ends at 3:00, then Tom's turn runs 30 seconds
-    const view = t.view()
-    expect(view.view).toMatchObject({ reaction: null })
-    expect(view.timer).toMatchObject({
-      kind: 'turn',
-      playerId: 'tom',
-      elapsedMs: 40 * SEC,
+    t.wait(150 * SEC) // 30 seconds past the extended 3:00
+    expect(t.view().timer).toMatchObject({
+      kind: 'reaction',
+      elapsedMs: 210 * SEC,
+      limitMs: 3 * MIN,
     })
-    expect(t.act({ kind: 'reactionDone', playerId: 'jaz' })).toBe(false)
+    expect(t.act({ kind: 'reactionDone', playerId: 'jaz' })).toBe(true)
+    t.act({ kind: 'reactionClosed' })
+    const window = t.view().entries.find((e) => e.kind === 'reaction')
+    expect(window).toMatchObject({
+      durationMs: 210 * SEC,
+      limitMs: 3 * MIN,
+      overtimeMs: 30 * SEC,
+    })
   })
 
   it('stays open without a limit and cannot be extended', () => {
@@ -120,12 +120,12 @@ describe('reaction window', () => {
 
   it('allows one strategic action per player per round', () => {
     const t = openWindow()
-    t.act({ kind: 'reactionClosed' })
-    t.act({ kind: 'turnEnded' })
-    passAll(t) // everyone else passes; Tom passes last
-    expect(t.view().view.phase).toBe('status')
-    const again = openWindow()
-    again.act({ kind: 'reactionClosed' })
-    expect(again.act({ kind: 'strategyCardPlayed', card: 1 })).toBe(false)
+    t.act({ kind: 'reactionClosed' }) // Tom's turn ends
+    for (let i = 0; i < 5; i++) t.act({ kind: 'passed' }) // all but Tom
+    expect(t.view().view).toMatchObject({
+      activeId: 'tom',
+      activeCards: [{ card: 1, played: true }],
+    })
+    expect(t.act({ kind: 'strategyCardPlayed', card: 1 })).toBe(false)
   })
 })

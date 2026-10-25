@@ -20,15 +20,16 @@ type Fields = Record<string, unknown>
  */
 export function parseGame(raw: unknown): Game | null {
   const game = isFields(raw) ? upgrade(raw) : null
-  if (game?.version !== 4) return null
+  if (game?.version !== 5) return null
   const players = listOf(game.players, parsePlayer)
   const actions = listOf(game.actions, parseAction)
   const pauses = listOf(game.pauses, parseInterval)
   const voids = listOf(game.voids, parseInterval)
   const limitsLog = listOf(game.limitsLog, parseLimitsChange)
-  const { startedAt, firstSpeakerId } = game
+  const { startedAt, firstSpeakerId, windowEndsTurn } = game
   if (!players || !actions || !pauses || !voids || !limitsLog) return null
   if (!isNumber(startedAt) || typeof firstSpeakerId !== 'string') return null
+  if (typeof windowEndsTurn !== 'boolean') return null
   const isPlayer = (id: unknown) => players.some((p) => p.id === id)
   if (!isPlayer(firstSpeakerId)) return null
   const owner = game.naaluTokenOwnerId
@@ -36,11 +37,12 @@ export function parseGame(raw: unknown): Game | null {
     return null
   }
   return {
-    version: 4,
+    version: 5,
     startedAt,
     players,
     firstSpeakerId,
     naaluTokenOwnerId: owner,
+    windowEndsTurn,
     actions,
     pauses,
     voids,
@@ -81,9 +83,21 @@ function upgrade(raw: Fields): Fields {
     case 2:
       // Builds before player removal have the shape of version 3.
       return upgrade({ ...raw, version: 3 })
-    case 3:
+    case 3: {
+      // Builds before a window close ended the turn resumed the turn. A
+      // version 3 game from a preview of that change stores the rule.
+      const stored = raw.windowEndsTurn
+      const windowEndsTurn = typeof stored === 'boolean' ? stored : false
+      return upgrade({ ...raw, version: 4, windowEndsTurn })
+    }
+    case 4:
+      // A preview of two cards each saved version 4 with cards and no window
+      // rule, before the window rule took version 4. It resumed the turn.
+      if (raw.windowEndsTurn === undefined) {
+        return { ...raw, version: 5, windowEndsTurn: false }
+      }
       // Builds that gave each player one card logged no card.
-      return { ...raw, version: 4, actions: mapList(raw.actions, cardless) }
+      return { ...raw, version: 5, actions: mapList(raw.actions, cardless) }
     default:
       return raw
   }

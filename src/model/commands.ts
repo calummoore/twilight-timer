@@ -10,11 +10,12 @@ export function startGame(
   now: number,
 ): Game {
   return {
-    version: 4,
+    version: 5,
     startedAt: now,
     players,
     firstSpeakerId: speakerId,
     naaluTokenOwnerId: players.find((p) => p.factionId === NAALU)?.id ?? null,
+    windowEndsTurn: true,
     actions: [],
     pauses: [],
     voids: [],

@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { startGame } from './commands'
-import { derive } from './derive'
-import { factionName } from './factions'
 import { DEFAULT_SETTINGS } from './settings'
 import {
   archiveGame,
@@ -10,53 +8,11 @@ import {
   loadSettings,
   saveGame,
   saveSettings,
-  type KeyValueStore,
-  type LoadedGame,
 } from './storage'
-import {
-  MIN,
-  NAALU_PLAYERS,
-  PLAYERS,
-  SEC,
-  T0,
-  playStrategy,
-  table,
-} from './test-table'
-import type { Game } from './types'
+import { memoryStore } from './test-store'
+import { NAALU_PLAYERS, PLAYERS, T0, table } from './test-table'
 
-function memoryStore(): KeyValueStore & { data: Map<string, string> } {
-  const data = new Map<string, string>()
-  return {
-    data,
-    getItem: (key) => data.get(key) ?? null,
-    setItem: (key, value) => void data.set(key, value),
-    removeItem: (key) => void data.delete(key),
-  }
-}
-
-/** The shape that builds before the Naalu token saved: typed factions. */
-function asVersion1(game: Game) {
-  return {
-    version: 1,
-    startedAt: game.startedAt,
-    players: game.players.map((p) => ({
-      id: p.id,
-      name: p.name,
-      colour: p.colour,
-      faction: factionName(p.factionId),
-    })),
-    firstSpeakerId: game.firstSpeakerId,
-    actions: game.actions,
-    pauses: game.pauses,
-    voids: game.voids,
-    limitsLog: game.limitsLog,
-  }
-}
-
-function gameOf(loaded: LoadedGame): Game {
-  if (loaded.status !== 'ok') throw new Error(`no game: ${loaded.status}`)
-  return loaded.game
-}
+/** Games of older versions are in `storage-versions.test.ts`. */
 
 describe('storage', () => {
   it('saves and loads a game with its whole log', () => {
@@ -72,26 +28,26 @@ describe('storage', () => {
   it('reports nothing saved, broken JSON, and data of the wrong shape', () => {
     const store = memoryStore()
     expect(loadGame(store)).toEqual({ status: 'none' })
-    store.data.set('ti4tempo.game.v4', '{not json')
+    store.data.set('ti4tempo.game.v5', '{not json')
     expect(loadGame(store)).toEqual({ status: 'invalid' })
     const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
     const broken = { ...game, actions: [{ kind: 'teleported', at: T0 }] }
-    store.data.set('ti4tempo.game.v4', JSON.stringify(broken))
+    store.data.set('ti4tempo.game.v5', JSON.stringify(broken))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
   })
 
   it('rejects a saved game with an unknown version or a broken pause', () => {
     const store = memoryStore()
     const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
-    store.data.set('ti4tempo.game.v4', JSON.stringify({ ...game, version: 5 }))
+    store.data.set('ti4tempo.game.v5', JSON.stringify({ ...game, version: 6 }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
     store.data.set(
-      'ti4tempo.game.v4',
-      JSON.stringify({ ...game, version: '4' }),
+      'ti4tempo.game.v5',
+      JSON.stringify({ ...game, version: '5' }),
     )
     expect(loadGame(store)).toEqual({ status: 'invalid' })
     const pauses = [{ from: T0, to: 'later' }]
-    store.data.set('ti4tempo.game.v4', JSON.stringify({ ...game, pauses }))
+    store.data.set('ti4tempo.game.v5', JSON.stringify({ ...game, pauses }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
   })
 
@@ -104,123 +60,14 @@ describe('storage', () => {
     expect(loadLastGame(store)).toEqual({ status: 'ok', game })
   })
 
-  it('loads a version 1 game with its typed factions and no token', () => {
-    const store = memoryStore()
-    const t = table(DEFAULT_SETTINGS, 'jaz', NAALU_PLAYERS)
-    playStrategy(t)
-    t.wait(30 * SEC)
-    t.act({ kind: 'turnEnded' })
-    const old = asVersion1(t.game)
-    const typed = ['  federation of sol ', 'Embers of Muaat', 'arborec']
-    const more = ['Emirates of Hacan', 'naalu', 'Space Elves']
-    old.players.forEach((p, i) => (p.faction = [...typed, ...more][i] ?? ''))
-    store.data.set('ti4tempo.game.v1', JSON.stringify(old))
-    const game = gameOf(loadGame(store))
-    expect(game).toMatchObject({ version: 4, naaluTokenOwnerId: null })
-    expect(game.players.map((p) => p.factionId)).toEqual([
-      'sol',
-      'muaat',
-      'arborec',
-      'hacan',
-      'naalu',
-      null,
-    ])
-    // The old build ran card order, so Tom took the first turn.
-    const view = derive(game, T0 + 90 * SEC)
-    expect(view.entries.filter((e) => e.kind === 'turn')).toMatchObject([
-      { playerId: 'tom', durationMs: 30 * SEC },
-      { playerId: 'wren', running: true },
-    ])
-  })
-
-  it('moves a version 1 game to the version 4 keys', () => {
-    const store = memoryStore()
-    const old = JSON.stringify(
-      asVersion1(startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)),
-    )
-    store.data.set('ti4tempo.game.v1', old)
-    store.data.set('ti4tempo.lastGame.v1', old)
-    const game = gameOf(loadGame(store))
-    expect(gameOf(loadLastGame(store))).toEqual(game)
-    saveGame(store, game)
-    expect(store.data.has('ti4tempo.game.v1')).toBe(false)
-    expect(gameOf(loadGame(store))).toEqual(game)
-    archiveGame(store)
-    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v4'])
-    expect(gameOf(loadLastGame(store))).toEqual(game)
-  })
-
-  it('loads a version 2 game as it was saved and moves it to the version 4 keys', () => {
-    const store = memoryStore()
-    const t = table(DEFAULT_SETTINGS, 'jaz', NAALU_PLAYERS)
-    playStrategy(t)
-    t.wait(30 * SEC)
-    t.act({ kind: 'turnEnded' })
-    const old = JSON.stringify({ ...t.game, version: 2 })
-    store.data.set('ti4tempo.game.v2', old)
-    store.data.set('ti4tempo.lastGame.v2', old)
-    expect(gameOf(loadGame(store))).toEqual(t.game)
-    expect(gameOf(loadLastGame(store))).toEqual(t.game)
-    saveGame(store, t.game)
-    archiveGame(store)
-    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v4'])
-  })
-
-  it('loads a version 3 game, which logged no card for a strategic action', () => {
-    const store = memoryStore()
-    const t = table()
-    playStrategy(t)
-    t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
-    saveGame(store, t.game)
-    expect(gameOf(loadGame(store))).toEqual(t.game)
-    const actions = t.game.actions.map((a) =>
-      a.kind === 'strategyCardPlayed' ? { kind: a.kind, at: a.at } : a,
-    )
-    // A version 4 strategic action needs a card field. Only an upgraded game
-    // from an older build holds a null card.
-    store.data.set('ti4tempo.game.v4', JSON.stringify({ ...t.game, actions }))
-    expect(loadGame(store)).toEqual({ status: 'invalid' })
-    store.data.delete('ti4tempo.game.v4')
-    const old = { ...t.game, version: 3, actions }
-    store.data.set('ti4tempo.game.v3', JSON.stringify(old))
-    const game = gameOf(loadGame(store))
-    expect(game.actions.at(-1)).toMatchObject({ card: null })
-    // Each player had one card, so the window is for Tom's Leadership.
-    expect(derive(game, T0 + 2 * MIN).view).toMatchObject({
-      reaction: { card: 1, byId: 'tom' },
-      activeCards: [{ card: 1, played: true }],
-    })
-  })
-
-  it('loads an older game again after the app saves it', () => {
-    const t = table()
-    playStrategy(t)
-    t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
-    const actions = t.game.actions.map((a) =>
-      a.kind === 'strategyCardPlayed' ? { kind: a.kind, at: a.at } : a,
-    )
-    const older = [
-      ['v1', { ...asVersion1(t.game), actions }],
-      ['v2', { ...t.game, version: 2, actions }],
-      ['v3', { ...t.game, version: 3, actions }],
-    ] as const
-    for (const [key, old] of older) {
-      const store = memoryStore()
-      store.data.set(`ti4tempo.game.${key}`, JSON.stringify(old))
-      const game = gameOf(loadGame(store))
-      saveGame(store, game)
-      expect(loadGame(store)).toEqual({ status: 'ok', game })
-    }
-  })
-
   it('rejects an unknown faction or token owner', () => {
     const store = memoryStore()
     const game = startGame(NAALU_PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
     const players = game.players.map((p) => ({ ...p, factionId: 'elves' }))
-    store.data.set('ti4tempo.game.v4', JSON.stringify({ ...game, players }))
+    store.data.set('ti4tempo.game.v5', JSON.stringify({ ...game, players }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
     const owner = { ...game, naaluTokenOwnerId: 'zed' }
-    store.data.set('ti4tempo.game.v4', JSON.stringify(owner))
+    store.data.set('ti4tempo.game.v5', JSON.stringify(owner))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
   })
 

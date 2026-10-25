@@ -185,9 +185,9 @@ export function reactionEntry(
 }
 
 /**
- * Closes the reaction window and resumes the suspended turn. When the player
- * who opened the window has left, the next turn starts instead, unless
- * `advance` is false.
+ * Closes the reaction window and resumes the suspended turn. When no turn is
+ * suspended, because the card player left or `endReaction` ended the turn,
+ * the next turn starts instead, unless `advance` is false.
  */
 export function closeReaction(s: FoldState, ms: number, advance = true): void {
   if (!s.reaction) return
@@ -198,10 +198,31 @@ export function closeReaction(s: FoldState, ms: number, advance = true): void {
   s.suspended = null
 }
 
-/** A reaction window with a limit closes itself when the limit passes. */
+/**
+ * A tap closes the reaction window: the last mark, Mark all done, or the
+ * removal of the last player it waits for. The strategic action was the
+ * action of the turn, so the turn ends where the window began, and the next
+ * turn starts at the close. A game from an older build resumes the turn.
+ */
+export function endReaction(s: FoldState, ms: number, wall: number): void {
+  if (s.game.windowEndsTurn) endSuspendedTurn(s, wall)
+  closeReaction(s, ms)
+}
+
+/** The turn that opened the reaction window ends where the window began. */
+export function endSuspendedTurn(s: FoldState, wall: number): void {
+  if (!s.suspended) return
+  s.entries.push(toEntry(s, s.suspended, s.suspended.startMs, wall, false))
+  s.suspended = null
+}
+
+/**
+ * In a game from an older build, a window with a limit closes itself when
+ * the limit passes. Otherwise the window stays open and counts overtime.
+ */
 export function expireReaction(s: FoldState, ms: number): void {
   const r = s.reaction
-  if (!r || r.limitMs === null) return
+  if (!r || r.limitMs === null || s.game.windowEndsTurn) return
   const end = r.startMs + r.limitMs + r.extraMs
   if (ms >= end) closeReaction(s, end)
 }

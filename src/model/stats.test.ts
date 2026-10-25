@@ -16,12 +16,10 @@ const IDS = PLAYERS.map((p) => p.id)
 function playedRound() {
   const t = table(LIMITS_ON)
   playStrategy(t, undefined, 10 * SEC) // six picks, one minute in total
-  t.wait(MIN)
+  t.wait(4 * MIN)
   t.act({ kind: 'strategyCardPlayed', card: 1 })
   t.wait(30 * SEC)
-  t.act({ kind: 'reactionClosed' })
-  t.wait(3 * MIN)
-  t.act({ kind: 'turnEnded' })
+  t.act({ kind: 'reactionClosed' }) // Tom's turn ends
   t.wait(MIN)
   t.act({ kind: 'turnEnded' })
   passAll(t)

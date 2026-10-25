@@ -19,8 +19,8 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 - The action-phase chess clock: End Turn, the strategic action, and Pass.
 - The Naalu "0" token puts the Naalu player first. Gift of Prescience can move
   it for one round.
-- A reaction window for secondary abilities that is charged to nobody. For
-  Politics, it also asks for the new speaker.
+- A reaction window for secondary abilities that is charged to nobody.
+  Closing it ends the turn. For Politics, it also asks for the new speaker.
 - The status checklist, and clocks for agenda discussion and each vote.
 - The table can remove a player who leaves mid-game. Their recorded time
   stays in the stats.

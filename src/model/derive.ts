@@ -170,7 +170,8 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
       byId: r.byId,
       elapsedMs: ms - r.startMs,
       limitMs: r.limitMs === null ? null : r.limitMs + r.extraMs,
-      pausedTurnMs: s.suspended?.bankedMs ?? 0,
+      turnMs: s.suspended?.bankedMs ?? 0,
+      endsTurn: s.game.windowEndsTurn,
       tiles: r.others.map((playerId) => ({
         playerId,
         passed: s.passed.has(playerId),
