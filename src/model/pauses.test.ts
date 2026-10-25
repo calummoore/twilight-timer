@@ -117,6 +117,39 @@ describe('pause reasons', () => {
     })
   })
 
+  it('runs the game clock during a rule check, and stops the turn clock', () => {
+    const t = actionTable()
+    t.wait(MIN)
+    const start = t.view().gameMs
+    t.pause()
+    t.wait(5 * MIN) // a plain pause is not game time
+    expect(t.view().gameMs).toBe(start)
+    t.pauseReason('ruleCheck')
+    t.wait(2 * MIN) // a rule check is game time
+    expect(t.view().gameMs).toBe(start + 2 * MIN)
+    expect(t.view().timer).toMatchObject({ playerId: 'tom', elapsedMs: MIN })
+    t.pauseReason(null)
+    t.wait(3 * MIN)
+    t.resume()
+    t.wait(MIN)
+    expect(t.view().gameMs).toBe(start + 3 * MIN)
+    expect(t.view().timer).toMatchObject({
+      playerId: 'tom',
+      elapsedMs: 2 * MIN,
+    })
+  })
+
+  it('stops the reaction window during a rule check', () => {
+    const t = actionTable()
+    t.act({ kind: 'strategyCardPlayed' })
+    t.wait(30 * SEC)
+    t.pause()
+    t.pauseReason('ruleCheck')
+    t.wait(5 * MIN)
+    t.resume()
+    expect(t.view().view).toMatchObject({ reaction: { elapsedMs: 30 * SEC } })
+  })
+
   it('totals rule checks only, with an open rule check up to now', () => {
     const t = actionTable()
     t.pause()
@@ -144,7 +177,7 @@ describe('pause reasons', () => {
     t.wait(3 * MIN)
     t.resume()
     t.undo()
-    expect(t.view().gameMs).toBe(atTap)
+    expect(t.view().gameMs).toBe(atTap + 3 * MIN) // the game keeps the rule check
     expect(t.view().timer).toMatchObject({
       playerId: 'tom',
       elapsedMs: 20 * SEC,

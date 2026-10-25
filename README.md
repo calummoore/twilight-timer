@@ -100,7 +100,8 @@ commit. Each successful preview run updates the comment.
   - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
     limit changes.
   - `stats.ts`: round and game stats.
-  - `pauses.ts`: the open pause, and the time and the count of rule checks.
+  - `pauses.ts`: the open pause, and the time and the count of rule checks,
+    which count as game time.
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
     The parser also reads games saved by older builds.
 - `src/ui/GameScreen.tsx` connects the model to the screens.

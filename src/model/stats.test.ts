@@ -30,6 +30,34 @@ function playedRound() {
   return t
 }
 
+describe('rule checks in the stats', () => {
+  it('adds rule checks to the game time as their own part', () => {
+    const t = playedRound()
+    t.act({ kind: 'gameEnded' })
+    const entries = t.view().entries
+    const without = gameStats(entries, IDS)
+    const stats = gameStats(entries, IDS, 2 * MIN)
+    expect(without.phases.ruleCheckMs).toBe(0)
+    expect(stats.phases.ruleCheckMs).toBe(2 * MIN)
+    expect(stats.totalMs).toBe(without.totalMs + 2 * MIN)
+  })
+
+  it('leaves rule checks out of the round length, and adds them to the game', () => {
+    const t = table()
+    playStrategy(t) // six picks, one minute
+    t.wait(MIN)
+    t.pause()
+    t.pauseReason('ruleCheck')
+    t.wait(5 * MIN)
+    t.resume()
+    passAll(t)
+    t.act({ kind: 'gameEnded' })
+    const view = t.view()
+    expect(roundStats(view.entries, 1, IDS).lengthMs).toBe(2 * MIN)
+    expect(view.gameMs).toBe(7 * MIN)
+  })
+})
+
 describe('stats', () => {
   it('splits a round into phases and players', () => {
     const t = playedRound()

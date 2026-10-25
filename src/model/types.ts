@@ -126,7 +126,7 @@ export interface ReactionTime {
   marked: boolean
 }
 
-/** One timed unit of the game. Times are game time: pauses do not count. */
+/** One timed unit of the game. Its times leave out every pause and undone range. */
 export interface Entry {
   kind: EntryKind
   phase: Exclude<Phase, 'ended'>

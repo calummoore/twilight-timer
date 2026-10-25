@@ -17,6 +17,25 @@ export interface ReasonTotal {
   count: number
 }
 
+/**
+ * Whether the time of each reason is game time. Each new reason needs an
+ * entry. Rule checks are: a rules discussion is part of playing the game.
+ */
+const IN_GAME_TIME: Record<PauseReason, boolean> = { ruleCheck: true }
+
+/** Whether the game clock runs while a pause has this reason. */
+export function inGameTime(reason: PauseReason): boolean {
+  return IN_GAME_TIME[reason]
+}
+
+/**
+ * The pause time that counts as game time: the time of rule checks. No
+ * player is charged for it, so every other clock leaves it out.
+ */
+export function gameTimeMs(totals: readonly ReasonTotal[]): number {
+  return totals.reduce((ms, t) => ms + (inGameTime(t.reason) ? t.ms : 0), 0)
+}
+
 export function openPause(
   pauses: readonly Pause[],
   now: number,

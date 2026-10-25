@@ -114,7 +114,10 @@ export interface GameView {
   pickOrder: string[]
   voteOrder: string[]
   custodiansRemoved: boolean
-  /** Game time: wall time since the start, without pauses and undone time. */
+  /**
+   * Game time: the time of the entries and of the rule checks. Plain pauses
+   * and undone time do not count.
+   */
   gameMs: number
   /** The open pause, or null while the game runs. */
   pause: PauseView | null
