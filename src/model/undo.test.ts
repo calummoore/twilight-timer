@@ -79,23 +79,29 @@ describe('undo', () => {
     ).toBe(false)
   })
 
-  it('restores an open reaction window when an extension is undone late', () => {
-    const t = table(LIMITS_ON) // the window limit is 2:00
-    playStrategy(t)
-    t.wait(10 * SEC)
-    t.act({ kind: 'strategyCardPlayed' })
-    t.wait(110 * SEC)
-    t.act({ kind: 'reactionExtended', ms: MIN })
-    t.wait(20 * SEC) // past the old 2:00 end
-    t.undo()
-    expect(t.view().view).toMatchObject({
-      reaction: {
-        elapsedMs: 110 * SEC,
-        limitMs: 2 * MIN,
-        turnMs: 10 * SEC,
-      },
-    })
-  })
+  it.each([
+    ['a new game', table],
+    ['an older game', olderTable],
+  ])(
+    'restores an open window when an extension is undone late, in %s',
+    (_, start) => {
+      const t = start(LIMITS_ON) // the window limit is 2:00
+      playStrategy(t)
+      t.wait(10 * SEC)
+      t.act({ kind: 'strategyCardPlayed' })
+      t.wait(110 * SEC)
+      t.act({ kind: 'reactionExtended', ms: MIN })
+      t.wait(20 * SEC) // past the old 2:00 end
+      t.undo()
+      expect(t.view().view).toMatchObject({
+        reaction: {
+          elapsedMs: 110 * SEC,
+          limitMs: 2 * MIN,
+          turnMs: 10 * SEC,
+        },
+      })
+    },
+  )
 
   it('reopens the game when the game end is undone', () => {
     const t = actionTable()
