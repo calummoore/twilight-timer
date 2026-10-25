@@ -158,6 +158,10 @@ select.fld {
   margin-top: 10px;
   line-height: 1.55;
 }
+.dialog .heir {
+  margin-top: 16px;
+  color: #f0cf6a;
+}
 .dialog .btns {
   display: flex;
   gap: 12px;
