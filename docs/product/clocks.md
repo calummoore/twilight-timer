@@ -60,9 +60,8 @@ under a master "enforce time limits" switch.
 ## Pauses
 
 The table can pause the whole game from the top bar: for food, a phone call, or
-a rules discussion. A pause stops every clock and charges nobody. Pause time is
-not game time, so the game clock, the round lengths, and the phase totals leave
-it out.
+a rules discussion. A pause stops every player clock and every table clock, such
+as the reaction window, so it charges nobody.
 
 A pause can have a **reason**. The one reason is **Rule check**, for a rules
 discussion. A new pause is always a plain pause: the pause screen shows
@@ -73,14 +72,24 @@ several rule checks. Rejected: letting the last reason cover the whole pause,
 because a rules discussion can end while the table stays paused. A rule check
 misses the seconds before its tap, and that is accepted.
 
+Rule-check time is **game time** that nobody is charged for. The game clock runs
+during a rule check, and the post-game stats count rule checks in the game time,
+as their own part of it. Plain pause time is not game time, so the game clock,
+the round lengths, and the phase totals leave it out. Rejected: leaving rule
+checks out of game time, because a rules discussion is part of playing the game,
+and a break is not.
+
 The stats show only time with a reason. The post-game stats show the time and
-the number of rule checks. Rejected: showing plain pause time or a paused
-total, because a plain pause does not say where the time went. The round
-summary shows no pause time.
+the number of rule checks, and their share of the game. Rejected: showing plain
+pause time or a paused total, because a plain pause does not say where the time
+went. The round summary shows no pause time, so its round length leaves rule
+checks out.
 
 A rule check counts in full, also when a later undo takes back the tap before
-the pause, because the table really spent that time. Undo does not change a
-pause or its rule checks. The reason can change only while the game is paused.
+the pause, because the table really spent that time. So after such an undo, the
+game clock keeps the rule check, and every player and table clock returns to its
+value at the undone tap. Undo does not change a pause or its rule checks. The
+reason can change only while the game is paused.
 
 A game saved by a build without reasons has no rule checks.
 
@@ -100,7 +109,8 @@ correction operations, and deliberately no others:
 bar, and pressing it repeatedly keeps stepping back, so the table can rewind to
 the last correct state and carry on from there. It restores **elapsed time as
 well as state**, so a mis-tapped End Turn costs nobody their seconds. Every
-clock returns to its value at the moment of the undone action. The time between
+clock returns to its value at the moment of the undone action. The game clock
+also keeps the rule checks in between (see [Pauses](#pauses)). The time between
 that action and the undo is charged to nobody, like a pause.
 
 **Edit time** — changes a duration and nothing else. A duration is a leaf value:
