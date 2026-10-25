@@ -69,9 +69,10 @@ skill at that moment instead of guessing the rule.
 
 ## Review focus
 
-- Time attribution: every moment of game time belongs to exactly one entry,
-  pause, or undone range.
-- Undo: every clock returns to its value at the undone action.
+- Time attribution: every moment of game time belongs to exactly one entry
+  or rule check. Plain pauses and undone ranges are not game time.
+- Undo: every clock returns to its value at the undone action. The game
+  clock also keeps the rule checks in between.
 - Stored games: a saved game from an older build still loads, or the app
   shows its notice and starts fresh.
 

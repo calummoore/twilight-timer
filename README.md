@@ -26,7 +26,8 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 - The table can remove a player who leaves mid-game. Their recorded time
   stays in the stats.
 - Optional time limits with overtime and an alarm.
-- Undo that also restores time, a pause, a round summary, and game stats.
+- Undo that also restores time, a pause that can time rule checks, a round
+  summary, and game stats.
 - The game saves in the browser after every tap, and the screen stays awake.
 
 ## Docs
@@ -102,8 +103,11 @@ commit. Each successful preview run updates the comment.
     `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
     player who leaves.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
-  - `commands.ts`: start, act, undo, pause, resume, and limit changes.
+  - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
+    limit changes.
   - `stats.ts`: round and game stats.
+  - `pauses.ts`: the open pause, and the time and the count of rule checks,
+    which count as game time.
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
     The parser also reads games saved by older builds.
 - `src/ui/GameScreen.tsx` connects the model to the screens.

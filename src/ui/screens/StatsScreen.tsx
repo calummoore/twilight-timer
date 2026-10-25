@@ -1,8 +1,9 @@
 import { cardName } from '../../model/rules'
-import { gameStats } from '../../model/stats'
+import { postGameStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
 import { pc } from '../colour'
 import { clock, percent, plural, words } from '../format'
+import { ReasonTiles } from './ReasonTiles'
 
 export function StatsScreen(props: {
   game: GameView
@@ -12,10 +13,7 @@ export function StatsScreen(props: {
   const { game } = props
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const leftIn = new Map(game.departures.map((d) => [d.playerId, d.round]))
-  const stats = gameStats(
-    game.entries,
-    game.players.map((p) => p.id),
-  )
+  const stats = postGameStats(game)
   const widest = Math.max(1, ...stats.players.map((p) => p.turnMs))
   const width = (ms: number) => `${(ms / widest) * 100}%`
   const phases = [
@@ -43,6 +41,11 @@ export function StatsScreen(props: {
       label: 'Strategy phase',
       ms: stats.phases.strategyMs,
       colour: 'var(--c-yellow)',
+    },
+    {
+      label: 'Rule checks',
+      ms: stats.phases.ruleCheckMs,
+      colour: 'var(--accent)',
     },
     {
       label: 'Between rounds',
@@ -75,7 +78,7 @@ export function StatsScreen(props: {
             plural(stats.reactionCount, 'reaction window'),
           ].join(' · ')}
         </div>
-        <div className="stat-grid" style={{ marginTop: 22 }}>
+        <div className="stat-grid five" style={{ marginTop: 22 }}>
           <div className="stat">
             <div className="l">Longest round</div>
             <div className="v num">
@@ -111,6 +114,7 @@ export function StatsScreen(props: {
               {plural(stats.overLimitCount, 'time')} over a limit
             </div>
           </div>
+          <ReasonTiles totals={game.reasonTotals} gameMs={stats.totalMs} />
         </div>
         <div
           style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 18 }}

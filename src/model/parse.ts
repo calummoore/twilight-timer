@@ -7,13 +7,16 @@ import {
   type Settings,
 } from './settings'
 import {
+  PAUSE_REASONS,
   TIMER_KEYS,
   type Action,
   type Game,
   type Interval,
   type Limits,
   type LimitsChange,
+  type Pause,
   type Player,
+  type ReasonRange,
 } from './types'
 
 type Fields = Record<string, unknown>
@@ -25,10 +28,10 @@ type Fields = Record<string, unknown>
  */
 export function parseGame(raw: unknown): Game | null {
   const game = isFields(raw) ? upgrade(raw) : null
-  if (game?.version !== 5) return null
+  if (game?.version !== 6) return null
   const players = listOf(game.players, parsePlayer)
   const actions = listOf(game.actions, parseAction)
-  const pauses = listOf(game.pauses, parseInterval)
+  const pauses = listOf(game.pauses, parsePause)
   const voids = listOf(game.voids, parseInterval)
   const limitsLog = listOf(game.limitsLog, parseLimitsChange)
   const { startedAt, firstSpeakerId, windowEndsTurn } = game
@@ -42,7 +45,7 @@ export function parseGame(raw: unknown): Game | null {
     return null
   }
   return {
-    version: 5,
+    version: 6,
     startedAt,
     players,
     firstSpeakerId,
@@ -105,13 +108,23 @@ function upgrade(raw: Fields): Fields {
       return upgrade({ ...raw, version: 4, windowEndsTurn })
     }
     case 4:
-      // A preview of two cards each saved version 4 with cards and no window
-      // rule, before the window rule took version 4. It resumed the turn.
+      // Two previews saved version 4 with no window rule, before the window
+      // rule took version 4: two cards each, with cards, and pause reasons,
+      // with rule checks. Both resumed the turn.
       if (raw.windowEndsTurn === undefined) {
-        return { ...raw, version: 5, windowEndsTurn: false }
+        return upgrade({ ...raw, version: 5, windowEndsTurn: false })
       }
       // Builds that gave each player one card logged no card.
-      return { ...raw, version: 5, actions: mapList(raw.actions, cardless) }
+      return upgrade({
+        ...raw,
+        version: 5,
+        actions: mapList(raw.actions, cardless),
+      })
+    case 5:
+      // A preview of pause reasons saved version 5 with rule checks and no
+      // card, before two cards each took version 5. Main's version 5 logs the
+      // card, so only a missing card becomes null.
+      return { ...raw, version: 6, actions: mapList(raw.actions, missingCard) }
     default:
       return raw
   }
@@ -133,6 +146,12 @@ function typedFaction(raw: unknown): unknown {
 function cardless(raw: unknown): unknown {
   if (!isFields(raw) || raw.kind !== 'strategyCardPlayed') return raw
   return { ...raw, card: null }
+}
+
+/** A strategic action without a card gets a null card. Another keeps its card. */
+function missingCard(raw: unknown): unknown {
+  if (!isFields(raw) || raw.card !== undefined) return raw
+  return cardless(raw)
 }
 
 function parsePlayer(raw: unknown): Player | null {
@@ -198,6 +217,29 @@ function parseInterval(raw: unknown): Interval | null {
   if (!isFields(raw) || !isNumber(raw.from)) return null
   if (raw.to !== null && !isNumber(raw.to)) return null
   return { from: raw.from, to: raw.to }
+}
+
+/**
+ * A pause and its reason ranges. A pause from before version 6 has no
+ * ranges, except in a game that a preview of pause reasons saved as version
+ * 4 or 5. A range that cannot be read is dropped, so its time counts as a
+ * plain pause and the game still loads.
+ */
+function parsePause(raw: unknown): Pause | null {
+  const range = parseInterval(raw)
+  if (!range || !isFields(raw)) return null
+  const reasons = Array.isArray(raw.reasons)
+    ? raw.reasons.flatMap((r: unknown) => parseReasonRange(r) ?? [])
+    : []
+  return { ...range, reasons }
+}
+
+function parseReasonRange(raw: unknown): ReasonRange | null {
+  const range = parseInterval(raw)
+  const reason = isFields(raw)
+    ? PAUSE_REASONS.find((r) => r === raw.reason)
+    : undefined
+  return range && reason ? { reason, ...range } : null
 }
 
 function parseLimitsChange(raw: unknown): LimitsChange | null {

@@ -1,4 +1,4 @@
-import { canUndo, isPaused } from './commands'
+import { canUndo } from './commands'
 import { foldGame } from './fold'
 import { currentPicker, tokenOwner, turnOrder } from './fold-orders'
 import {
@@ -9,8 +9,9 @@ import {
   type Reaction,
 } from './fold-state'
 import { pickOrder, voteOrder } from './orders'
+import { gameTimeMs, openPause, reasonTotals } from './pauses'
 import { POLITICS, STRATEGY_CARDS, cardsEach } from './rules'
-import { gameClock, mergeIntervals } from './time'
+import { entryClock, mergeIntervals } from './time'
 import type { Entry, Game } from './types'
 import type {
   GameView,
@@ -27,9 +28,10 @@ export function derive(game: Game, now: number): GameView {
   const excluded = mergeIntervals([...game.pauses, ...game.voids], now)
   const lastStart = s.segment?.startMs ?? s.reaction?.startMs ?? 0
   const ms =
-    s.endedMs ?? Math.max(lastStart, gameClock(game.startedAt, excluded)(now))
+    s.endedMs ?? Math.max(lastStart, entryClock(game.startedAt, excluded)(now))
   expireReaction(s, ms)
   const entries = [...s.entries, ...runningEntries(s, ms, now)]
+  const reasons = reasonTotals(game.pauses, now)
   return {
     round: s.round,
     players: game.players,
@@ -40,8 +42,9 @@ export function derive(game: Game, now: number): GameView {
     pickOrder: pickOrder(s.seats, s.speakerId),
     voteOrder: voteOrder(s.seats, s.speakerId),
     custodiansRemoved: s.custodiansRemoved,
-    gameMs: ms,
-    paused: isPaused(game),
+    gameMs: ms + gameTimeMs(reasons),
+    pause: openPause(game.pauses, now),
+    reasonTotals: reasons,
     canUndo: canUndo(game),
     timer: timerView(s, ms, now),
     entries,

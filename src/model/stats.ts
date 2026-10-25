@@ -1,4 +1,6 @@
+import { gameTimeMs } from './pauses'
 import type { Departure, Entry, Player } from './types'
+import type { GameView } from './view'
 
 export interface PlayerRoundStats {
   playerId: string
@@ -61,6 +63,8 @@ export interface GameStats {
   phases: {
     turnsMs: number
     reactionMs: number
+    /** Game time that no player is charged for, outside every phase. */
+    ruleCheckMs: number
     agendaMs: number
     statusMs: number
     strategyMs: number
@@ -115,9 +119,23 @@ export function roundStats(
   }
 }
 
+/**
+ * The post-game stats of a derived game. Their total is the game clock,
+ * because they add the rule-check time to the entries.
+ */
+export function postGameStats(game: GameView): GameStats {
+  return gameStats(
+    game.entries,
+    game.players.map((p) => p.id),
+    gameTimeMs(game.reasonTotals),
+  )
+}
+
+/** Stats for the whole game. `ruleCheckMs` is the rule-check time, also game time. */
 export function gameStats(
   entries: readonly Entry[],
   playerIds: readonly string[],
+  ruleCheckMs = 0,
 ): GameStats {
   const turns = entries.filter((e) => e.kind === 'turn')
   const windows = entries.filter((e) => e.kind === 'reaction')
@@ -128,7 +146,7 @@ export function gameStats(
     lengthMs: roundStats(entries, i + 1, []).lengthMs,
   }))
   return {
-    totalMs: sum(entries),
+    totalMs: sum(entries) + ruleCheckMs,
     rounds,
     turns: turns.length,
     reactionCount: windows.length,
@@ -142,6 +160,7 @@ export function gameStats(
     phases: {
       turnsMs,
       reactionMs: sum(windows),
+      ruleCheckMs,
       agendaMs: sum(entries.filter((e) => e.phase === 'agenda')),
       statusMs: sum(entries.filter((e) => e.phase === 'status')),
       strategyMs: sum(entries.filter((e) => e.phase === 'strategy')),

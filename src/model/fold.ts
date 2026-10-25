@@ -22,11 +22,11 @@ import {
 } from './fold-state'
 import { AGENDAS_PER_ROUND, STATUS_STEPS, isStrategyCard } from './rules'
 import { limitAt } from './settings'
-import { gameClock, mergeIntervals } from './time'
+import { entryClock, mergeIntervals } from './time'
 import type { Action, Game } from './types'
 
 /**
- * Folds the action log into state. `toMs` maps wall-clock time to game
+ * Folds the action log into state. `toMs` maps wall-clock time to entry
  * time. An action that is not valid in its state is skipped and listed in
  * `rejected`.
  */
@@ -46,7 +46,7 @@ export function actionClock(game: Game): (wall: number) => number {
     [...game.pauses, ...game.voids],
     Number.MAX_SAFE_INTEGER,
   )
-  return gameClock(game.startedAt, excluded)
+  return entryClock(game.startedAt, excluded)
 }
 
 function step(s: FoldState, a: Action, ms: number): boolean {
