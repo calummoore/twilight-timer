@@ -2,7 +2,7 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review findings 2, 4, 10, 14, 15, and 16 wait for Cal. Milestones 7
+on 2026-10-25. Review findings 2, 4, and 10 wait for Cal. Milestones 7
 to 11 make rule checks count as game time, and Milestone 14 applies
 findings 6 and 8.
 
@@ -118,6 +118,13 @@ Decisions:
   post-game stats list every player, also one who left, with their turn
   time. Alternative: B, also make `gameStats` private, so that every caller
   passes the view.
+- 2026-10-25, Cal: review findings 14, 15, and 16, option A each. Cal wrote
+  "1 = A"; finding 1 was fixed long before, so the answer is read as 14.
+  The player-list test goes on to round 2 after the player leaves (14),
+  checks that the removal is accepted and that the player is listed as
+  left (15), and moves into the "stats" block (16). Alternatives: 14 B,
+  `gameStats` takes player records; 15 B, the test table fails a test on
+  each rejected tap; 16 B, a new "post-game stats" block.
 
 Contract owners:
 
@@ -557,10 +564,34 @@ Apply Cal's answer to review finding 13. Only a test changes.
   - Review 7 found 3 findings, and none is `Auto-fix: yes`, so no fix round
     runs. Finding 13 is resolved for the two lists that it named. Report:
     `.context/pause-reasons/review-7.md`.
-  - 14. Test passes with the last round's players. Severity Low, effort Small. Recommended: A, let the game go on to round 2 after the player leaves.
-  - 15. Test never checks that the player left. Severity Low, effort Small. Recommended: A, assert that the removal is accepted, or check the departures.
-  - 16. Player-list test sits under rule checks. Severity Low, effort Small. Recommended: A, move the test into the "stats" block.
+  - 14. Test passes with the last round's players. Severity Low, effort Small. Recommended: A, let the game go on to round 2 after the player leaves. Cal chose A on 2026-10-25: Milestone 17.
+  - 15. Test never checks that the player left. Severity Low, effort Small. Recommended: A, assert that the removal is accepted, or check the departures. Cal chose A on 2026-10-25: Milestone 17.
+  - 16. Player-list test sits under rule checks. Severity Low, effort Small. Recommended: A, move the test into the "stats" block. Cal chose A on 2026-10-25: Milestone 17.
   - `plans/pause-reasons.md`: the Design section gives old line counts for `stats.ts` and `StatsScreen.tsx`. Separate branch.
+
+## Milestone 17: Review findings 14 to 16
+
+Apply Cal's answers to review findings 14, 15, and 16. Only a test
+changes.
+
+- [x] Finding 14: the player-list test goes on to round 2 after the player
+      leaves, so the last round's players differ from every player.
+- [x] Finding 15: the test checks that the game accepts the removal, and
+      that the player is listed as left in round 1.
+- [x] Finding 16: the test moves into the "stats" block, next to the other
+      test of a player who left.
+- [x] Check that the test fails when `postGameStats` lists only the seated
+      players, no player, or the players of the last round, when the test
+      has no removal, and when the game rejects the removal.
+- Evidence: `.context/pause-reasons/findings-14-16/mutation.log`: the new
+  test fails in each of the five checks.
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+- [x] Commit with Conventional Commits, push the branch, and update the
+      pull request description.
+- [ ] Review the complete local diff against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 
