@@ -221,6 +221,9 @@ Show the chips, the faction lists, and the deal as the mockup shows them.
   - The padding and the border of each seat row take room from its first
     and last columns. Widen those columns by about 12 pixels to keep the
     current look.
+  - Give the seat list the column gap of a seat row, 11 pixels. A
+    different gap takes room from the fixed columns, and the swatch
+    column then overflows.
 - [ ] Let the Game panel shrink and its summary rows scroll, as the
       mockup does.
 - [ ] Move the new mockup classes to `src/styles/mockup/setup.css`.
@@ -271,6 +274,8 @@ Run the checks, push, and review the branch.
   - Review 2 checked fix commit 1bfe11a: findings 2, 3, and 4 are
     resolved. It found 1 finding. No further fix round runs. Report:
     `.context/random-factions/review-2.md`.
+  - Review 3 checked Milestone 1 and the merge of `main` at 899933a. It
+    found no finding. Report: `.context/random-factions/review-3.md`.
   - Findings 1, 5, and 6: Cal chose B, A, and B on 2026-10-25, as the
     decisions record. Milestone 1 holds finding 1, Milestones 3 and 4
     hold the checks of finding 5, and the line below applies finding 6.
