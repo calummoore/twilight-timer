@@ -12,6 +12,8 @@ export interface Settings {
   keepAwake: boolean
   /** Show each player's game total on the rail, not only the current turn. */
   showCumulative: boolean
+  /** Show the Join button, so that players can join on their own device. */
+  allowCompanions: boolean
 }
 
 export const DEFAULT_LIMITS: Limits = {
@@ -31,6 +33,7 @@ export const DEFAULT_SETTINGS: Settings = {
   alarmSound: 'klaxon',
   keepAwake: true,
   showCumulative: true,
+  allowCompanions: true,
 }
 
 /** The limit for a timer at wall-clock time `at`, or null for no limit. */

@@ -58,6 +58,7 @@ export function parseSettings(raw: unknown): Settings {
     alarmSound: sound ?? d.alarmSound,
     keepAwake: bool(raw.keepAwake, d.keepAwake),
     showCumulative: bool(raw.showCumulative, d.showCumulative),
+    allowCompanions: bool(raw.allowCompanions, d.allowCompanions),
   }
 }
 
@@ -83,7 +84,7 @@ function parseLimitsChange(raw: unknown): LimitsChange | null {
   return { at: raw.at, enforce: raw.enforce, limits }
 }
 
-function parseLimits(raw: unknown): Limits | null {
+export function parseLimits(raw: unknown): Limits | null {
   if (!isFields(raw)) return null
   const out: Partial<Limits> = {}
   for (const key of TIMER_KEYS) {

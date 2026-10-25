@@ -1,8 +1,15 @@
 import { foldGame } from './fold'
 import { gameClock, mergeIntervals } from './time'
-import type { Settings } from './settings'
+import { DEFAULT_LIMITS, type Settings } from './settings'
 import { expireReaction } from './fold-state'
-import type { ActionInput, Game, Limits, Player } from './types'
+import type {
+  ActionInput,
+  Game,
+  Limits,
+  Player,
+  TimerKey,
+  TimerLimit,
+} from './types'
 
 export function startGame(
   players: Player[],
@@ -91,6 +98,30 @@ export function setLimits(
     ...game,
     limitsLog: [...game.limitsLog, { at: now, enforce, limits }],
   }
+}
+
+/** The limits in force after the newest change. */
+export function limitsNow(game: Game): { enforce: boolean; limits: Limits } {
+  const last = game.limitsLog.at(-1)
+  return last
+    ? { enforce: last.enforce, limits: last.limits }
+    : { enforce: false, limits: DEFAULT_LIMITS }
+}
+
+/** Changes one timer from now on, and keeps every other limit in force. */
+export function setLimit(
+  game: Game,
+  key: TimerKey,
+  limit: TimerLimit,
+  now: number,
+): Game {
+  const { enforce, limits } = limitsNow(game)
+  return setLimits(game, enforce, { ...limits, [key]: limit }, now)
+}
+
+/** Turns the master switch on or off from now on. */
+export function setEnforce(game: Game, enforce: boolean, now: number): Game {
+  return setLimits(game, enforce, limitsNow(game).limits, now)
 }
 
 function clockKey(game: Game, wall: number): string {

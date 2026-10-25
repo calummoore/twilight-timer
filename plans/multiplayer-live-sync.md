@@ -134,8 +134,8 @@ ordered version steps, each tested with a recorded game.
    and the game id.
 2. The device applies the change to its own copy at once, and marks it
    pending.
-3. The object takes one change at a time. It checks the game id and the
-   role of the sender, then runs the model on the newest game.
+3. The object takes one change at a time. It checks the role of the
+   sender, then runs the model on the newest game.
 4. The object keeps every tap id that it answered, also for a tap that
    undo removed later. A repeated tap id gets its first answer.
 5. One model helper puts the time of a change between the newest time in
@@ -306,40 +306,40 @@ move to version 2, and version 1 games migrate on load.
 Add the pure model functions for shared games. Each has unit tests with
 fixed times and a fixed random source.
 
-- [ ] Apply a change: check the game id and the role, run the model, and
-      stamp the time. Keep every answered tap id, and answer a repeated id
-      with its first answer.
-- [ ] One helper puts the time of a change between the newest time in the
+- [x] Apply a change: check the role, run the model, and stamp the time.
+      Keep every answered tap id, and answer a repeated id with its first
+      answer. The device checks the game id of each view.
+- [x] One helper puts the time of a change between the newest time in the
       game and the server clock.
-- [ ] Roles: table mode may send every change. Player mode may send the
+- [x] Roles: table mode may send every change. Player mode may send the
       game changes of decision 12 for its own seat, a seat claim, and a
       seat move request.
-- [ ] Views: the public game for every device, plus the private part of
+- [x] Views: the public game for every device, plus the private part of
       its seat for player mode. Roles and secrets stay in a server record
       that no view holds.
-  - [ ] Test that a table view holds no private data.
-  - [ ] Test that a player view holds no secret and no private part of
+  - [x] Test that a table view holds no private data.
+  - [x] Test that a player view holds no secret and no private part of
         another seat.
-  - [ ] Test that no view of any role holds a device secret or the table
+  - [x] Test that no view of any role holds a device secret or the table
         secret.
-- [ ] Outbox: the pending changes in order, the game with them applied,
+- [x] Outbox: the pending changes in order, the game with them applied,
       and the next step after an answer: done, or drop with a notice.
-- [ ] Records: the shared-game record of the object and the device record,
+- [x] Records: the shared-game record of the object and the device record,
       each read through the parser and the version steps. A record that
       does not parse gives a clear failure, not a crash.
-- [ ] Time base: move a game to server time, and give `now` for a game
+- [x] Time base: move a game to server time, and give `now` for a game
       from its time base. The mark joins version 2 of the stored game, and
       the version 1 step reads a game without it as device time.
-- [ ] A limits change names one timer or the master switch, and applies to
+- [x] A limits change names one timer or the master switch, and applies to
       the newest limits of the game.
-- [ ] Codes and links: make a code, a game id, and a table secret, read
+- [x] Codes and links: make a code, a game id, and a table secret, read
       typed input, and parse both links.
-- [ ] Add "Allow phone companions" to the stored settings, on by default
+- [x] Add "Allow phone companions" to the stored settings, on by default
       as the mockup shows. A parser default keeps the settings key at
       version 1.
-- [ ] Player views: who acts now and their clock, the turns before mine,
+- [x] Player views: who acts now and their clock, the turns before mine,
       my totals and card, my reaction tile, and my game stats.
-- [ ] The room module: one shared-game record, its connections, and the
+- [x] The room module: one shared-game record, its connections, and the
       messages in and out. Storage and connections are passed in, so the
       Vitest tests use memory fakes. This covers decision 13.
 
