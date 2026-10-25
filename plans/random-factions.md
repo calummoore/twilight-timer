@@ -265,10 +265,11 @@ Run the checks, push, and review the branch.
     sides. Justifications:
     `.context/random-factions/merge/justifications.md`. The description
     of PR #14 holds them.
-  - Open PRs #11 and #12 also change the spec, the mockup, the README,
-    and `src/model/parse.ts`. PR #11 also changes
-    `src/ui/screens/SetupGamePanel.tsx`. Expect conflicts when they
-    merge.
+  - Open PRs #11, #12, and #13 also change the spec, the mockup, the
+    README, and `src/model/parse.ts`. PR #11 also changes
+    `src/ui/screens/SetupGamePanel.tsx`. PR #13 also changes
+    `src/model/storage.test.ts` and `src/styles/app.css`. Expect
+    conflicts when they merge.
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
   Evidence: `.context/random-factions/check-final.log`.
 - [x] Commit with Conventional Commits and push the branch.
@@ -287,6 +288,10 @@ Run the checks, push, and review the branch.
     `.context/random-factions/review-2.md`.
   - Review 3 checked Milestone 1 and the merge of `main` at 899933a. It
     found no finding. Report: `.context/random-factions/review-3.md`.
+  - Review 4 checked the whole branch at 789d692, with the model and the
+    setup code. The code has no finding. It found 1 process finding.
+    Report: `.context/random-factions/review-4.md`.
+  - 9. PR #14 is closed without a merge. Severity Medium, effort Small. Recommended: A, ask Cal, then reopen PR #14 with a `feat` title and a description for Milestones 3 and 4.
   - Findings 1, 5, and 6: Cal chose B, A, and B on 2026-10-25, as the
     decisions record. Milestone 1 holds finding 1, Milestones 3 and 4
     hold the checks of finding 5, and the line below applies finding 6.
