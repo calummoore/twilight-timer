@@ -1021,7 +1021,7 @@ const CARDNAME = {1:'Leadership',2:'Diplomacy',3:'Politics',4:'Construction',
                   5:'Trade',6:'Warfare',7:'Technology',8:'Imperial'};
 // Marks a control that is designed but not in the app yet.
 const LATER = '<span class="later-tag">Later</span>';
-// A paused game stops every clock, so the screen behind an overlay stands still.
+// Removes the live clocks of a screen behind an overlay. A pause stops them all, but a rule check keeps the game clock running.
 const still = h => h.replace(/ data-clock="[^"]*"/g,'');
 
 const sccard = (n, used) =>
