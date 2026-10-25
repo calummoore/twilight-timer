@@ -1,9 +1,9 @@
 # Three- and four-player games
 
 Status: Active. [PR #11](https://github.com/calummoore/twilight-timer/pull/11)
-is open and stacked on
-[PR #9](https://github.com/calummoore/twilight-timer/pull/9). The plan closes
-when its PR merges.
+is open on `main`. It was stacked on
+[PR #9](https://github.com/calummoore/twilight-timer/pull/9), which merged on
+2026-10-25. The plan closes when its PR merges.
 
 Setup offers 5 to 8 players, and each player takes one strategy card. TI4
 also plays with 3 or 4 players. Then each player takes two strategy cards,
@@ -207,6 +207,11 @@ Run the checks, push, open the stacked PR, and review it.
     further fix round runs. Report:
     `.context/three-and-four-player-games/review-2.md`.
   - `docs/mockups/index.html`: the phone "Your Turn" screen still greys Pass as "PASS — strategy card unplayed", but Pass only warns. Separate branch.
+- [x] Merge `origin/main` after PR #9 landed as b6f658d. Each conflicted
+      path equals the PR #9 tip on `main`, so the merge keeps this branch's
+      version, and it adds only the #10 change. Retarget PR #11 to `main`.
+      Justifications: `.context/three-and-four-player-games/merge-main.log`.
+      The PR description copies them.
 
 ## Post-merge follow-up (non-blocking)
 
