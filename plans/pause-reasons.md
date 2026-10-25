@@ -490,9 +490,13 @@ Apply Cal's answers to review findings 6 and 8. Both keep the behaviour.
   - Commits 87f40e1 and 26c5376.
   - Review 5 found 2 findings. Fixed: 12, the `foldGame` comment still
     called entry time game time. Report:
-    `.context/pause-reasons/review-5.md`.
+    `.context/pause-reasons/review-5.md`. Findings 6 and 8 of review 3 are
+    resolved.
+  - Review 6 checked fix commit 745a54a: finding 12 is resolved, and it
+    found no new finding. No further fix round runs. Report:
+    `.context/pause-reasons/review-6.md`.
   - 13. Post-game player list has no test. Severity Low, effort Small. Recommended: A, a unit test that removes a player, ends the game, and checks that `postGameStats` lists every player.
-  - `src/ui/screens/ActionScreen.tsx` and `src/ui/screens/SettingsScreen.tsx`: the app calls a player's own-turn total "game total" and "game time", but the mockup calls it "cumulative". Separate branch.
+  - `src/ui/screens/ActionScreen.tsx`, `src/ui/screens/SettingsScreen.tsx`, and `src/model/settings.ts`: the app calls a player's own-turn total "game total" and "game time", but the mockup calls it "cumulative". Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
