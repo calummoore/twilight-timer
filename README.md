@@ -72,24 +72,35 @@ To deploy by hand, run `npx wrangler login`, then `npm run build` and
 
 The same workflow gives each pull request a preview. Its `preview` job builds
 the pull request head commit of each run. A rerun builds the same commit
-again. Then the job runs `wrangler versions upload` with the alias
-`pr-<number>`. This adds a version of the Worker but does not deploy it, so
-production does not change.
+again. Then the job runs `wrangler preview --name pr-<number>`. This makes or
+updates a Workers Preview of the build under the same Worker. Production does
+not change.
 
 The preview opens at `https://pr-<number>-twilight-timer.futex.workers.dev`.
 A bot comment on the pull request gives this link and a link to the exact
 commit. Each successful preview run updates the comment.
 
+When the pull request closes, also by a merge, the `cleanup` job runs
+`wrangler preview delete`. Then it edits the comment to say that the preview
+is deleted. If the pull request opens again, the next run makes a new preview.
+
+- Workers Previews is an open beta of Cloudflare. A failed preview fails only
+  the `Preview` check. It does not stop the deploy of `main`.
 - Pull requests from forks get no preview, because their runs get no secrets.
-  A run without the Cloudflare secrets skips the preview with a warning.
+  A run without the Cloudflare secrets skips the preview or the cleanup with a
+  warning.
 - Package code from a pull request runs before review in the same job as the
   upload step, which holds `CLOUDFLARE_API_TOKEN`. Cal accepted this risk on
-  2026-10-23.
+  2026-10-23. The `cleanup` job installs from the default branch, so it runs
+  no pull request code.
 - A preview has its own origin, so it keeps its own saved games.
-- The workflow does not delete previews. A preview stays online after its pull
-  request closes.
-- Previews need Preview URLs on the Worker. `"preview_urls": true` in
-  `wrangler.jsonc` keeps them on at each deploy.
+- Workers Previews need Preview URLs on the Worker. `"preview_urls": true` in
+  `wrangler.jsonc` keeps them on at each deploy. `wrangler preview` also needs
+  the `previews` block in `wrangler.jsonc`.
+- Cal chose Workers Previews on 2026-10-25, so that CI can delete each
+  preview. Rejected: aliases from `wrangler versions upload`, because
+  Cloudflare cannot delete them. The alias previews of pull requests #4 to #15
+  stay online for this reason.
 
 ## Key code
 
