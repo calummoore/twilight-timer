@@ -122,7 +122,7 @@
   .rail .row .nm i{display:none}
   .rail .row .fc{grid-area:fc; display:flex; flex-direction:column; align-items:flex-start; gap:3px; min-width:0; margin:0}
   .rail .row .sccard{margin:0; padding:1px 6px; font-size:10.5px; letter-spacing:0; text-transform:none}
-  .rail .row .fac{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .rail .row .fn{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .rail .row .tm{grid-area:tm; display:flex; flex-wrap:wrap; column-gap:6px; align-items:baseline; text-align:left}
   .rail .row .tm .a{font-size:13px}
   .rail .row .tm .b{font-size:10.5px; margin:0}

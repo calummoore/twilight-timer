@@ -169,6 +169,10 @@ Run the checks, push, and review the branch.
       faction deal. The seat list subgrid takes the responsive columns, and
       a phone keeps its seat cards. Justifications:
       `.context/phone-version/merge-notes.md`.
+- [x] Merge `origin/main` again for PR #11, three- and four-player games.
+      The mockup no longer marks them as Later, and a phone shows both
+      cards of each player. Justifications:
+      `.context/phone-version/merge-notes.md`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,

@@ -73,7 +73,9 @@ export function GameScreen(props: {
             alarming={alarming}
             onSilence={silence}
             onEndTurn={() => dispatch({ kind: 'turnEnded' })}
-            onPlayCard={() => dispatch({ kind: 'strategyCardPlayed' })}
+            onPlayCard={(card) =>
+              dispatch({ kind: 'strategyCardPlayed', card })
+            }
             onPass={() => dispatch({ kind: 'passed' })}
           />
         )

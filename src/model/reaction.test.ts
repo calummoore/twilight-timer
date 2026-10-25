@@ -8,7 +8,7 @@ function openWindow(settings = LIMITS_ON) {
   const t = table(settings)
   playStrategy(t)
   t.wait(10 * SEC) // Tom's turn
-  t.act({ kind: 'strategyCardPlayed' })
+  t.act({ kind: 'strategyCardPlayed', card: 1 })
   return t
 }
 
@@ -26,7 +26,7 @@ describe('reaction window', () => {
     expect(view.view).toMatchObject({
       phase: 'action',
       activeId: 'tom',
-      cardPlayed: true,
+      activeCards: [{ card: 1, played: true }],
       reaction: {
         card: 1,
         byId: 'tom',
@@ -77,7 +77,7 @@ describe('reaction window', () => {
     const t = table()
     playStrategy(t)
     t.act({ kind: 'passed' }) // Tom passes
-    t.act({ kind: 'strategyCardPlayed' }) // Wren plays Diplomacy
+    t.act({ kind: 'strategyCardPlayed', card: 2 }) // Wren plays Diplomacy
     const view = t.view().view
     const tiles = view.phase === 'action' ? view.reaction?.tiles : []
     expect(tiles?.find((tile) => tile.playerId === 'tom')).toMatchObject({
@@ -122,7 +122,10 @@ describe('reaction window', () => {
     const t = openWindow()
     t.act({ kind: 'reactionClosed' }) // Tom's turn ends
     for (let i = 0; i < 5; i++) t.act({ kind: 'passed' }) // all but Tom
-    expect(t.view().view).toMatchObject({ activeId: 'tom', cardPlayed: true })
-    expect(t.act({ kind: 'strategyCardPlayed' })).toBe(false)
+    expect(t.view().view).toMatchObject({
+      activeId: 'tom',
+      activeCards: [{ card: 1, played: true }],
+    })
+    expect(t.act({ kind: 'strategyCardPlayed', card: 1 })).toBe(false)
   })
 })

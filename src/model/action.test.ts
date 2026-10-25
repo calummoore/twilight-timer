@@ -58,7 +58,9 @@ describe('action phase', () => {
 
   it('accepts a pass before the strategy card is played', () => {
     const t = actionTable()
-    expect(t.view().view).toMatchObject({ cardPlayed: false })
+    expect(t.view().view).toMatchObject({
+      activeCards: [{ card: 1, played: false }],
+    })
     expect(t.act({ kind: 'passed' })).toBe(true)
   })
 

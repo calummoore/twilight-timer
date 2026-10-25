@@ -47,7 +47,8 @@ export type Action =
   | { kind: 'phaseStepped'; at: number }
   | { kind: 'turnEnded'; at: number }
   | { kind: 'passed'; at: number }
-  | { kind: 'strategyCardPlayed'; at: number }
+  /** `card` is null in a game from an older build, which gave each player one. */
+  | { kind: 'strategyCardPlayed'; at: number; card: number | null }
   | { kind: 'reactionDone'; at: number; playerId: string }
   | { kind: 'reactionExtended'; at: number; ms: number }
   | { kind: 'reactionClosed'; at: number }
@@ -73,7 +74,7 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 4
+  version: 5
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
