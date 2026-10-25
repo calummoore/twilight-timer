@@ -348,24 +348,26 @@ fixed times and a fixed random source.
 Add the Worker and the Durable Object. No screen uses them yet. Evidence
 for the game size: `.context/multiplayer-live-sync/game-size.md`.
 
-- [ ] Add `partyserver`. Add the Worker entry, the Durable Object binding,
+- [x] Add `partyserver`. Add the Worker entry, the Durable Object binding,
       and its SQLite migration to `wrangler.jsonc`. Keep the static files.
-- [ ] Add the Cloudflare Vite plugin, so that `npm run dev` runs the Worker
+- [x] Add the Cloudflare Vite plugin, so that `npm run dev` runs the Worker
       and the object locally. Name the new commands in `AGENTS.md`.
-- [ ] The object loads its shared-game record on start through the parser
+- [x] The object loads its shared-game record on start through the parser
       and the version steps. It applies changes with the model, stores the
       record after each change, and sends each connection its view.
-- [ ] The object tracks connections for presence. It handles seat claims,
+- [x] The object tracks connections for presence. It handles seat claims,
       move requests, approvals, releases, the code, and the table secret.
-- [ ] Stop sharing closes the game, and the object rejects every later
+- [x] Stop sharing closes the game, and the object rejects every later
       change.
-- [ ] The Worker routes a code to its object, answers a code check over
+- [x] The Worker routes a code to its object, answers a code check over
       HTTP, and limits code tries per address.
-- [ ] The object refuses to serve a record that does not parse.
-- [ ] Decision 30: the object sends its protocol version, and it answers
+- [x] The object refuses to serve a record that does not parse.
+- [x] Decision 30: the object sends its protocol version, and it answers
       an older client with a reload message.
-- [ ] Scratch check, not committed: two clients send the same tap at once
+- [x] Scratch check, not committed: two clients send the same tap at once
       to the local object, and exactly one applies.
+- [x] Evidence of the scratch checks: `.context/multiplayer-live-sync/race-check.log`
+      and `rate-limit-check.log`.
 
 ## Milestone 6: Sync client
 

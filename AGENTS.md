@@ -31,7 +31,10 @@ skill at that moment instead of guessing the rule.
 
 ## Commands
 
-- Build: `npm run build`
+- Local app with the Worker and the game server object: `npm run dev`.
+  The Cloudflare Vite plugin runs both in workerd.
+- Build: `npm run build`. It writes `dist/client` and the Worker, and
+  `wrangler deploy` then reads the generated config.
 - Targeted tests: `npx vitest run src/model/<name>.test.ts`
 - Typecheck: `npm run typecheck`
 - Early check (format and lint): `npm run lint && npm run format:check`

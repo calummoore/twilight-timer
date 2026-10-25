@@ -1,9 +1,25 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "twilight-timer",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-10-01",
+  // node:crypto hashes the device secrets in the game server object.
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist",
     "not_found_handling": "single-page-application",
+    // Only the game server routes run the Worker. The rest is static.
+    "run_worker_first": ["/parties/*"],
   },
+  "durable_objects": {
+    "bindings": [{ "name": "GameRoom", "class_name": "GameRoom" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GameRoom"] }],
+  // Code tries per address. The limit counts each code check and connect.
+  "ratelimits": [
+    {
+      "name": "JOIN_LIMIT",
+      "namespace_id": "1001",
+      "simple": { "limit": 60, "period": 60 },
+    },
+  ],
 }
