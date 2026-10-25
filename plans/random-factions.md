@@ -192,6 +192,11 @@ Show the chips, the faction lists, and the deal as the mockup shows them.
 - [ ] Each faction list shows the choices of its seat.
 - [ ] Keep one faction column width in every seat row with CSS subgrid,
       also while a seat keeps a faction outside the chosen expansions.
+  - Give the seat list `align-content: start`, so that its rows do not
+    stretch to fill the list.
+  - The padding and the border of each seat row take room from its first
+    and last columns. Widen those columns by about 12 pixels to keep the
+    current look.
 - [ ] Let the Game panel shrink and its summary rows scroll, as the
       mockup does.
 - [ ] Move the new mockup classes to `src/styles/mockup/setup.css`.
@@ -224,8 +229,12 @@ Run the checks, push, and review the branch.
     button rule set no text alignment for the CSS port, and 4, a faction
     list for each seat could shift its seat row. Report:
     `.context/random-factions/review-1.md`.
+  - Review 2 checked fix commit 1bfe11a: findings 2, 3, and 4 are
+    resolved. It found 1 finding. No further fix round runs. Report:
+    `.context/random-factions/review-2.md`.
   - 1. Spec does not state the chips or deal. Severity Medium, effort Small. Recommended: B, write Milestone 1 now.
   - 5. Tests miss three decided behaviours. Severity Low, effort Small. Recommended: A, add the three checks to the plan.
+  - 6. Button reset follow-up needs a decision. Severity Low, effort Small. Recommended: B, one decision line in place of the follow-up line and the `src/styles/app.css` line.
   - Follow-up: give the app button reset a centred label default, and set left alignment only in the rules that need it. Effort Medium. Covers finding 3. Previous examples: the left BEGIN GAME in `plans/naalu-initiative-token.md`, Milestone 9.
   - `docs/mockups/index.html`: the setup seat rows show a drag handle and six colour swatches, but the app has move buttons and eight colours. Separate branch.
   - `src/styles/app.css`: the button reset puts BEGIN GAME, BEGIN ACTION PHASE, and END TURN at the left, but the mockup centres them. Separate branch.
