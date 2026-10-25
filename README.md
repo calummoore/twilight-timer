@@ -84,8 +84,11 @@ its certificate.
 - The API token needs the permission Zone > Workers Routes > Edit on the
   `ti4.nexus` zone. Without it, the deploy job fails at the Custom Domain
   step. The new version is then live only at the workers.dev URL.
-- Each deploy removes the Custom Domains that `wrangler.jsonc` does not
-  name. Add a domain in `wrangler.jsonc`, not in the dashboard.
+- While `wrangler.jsonc` names at least one Custom Domain, each deploy
+  removes the Custom Domains that it does not name. Add a domain in
+  `wrangler.jsonc`, not in the dashboard.
+- A deploy never removes the last Custom Domain. When you remove the last
+  domain from `wrangler.jsonc`, also remove it in the Cloudflare dashboard.
 - Do not add a DNS record for `ti4.nexus` by hand. In CI, Wrangler replaces
   a record that conflicts with the Custom Domain.
 - `"workers_dev": true` keeps https://twilight-timer.futex.workers.dev on.

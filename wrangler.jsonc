@@ -3,8 +3,8 @@
   "name": "twilight-timer",
   "compatibility_date": "2026-10-01",
   // Production opens at https://ti4.nexus. Each deploy attaches this Custom
-  // Domain, and Cloudflare makes its DNS record and its certificate. Each
-  // deploy also removes a Custom Domain that this list does not name.
+  // Domain, and Cloudflare makes its DNS record and its certificate. While
+  // this list names a Custom Domain, each deploy removes the others.
   "routes": [{ "pattern": "ti4.nexus", "custom_domain": true }],
   // Production also opens at https://twilight-timer.futex.workers.dev. When a
   // route is set, Wrangler turns that URL off unless this setting is true.
