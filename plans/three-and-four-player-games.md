@@ -12,7 +12,7 @@ the turn-order rule was confirmed. This change adds 3 and 4 players: two
 picks each in the strategy phase, one place for each player in the turn
 order at their lowest card, and a play button for each card in the action
 phase. A strategic action now logs its card, so the saved game moves to
-version 4.
+version 5.
 
 The change follows the TI4 Living Rules Reference (LRR): 84.1 for the second
 pick, 84.2 for trade goods, 48.3 for initiative, 3.4 and 82.2 for passing,
@@ -39,6 +39,12 @@ Decisions:
   the same turn, after the first window closes.
 - 2026-10-25, Cal: decision 4, option A. This plan records the change.
   Alternative: B, the PR description only.
+- 2026-10-25, Cal: review finding 3, option C. The TI4 rules give one action
+  in a turn, so a player plays one strategy card in a turn. Cal merged PR
+  #12 first, and this branch merged `main` in Milestone 6. A window close
+  now ends the turn, so the second card waits for a later turn.
+  Alternatives: A, a plan note only, B, a list of cards on a turn entry, and
+  D, reject a second strategic action in a turn.
 
 Contract owners:
 
@@ -65,8 +71,14 @@ Contract owners:
 - A game from an older build logged no card, because each player had one.
   Its strategic actions load with no card, and the fold plays the lowest card
   that the active player has not played.
-- The saved game moves to version 4 under `.v4` keys. When a `.v4` key is
-  empty, load reads the `.v3`, `.v2`, and `.v1` keys.
+- The saved game moves to version 5 under `.v5` keys, because PR #12 took
+  version 4 for the window rule. When a `.v5` key is empty, load reads the
+  `.v4` to `.v1` keys. Load gives an older game the shape of the next
+  version until it has the newest shape, and one parser reads every game.
+  A version 4 game with no window rule is from a preview of this change: it
+  has cards, and it keeps the old window rule.
+- With the window rule of PR #12, a window close ends the turn. So a turn
+  holds one strategic action, and the second card waits for a later turn.
 - The view gives each rail row its cards, each with a played flag, and the
   hero the cards of the active player. The game view gives the number of
   cards each.
@@ -195,7 +207,7 @@ Run the checks, push, open the stacked PR, and review it.
     `.context/three-and-four-player-games/review-1.md`.
   - Finding 2, the conflict with PR #9 commit 70e4e9f, is resolved by merge
     7c04191, as decision 2 needs for a stacked branch.
-  - 3. A turn keeps only its last card. Severity Low, effort Small. Recommended: A, record the gap under decision 3 in the plan.
+  - 3. A turn keeps only its last card. Decided 2026-10-25: C, in Milestone 6.
   - 5. No test checks the held-card order. Severity Low, effort Small. Recommended: B, Kira picks Warfare before Trade in `FOUR_PICKS`.
   - `src/model/parse.ts`: PR #9 and the turn-end branch both save version 3 under `ti4tempo.game.v3` with different shapes. Separate branch.
   - `docs/mockups/index.html`: the hero clock line says "cumulative", but the app says "game total". Separate branch.
@@ -212,6 +224,37 @@ Run the checks, push, open the stacked PR, and review it.
       version, and it adds only the #10 change. Retarget PR #11 to `main`.
       Justifications: `.context/three-and-four-player-games/merge-main.log`.
       The PR description copies them.
+
+## Milestone 6: Merge main with the window rule
+
+PR #12 merged first, as review finding 3 decided. It ends the turn when the
+reaction window closes, and it also took saved-game version 4. Merge it,
+and move this branch to version 5.
+
+- [x] Merge `origin/main` at 046492d and resolve the conflicts in
+      `docs/mockups/index.html`, `src/model/parse.ts`, and the reaction,
+      stats, storage, and undo tests.
+- [x] Move the saved game to version 5. Upgrade a main version 4 game with
+      null cards, and a version 4 game of this preview with the old window
+      rule, as `AGENTS.md` asks.
+- [x] Split `storage.test.ts`, which passed 300 lines. The older-version
+      tests move to `storage-versions.test.ts`, and the memory store to
+      `test-store.ts`.
+- [x] Let the window close end the turn in the two-card tests. Test the
+      second card in a new turn when everyone else has passed.
+- [x] State in the spec and in the mockup note that the second card waits
+      for a later turn.
+- [x] Run the complete gate.
+  Evidence: `.context/three-and-four-player-games/merge-12/check.log`.
+- [x] Scratch smoke test, not committed: play a four-player round with the
+      window rule in headless Chrome.
+  Evidence: `.context/three-and-four-player-games/merge-12/smoke.log`. 34 of
+  34 checks passed, also a main version 4 save that loads twice.
+- [ ] Commit, push, and copy the merge justifications into the PR
+      description.
+- [ ] Review the merge with the `implementation-review` skill after the
+      push. Report the findings, then apply the review-fix rule: fix the
+      `Auto-fix: yes` findings, re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 

@@ -137,9 +137,10 @@ token keeps card order for every player, because its log follows that rule.
 
 With two cards, a player's initiative is their lowest card. So each player has
 one place in the turn order and takes one turn in each cycle. On a turn, the
-player can play either card that they have not played yet. Rejected: a turn at
-each of the player's card numbers, because the TI4 rules give each player one
-initiative.
+player can play either card that they have not played yet. The strategic
+action is the action of the turn, so the window close ends the turn, and the
+second card waits for a later turn. Rejected: a turn at each of the player's
+card numbers, because the TI4 rules give each player one initiative.
 
 The player count at the start of the game sets the number of cards each, also
 when a player leaves later.
