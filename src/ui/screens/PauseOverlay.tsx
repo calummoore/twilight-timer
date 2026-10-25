@@ -1,5 +1,6 @@
 import type { PauseView } from '../../model/pauses'
 import { PAUSE_REASONS, type PauseReason } from '../../model/types'
+import { Overlay } from '../controls'
 import { clock } from '../format'
 import { reasonLabel } from '../reasons'
 
@@ -14,7 +15,7 @@ export function PauseOverlay(props: {
 }) {
   const { pause } = props
   return (
-    <div className="overlay">
+    <Overlay label="Game paused">
       <div className="pause-card">
         <div className="t num">{clock(pause.elapsedMs)}</div>
         <div className="l">Game paused · no clock is running</div>
@@ -45,6 +46,6 @@ export function PauseOverlay(props: {
           RESUME
         </button>
       </div>
-    </div>
+    </Overlay>
   )
 }

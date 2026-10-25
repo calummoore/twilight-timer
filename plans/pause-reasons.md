@@ -280,6 +280,12 @@ Run the checks, push, and review the branch.
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 1 found 3 findings. Fixed: 1, the pause card had no dialog role
+    for screen readers. Option B: a shared `Overlay` control sets the role
+    for every full-stage overlay. Report:
+    `.context/pause-reasons/review-1.md`.
+  - 2. New clock-step rules have no test. Severity Low, effort Small. Recommended: A, example tests that step the fake clock back during a rule check.
+  - 3. Pause card says no clock runs. Severity Low, effort Small. Recommended: B, "Game paused · no game clock is running" in the app and the mockup.
 
 ## Post-merge follow-up (non-blocking)
 
