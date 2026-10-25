@@ -191,6 +191,27 @@ describe('storage', () => {
     })
   })
 
+  it('loads an older game again after the app saves it', () => {
+    const t = table()
+    playStrategy(t)
+    t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
+    const actions = t.game.actions.map((a) =>
+      a.kind === 'strategyCardPlayed' ? { kind: a.kind, at: a.at } : a,
+    )
+    const older = [
+      ['v1', { ...asVersion1(t.game), actions }],
+      ['v2', { ...t.game, version: 2, actions }],
+      ['v3', { ...t.game, version: 3, actions }],
+    ] as const
+    for (const [key, old] of older) {
+      const store = memoryStore()
+      store.data.set(`ti4tempo.game.${key}`, JSON.stringify(old))
+      const game = gameOf(loadGame(store))
+      saveGame(store, game)
+      expect(loadGame(store)).toEqual({ status: 'ok', game })
+    }
+  })
+
   it('rejects an unknown faction or token owner', () => {
     const store = memoryStore()
     const game = startGame(NAALU_PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)

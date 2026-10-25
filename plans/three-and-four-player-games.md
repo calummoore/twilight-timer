@@ -1,8 +1,9 @@
 # Three- and four-player games
 
-Status: Active. The branch `calummoore/less-than-5-players-support` is
-stacked on [PR #9](https://github.com/calummoore/twilight-timer/pull/9). The
-plan closes when its PR merges.
+Status: Active. [PR #11](https://github.com/calummoore/twilight-timer/pull/11)
+is open and stacked on
+[PR #9](https://github.com/calummoore/twilight-timer/pull/9). The plan closes
+when its PR merges.
 
 Setup offers 5 to 8 players, and each player takes one strategy card. TI4
 also plays with 3 or 4 players. Then each player takes two strategy cards,
@@ -177,13 +178,28 @@ Show two cards each on the screens as the mockup shows them.
 
 Run the checks, push, open the stacked PR, and review it.
 
-- [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits and push the branch.
-- [ ] Open the PR on the PR #9 branch, and link it in the status paragraph.
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+  Evidence: `.context/three-and-four-player-games/check-2.log`.
+- [x] Commit with Conventional Commits and push the branch.
+- [x] Merge the two newer commits of the PR #9 branch, 61483f8 and 5648ce2.
+      The merge had no conflict, and the gate passed again.
+- [x] Open the PR on the PR #9 branch, and link it in the status paragraph.
 - [ ] Review the complete local diff against the PR #9 branch, the base of
       this stacked PR, with the `implementation-review` skill after the
       push. Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
+  - Review 1 found 5 findings. Fixed: 1, an older saved game failed to
+    load after its first save, with option C: load upgrades each older
+    version, and one parser reads every game. Fixed: 4, the six-player
+    mockup said "Cannot pass", with option B: one Pass fragment. Report:
+    `.context/three-and-four-player-games/review-1.md`.
+  - Finding 2, the conflict with PR #9 commit 70e4e9f, is resolved by merge
+    7c04191, as decision 2 needs for a stacked branch.
+  - 3. A turn keeps only its last card. Severity Low, effort Small. Recommended: A, record the gap under decision 3 in the plan.
+  - 5. No test checks the held-card order. Severity Low, effort Small. Recommended: B, Kira picks Warfare before Trade in `FOUR_PICKS`.
+  - `src/model/parse.ts`: PR #9 and the turn-end branch both save version 3 under `ti4tempo.game.v3` with different shapes. Separate branch.
+  - `docs/mockups/index.html`: the hero clock line says "cumulative", but the app says "game total". Separate branch.
+  - `src/ui/screens/StrategyScreen.tsx`: "Every card is picked" shows while cards stay unpicked at 3, 5, 6, or 7 players. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
