@@ -2,7 +2,7 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25.
+on 2026-10-25. Review findings 2 and 3 wait for Cal.
 
 The table can pause the game from the top bar. A pause stops every clock
 and charges nobody. The app stores each pause as a start time and an end
@@ -276,7 +276,7 @@ Run the checks, push, and review the branch.
   Evidence: `.context/pause-reasons/check.log`.
 - [x] Commit with Conventional Commits, push the branch, and open the pull
       request. Link it in the status paragraph.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
@@ -284,8 +284,14 @@ Run the checks, push, and review the branch.
     for screen readers. Option B: a shared `Overlay` control sets the role
     for every full-stage overlay. Report:
     `.context/pause-reasons/review-1.md`.
+  - Review 2 checked fix commit b93292e: finding 1 is resolved, and it
+    found no new finding. Report: `.context/pause-reasons/review-2.md`.
+  - The fix round ran the smoke test again with checks for the dialog role:
+    25 of 25 passed. Its log replaced the first run in
+    `.context/pause-reasons/smoke/smoke.log`.
   - 2. New clock-step rules have no test. Severity Low, effort Small. Recommended: A, example tests that step the fake clock back during a rule check.
   - 3. Pause card says no clock runs. Severity Low, effort Small. Recommended: B, "Game paused · no game clock is running" in the app and the mockup.
+  - `src/ui/screens/SettingsScreen.tsx` and `src/ui/screens/SeatingScreen.tsx`: the Settings and Seating screens cover the game screen without a dialog role, so VoiceOver can reach the hidden game buttons. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
