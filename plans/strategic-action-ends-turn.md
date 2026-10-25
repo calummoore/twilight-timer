@@ -57,6 +57,15 @@ Decisions:
   the last player a window waits for ends the turn, as the last MARK DONE
   does. Reason: decision 1B, because every player is done. In an older
   game the removal resumes the turn, as PR #9 built it.
+- 2026-10-25, Cal: review decision 7, option B. `AGENTS.md` gets a rule:
+  when a merge from main brings the saved-game version that the branch
+  also took, the branch moves to the next free version, and it keeps
+  loading the games that it saved under the old number. Alternatives: A,
+  no rule; C, remove this change's version change, so that a new field
+  with a default needs no new version; D, only the move to the next free
+  version. Reason: wrong clocks in a preview game would mislead the person
+  who tests the PR, and the version change keeps an older build from
+  damaging a new game.
 
 Contract owners:
 
@@ -252,7 +261,7 @@ saved-game version 3. Merge it, and keep both features.
     `.context/strategic-action-ends-turn/review-4.md`. Review 4 numbers
     them 1 to 3.
   - 5. No undo test for the removal close. Severity Low, effort Small. Recommended: B, one undo test of a removal that closes the window.
-  - Decision for Cal, from finding 4: a rule in `AGENTS.md` for a merge that moves the saved-game version: take the next free version, and keep reading the shape that the branch saved before. Effort Small. Previous examples: review 3, and Milestone 10 of the Naalu plan.
+  - Decision for Cal, from finding 4: a rule in `AGENTS.md` for a merge that moves the saved-game version: take the next free version, and keep reading the shape that the branch saved before. Effort Small. Previous examples: review 3, and Milestone 10 of the Naalu plan. Cal chose B on 2026-10-25 as decision 7. Done in Milestone 8.
   - `docs/mockups/index.html`: the reaction note says that a player who left shows a Left tile, but no window screen draws the Left chip or the "left the game" header. Separate branch.
 - [x] Re-review the fix of findings 4 and 6 once.
   - Review 5 checked fix commit 41b8162: findings 4 and 6 are resolved. It
@@ -261,6 +270,18 @@ saved-game version 3. Merge it, and keep both features.
     `.context/strategic-action-ends-turn/review-5.md`. Review 5 numbers
     them 1 and 2.
   - 9. Comments name the early builds "this change". Severity Low, effort Small. Recommended: A, name the builds by feature in the `windowRule` comment and the storage test.
+
+## Milestone 8: Decision 7
+
+Apply Cal's answer to review decision 7.
+
+- [x] Add the rule for a saved-game version clash in a merge to
+      "Repository rules" in `AGENTS.md`.
+- [x] Validate the changed Markdown, commit, and push.
+- [ ] Review the commit against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 

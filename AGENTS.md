@@ -49,6 +49,9 @@ skill at that moment instead of guessing the rule.
 - Saved games use versioned `localStorage` keys. Change the version when
   the stored shape changes. Keep reading the keys and the shapes of older
   versions, so that a saved game from an older build still loads.
+- When a merge from main brings the saved-game version that your branch
+  also took, move your branch to the next free version. Keep loading the
+  games that your branch saved under the old number.
 - When a game rule changes, search `src/ui/` and the mockup for text that
   states the old rule.
 - A push to `main` deploys to Cloudflare. CI needs the repository variable
