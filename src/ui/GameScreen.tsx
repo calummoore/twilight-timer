@@ -143,11 +143,14 @@ export function GameScreen(props: {
         <SeatingScreen
           round={g.round}
           players={g.players}
+          seated={g.seated}
+          departures={g.departures}
           speakerId={g.speakerId}
           pickOrder={g.pickOrder}
           voteOrder={g.voteOrder}
           canUndo={g.canUndo}
           onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
+          onRemove={(playerId) => dispatch({ kind: 'playerRemoved', playerId })}
           onUndo={onUndo}
           onClose={() => setOverlay(null)}
         />

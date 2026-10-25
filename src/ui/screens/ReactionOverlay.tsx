@@ -36,10 +36,20 @@ export function ReactionOverlay(props: {
             </h3>
             <div className="by">
               <i />
-              Played by {by?.name} · their clock is paused at{' '}
-              <b className="num" style={{ color: 'var(--dim)', marginLeft: 4 }}>
-                {clock(r.pausedTurnMs)}
-              </b>
+              Played by {by?.name} ·{' '}
+              {game.seated.includes(r.byId) ? (
+                <>
+                  their clock is paused at{' '}
+                  <b
+                    className="num"
+                    style={{ color: 'var(--dim)', marginLeft: 4 }}
+                  >
+                    {clock(r.pausedTurnMs)}
+                  </b>
+                </>
+              ) : (
+                'left the game'
+              )}
             </div>
           </div>
           <div className="rw-clock">
@@ -79,7 +89,11 @@ export function ReactionOverlay(props: {
                 className={`tile ${done ? 'done' : 'wait'}`}
                 style={pc(p?.colour)}
               >
-                {tile.passed && <span className="pchip">Passed</span>}
+                {tile.left ? (
+                  <span className="pchip">Left</span>
+                ) : (
+                  tile.passed && <span className="pchip">Passed</span>
+                )}
                 <div className="nm">
                   <i />
                   {p?.name}

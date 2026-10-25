@@ -1,5 +1,5 @@
 import type { Player } from '../../model/types'
-import { pc } from '../colour'
+import { PlayerOptions } from '../controls'
 
 const TITLE = 'Who has the Naalu 0 token?'
 
@@ -19,23 +19,14 @@ export function NaaluTokenPicker(props: {
           Move it when a player plays Gift of Prescience. The holder goes first
           this round, and the token returns to {props.ownerName} next round.
         </p>
-        <div className="tokopts">
-          {props.players.map((p) => {
-            const holds = p.id === props.holderId
-            return (
-              <button
-                key={p.id}
-                className={`tokopt ${holds ? 'on' : ''}`}
-                style={pc(p.colour)}
-                onClick={() => (holds ? props.onClose() : props.onPick(p.id))}
-              >
-                <i />
-                {p.name}
-                {holds && <span className="tag">0 token</span>}
-              </button>
-            )
-          })}
-        </div>
+        <PlayerOptions
+          players={props.players}
+          chosenId={props.holderId}
+          tag="0 token"
+          onChoose={(id) =>
+            id === props.holderId ? props.onClose() : props.onPick(id)
+          }
+        />
         <div className="btns">
           <button className="ibtn" onClick={props.onClose}>
             Cancel

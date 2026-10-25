@@ -58,6 +58,7 @@ export type Action =
   | { kind: 'agendaResolved'; at: number }
   | { kind: 'speakerMoved'; at: number; playerId: string }
   | { kind: 'naaluTokenMoved'; at: number; playerId: string }
+  | { kind: 'playerRemoved'; at: number; playerId: string }
   | { kind: 'gameEnded'; at: number }
 
 /** An action before it gets its timestamp. */
@@ -72,7 +73,7 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 2
+  version: 3
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
@@ -94,6 +95,12 @@ export type Phase =
 
 export type EntryKind =
   'pick' | 'turn' | 'reaction' | 'status' | 'discussion' | 'vote' | 'table'
+
+/** A player who left the game, and the round in which they left. */
+export interface Departure {
+  playerId: string
+  round: number
+}
 
 export interface ReactionTime {
   playerId: string

@@ -1,11 +1,10 @@
 import { canUndo, isPaused } from './commands'
 import { foldGame } from './fold'
+import { currentPicker, tokenOwner, turnOrder } from './fold-orders'
 import {
-  currentPicker,
   expireReaction,
   reactionEntry,
   toEntry,
-  turnOrder,
   type FoldState,
   type Reaction,
 } from './fold-state'
@@ -33,6 +32,8 @@ export function derive(game: Game, now: number): GameView {
   return {
     round: s.round,
     players: game.players,
+    seated: [...s.seats],
+    departures: [...s.departures],
     speakerId: s.speakerId,
     pickOrder: pickOrder(s.seats, s.speakerId),
     voteOrder: voteOrder(s.seats, s.speakerId),
@@ -91,7 +92,7 @@ function phaseView(s: FoldState, entries: Entry[], ms: number): PhaseView {
         ),
         tradeGoods: tradeGoods(s),
         order: turnOrder(s),
-        naaluTokenOwnerId: s.game.naaluTokenOwnerId,
+        naaluTokenOwnerId: tokenOwner(s),
         naaluTokenHolderId: s.naaluTokenHolderId,
       }
     case 'action':
@@ -159,7 +160,7 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
     activeId,
     turnNumber: s.turnCounts.get(activeId) ?? 0,
     rail,
-    passedCount: s.passed.size,
+    passedCount: rail.filter((row) => row.state === 'passed').length,
     activeInitiative:
       order.find((slot) => slot.playerId === activeId)?.initiative ?? 0,
     activeCard: s.picks.get(activeId) ?? 0,
@@ -173,6 +174,7 @@ function actionView(s: FoldState, entries: Entry[], ms: number): PhaseView {
       tiles: r.others.map((playerId) => ({
         playerId,
         passed: s.passed.has(playerId),
+        left: !s.seats.includes(playerId),
         tookMs: r.done.get(playerId) ?? null,
       })),
       doneCount: r.done.size,

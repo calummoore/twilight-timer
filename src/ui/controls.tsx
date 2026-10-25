@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import type { Player } from '../model/types'
+import { pc } from './colour'
 import { clock } from './format'
 
 export function Toggle({
@@ -82,6 +84,40 @@ export function Dialog({
           </button>
         </div>
       </div>
+    </div>
+  )
+}
+
+/** The players as a grid of buttons. The chosen player is tinted and tagged. */
+export function PlayerOptions({
+  players,
+  chosenId,
+  tag,
+  onChoose,
+}: {
+  players: Player[]
+  chosenId: string | null
+  tag?: string
+  onChoose: (playerId: string) => void
+}) {
+  return (
+    <div className="tokopts">
+      {players.map((p) => {
+        const on = p.id === chosenId
+        return (
+          <button
+            key={p.id}
+            className={`tokopt ${on ? 'on' : ''}`}
+            style={pc(p.colour)}
+            aria-pressed={on}
+            onClick={() => onChoose(p.id)}
+          >
+            <i />
+            {p.name}
+            {on && tag && <span className="tag">{tag}</span>}
+          </button>
+        )
+      })}
     </div>
   )
 }
