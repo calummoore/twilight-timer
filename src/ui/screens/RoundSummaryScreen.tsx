@@ -1,4 +1,4 @@
-import { roundStats } from '../../model/stats'
+import { playersOfRound, roundStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
 import { pc } from '../colour'
 import { clock, percent, plural, words } from '../format'
@@ -9,7 +9,7 @@ export function RoundSummaryScreen(props: {
   onEndGame: () => void
 }) {
   const { game } = props
-  const ids = game.players.map((p) => p.id)
+  const ids = playersOfRound(game.players, game.departures, game.round)
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const stats = roundStats(game.entries, game.round, ids)
   const previous =

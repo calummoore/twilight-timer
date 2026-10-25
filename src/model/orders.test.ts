@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initiativeOrder, pickOrder, rotate, voteOrder } from './orders'
+import { initiativeOrder, leftOf, pickOrder, rotate, voteOrder } from './orders'
 
 const SEATS = ['jaz', 'kira', 'tom', 'priya', 'sam', 'wren']
 const PICKS = new Map([
@@ -30,6 +30,12 @@ describe('orders', () => {
       'jaz',
     ])
     expect(voteOrder(SEATS, 'wren')).toEqual(SEATS)
+  })
+
+  it('finds the player on the left, around the table', () => {
+    expect(leftOf(SEATS, 'jaz')).toBe('kira')
+    expect(leftOf(SEATS, 'wren')).toBe('jaz')
+    expect(leftOf(SEATS, 'zed')).toBeUndefined()
   })
 
   it('orders the action phase by strategy card number', () => {
