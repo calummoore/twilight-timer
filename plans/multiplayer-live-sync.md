@@ -12,9 +12,10 @@ phone screens.
 This plan makes every action safe to send twice. It adds a sync service,
 shared games, two device roles, and the screens for both roles. It
 prepares for private player data, but it builds no private feature. The
-design uses the recommended option of each open decision. The plan does
-not cover push notifications, game history, a visible sign-in, play
-without a table device, or the removal of old shared games.
+design uses the recommended option of each open decision, unless the
+decision names the option that the design keeps until Cal answers. The
+plan does not cover push notifications, game history, a visible sign-in,
+play without a table device, or the removal of old shared games.
 
 Decisions:
 
@@ -59,11 +60,13 @@ recommended option. Their numbers follow the plan review findings.
 15. Rules deploy, only for option A of decision 9. A: by hand. B: from
     CI. Recommended: B.
 16. Storage keys. A: versioned keys, as today. B: one unversioned key per
-    slot, as MVP review finding 6 proposes. Recommended: B.
+    slot, as MVP review finding 6 proposes. Recommended: B. The design
+    keeps A until Cal answers.
 30. Old pages after a deploy. A: no check. B: a protocol version check
     makes an older page reload. Recommended: B.
 36. Join code format. A: four letters and digits, as the mockup shows. B:
-    six digits. C: six letters and digits. Recommended: B.
+    six digits. C: six letters and digits. Recommended: B. The design
+    keeps A until Cal answers.
 
 Contract owners: `docs/product.md`, the new `docs/architecture.md`, the
 mockup at `docs/mockups/index.html`, the [README](../README.md), and
@@ -208,6 +211,9 @@ second tap names a target that no longer runs, so the model rejects it.
   the RTDB data paths, and the security rules. Decisions 13 and 15 and
   finding 6 then apply as first written. Evidence:
   `.context/multiplayer-live-sync/rtdb-cas-check.md`.
+- Each decision recorded in this plan overrides the restored design where
+  they differ. For example, decision 35 keeps every code entry, so no code
+  expires.
 - The rules then add role checks, a private path for each seat, and a
   hidden table secret.
 - A pre-selected card then needs the owner's phone online at the pick, or
@@ -402,6 +408,7 @@ Run the checks, push, and review the branch.
   - Plan review 2 of 97fb703 found 4 findings, 17 to 20. Fixed: 17, 18, and 19, and the rest of 3 and 4. Report: `.context/multiplayer-live-sync/review-2.md`.
   - Plan review 3 of 9850502 found 8 findings, 22 to 29. Fixed: 22, 23, 25, 26, 27, and 29. Decision 30 is the wider fix of finding 23. Report: `.context/multiplayer-live-sync/review-3.md`.
   - Plan review 4 of 4128a52 found 4 findings, 31 to 34. Fixed: 31 and 32. Report: `.context/multiplayer-live-sync/review-4.md`.
+  - Plan review 5 of 4564413 found 2 findings, 37 and 38. Fixed: 37 and 38. Report: `.context/multiplayer-live-sync/review-5.md`.
   - 1. A code holder can erase the game. Severity High, effort Small. Recommended: close it, because decision 21 covers it: the join code opens player mode only, and table mode needs the table link.
   - 24. A lost table device cannot recover. Severity Medium, effort Small. Recommended: A, the Join screen asks the host to save the table link, and the docs state the limit.
   - 6. CI steps for the rules are missing. Severity Low, effort Small. Recommended: A, a CI test step, the rules deploy first, and Cal's credential. It applies only if decision 9 picks A.
@@ -414,6 +421,8 @@ Run the checks, push, and review the branch.
   - `docs/mockups/index.html`: the Waiting note says "3 turns away", but its screen says "2 turns away". Separate branch.
   - `plans/multiplayer-live-sync.md`: the role rule lets player mode send only the changes of decision 12, so it rejects a seat claim. Separate branch.
   - `plans/multiplayer-live-sync.md`: a second reaction extension from another table device names a clock that still runs, so it applies twice. Separate branch.
+  - `plans/multiplayer-live-sync.md`: Phone Join has no state for a code try that the Worker rate limit refuses. Separate branch.
+  - `plans/multiplayer-live-sync.md`: no TODO says what the object and the devices show when a stored shared-game record does not parse. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
