@@ -282,22 +282,24 @@ the Join screen, the roles, the connection states, and most phone states.
 Make every action safe to apply again on a newer state. Both game keys
 move to version 2, and version 1 games migrate on load.
 
-- [ ] Add one model helper that names the running clock by round, phase,
+- [x] Add one model helper that names the running clock by round, phase,
       player, and turn or agenda number. Each action that ends or changes
       a clock carries that name. The fold rejects the action when another
       clock runs. Replace `statusStepToggled` with `statusStepSet`.
-- [ ] A reaction extension also names the window length that it extends,
+- [x] A reaction extension also names the window length that it extends,
       so that two table devices cannot both extend the window.
-- [ ] Undo names the action that it removes, not only the log length.
-- [ ] Each action carries a tap id.
-- [ ] Update the parser, and pass the new fields from `GameScreen.tsx`.
-- [ ] Build the migration as ordered version steps, each tested with a
+- [x] Undo names the action that it removes, not only the log length.
+- [x] Each action carries a tap id.
+- [x] Update the parser, and pass the new fields from `GameScreen.tsx`.
+- [x] Build the migration as ordered version steps, each tested with a
       recorded game. The first step moves the current game and the last
       game from version 1 to version 2. A replay of each log fills the new
       fields. The settings key keeps version 1. Decision 16 can change the
       key layout.
-- [ ] Add one table-driven test that applies each change twice. Test the
+- [x] Add one table-driven test that applies each change twice. Test the
       migration of recorded version 1 games under both keys.
+- [x] Scratch: the version 1 fixture came from the version 1 model, with
+      `.context/fixture-gen/gen.ts`.
 
 ## Milestone 4: Shared-game model
 

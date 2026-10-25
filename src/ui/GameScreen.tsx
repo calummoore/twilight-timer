@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { aim } from '../model/aim'
 import { act, pause, resume, undo } from '../model/commands'
 import { derive } from '../model/derive'
 import type { Settings } from '../model/settings'
-import type { ActionInput, Game } from '../model/types'
+import type { Game, Intent } from '../model/types'
+import { randomId } from '../random'
 import { Dialog } from './controls'
 import { clock } from './format'
 import { useAlarm, useClock, useWakeLock } from './hooks'
@@ -36,9 +38,17 @@ export function GameScreen(props: {
     props.onGame(fn)
     refresh()
   }
-  const dispatch = (input: ActionInput) =>
-    update((game, at) => act(game, input, at))
-  const onUndo = () => update(undo)
+  // A tap names the clock of the view that the screen showed.
+  const dispatch = (intent: Intent) => {
+    const input = aim(g, intent)
+    if (!input) return
+    const id = randomId()
+    update((game, at) => act(game, input, at, id))
+  }
+  const onUndo = () => {
+    const last = props.game.actions.at(-1)
+    if (last) update((game, at) => undo(game, at, last.id))
+  }
   const speakerName = g.players.find((p) => p.id === g.speakerId)?.name ?? ''
 
   if (g.view.phase === 'ended') {
@@ -79,7 +89,7 @@ export function GameScreen(props: {
             game={g}
             view={v}
             onToggleStep={(step) =>
-              dispatch({ kind: 'statusStepToggled', step })
+              dispatch({ kind: 'statusStepSet', step, done: !v.steps[step] })
             }
             onCustodians={(removed) =>
               dispatch({ kind: 'custodiansSet', removed })

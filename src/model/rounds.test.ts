@@ -11,12 +11,12 @@ function statusTable() {
 describe('status, agenda, and the next round', () => {
   it('ticks status steps and ends the round when the Custodians token is on Mecatol', () => {
     const t = statusTable()
-    expect(t.act({ kind: 'statusStepToggled', step: 3 })).toBe(true)
+    expect(t.act({ kind: 'statusStepSet', step: 3, done: true })).toBe(true)
     expect(t.view().view).toMatchObject({
       phase: 'status',
       steps: [false, false, false, true, false, false, false],
     })
-    expect(t.act({ kind: 'statusStepToggled', step: 7 })).toBe(false)
+    expect(t.act({ kind: 'statusStepSet', step: 7, done: true })).toBe(false)
     t.wait(2 * MIN)
     t.act({ kind: 'phaseStepped' })
     expect(t.view().view.phase).toBe('summary')

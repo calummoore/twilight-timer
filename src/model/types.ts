@@ -36,38 +36,63 @@ export interface Interval {
   to: number | null
 }
 
-/** One tap at the table. `at` is the wall-clock time in ms. */
-export type Action =
-  | { kind: 'cardPicked'; at: number; playerId: string; card: number }
-  | { kind: 'phaseStepped'; at: number }
-  | { kind: 'turnEnded'; at: number }
-  | { kind: 'passed'; at: number }
-  | { kind: 'strategyCardPlayed'; at: number }
-  | { kind: 'reactionDone'; at: number; playerId: string }
-  | { kind: 'reactionExtended'; at: number; ms: number }
-  | { kind: 'reactionClosed'; at: number }
-  | { kind: 'statusStepToggled'; at: number; step: number }
-  | { kind: 'custodiansSet'; at: number; removed: boolean }
-  | { kind: 'votingOpened'; at: number }
-  | { kind: 'voteCast'; at: number }
-  | { kind: 'agendaResolved'; at: number }
-  | { kind: 'speakerMoved'; at: number; playerId: string }
-  | { kind: 'gameEnded'; at: number }
+/**
+ * What a tap at the table means, before it names its target. The screens
+ * send intents, and `aim` turns each one into an action input.
+ */
+export type Intent =
+  | { kind: 'cardPicked'; playerId: string; card: number }
+  | { kind: 'phaseStepped' }
+  | { kind: 'turnEnded' }
+  | { kind: 'passed' }
+  | { kind: 'strategyCardPlayed' }
+  | { kind: 'reactionDone'; playerId: string }
+  | { kind: 'reactionExtended'; ms: number }
+  | { kind: 'reactionClosed' }
+  | { kind: 'statusStepSet'; step: number; done: boolean }
+  | { kind: 'custodiansSet'; removed: boolean }
+  | { kind: 'votingOpened' }
+  | { kind: 'voteCast' }
+  | { kind: 'agendaResolved' }
+  | { kind: 'speakerMoved'; playerId: string }
+  | { kind: 'gameEnded' }
 
-/** An action before it gets its timestamp. */
-export type ActionInput = Action extends infer A
-  ? A extends Action
-    ? Omit<A, 'at'>
-    : never
-  : never
+/**
+ * A tap with its target. `clock` names the clock that ran when the tap was
+ * made, so the tap applies only while that clock still runs. Taps that are
+ * the same whenever they apply, such as moving the speaker, need no clock.
+ */
+export type ActionInput =
+  | { kind: 'cardPicked'; clock: string; playerId: string; card: number }
+  | { kind: 'phaseStepped'; clock: string }
+  | { kind: 'turnEnded'; clock: string; playerId: string }
+  | { kind: 'passed'; clock: string; playerId: string }
+  | { kind: 'strategyCardPlayed'; clock: string; playerId: string }
+  | { kind: 'reactionDone'; clock: string; playerId: string }
+  | { kind: 'reactionExtended'; clock: string; ms: number; fromMs: number }
+  | { kind: 'reactionClosed'; clock: string }
+  | { kind: 'statusStepSet'; step: number; done: boolean }
+  | { kind: 'custodiansSet'; removed: boolean }
+  | { kind: 'votingOpened'; clock: string }
+  | { kind: 'voteCast'; clock: string; playerId: string }
+  | { kind: 'agendaResolved'; clock: string }
+  | { kind: 'speakerMoved'; playerId: string }
+  | { kind: 'gameEnded' }
+
+/** One tap at the table: `id` is the tap id, `at` the wall-clock time in ms. */
+export type Action = ActionInput & { id: string; at: number }
+
+/** Device: the times come from this device. Server: from the sync service. */
+export type TimeBase = 'device' | 'server'
 
 /**
  * A stored game. State is never stored: it is a fold over `actions`.
  * Undo pops the last action.
  */
 export interface Game {
-  version: 1
+  version: 2
   startedAt: number
+  timeBase: TimeBase
   /** Seat order, clockwise. */
   players: Player[]
   firstSpeakerId: string

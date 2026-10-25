@@ -1,4 +1,5 @@
 import {
+  clockName,
   close,
   closeReaction,
   createState,
@@ -29,7 +30,7 @@ export function foldGame(game: Game, toMs = actionClock(game)): FoldState {
   game.actions.forEach((action, index) => {
     const ms = toMs(action.at)
     expireReaction(s, ms)
-    if (!step(s, action, ms)) s.rejected.push(index)
+    if (!applyAction(s, action, ms)) s.rejected.push(index)
   })
   return s
 }
@@ -43,8 +44,14 @@ export function actionClock(game: Game): (wall: number) => number {
   return gameClock(game.startedAt, excluded)
 }
 
-function step(s: FoldState, a: Action, ms: number): boolean {
+/**
+ * Applies one action at game time `ms`, after the caller expired the
+ * reaction window. Returns false when the action is not valid now.
+ */
+export function applyAction(s: FoldState, a: Action, ms: number): boolean {
   if (s.phase === 'ended') return false
+  // A tap that names a clock applies only while that clock still runs.
+  if ('clock' in a && a.clock !== clockName(s)) return false
   switch (a.kind) {
     case 'speakerMoved':
       return moveSpeaker(s, a.playerId, ms, a.at)
@@ -58,8 +65,10 @@ function step(s: FoldState, a: Action, ms: number): boolean {
       return stepPhase(s, ms, a.at)
     case 'turnEnded':
     case 'passed':
+      if (a.playerId !== s.activeId) return false
       return endTurn(s, a.kind === 'passed', ms, a.at)
     case 'strategyCardPlayed':
+      if (a.playerId !== s.activeId) return false
       return playStrategyCard(s, ms, a.at)
     case 'reactionDone': {
       const r = s.reaction
@@ -70,18 +79,23 @@ function step(s: FoldState, a: Action, ms: number): boolean {
       if (r.done.size === r.others.length) closeReaction(s, ms)
       return true
     }
-    case 'reactionExtended':
-      if (!s.reaction || s.reaction.limitMs === null || a.ms <= 0) return false
-      s.reaction.extraMs += a.ms
+    case 'reactionExtended': {
+      const r = s.reaction
+      if (!r || r.limitMs === null || a.ms <= 0) return false
+      // The tap names the length it extends, so a second tap cannot stack.
+      if (a.fromMs !== r.limitMs + r.extraMs) return false
+      r.extraMs += a.ms
       return true
+    }
     case 'reactionClosed':
       if (!s.reaction) return false
       closeReaction(s, ms)
       return true
-    case 'statusStepToggled':
+    case 'statusStepSet':
       if (s.phase !== 'status') return false
       if (a.step < 0 || a.step >= STATUS_STEPS.length) return false
-      s.statusSteps[a.step] = !s.statusSteps[a.step]
+      if (s.statusSteps[a.step] === a.done) return false
+      s.statusSteps[a.step] = a.done
       return true
     case 'votingOpened':
       if (s.agenda?.stage !== 'discussion') return false
@@ -91,6 +105,7 @@ function step(s: FoldState, a: Action, ms: number): boolean {
     case 'voteCast': {
       const voter = currentVoter(s)
       if (s.agenda?.stage !== 'voting' || !voter) return false
+      if (a.playerId !== voter) return false
       close(s, ms, a.at)
       s.agenda.voted.push(voter)
       openVoteSegment(s, ms)

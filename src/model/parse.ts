@@ -1,8 +1,9 @@
+import { parseAction } from './parse-action'
+import { bool, isFields, isNumber, listOf } from './parse-util'
 import { COLOURS, type Colour } from './rules'
 import { ALARM_SOUNDS, DEFAULT_SETTINGS, type Settings } from './settings'
 import {
   TIMER_KEYS,
-  type Action,
   type Game,
   type Interval,
   type Limits,
@@ -10,30 +11,39 @@ import {
   type Player,
 } from './types'
 
-type Fields = Record<string, unknown>
+/** The parts that every stored game version shares. */
+export interface GameBase {
+  startedAt: number
+  players: Player[]
+  firstSpeakerId: string
+  pauses: Interval[]
+  voids: Interval[]
+  limitsLog: LimitsChange[]
+}
 
-/** Narrows stored data to a game, or returns null when it is not valid. */
-export function parseGame(raw: unknown): Game | null {
-  if (!isFields(raw) || raw.version !== 1) return null
+/** Narrows the parts that every version shares, or returns null. */
+export function parseGameBase(raw: unknown): GameBase | null {
+  if (!isFields(raw)) return null
   const players = listOf(raw.players, parsePlayer)
-  const actions = listOf(raw.actions, parseAction)
   const pauses = listOf(raw.pauses, parseInterval)
   const voids = listOf(raw.voids, parseInterval)
   const limitsLog = listOf(raw.limitsLog, parseLimitsChange)
   const { startedAt, firstSpeakerId } = raw
-  if (!players || !actions || !pauses || !voids || !limitsLog) return null
+  if (!players || !pauses || !voids || !limitsLog) return null
   if (!isNumber(startedAt) || typeof firstSpeakerId !== 'string') return null
   if (!players.some((p) => p.id === firstSpeakerId)) return null
-  return {
-    version: 1,
-    startedAt,
-    players,
-    firstSpeakerId,
-    actions,
-    pauses,
-    voids,
-    limitsLog,
-  }
+  return { startedAt, players, firstSpeakerId, pauses, voids, limitsLog }
+}
+
+/** Narrows a version 2 game, or returns null when it is not valid. */
+export function parseGame(raw: unknown): Game | null {
+  if (!isFields(raw) || raw.version !== 2) return null
+  const base = parseGameBase(raw)
+  const actions = listOf(raw.actions, parseAction)
+  const { timeBase } = raw
+  if (!base || !actions) return null
+  if (timeBase !== 'device' && timeBase !== 'server') return null
+  return { version: 2, timeBase, ...base, actions }
 }
 
 /** Reads stored settings. Missing or broken fields fall back to defaults. */
@@ -58,41 +68,6 @@ function parsePlayer(raw: unknown): Player | null {
   if (typeof id !== 'string' || typeof name !== 'string' || !c) return null
   if (typeof faction !== 'string') return null
   return { id, name, colour: c, faction }
-}
-
-function parseAction(raw: unknown): Action | null {
-  if (!isFields(raw) || !isNumber(raw.at)) return null
-  const { at, playerId, card, ms, step, removed } = raw
-  const id = typeof playerId === 'string' ? playerId : null
-  switch (raw.kind) {
-    case 'cardPicked':
-      return id && isNumber(card)
-        ? { kind: raw.kind, at, playerId: id, card }
-        : null
-    case 'reactionDone':
-    case 'speakerMoved':
-      return id ? { kind: raw.kind, at, playerId: id } : null
-    case 'reactionExtended':
-      return isNumber(ms) ? { kind: raw.kind, at, ms } : null
-    case 'statusStepToggled':
-      return isNumber(step) ? { kind: raw.kind, at, step } : null
-    case 'custodiansSet':
-      return typeof removed === 'boolean'
-        ? { kind: raw.kind, at, removed }
-        : null
-    case 'phaseStepped':
-    case 'turnEnded':
-    case 'passed':
-    case 'strategyCardPlayed':
-    case 'reactionClosed':
-    case 'votingOpened':
-    case 'voteCast':
-    case 'agendaResolved':
-    case 'gameEnded':
-      return { kind: raw.kind, at }
-    default:
-      return null
-  }
 }
 
 function parseInterval(raw: unknown): Interval | null {
@@ -122,30 +97,4 @@ function parseLimits(raw: unknown): Limits | null {
 
 function isComplete(limits: Partial<Limits>): limits is Limits {
   return TIMER_KEYS.every((key) => limits[key] !== undefined)
-}
-
-function listOf<T>(
-  raw: unknown,
-  parse: (item: unknown) => T | null,
-): T[] | null {
-  if (!Array.isArray(raw)) return null
-  const out: T[] = []
-  for (const item of raw) {
-    const parsed = parse(item)
-    if (parsed === null) return null
-    out.push(parsed)
-  }
-  return out
-}
-
-function isFields(raw: unknown): raw is Fields {
-  return typeof raw === 'object' && raw !== null && !Array.isArray(raw)
-}
-
-function isNumber(raw: unknown): raw is number {
-  return typeof raw === 'number' && Number.isFinite(raw)
-}
-
-function bool(raw: unknown, fallback: boolean): boolean {
-  return typeof raw === 'boolean' ? raw : fallback
 }

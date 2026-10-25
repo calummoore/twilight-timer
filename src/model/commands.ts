@@ -11,8 +11,9 @@ export function startGame(
   now: number,
 ): Game {
   return {
-    version: 1,
+    version: 2,
     startedAt: now,
+    timeBase: 'device',
     players,
     firstSpeakerId: speakerId,
     actions: [],
@@ -28,23 +29,32 @@ export function isPaused(game: Game): boolean {
   return game.pauses.some((p) => p.to === null)
 }
 
-/** Appends an action. Returns the same game when the action is not valid. */
-export function act(game: Game, input: ActionInput, now: number): Game {
-  if (isPaused(game)) return game
+/**
+ * Appends an action with tap id `id`. Returns the same game when the action
+ * is not valid, or when the log already holds a tap with that id.
+ */
+export function act(
+  game: Game,
+  input: ActionInput,
+  now: number,
+  id: string,
+): Game {
+  if (isPaused(game) || game.actions.some((a) => a.id === id)) return game
   const at = Math.max(now, game.actions.at(-1)?.at ?? game.startedAt)
-  const next = { ...game, actions: [...game.actions, { ...input, at }] }
+  const next = { ...game, actions: [...game.actions, { ...input, id, at }] }
   const { rejected } = foldGame(next)
   return rejected.includes(next.actions.length - 1) ? game : next
 }
 
 /**
- * Pops the last action. When the action changed which clock ran, the time
- * since the action is charged to nobody, so every clock returns to its
- * value at the moment of the action.
+ * Pops the last action, which must be the action with tap id `actionId`.
+ * When the action changed which clock ran, the time since the action is
+ * charged to nobody, so every clock returns to its value at the moment of
+ * the action.
  */
-export function undo(game: Game, now: number): Game {
+export function undo(game: Game, now: number, actionId: string): Game {
   const last = game.actions.at(-1)
-  if (!last || isPaused(game)) return game
+  if (!last || last.id !== actionId || isPaused(game)) return game
   const prev = { ...game, actions: game.actions.slice(0, -1) }
   const sameClock = clockKey(prev, last.at) === clockKey(game, last.at)
   const voids = sameClock

@@ -1,6 +1,7 @@
 import { canUndo, isPaused } from './commands'
 import { foldGame } from './fold'
 import {
+  clockName,
   currentPicker,
   expireReaction,
   reactionEntry,
@@ -30,6 +31,7 @@ export function derive(game: Game, now: number): GameView {
     voteOrder: voteOrder(s.seats, s.speakerId),
     custodiansRemoved: s.custodiansRemoved,
     gameMs: ms,
+    clock: clockName(s),
     paused: isPaused(game),
     canUndo: canUndo(game),
     timer: timerView(s, ms, now),

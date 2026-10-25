@@ -86,6 +86,8 @@ export interface GameView {
   custodiansRemoved: boolean
   /** Game time: wall time since the start, without pauses and undone time. */
   gameMs: number
+  /** The name of the clock that runs now, or null once the game ended. */
+  clock: string | null
   paused: boolean
   canUndo: boolean
   timer: TimerView | null

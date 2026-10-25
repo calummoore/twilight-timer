@@ -1,7 +1,8 @@
+import { aim } from './aim'
 import { act, pause, resume, setLimits, startGame, undo } from './commands'
 import { derive } from './derive'
 import { DEFAULT_SETTINGS, type Settings } from './settings'
-import type { ActionInput, Game, Limits, Player } from './types'
+import type { ActionInput, Game, Intent, Limits, Player } from './types'
 
 /** Test support: a six-player table with a fake clock. */
 
@@ -40,22 +41,44 @@ export function table(
   speakerId = 'jaz',
 ) {
   let now = T0
+  let taps = 0
   let game: Game = startGame(PLAYERS, speakerId, settings, now)
+  const apply = (input: ActionInput, id: string): boolean => {
+    const before = game
+    game = act(game, input, now, id)
+    return game !== before
+  }
   return {
     get game() {
       return game
     },
+    get now() {
+      return now
+    },
     wait(ms: number) {
       now += ms
     },
-    /** Applies an action and reports whether the game accepted it. */
-    act(input: ActionInput): boolean {
-      const before = game
-      game = act(game, input, now)
-      return game !== before
+    /** Taps as a screen does: aims the intent at the view of now. */
+    act(intent: Intent): boolean {
+      const input = aim(derive(game, now), intent)
+      return input !== null && apply(input, `tap-${++taps}`)
     },
+    /** Applies an aimed input, as a tap from another device would. */
+    send(input: ActionInput, id = `tap-${++taps}`): boolean {
+      return apply(input, id)
+    },
+    /** Aims an intent at the view of now without applying it. */
+    aim(intent: Intent): ActionInput | null {
+      return aim(derive(game, now), intent)
+    },
+    /** Undoes the last action, as the Undo button does. */
     undo() {
-      game = undo(game, now)
+      const last = game.actions.at(-1)
+      if (last) game = undo(game, now, last.id)
+    },
+    /** Undoes the action with tap id `id`, as a late tap would. */
+    undoTap(id: string) {
+      game = undo(game, now, id)
     },
     pause() {
       game = pause(game, now)

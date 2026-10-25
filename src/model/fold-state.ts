@@ -184,6 +184,28 @@ export function expireReaction(s: FoldState, ms: number): void {
   if (ms >= end) closeReaction(s, end)
 }
 
+/**
+ * Names the clock that runs: the round, the phase, the kind, the player,
+ * and the turn or agenda number. A tap that names another clock is stale.
+ */
+export function clockName(s: FoldState): string | null {
+  if (s.phase === 'ended') return null
+  const r = s.reaction
+  if (r) {
+    const turn = s.turnCounts.get(r.byId) ?? 0
+    return `r${s.round}:action:reaction:${r.byId}:${turn}`
+  }
+  const seg = s.segment
+  if (!seg) return null
+  const n =
+    seg.phase === 'action'
+      ? (s.turnCounts.get(seg.playerId ?? '') ?? 0)
+      : seg.phase === 'agenda'
+        ? (s.agenda?.n ?? 0)
+        : 0
+  return `r${s.round}:${seg.phase}:${seg.kind}:${seg.playerId ?? 'table'}:${n}`
+}
+
 export function currentPicker(s: FoldState): string | null {
   return pickOrder(s.seats, s.speakerId).find((id) => !s.picks.has(id)) ?? null
 }
