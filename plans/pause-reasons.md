@@ -2,7 +2,7 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review findings 2, 4, and 10 wait for Cal. Milestones 7
+on 2026-10-25. Review findings 2, 4, 10, and 17 wait for Cal. Milestones 7
 to 11 make rule checks count as game time, and Milestone 14 applies
 findings 6 and 8.
 
@@ -119,12 +119,13 @@ Decisions:
   time. Alternative: B, also make `gameStats` private, so that every caller
   passes the view.
 - 2026-10-25, Cal: review findings 14, 15, and 16, option A each. Cal wrote
-  "1 = A"; finding 1 was fixed long before, so the answer is read as 14.
-  The player-list test goes on to round 2 after the player leaves (14),
-  checks that the removal is accepted and that the player is listed as
-  left (15), and moves into the "stats" block (16). Alternatives: 14 B,
-  `gameStats` takes player records; 15 B, the test table fails a test on
-  each rejected tap; 16 B, a new "post-game stats" block.
+  "1 = A". Commit b93292e fixed finding 1, so the plan reads this answer as
+  finding 14. For finding 14, the player-list test goes on to round 2 after
+  the player leaves. For finding 15, the test checks that the game accepts
+  the removal and lists the player as left. For finding 16, the test moves
+  into the "stats" block. Alternatives: 14 B, `gameStats` takes player
+  records. 15 B, the test table fails a test on each rejected tap. 16 B, a
+  new "post-game stats" block.
 
 Contract owners:
 
@@ -584,7 +585,7 @@ changes.
       players, no player, or the players of the last round, when the test
       has no removal, and when the game rejects the removal.
 - Evidence: `.context/pause-reasons/findings-14-16/mutation.log`: the new
-  test fails in each of the five checks.
+  test fails in each of the five checks. `check.log` beside it.
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [x] Commit with Conventional Commits, push the branch, and update the
       pull request description.
@@ -592,6 +593,11 @@ changes.
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Commit 48c0b34.
+  - Review 8 found 2 findings. Findings 14, 15, and 16 are resolved. Fixed:
+    18, the decision entry for findings 14 to 16 used semicolons. Report:
+    `.context/pause-reasons/review-8.md`.
+  - 17. Test no longer covers players with no turn. Severity Low, effort Small. Recommended: A, let another player leave before their first turn, and check that their row has 0 turns.
 
 ## Post-merge follow-up (non-blocking)
 
