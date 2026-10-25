@@ -13,6 +13,15 @@ export function pickOrder(
   return rotate(seats, seats.indexOf(speakerId))
 }
 
+/** The player on the left of `id`: the next seat clockwise. */
+export function leftOf(
+  seats: readonly string[],
+  id: string,
+): string | undefined {
+  const at = seats.indexOf(id)
+  return at < 0 ? undefined : seats[(at + 1) % seats.length]
+}
+
 /** Agenda votes: left of the speaker first, clockwise, speaker last. */
 export function voteOrder(
   seats: readonly string[],

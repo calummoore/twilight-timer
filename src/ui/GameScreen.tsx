@@ -148,11 +148,14 @@ export function GameScreen(props: {
         <SeatingScreen
           round={g.round}
           players={g.players}
+          seated={g.seated}
+          departures={g.departures}
           speakerId={g.speakerId}
           pickOrder={g.pickOrder}
           voteOrder={g.voteOrder}
           canUndo={g.canUndo}
           onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
+          onRemove={(playerId) => dispatch({ kind: 'playerRemoved', playerId })}
           onUndo={onUndo}
           onClose={() => setOverlay(null)}
         />
@@ -168,13 +171,15 @@ export function GameScreen(props: {
       {overlay === 'endGame' && (
         <Dialog
           title="End the game?"
-          confirm="End game"
-          danger
-          onCancel={() => setOverlay(null)}
-          onConfirm={() => {
-            setOverlay(null)
-            dispatch({ kind: 'gameEnded' })
+          confirm={{
+            label: 'End game',
+            danger: true,
+            onConfirm: () => {
+              setOverlay(null)
+              dispatch({ kind: 'gameEnded' })
+            },
           }}
+          onCancel={() => setOverlay(null)}
         >
           Every clock stops and the post-game stats open. You can reopen the
           game from there.

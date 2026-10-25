@@ -18,6 +18,9 @@
   background:var(--accent); color:#04211f; font-size:9px; font-weight:800; letter-spacing:.1em;
   text-transform:uppercase; padding:2px 8px; border-radius:20px}
 .seatnode.cand{border-style:dashed; border-color:#33566b}
+/* the empty seat of a player who left the game */
+.seatnode.out{opacity:.38; cursor:default}
+.seatnode.out .nm{text-decoration:line-through; text-decoration-color:var(--faint)}
 .ordlist{display:flex; flex-direction:column; gap:5px}
 .ordrow{display:grid; grid-template-columns:24px 1fr auto; gap:11px; align-items:center; padding:7px 12px;
   border:1px solid var(--line); border-radius:9px; background:#0a0f16; font-size:14px}

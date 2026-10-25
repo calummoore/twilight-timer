@@ -15,3 +15,10 @@
 .card:disabled {
   cursor: default;
 }
+
+/* Stats: the round in which a player left the game. */
+.left-note {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--faint);
+}

@@ -45,8 +45,8 @@ round structure to know whose turn it is and when it's legal to pass.
 ## Core concepts
 
 The round structure, seating and the speaker, factions, initiative order,
-passing, the reaction window, time limits and overtime, and corrections are in
-[Core concepts](concepts.md).
+passing, players who leave, the reaction window, time limits and overtime, and
+corrections are in [Core concepts](concepts.md).
 
 ---
 
@@ -73,7 +73,7 @@ wait for an answer.
 | ------------------- | ----------------------------------------------------------------------- |
 | **Setup**           | Player count, names, colours, factions, seating order, speaker token     |
 | **Settings**        | Time limits, alarm, display options                                      |
-| **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive       |
+| **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive; remove a player who leaves |
 | **Strategy Phase**  | Card selection in speaker order; sets initiative                         |
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
 | ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
@@ -162,6 +162,7 @@ From the should-have list, the MVP adds the pause.
 - [ ] Setup: 3–8 players with name, colour, faction, seat order, speaker
 - [ ] Speaker movable at any time; strategy pick and agenda voting orders derive
       from it automatically. Seats re-orderable as a correction.
+- [ ] Remove a player who leaves the game, and keep their recorded time
 - [ ] Strategy phase: assign cards 1–8, derive initiative order with the Naalu
       "0" token, handle two-cards-each at 3–4 players
 - [ ] Action phase chess clock with one-tap End Turn

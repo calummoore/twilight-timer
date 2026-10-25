@@ -20,10 +20,12 @@ export function StrategyScreen(props: {
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const picker = view.pickerId ? byId.get(view.pickerId) : undefined
   const taken = Object.keys(view.owners).length
-  const remaining = game.players.length - taken
+  // Every player still in the game picks one card.
+  const pickers = game.pickOrder.length
+  const remaining = pickers - taken
   const timer = game.timer?.kind === 'pick' ? game.timer : null
   const clock = timer ? timerText(timer.elapsedMs, timer.limitMs, true) : null
-  // The Naalu "0" token exists only when a player has the Naalu faction.
+  // The token button shows only while the Naalu player is in the game.
   const owner = byId.get(view.naaluTokenOwnerId ?? '')
   const holder = byId.get(view.naaluTokenHolderId ?? '')
   const waiting = game.pickOrder.filter(
@@ -40,7 +42,7 @@ export function StrategyScreen(props: {
           <div className="who-box">
             <div className="lbl">
               {picker
-                ? `Now picking · ${taken + 1} of ${game.players.length}`
+                ? `Now picking · ${taken + 1} of ${pickers}`
                 : 'Every card is picked'}
             </div>
             <div className="who">
@@ -136,7 +138,7 @@ export function StrategyScreen(props: {
       </div>
       {picking && owner && (
         <NaaluTokenPicker
-          players={game.players}
+          players={game.players.filter((p) => game.seated.includes(p.id))}
           ownerName={owner.name}
           holderId={view.naaluTokenHolderId}
           onPick={(playerId) => {

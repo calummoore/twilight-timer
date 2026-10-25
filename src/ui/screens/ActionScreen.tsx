@@ -130,13 +130,15 @@ export function ActionScreen(props: {
       {confirmPass && (
         <Dialog
           title={`Pass before playing ${card}?`}
-          confirm="Pass anyway"
-          danger
-          onCancel={() => setConfirmPass(false)}
-          onConfirm={() => {
-            setConfirmPass(false)
-            props.onPass()
+          confirm={{
+            label: 'Pass anyway',
+            danger: true,
+            onConfirm: () => {
+              setConfirmPass(false)
+              props.onPass()
+            },
           }}
+          onCancel={() => setConfirmPass(false)}
         >
           The rules say a player passes only after their strategic action. Pass
           anyway if the table agrees.

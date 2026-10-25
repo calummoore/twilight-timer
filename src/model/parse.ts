@@ -13,12 +13,16 @@ import {
 
 type Fields = Record<string, unknown>
 
+/** The stored versions that this build reads. Older versions load as the newest. */
+const VERSIONS: readonly unknown[] = [1, 2, 3]
+
 /**
  * Narrows stored data to a game, or returns null when it is not valid.
  * Version 1, from builds before the Naalu token, loads with no token owner.
+ * Version 2, from builds before player removal, has the shape of version 3.
  */
 export function parseGame(raw: unknown): Game | null {
-  if (!isFields(raw) || (raw.version !== 1 && raw.version !== 2)) return null
+  if (!isFields(raw) || !VERSIONS.includes(raw.version)) return null
   const legacy = raw.version === 1
   const players = listOf(raw.players, (p) => parsePlayer(p, legacy))
   const actions = listOf(raw.actions, parseAction)
@@ -35,7 +39,7 @@ export function parseGame(raw: unknown): Game | null {
     return null
   }
   return {
-    version: 2,
+    version: 3,
     startedAt,
     players,
     firstSpeakerId,
@@ -97,6 +101,7 @@ function parseAction(raw: unknown): Action | null {
     case 'reactionDone':
     case 'speakerMoved':
     case 'naaluTokenMoved':
+    case 'playerRemoved':
       return id ? { kind: raw.kind, at, playerId: id } : null
     case 'reactionExtended':
       return isNumber(ms) ? { kind: raw.kind, at, ms } : null

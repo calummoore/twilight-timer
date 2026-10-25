@@ -11,6 +11,7 @@ export function StatsScreen(props: {
 }) {
   const { game } = props
   const byId = new Map(game.players.map((p) => [p.id, p]))
+  const leftIn = new Map(game.departures.map((d) => [d.playerId, d.round]))
   const stats = gameStats(
     game.entries,
     game.players.map((p) => p.id),
@@ -172,6 +173,11 @@ export function StatsScreen(props: {
                         >
                           <i />
                           {byId.get(p.playerId)?.name}
+                          {leftIn.has(p.playerId) && (
+                            <span className="left-note">
+                              Left in round {leftIn.get(p.playerId)}
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="num" data-l="Turns">

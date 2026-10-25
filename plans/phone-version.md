@@ -143,6 +143,10 @@ Run the checks, push, and review the branch.
       off on a phone held sideways, with its Cancel button out of reach.
       Evidence: `.context/phone-version/merge/safe/dialog-before.log` and
       `dialog-after.log`.
+- [x] Merge `origin/main` again for PR #9, which removes a player who leaves
+      the game. Its dialogs open as a bottom sheet on a phone, and the
+      mockup draws its screens in every frame. Justifications:
+      `.context/phone-version/merge-notes.md`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,

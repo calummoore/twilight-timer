@@ -1,4 +1,4 @@
-import type { Entry } from './types'
+import type { Departure, Entry, Player } from './types'
 
 export interface PlayerRoundStats {
   playerId: string
@@ -68,6 +68,18 @@ export interface GameStats {
   }
   players: PlayerGameStats[]
   longestTurns: LongTurn[]
+}
+
+/** The players in the game during `round`: all but those who left before it. */
+export function playersOfRound(
+  players: readonly Player[],
+  departures: readonly Departure[],
+  round: number,
+): string[] {
+  const leftIn = new Map(departures.map((d) => [d.playerId, d.round]))
+  return players
+    .map((p) => p.id)
+    .filter((id) => (leftIn.get(id) ?? round) >= round)
 }
 
 export function roundStats(

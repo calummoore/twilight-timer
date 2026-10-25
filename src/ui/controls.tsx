@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import type { Player } from '../model/types'
+import { pc } from './colour'
 import { clock } from './format'
 
 export function Toggle({
@@ -50,20 +52,32 @@ export function DurationStepper({
   )
 }
 
+export interface DialogConfirm {
+  label: string
+  onConfirm: () => void
+  danger?: boolean
+  /** The button shows, but a tap does nothing, for example before a choice. */
+  disabled?: boolean
+}
+
+/**
+ * The shell of every modal dialog: a title, a line of text, optional
+ * controls, and Cancel. A dialog without `confirm` acts in its controls.
+ */
 export function Dialog({
   title,
   children,
+  content,
   confirm,
-  onConfirm,
   onCancel,
-  danger = false,
 }: {
   title: string
+  /** The text below the title. */
   children: ReactNode
-  confirm: string
-  onConfirm: () => void
+  /** Controls below the text, for example a choice of players. */
+  content?: ReactNode
+  confirm?: DialogConfirm
   onCancel: () => void
-  danger?: boolean
 }) {
   return (
     <div
@@ -75,18 +89,56 @@ export function Dialog({
       <div className="dialog">
         <h3>{title}</h3>
         <p>{children}</p>
+        {content}
         <div className="btns">
           <button className="ibtn" onClick={onCancel}>
             Cancel
           </button>
-          <button
-            className={`big small ${danger ? 'red' : ''}`}
-            onClick={onConfirm}
-          >
-            {confirm}
-          </button>
+          {confirm && (
+            <button
+              className={`big small ${confirm.danger ? 'red' : ''}`}
+              disabled={confirm.disabled}
+              onClick={confirm.onConfirm}
+            >
+              {confirm.label}
+            </button>
+          )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/** The players as a grid of buttons. The chosen player is tinted and tagged. */
+export function PlayerOptions({
+  players,
+  chosenId,
+  tag,
+  onChoose,
+}: {
+  players: Player[]
+  chosenId: string | null
+  tag?: string
+  onChoose: (playerId: string) => void
+}) {
+  return (
+    <div className="tokopts">
+      {players.map((p) => {
+        const on = p.id === chosenId
+        return (
+          <button
+            key={p.id}
+            className={`tokopt ${on ? 'on' : ''}`}
+            style={pc(p.colour)}
+            aria-pressed={on}
+            onClick={() => onChoose(p.id)}
+          >
+            <i />
+            {p.name}
+            {on && tag && <span className="tag">{tag}</span>}
+          </button>
+        )
+      })}
     </div>
   )
 }
