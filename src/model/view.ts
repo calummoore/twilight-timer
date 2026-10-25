@@ -10,13 +10,20 @@ export interface TimerView {
   limitMs: number | null
 }
 
+/** A strategy card that a player holds this round. */
+export interface HeldCard {
+  card: number
+  /** The player took the strategic action of the card this round. */
+  played: boolean
+}
+
 export interface RailRow {
   playerId: string
-  /** The strategy card number, or 0 for the holder of the Naalu token. */
+  /** The lowest strategy card number, or 0 for the holder of the Naalu token. */
   initiative: number
-  card: number
+  /** The strategy cards of the player, lowest first. */
+  cards: HeldCard[]
   state: 'active' | 'passed' | 'waiting'
-  cardPlayed: boolean
   /** Own-turn time this game, with the running turn. */
   totalMs: number
   /** Turns started this round. */
@@ -91,8 +98,8 @@ export type PhaseView =
       rail: RailRow[]
       passedCount: number
       activeInitiative: number
-      activeCard: number
-      cardPlayed: boolean
+      /** The strategy cards of the active player, lowest first. */
+      activeCards: HeldCard[]
       reaction: ReactionView | null
     }
   | { phase: 'status'; steps: boolean[] }
@@ -115,6 +122,8 @@ export interface GameView {
   seated: string[]
   /** The players who left the game, oldest first. */
   departures: Departure[]
+  /** The strategy cards that each player picks in a round. */
+  cardsEach: number
   speakerId: string
   pickOrder: string[]
   voteOrder: string[]

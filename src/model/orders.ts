@@ -35,22 +35,24 @@ const TOKEN_INITIATIVE = 0
 
 export interface InitiativeSlot {
   playerId: string
-  /** The strategy card number, or 0 for the holder of the Naalu token. */
+  /** The lowest strategy card number, or 0 for the holder of the Naalu token. */
   initiative: number
 }
 
 /**
  * Action-phase turn order: the lowest initiative goes first. Initiative is
- * the strategy card number, except for the holder of the Naalu "0" token.
+ * the lowest strategy card number of the player, except for the holder of
+ * the Naalu "0" token. So a player with two cards has one place.
  */
 export function initiativeOrder(
-  picks: ReadonlyMap<string, number>,
+  picks: ReadonlyMap<string, readonly number[]>,
   tokenHolderId: string | null,
 ): InitiativeSlot[] {
   return [...picks]
-    .map(([playerId, card]) => ({
+    .map(([playerId, cards]) => ({
       playerId,
-      initiative: playerId === tokenHolderId ? TOKEN_INITIATIVE : card,
+      initiative:
+        playerId === tokenHolderId ? TOKEN_INITIATIVE : Math.min(...cards),
     }))
     .sort((a, b) => a.initiative - b.initiative)
 }

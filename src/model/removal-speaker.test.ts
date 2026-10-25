@@ -70,7 +70,7 @@ describe('a speaker who leaves the game', () => {
     playStrategy(t)
     t.act({ kind: 'turnEnded' }) // Tom
     t.act({ kind: 'turnEnded' }) // Wren
-    t.act({ kind: 'strategyCardPlayed' }) // Jaz plays Politics
+    t.act({ kind: 'strategyCardPlayed', card: 3 }) // Jaz plays Politics
     t.act({ kind: 'playerRemoved', playerId: 'jaz' })
     const view = t.view().view
     expect(view.phase === 'action' && view.reaction?.speakerChoice).toEqual({

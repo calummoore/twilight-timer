@@ -139,6 +139,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 
 /* action buttons */
 .acts{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; flex:none}
+.acts.two{grid-template-columns:1fr 1fr 1fr}
+.acts.two .sec{font-size:14px; text-wrap:balance}
 .big{grid-column:1/-1; background:linear-gradient(180deg,#25d3c5,#12a89c); color:#032422; border:none;
   font-family:var(--f); font-size:29px; font-weight:800; letter-spacing:.04em; padding:24px; border-radius:13px;
   cursor:pointer; box-shadow:0 8px 0 #0a5f58, 0 14px 30px rgba(18,168,156,.28)}
@@ -163,6 +165,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .row .nm{font-size:17px; font-weight:650; display:flex; align-items:center; gap:8px}
 .row .nm i{width:9px; height:9px; border-radius:50%; background:var(--pc); flex:none; font-style:normal}
 .row .fc{font-size:11.5px; color:var(--faint); margin-top:2px}
+.row .fc .fn{white-space:nowrap}
 .row .tm{text-align:right}
 .row .tm .a{font-size:17px; font-weight:700; letter-spacing:-.01em}
 .row .tm .b{font-size:11px; color:var(--faint); margin-top:2px}
@@ -582,6 +585,22 @@ const ORDER = [
   {id:'priya', init:7, card:7, state:'wait',   sc:true,  total:1448},
 ];
 
+// A four-player game: Jaz, Kira, Tom and Priya pick two cards each.
+// Mid-strategy-phase, second round: Jaz took Imperial, Kira picks now.
+const CARDS4 = [
+  {n:1, nm:'Leadership',   o:'tom'},   {n:2, nm:'Diplomacy',   o:'priya'},
+  {n:3, nm:'Politics',     o:'jaz'},   {n:4, nm:'Construction',o:null},
+  {n:5, nm:'Trade',        o:'kira'},  {n:6, nm:'Warfare',     o:null},
+  {n:7, nm:'Technology',   o:null},    {n:8, nm:'Imperial',    o:'jaz'},
+];
+// Its action phase: the lower card is the initiative, one turn per cycle.
+const ORDER4 = [
+  {id:'tom',   init:1, cards:[[1,true],[7,true]],  state:'passed', total:1022},
+  {id:'priya', init:2, cards:[[2,true],[4,false]], state:'wait',   total:1310},
+  {id:'jaz',   init:3, cards:[[3,true],[8,true]],  state:'wait',   total:1188},
+  {id:'kira',  init:5, cards:[[5,true],[6,false]], state:'active', total:950 },
+];
+
 const fmt = s => { s=Math.max(0,Math.round(s));
   const m=Math.floor(s/60), ss=String(s%60).padStart(2,'0');
   return m>=60 ? `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}:${ss}` : `${m}:${ss}`; };
@@ -590,15 +609,18 @@ const fmtL = s => { const m=Math.floor(s/60); return `${m}:${String(Math.round(s
 /* ══════════════════ fragments ══════════════════ */
 const CARDNAME = {1:'Leadership',2:'Diplomacy',3:'Politics',4:'Construction',
                   5:'Trade',6:'Warfare',7:'Technology',8:'Imperial'};
+const sccard = (n, used) =>
+  `<span class="sccard ${used?'used':''}">${used?'✓ ':''}${CARDNAME[n]}</span>`;
 const railRow = p => {
   const d=P[p.id], live = p.state==='active';
   const chip = p.state==='active' ? '<b class="chip now">Turn</b>'
              : p.state==='passed' ? '<b class="chip pass">Passed</b>' : '';
+  const cards = p.cards ? p.cards.map(([n,used])=>sccard(n,used)).join('') : sccard(p.card, p.sc);
   return `<div class="row ${p.state}" style="${col(p.id)}">
     ${chip}
     <div class="in num">${p.init}</div>
     <div><div class="nm"><i></i>${d.name}</div>
-      <div class="fc"><span class="sccard ${p.sc?'used':''}">${p.sc?'✓ ':''}${CARDNAME[p.card]}</span>${d.f}</div></div>
+      <div class="fc">${cards}<span class="fn">${d.f}</span></div></div>
     <div class="tm">
       <div class="a num">${fmt(p.total)}</div>
       <div class="b num">${live?'this turn 1:47':(p.state==='passed'?'4 turns':'3 turns')}</div>
@@ -675,7 +697,7 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true) => { const missing = 
           Seat order is the physical ring. The <b style="color:var(--dim)">speaker ★</b> is a pointer into it —
           move it and the strategy pick order and agenda voting order both re-derive.</div>
         <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:12px">
-          At 3–4 players each player picks <b style="color:var(--dim)">two</b> strategy cards and takes a turn at each initiative number. The app handles this automatically.</div>
+          At 3–4 players each player picks <b style="color:var(--dim)">two</b> strategy cards, and the lower card sets their place in the turn order.</div>
       </div>
       <div style="padding:16px 18px">
         <div class="exps"><div class="lbl">Expansions</div><div class="exp-row">
@@ -843,33 +865,38 @@ S.seatingOut = {t:'Speaker & Seating — After a Player Leaves', d:'ipad', note:
  h:seatingScreen('tom')};
 
 /* ── 4. Strategy phase ── */
-const strategyScreen = () => `<div class="space"></div><div class="lay">
+// the six-player snapshot, and the four-player one in its second round of picks
+const PICKS6 = {who:'sam', lbl:'5 of 6', cards:CARDS, order:ORDER.filter(p=>CARDS.some(c=>c.o===p.id)),
+  waiting:['sam','kira'], token:true, left:2};
+const PICKS4 = {who:'kira', lbl:'6 of 8 · second card', cards:CARDS4, order:ORDER4,
+  waiting:[], token:false, left:3};
+const strategyScreen = (g=PICKS6) => `<div class="space"></div><div class="lay">
   ${topBar('str')}
   <div class="content" style="display:flex;flex-direction:column">
-    <div class="picker" style="${col('sam')}">
-      <div><div class="lbl">Now picking · 5 of 6</div><div class="who"><i></i>Sam</div></div>
+    <div class="picker" style="${col(g.who)}">
+      <div><div class="lbl">Now picking · ${g.lbl}</div><div class="who"><i></i>${P[g.who].name}</div></div>
       <div style="font-size:12.5px;color:var(--faint);line-height:1.5;margin-left:22px;max-width:250px">
         Order derives from the speaker. Tap a card to assign it.</div>
       <button class="ibtn spkb" style="margin-left:6px;padding:10px 14px">★ Speaker: Jaz · change</button>
       <div class="t num" data-clock="down" data-t="27" data-limit="45">0:27</div>
     </div>
     <div class="cards" style="flex:1">
-      ${CARDS.map(c=>{
+      ${g.cards.map(c=>{
         const taken=!!c.o;
         return `<div class="card ${taken?'taken':'next'}" style="${taken?col(c.o):''}">
           ${c.tg?'<div class="tg">+1 TG</div>':''}
           <div class="n num">${c.n}</div><div class="nm">${c.nm}</div>
-          ${taken?`<div class="own"><i></i>${P[c.o].name}</div>`:'<div class="free">Tap to assign to Sam</div>'}
+          ${taken?`<div class="own"><i></i>${P[c.o].name}</div>`:`<div class="free">Tap to assign to ${P[g.who].name}</div>`}
         </div>`}).join('')}
     </div>
     <div class="order-strip"><span class="lbl">Initiative order so far</span>
-      ${ORDER.filter(p=>CARDS.some(c=>c.o===p.id)).map(p=>
+      ${g.order.map(p=>
         `<span class="oc" style="${col(p.id)}"><b>${p.init}</b><i></i>${P[p.id].name}</span>`).join('')}
-      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Sam</span>
-      <span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>Kira</span>
-      <button class="ibtn tokb" style="${col('sam')}"><b>0</b>Naalu token: Sam · change</button></div>
+      ${g.waiting.map(id=>
+        `<span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>${P[id].name}</span>`).join('')}
+      ${g.token?`<button class="ibtn tokb" style="${col('sam')}"><b>0</b>Naalu token: Sam · change</button>`:''}</div>
   </div>
-  <div style="padding:0 22px 20px"><button class="big" style="width:100%;opacity:.45" disabled>BEGIN ACTION PHASE — 2 PICKS REMAINING</button></div>
+  <div style="padding:0 22px 20px"><button class="big" style="width:100%;opacity:.45" disabled>BEGIN ACTION PHASE — ${g.left} PICKS REMAINING</button></div>
   </div>`;
 
 S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
@@ -886,8 +913,16 @@ S.token = {t:'Strategy Phase — Naalu 0 Token', d:'ipad', note:
     <div class="btns"><button class="ibtn">Cancel</button></div>
   </div></div>`};
 
+S.strategyFour = {t:'Strategy Phase — Four Players', d:'ipad', note:
+ `With 3 or 4 players, each player picks <b>two</b> strategy cards. When every player has one card, the second round starts with the <b>speaker</b> again and goes clockwise, so Jaz took a second card first and Kira picks now. The label counts every pick and names the <b>second card</b>. The strip shows each player's <b>lower</b> card, because that card alone sets their place in the turn order. With four players every card is picked, so no card gains a trade good.`,
+ h:strategyScreen(PICKS4)};
+
 /* ── 4. Action phase ── */
-const actionScreen = over => `<div class="space"></div><div class="lay">
+// Pass only warns: its label counts the cards that are still to play.
+const passButton = unplayed => `<button class="sec"><span class="k"${unplayed?' style="color:var(--warn)"':''}>${
+  unplayed===0 ? 'Out for the round'
+  : unplayed===1 ? 'Strategy card not played yet' : 'Strategy cards not played yet'}</span>Pass</button>`;
+const actionScreen = (over, four=false) => `<div class="space"></div><div class="lay">
   ${topBar('act')}
   <div class="body">
     <div class="hero ${over?'over':''}" style="${col('kira')}">
@@ -903,30 +938,37 @@ const actionScreen = over => `<div class="space"></div><div class="lay">
       <div class="bigclock num" data-clock="up" data-t="${over?192:107}" data-limit="180" data-bar="lb${over?'2':'1'}">${over?'3:12':'1:47'}</div>
       <div class="clock-sub">${over
         ? 'Turn 4 · cumulative 17:30 · <b>counting overtime</b>'
-        : 'Turn 4 this round · cumulative <b>17:30</b>'}</div>
+        : `Turn ${four?3:4} this round · cumulative <b>${four?'15:50':'17:30'}</b>`}</div>
       <div class="limitbar"><i id="lb${over?'2':'1'}" style="width:${over?100:59}%"></i></div>
       <div class="limitrow"><span>Turn limit 3:00</span><span data-rem="lb${over?'2':'1'}">${over?'Over by 0:12':'1:13 remaining'}</span></div>
-      <div class="acts">
+      <div class="acts ${four?'two':''}">
         <button class="big ${over?'red':''}">END TURN</button>
-        <button class="sec hl"><span class="k">Strategic action</span>Play Trade (5) ▸</button>
-        <button class="sec"><span class="k">Cannot pass — SC unplayed</span>Pass</button>
+        ${four
+          ? `<button class="sec hl" style="opacity:.45" disabled><span class="k">Strategic action</span>Trade (5) played ✓</button>
+        <button class="sec hl"><span class="k">Strategic action</span>Play Warfare (6) ▸</button>`
+          : `<button class="sec hl"><span class="k">Strategic action</span>Play Trade (5) ▸</button>`}
+        ${passButton(1)}
       </div>
     </div>
     <div class="rail">
-      <div class="rail-h"><span class="t">Initiative · set by strategy card</span><span class="c">2 of 6 passed</span></div>
-      <div class="rail-b">${ORDER.map(railRow).join('')}</div>
+      <div class="rail-h"><span class="t">Initiative · set by strategy card</span><span class="c">${four?'1 of 4':'2 of 6'} passed</span></div>
+      <div class="rail-b">${(four?ORDER4:ORDER).map(railRow).join('')}</div>
       <div class="rail-f"><span><span class="sccard" style="margin-right:5px">Card</span>still to play</span>
         <span><span class="sccard used" style="margin-right:5px">✓ Card</span>already played</span></div>
     </div>
   </div></div>`;
 
 S.action = {t:'Action Phase', d:'ipad', note:
- `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal, which is why Kira's Pass button is greyed. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
+ `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal, which is why Kira's Pass button warns that Trade is not played yet. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
  h:actionScreen(false)};
 
 S.overtime = {t:'Action Phase — Limit Exceeded', d:'ipad', note:
  `The same screen once the limit passes. Soft expiry: the clock goes red and <b>flips to counting overtime upward</b>, an alarm sounds so the table notices without watching, and the End Turn button turns red. Nothing has advanced and nothing is blocked — the overage is simply recorded and surfaces in the round and post-game stats.`,
  h:actionScreen(true)};
+
+S.actionFour = {t:'Action Phase — Four Players', d:'ipad', note:
+ `In a four-player game each player holds <b>two</b> strategy cards and takes <b>one turn</b> in each cycle, at their lower card. Each rail row shows both cards: blue while still to play, grey with a ✓ once used. On a turn the player can play <b>either</b> card that is still blue, so the hero shows a play button for each card. A strategic action is the whole turn: closing its window ends the turn, so the second card waits for a <b>later turn</b>. Kira played Trade on an earlier turn and can play Warfare now. Pass stays a warning until both cards are played. Tom played both cards and has passed.`,
+ h:actionScreen(false, true)};
 
 /* ── 5. Reaction window ── */
 const RW = [
@@ -1455,7 +1497,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['iPad — table device', ['setup','setupMissing','setupDeal','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','reaction','reactionOver','politics','status','agenda','round','history','stats','join']],
+  ['iPad — table device', ['setup','setupMissing','setupDeal','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','strategyFour','action','overtime','actionFour','reaction','reactionOver','politics','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);

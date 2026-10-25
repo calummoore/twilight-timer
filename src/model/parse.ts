@@ -18,37 +18,31 @@ import {
 
 type Fields = Record<string, unknown>
 
-/** The stored versions that this build reads. Older versions load as the newest. */
-const VERSIONS: readonly unknown[] = [1, 2, 3, 4]
-
 /**
- * Narrows stored data to a game, or returns null when it is not valid.
- * Version 1, from builds before the Naalu token, loads with no token owner.
- * Version 2, from builds before player removal, has the shape of version 3.
- * Versions 1 to 3, from builds before a window close ended the turn, load
- * with the window rule of those builds, unless they store the rule.
+ * Narrows stored data to a game, or returns null when it is not valid. A game
+ * of an older version gets the shape of the newest first, and one parser reads
+ * every game. So a game that loads once loads again after the app saves it.
  */
 export function parseGame(raw: unknown): Game | null {
-  if (!isFields(raw) || !VERSIONS.includes(raw.version)) return null
-  const legacy = raw.version === 1
-  const players = listOf(raw.players, (p) => parsePlayer(p, legacy))
-  const actions = listOf(raw.actions, parseAction)
-  const pauses = listOf(raw.pauses, parseInterval)
-  const voids = listOf(raw.voids, parseInterval)
-  const limitsLog = listOf(raw.limitsLog, parseLimitsChange)
-  const { startedAt, firstSpeakerId } = raw
+  const game = isFields(raw) ? upgrade(raw) : null
+  if (game?.version !== 5) return null
+  const players = listOf(game.players, parsePlayer)
+  const actions = listOf(game.actions, parseAction)
+  const pauses = listOf(game.pauses, parseInterval)
+  const voids = listOf(game.voids, parseInterval)
+  const limitsLog = listOf(game.limitsLog, parseLimitsChange)
+  const { startedAt, firstSpeakerId, windowEndsTurn } = game
   if (!players || !actions || !pauses || !voids || !limitsLog) return null
   if (!isNumber(startedAt) || typeof firstSpeakerId !== 'string') return null
+  if (typeof windowEndsTurn !== 'boolean') return null
   const isPlayer = (id: unknown) => players.some((p) => p.id === id)
   if (!isPlayer(firstSpeakerId)) return null
-  const owner = legacy ? null : raw.naaluTokenOwnerId
+  const owner = game.naaluTokenOwnerId
   if (owner !== null && (typeof owner !== 'string' || !isPlayer(owner))) {
     return null
   }
-  const windowEndsTurn = windowRule(raw.version, raw.windowEndsTurn)
-  if (windowEndsTurn === null) return null
   return {
-    version: 4,
+    version: 5,
     startedAt,
     players,
     firstSpeakerId,
@@ -59,16 +53,6 @@ export function parseGame(raw: unknown): Game | null {
     voids,
     limitsLog,
   }
-}
-
-/**
- * A version 4 game must store the window rule. An older game has the old
- * rule, except a game that this change saved as version 3 before main took
- * that version: it stores the rule.
- */
-function windowRule(version: unknown, stored: unknown): boolean | null {
-  if (typeof stored === 'boolean') return stored
-  return version === 4 ? null : false
 }
 
 /** Reads stored settings. Missing or broken fields fall back to defaults. */
@@ -95,16 +79,67 @@ function parseExpansions(raw: unknown): Expansions {
   return out
 }
 
-function parsePlayer(raw: unknown, legacy: boolean): Player | null {
+/**
+ * Gives a stored game of an older version the shape of the next version, until
+ * it has the shape of the newest. Another version stays as it is, so the
+ * parser rejects it.
+ */
+function upgrade(raw: Fields): Fields {
+  switch (raw.version) {
+    case 1:
+      // Builds before the Naalu token stored the typed faction text.
+      return upgrade({
+        ...raw,
+        version: 2,
+        players: mapList(raw.players, typedFaction),
+        naaluTokenOwnerId: null,
+      })
+    case 2:
+      // Builds before player removal have the shape of version 3.
+      return upgrade({ ...raw, version: 3 })
+    case 3: {
+      // Builds before a window close ended the turn resumed the turn. A
+      // version 3 game from a preview of that change stores the rule.
+      const stored = raw.windowEndsTurn
+      const windowEndsTurn = typeof stored === 'boolean' ? stored : false
+      return upgrade({ ...raw, version: 4, windowEndsTurn })
+    }
+    case 4:
+      // A preview of two cards each saved version 4 with cards and no window
+      // rule, before the window rule took version 4. It resumed the turn.
+      if (raw.windowEndsTurn === undefined) {
+        return { ...raw, version: 5, windowEndsTurn: false }
+      }
+      // Builds that gave each player one card logged no card.
+      return { ...raw, version: 5, actions: mapList(raw.actions, cardless) }
+    default:
+      return raw
+  }
+}
+
+/**
+ * A version 1 player: the typed faction becomes the id from the list. A
+ * faction that is not text stays invalid.
+ */
+function typedFaction(raw: unknown): unknown {
+  if (!isFields(raw)) return raw
+  const { faction, ...player } = raw
+  const factionId =
+    typeof faction === 'string' ? factionFromText(faction) : undefined
+  return { ...player, factionId }
+}
+
+/** A strategic action that logged no card gets a null card. */
+function cardless(raw: unknown): unknown {
+  if (!isFields(raw) || raw.kind !== 'strategyCardPlayed') return raw
+  return { ...raw, card: null }
+}
+
+function parsePlayer(raw: unknown): Player | null {
   if (!isFields(raw)) return null
-  const { id, name, colour, faction, factionId } = raw
+  const { id, name, colour, factionId } = raw
   const c: Colour | undefined = COLOURS.find((x) => x === colour)
   if (typeof id !== 'string' || typeof name !== 'string' || !c) return null
-  if (legacy) {
-    // Version 1 stored the faction as the text that a player typed.
-    if (typeof faction !== 'string') return null
-    return { id, name, colour: c, factionId: factionFromText(faction) }
-  }
   if (factionId !== null && !isFactionId(factionId)) return null
   return { id, name, colour: c, factionId }
 }
@@ -140,10 +175,14 @@ function parseAction(raw: unknown): Action | null {
       return typeof removed === 'boolean'
         ? { kind: raw.kind, at, removed }
         : null
+    case 'strategyCardPlayed':
+      // An upgraded game from an older build has a null card.
+      return isNumber(card) || card === null
+        ? { kind: raw.kind, at, card }
+        : null
     case 'phaseStepped':
     case 'turnEnded':
     case 'passed':
-    case 'strategyCardPlayed':
     case 'reactionClosed':
     case 'votingOpened':
     case 'voteCast':
@@ -182,6 +221,11 @@ function parseLimits(raw: unknown): Limits | null {
 
 function isComplete(limits: Partial<Limits>): limits is Limits {
   return TIMER_KEYS.every((key) => limits[key] !== undefined)
+}
+
+/** Maps each item of a list, and keeps anything else for the parser. */
+function mapList(raw: unknown, map: (item: unknown) => unknown): unknown {
+  return Array.isArray(raw) ? raw.map(map) : raw
 }
 
 function listOf<T>(

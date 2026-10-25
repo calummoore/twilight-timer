@@ -18,7 +18,7 @@ const OTHERS = ['wren', 'jaz', 'sam', 'kira', 'priya']
 function playLeadership(t: Table = table(LIMITS_ON)): Table {
   playStrategy(t)
   t.wait(10 * SEC)
-  t.act({ kind: 'strategyCardPlayed' })
+  t.act({ kind: 'strategyCardPlayed', card: 1 })
   return t
 }
 
@@ -71,13 +71,13 @@ describe('a strategic action', () => {
     playStrategy(t)
     for (let i = 0; i < 5; i++) t.act({ kind: 'passed' }) // all but Priya
     t.wait(20 * SEC)
-    t.act({ kind: 'strategyCardPlayed' }) // Priya plays Technology
+    t.act({ kind: 'strategyCardPlayed', card: 7 }) // Priya plays Technology
     t.act({ kind: 'reactionClosed' })
     t.wait(5 * SEC)
     expect(t.view().view).toMatchObject({
       activeId: 'priya',
       turnNumber: 2,
-      cardPlayed: true,
+      activeCards: [{ card: 7, played: true }],
     })
     expect(t.view().timer).toMatchObject({
       playerId: 'priya',

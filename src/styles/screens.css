@@ -58,6 +58,9 @@
 .setup-help b {
   color: var(--dim);
 }
+.setup-help + .setup-help {
+  margin-top: 12px;
+}
 
 .settings-screen {
   z-index: 5;
