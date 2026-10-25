@@ -288,7 +288,8 @@
   .dialog h3{font-size:22px}
   .dialog .btns{flex-direction:column-reverse; gap:10px}
   .dialog .btns > *{justify-content:center; text-align:center}
-  .dialog .big{font-size:20px; padding:18px}
+  /* Cancel goes under the big button, so the big button keeps the full gap under its 8 px edge, as End Turn does. */
+  .dialog .big{font-size:20px; padding:18px; margin-bottom:8px}
   .dialog .ibtn{padding:14px}
   .pause-card{width:100%; padding:0 16px}
   .reasons{width:auto}
