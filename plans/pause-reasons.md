@@ -118,14 +118,15 @@ Decisions:
   post-game stats list every player, also one who left, with their turn
   time. Alternative: B, also make `gameStats` private, so that every caller
   passes the view.
-- 2026-10-25, Cal: review findings 14, 15, and 16, option A each. Cal wrote
-  "1 = A". Commit b93292e fixed finding 1, so the plan reads this answer as
-  finding 14. For finding 14, the player-list test goes on to round 2 after
-  the player leaves. For finding 15, the test checks that the game accepts
-  the removal and lists the player as left. For finding 16, the test moves
-  into the "stats" block. Alternatives: 14 B, `gameStats` takes player
-  records. 15 B, the test table fails a test on each rejected tap. 16 B, a
-  new "post-game stats" block.
+- 2026-10-25, Cal: review finding 14, option A. Cal wrote "1 = A". Commit
+  b93292e fixed finding 1, so the plan reads this answer as finding 14. The
+  player-list test goes on to round 2 after the player leaves. Alternative:
+  B, `gameStats` takes player records.
+- 2026-10-25, Cal: review finding 15, option A. The player-list test checks
+  that the game accepts the removal and lists the player as left.
+  Alternative: B, the test table fails a test on each rejected tap.
+- 2026-10-25, Cal: review finding 16, option A. The player-list test moves
+  into the "stats" block. Alternative: B, a new "post-game stats" block.
 
 Contract owners:
 
@@ -589,7 +590,7 @@ changes.
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [x] Commit with Conventional Commits, push the branch, and update the
       pull request description.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
@@ -597,6 +598,10 @@ changes.
   - Review 8 found 2 findings. Findings 14, 15, and 16 are resolved. Fixed:
     18, the decision entry for findings 14 to 16 used semicolons. Report:
     `.context/pause-reasons/review-8.md`.
+  - Review 9 checked fix commit 795600f: finding 18 is resolved. It found
+    1 finding. Fixed: 19, the rewritten entry had nine sentences in one
+    paragraph. No further fix round runs. Report:
+    `.context/pause-reasons/review-9.md`.
   - 17. Test no longer covers players with no turn. Severity Low, effort Small. Recommended: A, let another player leave before their first turn, and check that their row has 0 turns.
 
 ## Post-merge follow-up (non-blocking)
