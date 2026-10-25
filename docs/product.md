@@ -78,9 +78,9 @@ genuinely moves during play: the Politics (3) primary ability hands it to a
 player who does not hold it, and some agendas elect a new speaker. The token is
 editable from the speaker chip in the top bar, visible on every in-game screen.
 
-The token never moves on its own, also not at the start of a round. A player
-moves it in one of two places: the Speaker & Seating screen, which the speaker
-chip opens, or the new speaker choice in a Politics reaction window (see
+The token does not move at the start of a round. A player moves it in one of
+two places: the Speaker & Seating screen, which the speaker chip opens, or the
+new speaker choice in a Politics reaction window (see
 [The reaction window](#the-reaction-window)). The one other move follows the
 TI4 rules: when the speaker leaves the game, the token passes to the player on
 their left (see [Players who leave](#players-who-leave)). Rejected: passing the

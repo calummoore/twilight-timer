@@ -25,7 +25,7 @@ export function StrategyScreen(props: {
   const remaining = pickers - taken
   const timer = game.timer?.kind === 'pick' ? game.timer : null
   const clock = timer ? timerText(timer.elapsedMs, timer.limitMs, true) : null
-  // The Naalu "0" token exists only when a player has the Naalu faction.
+  // The token button shows only while the Naalu player is in the game.
   const owner = byId.get(view.naaluTokenOwnerId ?? '')
   const holder = byId.get(view.naaluTokenHolderId ?? '')
   const waiting = game.pickOrder.filter(
