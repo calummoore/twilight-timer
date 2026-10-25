@@ -245,6 +245,17 @@ Show the chips, the faction lists, and the deal as the mockup shows them.
 
 Run the checks, push, and review the branch.
 
+- [ ] Merge `origin/main` each time it moves ahead, with the `git-merge`
+      skill. Save the justifications under `.context/random-factions/`,
+      and copy them into the PR description.
+  - 2026-10-25: merged `b6f658d`, PR #9, player removal, in `075896f`.
+    The one conflict, the iPad screen list of the mockup, keeps both
+    sides. Justifications:
+    `.context/random-factions/merge/justifications.md`.
+  - Open PRs #11 and #12 also change the spec, the mockup, the README,
+    and `src/model/parse.ts`. PR #11 also changes
+    `src/ui/screens/SetupGamePanel.tsx`. Expect conflicts when they
+    merge.
 - [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [ ] Commit with Conventional Commits and push the branch.
 - [ ] Open the PR and link it in the status paragraph.
