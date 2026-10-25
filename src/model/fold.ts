@@ -26,7 +26,7 @@ import { entryClock, mergeIntervals } from './time'
 import type { Action, Game } from './types'
 
 /**
- * Folds the action log into state. `toMs` maps wall-clock time to game
+ * Folds the action log into state. `toMs` maps wall-clock time to entry
  * time. An action that is not valid in its state is skipped and listed in
  * `rejected`.
  */

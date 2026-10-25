@@ -2,7 +2,7 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review findings 2, 4, and 10 wait for Cal. Milestones 7
+on 2026-10-25. Review findings 2, 4, 10, and 13 wait for Cal. Milestones 7
 to 11 make rule checks count as game time, and Milestone 14 applies
 findings 6 and 8.
 
@@ -481,12 +481,18 @@ Apply Cal's answers to review findings 6 and 8. Both keep the behaviour.
 - Evidence: `.context/pause-reasons/findings-6-8/`: `mutation.log`, the new
   test fails when `postGameStats` drops the rule-check time; `check.log`;
   and `smoke/smoke.log` with 36 of 36 checks.
-- [ ] Commit with Conventional Commits, push the branch, and update the
+- [x] Commit with Conventional Commits, push the branch, and update the
       pull request description.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Commits 87f40e1 and 26c5376.
+  - Review 5 found 2 findings. Fixed: 12, the `foldGame` comment still
+    called entry time game time. Report:
+    `.context/pause-reasons/review-5.md`.
+  - 13. Post-game player list has no test. Severity Low, effort Small. Recommended: A, a unit test that removes a player, ends the game, and checks that `postGameStats` lists every player.
+  - `src/ui/screens/ActionScreen.tsx` and `src/ui/screens/SettingsScreen.tsx`: the app calls a player's own-turn total "game total" and "game time", but the mockup calls it "cumulative". Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
