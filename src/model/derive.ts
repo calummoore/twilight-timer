@@ -11,7 +11,7 @@ import {
 import { pickOrder, voteOrder } from './orders'
 import { gameTimeMs, openPause, reasonTotals } from './pauses'
 import { POLITICS, STRATEGY_CARDS } from './rules'
-import { gameClock, mergeIntervals } from './time'
+import { entryClock, mergeIntervals } from './time'
 import type { Entry, Game } from './types'
 import type {
   GameView,
@@ -27,7 +27,7 @@ export function derive(game: Game, now: number): GameView {
   const excluded = mergeIntervals([...game.pauses, ...game.voids], now)
   const lastStart = s.segment?.startMs ?? s.reaction?.startMs ?? 0
   const ms =
-    s.endedMs ?? Math.max(lastStart, gameClock(game.startedAt, excluded)(now))
+    s.endedMs ?? Math.max(lastStart, entryClock(game.startedAt, excluded)(now))
   expireReaction(s, ms)
   const entries = [...s.entries, ...runningEntries(s, ms, now)]
   const reasons = reasonTotals(game.pauses, now)

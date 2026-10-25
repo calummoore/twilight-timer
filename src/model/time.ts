@@ -21,10 +21,12 @@ export function mergeIntervals(
 }
 
 /**
- * Maps wall-clock ms to game ms: the time since the game started, minus
- * the excluded ranges.
+ * Maps wall-clock ms to entry ms: the time since the game started, minus
+ * the excluded ranges. Every entry is timed on this clock, and callers
+ * exclude every pause and undone range, so they charge nobody. Game time is
+ * not this clock: it also counts rule checks.
  */
-export function gameClock(
+export function entryClock(
   startedAt: number,
   excluded: readonly Range[],
 ): (wall: number) => number {
