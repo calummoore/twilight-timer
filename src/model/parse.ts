@@ -19,12 +19,14 @@ import {
 type Fields = Record<string, unknown>
 
 /** The stored versions that this build reads. Older versions load as the newest. */
-const VERSIONS: readonly unknown[] = [1, 2, 3]
+const VERSIONS: readonly unknown[] = [1, 2, 3, 4]
 
 /**
  * Narrows stored data to a game, or returns null when it is not valid.
  * Version 1, from builds before the Naalu token, loads with no token owner.
  * Version 2, from builds before player removal, has the shape of version 3.
+ * Versions 1 to 3, from builds before a window close ended the turn, load
+ * with the window rule of those builds, unless they store the rule.
  */
 export function parseGame(raw: unknown): Game | null {
   if (!isFields(raw) || !VERSIONS.includes(raw.version)) return null
@@ -43,17 +45,30 @@ export function parseGame(raw: unknown): Game | null {
   if (owner !== null && (typeof owner !== 'string' || !isPlayer(owner))) {
     return null
   }
+  const windowEndsTurn = windowRule(raw.version, raw.windowEndsTurn)
+  if (windowEndsTurn === null) return null
   return {
-    version: 3,
+    version: 4,
     startedAt,
     players,
     firstSpeakerId,
     naaluTokenOwnerId: owner,
+    windowEndsTurn,
     actions,
     pauses,
     voids,
     limitsLog,
   }
+}
+
+/**
+ * A version 4 game must store the window rule. An older game has the old
+ * rule, except a game that this change saved as version 3 before main took
+ * that version: it stores the rule.
+ */
+function windowRule(version: unknown, stored: unknown): boolean | null {
+  if (typeof stored === 'boolean') return stored
+  return version === 4 ? null : false
 }
 
 /** Reads stored settings. Missing or broken fields fall back to defaults. */

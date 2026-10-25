@@ -73,7 +73,7 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 3
+  version: 4
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
@@ -84,6 +84,14 @@ export interface Game {
    * the Naalu token, has null, because its log follows card order.
    */
   naaluTokenOwnerId: string | null
+  /**
+   * True when a tap that closes a reaction window also ends the turn. The
+   * window then stays open past its limit, so that only a tap ends a turn.
+   * A version 1 to 3 game, from an older build, has false: its window close
+   * resumed the turn, and its window closed itself at its limit. A version 3
+   * game that stores the field keeps it.
+   */
+  windowEndsTurn: boolean
   actions: Action[]
   pauses: Interval[]
   voids: Interval[]
