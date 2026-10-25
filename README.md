@@ -21,7 +21,8 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
   Politics, it also asks for the new speaker.
 - The status checklist, and clocks for agenda discussion and each vote.
 - Optional time limits with overtime and an alarm.
-- Undo that also restores time, a pause, a round summary, and game stats.
+- Undo that also restores time, a pause that can time rule checks, a round
+  summary, and game stats.
 - The game saves in the browser after every tap, and the screen stays awake.
 
 ## Docs
@@ -92,8 +93,10 @@ commit. Each successful preview run updates the comment.
   - `factions.ts`: the official factions and the ids that saved games store.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
-  - `commands.ts`: start, act, undo, pause, resume, and limit changes.
+  - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
+    limit changes.
   - `stats.ts`: round and game stats.
+  - `pauses.ts`: the time and the count of rule checks.
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
     The parser also reads games saved by older builds.
 - `src/ui/GameScreen.tsx` connects the model to the screens.

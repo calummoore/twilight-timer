@@ -57,14 +57,41 @@ Configurable limits: turn, reaction window, agenda discussion, per-player vote,
 status phase, strategy pick. Each is independently on/off with its own duration,
 under a master "enforce time limits" switch.
 
+## Pauses
+
+The table can pause the whole game from the top bar: for food, a phone call, or
+a rules discussion. A pause stops every clock and charges nobody. Pause time is
+not game time, so the game clock, the round lengths, and the phase totals leave
+it out.
+
+A pause can have a **reason**. The one reason is **Rule check**, for a rules
+discussion. A new pause is always a plain pause: the pause screen shows
+**Pause** selected. While the game is paused, one tap on Rule check starts a
+rule check, and the screen shows its running time. A tap on Pause ends the rule
+check, and the game stays paused. Resume also ends it. One pause can hold
+several rule checks. Rejected: letting the last reason cover the whole pause,
+because a rules discussion can end while the table stays paused. A rule check
+misses the seconds before its tap, and that is accepted.
+
+The stats show only time with a reason. The post-game stats show the time and
+the number of rule checks. Rejected: showing plain pause time or a paused
+total, because a plain pause does not say where the time went. The round
+summary shows no pause time.
+
+A rule check counts in full, also when a later undo takes back the tap before
+the pause, because the table really spent that time. Undo does not change a
+pause or its rule checks. The reason can change only while the game is paused.
+
+A game saved by a build without reasons has no rule checks.
+
 ## Corrections
 
 Game state is a fold over an **append-only log of actions**. The log records
 every game tap: card picks, turns ended, passes, strategy cards played,
 reaction marks and window changes, phase steps, status steps, the Custodians
 switch, votes, agenda resolutions, speaker moves, Naalu token moves, and the
-game end. So undo can take back any tap. Pauses and time-limit changes are kept
-beside the log, not in it.
+game end. So undo can take back any tap. Pauses with their rule checks, and
+time-limit changes, are kept beside the log, not in it.
 
 Because state is *derived*, it is never edited directly. There are exactly two
 correction operations, and deliberately no others:

@@ -49,7 +49,7 @@ The core concepts have their own pages:
 - [Rounds and turn order](product/rounds.md): the round structure, seating
   and the speaker, factions, initiative order, and passing.
 - [Clocks and corrections](product/clocks.md): the reaction window, time
-  limits and overtime, and corrections.
+  limits and overtime, pauses, and corrections.
 
 ---
 
@@ -67,11 +67,12 @@ The core concepts have their own pages:
 | ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
 | **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles, new speaker for Politics |
+| **Game Paused**     | Overlay: pause clock, Pause or Rule check, rule-check time, Resume       |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
 | **Agenda Phase**    | Discussion timer, speaker-order voting with per-player timers            |
 | **Round Summary**   | Per-player time this round, split by phase                               |
 | **History & Undo**  | Action log; undo repeatedly to rewind, or edit any duration               |
-| **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count         |
+| **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count, rule-check time |
 | **Join**            | QR + join code for phone companions                                      |
 
 ### Phone (companion — add-on)
@@ -164,7 +165,8 @@ From the should-have list, the MVP adds the pause.
 
 ### Should have
 
-- [ ] Pause the whole game (food, rules argument, someone's on the phone)
+- [ ] Pause the whole game (food, rules argument, someone's on the phone), and
+      time rule checks during a pause
 - [ ] Export a game as JSON / CSV
 - [ ] Game history across sessions
 
@@ -188,6 +190,7 @@ From the should-have list, the MVP adds the pause.
 - **Pausing the clock.** A pause charges nobody. The pause duration is logged
   separately, so the total game time still reconciles. Rejected: keeping the
   active player's clock running, because a break is not their turn.
+  [Pauses](product/clocks.md#pauses) gives the rules, with rule checks.
 - **Component actions during another player's turn.** Not tracked. The time is
   real, but attributing it costs more taps than it's worth.
 - **7–8 player games.** Each player takes one card from the normal set of eight,
