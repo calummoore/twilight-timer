@@ -185,6 +185,8 @@ Run the checks, push, and review the branch.
   - 29. Decisions 22 and 19 live only in the plan. Severity Low, effort Small. Recommended: A, add both to `docs/product.md`.
   - 30. Reaction window sticky rule has no effect now. Severity Low, effort Small. Recommended: B, one sticky base rule for the top bar.
   - 31. Phone phase line gap is set twice. Severity Low, effort Small. Recommended: B, side margins in place of the shorthand.
+  - Review 7 checked the merge `3951140` of PRs #12 and #15. Fixed: 32, the reaction footer note may break inside a long word in the narrow layout; 33, the Random Factions note says the chips wrap on a phone; and 34, PR #12 settled the recorded line about the demo reaction clock, which now counts overtime as the app does. Report: `.context/phone-version/review-7.md`.
+  - Decision: use the phone layout up to about 700 to 760 px wide, in place of 600 px. Effort Small. Covers findings 28 and 32, the tile grid line below, and the 320 and 360 px phones of review 3.
   - 4. Phone History and Join have no way in. Severity Low, effort Small. Recommended: B, add the controls.
   - 7. Up and down keys block keyboard scrolling. Severity Low, effort Small. Recommended: A, use the I and P keys.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
@@ -196,7 +198,6 @@ Run the checks, push, and review the branch.
   - Decision 19, the seat list as its own size container (finding 18, option C), and the cut faction names: decided 2026-10-25, A. The cut names stay. Examples: `.context/phone-version/decision-19/`.
   - `docs/product.md`: "Must have (v1, iPad only)" and "Live sync between iPad and phones" still name only the iPad. Separate branch.
   - `src/styles/mockup/reaction.css`: with long player names, the three-column tile grid is wider than the window at about 601 to 650 px. Separate branch.
-  - `docs/mockups/index.html`: the demo reaction clock counts into overtime, but the app closes the window at its limit. Separate branch.
   - Review 1 also listed three iPad mockup problems outside its scope: the reaction clock runs behind the scrim, the agenda runs two clocks, and the strategy demo picks skip Kira. Milestone 2 fixes them while it aligns the iPad layouts with the app.
   - `docs/mockups/index.html`: no iPad layout opens the Join screen. Finding 4 covers it.
   - `docs/mockups/index.html`: the companion Pass Confirmation note calls it the only confirmation dialog. Separate branch.
@@ -206,6 +207,8 @@ Run the checks, push, and review the branch.
   - `docs/mockups/index.html`: in the upright iPad frame, the stats top bar wraps the text of its four buttons, because of the two Later export buttons. Separate branch.
   - `src/styles/mockup/responsive.css`: from 601 to 629 px wide, the two-row top bar is wider than the window, so the screen scrolls sideways. Option D of finding 28 covers it.
   - `src/styles/mockup/responsive.css`: from 601 to about 730 px wide, the speaker chip and Undo wrap, so the top bar is 124 to 141 px tall. Option D of finding 28 covers it.
+  - `docs/mockups/index.html`: the History log shows a turn that ends after "Reaction window closed", which PR #12 no longer allows. origin/main has the same log. Separate branch.
+  - `src/styles/mockup/responsive.css`: the phone rule `.count b{padding:10px 0}` does not reach the app's count buttons, so they are 2 px taller than in the mockup. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 

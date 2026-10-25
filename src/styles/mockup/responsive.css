@@ -27,6 +27,7 @@
   .rail-b{flex:none}
   .rw{inset:calc(var(--top-h, 135px) + 12px) 24px 20px}
   .rw-f .ibtn, .rw-f .big{white-space:nowrap; flex:none}
+  .rw-f .note{min-width:0; overflow-wrap:anywhere}
   .rw-spk{flex-wrap:wrap; gap:10px}
   .rw-spk .l{flex-basis:100%; width:auto}
   .rw-spk .opts{flex-wrap:wrap}

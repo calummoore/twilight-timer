@@ -642,6 +642,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .rail-b{flex:none}
   .rw{inset:calc(var(--top-h, 135px) + 12px) 24px 20px}
   .rw-f .ibtn, .rw-f .big{white-space:nowrap; flex:none}
+  .rw-f .note{min-width:0; overflow-wrap:anywhere}
   .rw-spk{flex-wrap:wrap; gap:10px}
   .rw-spk .l{flex-basis:100%; width:auto}
   .rw-spk .opts{flex-wrap:wrap}
@@ -1095,7 +1096,7 @@ S.setupMissing = {t:'Setup — Faction Missing', d:'ipad', note:
 S.setupDeal = {t:'Setup — Random Factions', d:'ipad', note:
  `A new setup, before any seat has a faction. This table plays with the base game and Prophecy of Kings, so <b>Thunder's Edge</b> and <b>Council Keleres</b> are off. Every faction list then offers only the 24 factions of those two boxes, and so does the deal. The time limits show their default, off. <b>Random factions for empty seats</b> gives each empty seat a different faction, and BEGIN GAME turns on. The button shows only while a seat has no faction, so it never replaces a faction that a player picked. A seat keeps its faction when its expansion turns off.`,
  mnote:
- `The same setup in the narrow layout. The expansion chips wrap, and the deal button sits above BEGIN GAME.`,
+ `The same setup in the narrow layout. The deal button sits above BEGIN GAME. On a phone, the expansion chips wrap.`,
  h:setupScreen(Object.keys(P), ['pok'], false)};
 
 /* ── 2. Settings ── */
