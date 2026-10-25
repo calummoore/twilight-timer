@@ -58,7 +58,7 @@ Decisions:
   saved-game rule in `AGENTS.md` requires. Main took version 3 for player
   removals in PR #9 while this plan was open. When a `.v4` key is empty,
   load reads its `.v3` key, then `.v2`, then `.v1`. A game of version 1, 2,
-  or 3 has no rule checks.
+  or 3 has no rule checks. A later entry moves this change to version 5.
 - 2026-10-25: a saved reason range that the parser cannot use is dropped,
   and the game stays valid. Its time counts as a plain pause. Reason: the
   reason only labels time, and the global rules prefer to continue on
@@ -88,6 +88,13 @@ Decisions:
 - 2026-10-25: during a rule check, the pause card says "Game paused · only
   the game clock is running", because "no clock is running" is no longer
   true then. This resolves review finding 3.
+- 2026-10-25: main took version 4 for the window rule in PR #12, so the
+  saved game moves to version 5 under `.v5` keys, as the merge rule in
+  `AGENTS.md` says. A version 4 game that this branch saved stores rule
+  checks and no window rule: it keeps its rule checks and gets the old
+  window rule of its build. A version 4 game from main keeps its window
+  rule and has no rule checks. Only a version 5 game must store the window
+  rule.
 
 Contract owners:
 
@@ -102,7 +109,7 @@ Contract owners:
   `PauseReason`. A `ReasonRange` is an `Interval` with a `reason`. A
   `Pause` is an `Interval` with `reasons`: its reason ranges, oldest first,
   each inside the pause. A pause with no range is a plain pause.
-  `Game.pauses` holds `Pause` items, and `Game.version` becomes 4. `voids`
+  `Game.pauses` holds `Pause` items, and `Game.version` becomes 5. `voids`
   keep the plain `Interval`.
 - `pause` opens a pause with no reason range. The new command
   `setPauseReason(game, reason, now)` takes a reason, or null for a plain
@@ -125,11 +132,12 @@ Contract owners:
   `now`. A range counts only inside its pause, so a broken saved range
   cannot count more than its pause. `derive` puts the totals in the view.
   `stats.ts` keeps the entry stats. It has 183 lines now.
-- `parse.ts` reads versions 1 to 4. A pause of version 1, 2, or 3 gets no
-  reason range. In a version 4 pause, a missing range list becomes empty,
-  and a broken range or a range with an unknown reason is dropped.
-  `storage.ts` puts the `.v4` keys in front of the `.v3`, `.v2`, and `.v1`
-  keys. Save and archive remove the older keys, as before.
+- `parse.ts` reads versions 1 to 5. A pause before version 5 gets no reason
+  range, except in a version 4 game from this branch, which keeps its
+  ranges. In a pause, a missing range list becomes empty, and a broken
+  range or a range with an unknown reason is dropped. `storage.ts` puts the
+  `.v5` keys in front of the `.v4` to `.v1` keys. Save and archive remove
+  the older keys, as before.
 - The pause overlay moves from `GameScreen.tsx` into its own screen
   component. It gets an accessible single-choice control with Pause, the
   default, and one option for each reason. One label map in `src/ui/`
@@ -407,6 +415,28 @@ Show rule checks as game time as the mockup shows them.
   - 11. Fix commit title passes 50 characters. Severity Low, effort Small. Recommended: A, keep the commit and squash-merge PR #13.
   - `docs/mockups/index.html`: "Where the game went" has no "Between rounds" row, but the app has one. Separate branch.
   - `docs/mockups/index.html`: "Where the game went" writes times under an hour as "0:58:00", but the app writes "58:00". Separate branch.
+
+## Milestone 12: Merge origin/main again
+
+Main added PR #12: closing the reaction window ends the turn. It took
+saved-game version 4, which this branch also took. Merge it, keep both
+sides, and move this branch to the next free version.
+
+- [x] Merge `origin/main` at 046492d. Resolve the parser, the storage
+      tests, the spec, and the mockup navigation, and keep both sides.
+- [x] Move the saved game to version 5 under the `.v5` keys. Keep loading
+      the version 4 games of main and of this branch.
+- [x] Split the storage tests, which pass 300 lines together, into
+      `storage.test.ts`, `storage-versions.test.ts`, and
+      `storage-fixtures.ts`.
+- [x] Check the merge: the spec pages hold main's text word for word,
+      every test of main is in the merge, the mockup renders with no script
+      error, the complete gate passes, and the smoke test passes.
+- Merge commit f6663c4. Justifications:
+  `.context/pause-reasons/merge-2/justifications.md`. The PR description
+  copies them. Evidence beside it: `verify-spec.log`, `tests.log`,
+  `audit-merge.log`, `check.log`, and `smoke/smoke.log` with 36 of 36
+  checks.
 
 ## Post-merge follow-up (non-blocking)
 
