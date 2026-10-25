@@ -12,10 +12,19 @@ export const COLOURS = [
 ] as const
 export type Colour = (typeof COLOURS)[number]
 
-/** The MVP supports 5 to 8 players, who each take one strategy card. */
-export const MIN_PLAYERS = 5
+/** Setup offers 3 to 8 players. */
+export const MIN_PLAYERS = 3
 export const MAX_PLAYERS = 8
 export const DEFAULT_PLAYERS = 6
+
+/**
+ * The strategy cards that each player picks in a round: two in a game that
+ * starts with three or four players, else one. The player count at the start
+ * sets it, so it stays when a player leaves.
+ */
+export function cardsEach(playerCount: number): number {
+  return playerCount <= 4 ? 2 : 1
+}
 
 export const STRATEGY_CARDS = [
   { number: 1, name: 'Leadership' },

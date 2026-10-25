@@ -79,14 +79,14 @@ describe('the Naalu "0" token', () => {
       phase: 'action',
       activeId: 'sam',
       activeInitiative: 0,
-      activeCard: 4,
+      activeCards: [{ card: 4, played: false }],
       rail: [
-        { playerId: 'sam', initiative: 0, card: 4 },
-        { playerId: 'tom', initiative: 1, card: 1 },
-        { playerId: 'wren', initiative: 2, card: 2 },
-        { playerId: 'jaz', initiative: 3, card: 3 },
-        { playerId: 'kira', initiative: 5, card: 5 },
-        { playerId: 'priya', initiative: 7, card: 7 },
+        { playerId: 'sam', initiative: 0, cards: [{ card: 4 }] },
+        { playerId: 'tom', initiative: 1, cards: [{ card: 1 }] },
+        { playerId: 'wren', initiative: 2, cards: [{ card: 2 }] },
+        { playerId: 'jaz', initiative: 3, cards: [{ card: 3 }] },
+        { playerId: 'kira', initiative: 5, cards: [{ card: 5 }] },
+        { playerId: 'priya', initiative: 7, cards: [{ card: 7 }] },
       ],
     })
   })
@@ -118,11 +118,11 @@ describe('the Naalu "0" token', () => {
     expect(t.view().view).toMatchObject({
       activeId: 'priya',
       rail: [
-        { playerId: 'priya', initiative: 0, card: 7 },
+        { playerId: 'priya', initiative: 0, cards: [{ card: 7 }] },
         { playerId: 'tom', initiative: 1 },
         { playerId: 'wren', initiative: 2 },
         { playerId: 'jaz', initiative: 3 },
-        { playerId: 'sam', initiative: 4, card: 4 },
+        { playerId: 'sam', initiative: 4, cards: [{ card: 4 }] },
         { playerId: 'kira', initiative: 5 },
       ],
     })

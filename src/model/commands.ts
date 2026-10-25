@@ -10,7 +10,7 @@ export function startGame(
   now: number,
 ): Game {
   return {
-    version: 3,
+    version: 4,
     startedAt: now,
     players,
     firstSpeakerId: speakerId,

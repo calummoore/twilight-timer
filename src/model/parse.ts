@@ -14,18 +14,21 @@ import {
 type Fields = Record<string, unknown>
 
 /** The stored versions that this build reads. Older versions load as the newest. */
-const VERSIONS: readonly unknown[] = [1, 2, 3]
+const VERSIONS: readonly unknown[] = [1, 2, 3, 4]
 
 /**
  * Narrows stored data to a game, or returns null when it is not valid.
  * Version 1, from builds before the Naalu token, loads with no token owner.
  * Version 2, from builds before player removal, has the shape of version 3.
+ * Versions 1 to 3, from builds that gave each player one strategy card, log
+ * no card for a strategic action.
  */
 export function parseGame(raw: unknown): Game | null {
   if (!isFields(raw) || !VERSIONS.includes(raw.version)) return null
   const legacy = raw.version === 1
+  const logsCards = raw.version === 4
   const players = listOf(raw.players, (p) => parsePlayer(p, legacy))
-  const actions = listOf(raw.actions, parseAction)
+  const actions = listOf(raw.actions, (a) => parseAction(a, logsCards))
   const pauses = listOf(raw.pauses, parseInterval)
   const voids = listOf(raw.voids, parseInterval)
   const limitsLog = listOf(raw.limitsLog, parseLimitsChange)
@@ -39,7 +42,7 @@ export function parseGame(raw: unknown): Game | null {
     return null
   }
   return {
-    version: 3,
+    version: 4,
     startedAt,
     players,
     firstSpeakerId,
@@ -89,7 +92,7 @@ function factionFromText(text: string): FactionId | null {
   return match?.id ?? null
 }
 
-function parseAction(raw: unknown): Action | null {
+function parseAction(raw: unknown, logsCards: boolean): Action | null {
   if (!isFields(raw) || !isNumber(raw.at)) return null
   const { at, playerId, card, ms, step, removed } = raw
   const id = typeof playerId === 'string' ? playerId : null
@@ -111,10 +114,12 @@ function parseAction(raw: unknown): Action | null {
       return typeof removed === 'boolean'
         ? { kind: raw.kind, at, removed }
         : null
+    case 'strategyCardPlayed':
+      if (!logsCards) return { kind: raw.kind, at, card: null }
+      return isNumber(card) ? { kind: raw.kind, at, card } : null
     case 'phaseStepped':
     case 'turnEnded':
     case 'passed':
-    case 'strategyCardPlayed':
     case 'reactionClosed':
     case 'votingOpened':
     case 'voteCast':

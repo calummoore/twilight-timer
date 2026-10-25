@@ -8,7 +8,7 @@ function openWindow(settings = LIMITS_ON) {
   const t = table(settings)
   playStrategy(t)
   t.wait(10 * SEC) // Tom's turn
-  t.act({ kind: 'strategyCardPlayed' })
+  t.act({ kind: 'strategyCardPlayed', card: 1 })
   return t
 }
 
@@ -26,7 +26,7 @@ describe('reaction window', () => {
     expect(view.view).toMatchObject({
       phase: 'action',
       activeId: 'tom',
-      cardPlayed: true,
+      activeCards: [{ card: 1, played: true }],
       reaction: { card: 1, byId: 'tom', pausedTurnMs: 10 * SEC, doneCount: 1 },
     })
   })
@@ -82,7 +82,7 @@ describe('reaction window', () => {
     const t = table()
     playStrategy(t)
     t.act({ kind: 'passed' }) // Tom passes
-    t.act({ kind: 'strategyCardPlayed' }) // Wren plays Diplomacy
+    t.act({ kind: 'strategyCardPlayed', card: 2 }) // Wren plays Diplomacy
     const view = t.view().view
     const tiles = view.phase === 'action' ? view.reaction?.tiles : []
     expect(tiles?.find((tile) => tile.playerId === 'tom')).toMatchObject({
@@ -126,6 +126,6 @@ describe('reaction window', () => {
     expect(t.view().view.phase).toBe('status')
     const again = openWindow()
     again.act({ kind: 'reactionClosed' })
-    expect(again.act({ kind: 'strategyCardPlayed' })).toBe(false)
+    expect(again.act({ kind: 'strategyCardPlayed', card: 1 })).toBe(false)
   })
 })

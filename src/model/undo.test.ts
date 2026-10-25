@@ -55,7 +55,7 @@ describe('undo', () => {
 
   it('reopens a reaction window that the last mark closed', () => {
     const t = actionTable()
-    t.act({ kind: 'strategyCardPlayed' })
+    t.act({ kind: 'strategyCardPlayed', card: 1 })
     for (const id of ['jaz', 'kira', 'priya', 'sam'])
       t.act({ kind: 'reactionDone', playerId: id })
     t.wait(8 * SEC)
@@ -71,7 +71,7 @@ describe('undo', () => {
     const t = table(LIMITS_ON) // the window limit is 2:00
     playStrategy(t)
     t.wait(10 * SEC)
-    t.act({ kind: 'strategyCardPlayed' })
+    t.act({ kind: 'strategyCardPlayed', card: 1 })
     t.wait(110 * SEC)
     t.act({ kind: 'reactionExtended', ms: MIN })
     t.wait(20 * SEC) // past the old 2:00 end
@@ -120,7 +120,7 @@ describe('undo', () => {
     const t = table(LIMITS_ON) // the window limit is 2:00
     playStrategy(t)
     t.wait(10 * SEC)
-    t.act({ kind: 'strategyCardPlayed' })
+    t.act({ kind: 'strategyCardPlayed', card: 1 })
     t.wait(3 * MIN) // the window closes at 2:00, then Tom's turn runs 1:00
     t.act({ kind: 'turnEnded' })
     t.wait(10 * SEC)

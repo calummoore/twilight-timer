@@ -15,7 +15,7 @@ function openWindow(settings = DEFAULT_SETTINGS) {
   const t = table(settings)
   playStrategy(t)
   t.wait(10 * SEC)
-  t.act({ kind: 'strategyCardPlayed' })
+  t.act({ kind: 'strategyCardPlayed', card: 1 })
   return t
 }
 

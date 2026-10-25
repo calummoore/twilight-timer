@@ -132,10 +132,17 @@ A game without a Naalu player has no token. A game saved by a build without the
 token keeps card order for every player, because its log follows that rule.
 
 - **5–6 players (and 7–8 with PoK):** one card each
-- **3–4 players:** two cards each; a player takes a turn at each of their
-  initiative numbers. Not in the MVP. Confirm the turn-order rule before
-  building it: the official rules may give one turn per cycle, at the
-  player's lowest card.
+- **3–4 players:** two cards each. When every player has one card, the
+  second round of picks starts with the speaker again and goes clockwise.
+
+With two cards, a player's initiative is their lowest card. So each player has
+one place in the turn order and takes one turn in each cycle. On a turn, the
+player can play either card that they have not played yet. Rejected: a turn at
+each of the player's card numbers, because the TI4 rules give each player one
+initiative.
+
+The player count at the start of the game sets the number of cards each, also
+when a player leaves later.
 
 Unchosen cards accumulate a trade good, shown on the strategy phase screen.
 
@@ -144,10 +151,10 @@ Unchosen cards accumulate a trade good, shown on the strategy phase screen.
 Passing is sticky. A passed player is dimmed on the rail and skipped for the
 remainder of the round.
 
-A player may only pass once they have **played their strategy card**. The app
-knows whether each player has taken their strategic action, and warns — but does
-not block — on an illegal pass. (The table is the authority; sometimes a rule is
-being bent deliberately.)
+A player may only pass once they have **played their strategy card**, or both of
+their cards at 3–4 players. The app knows whether each player has taken their
+strategic actions, and warns — but does not block — on an illegal pass. (The
+table is the authority; sometimes a rule is being bent deliberately.)
 
 The action phase ends when the last unpassed player passes.
 
@@ -169,9 +176,9 @@ A removal applies at once, in any phase:
 - When the player's clock runs, it stops, and the clock of the next player
   starts. When nobody is left to act in the action phase, the status phase
   begins.
-- In the strategy phase, the card that they picked returns to the common
+- In the strategy phase, each card that they picked returns to the common
   play area, and another player can take it.
-- After the strategy phase, nobody plays their card for the rest of the
+- After the strategy phase, nobody plays their cards for the rest of the
   round.
 - In a reaction window, a player who leaves counts as done. When the player
   who played the card leaves, their turn ends. The next turn starts when the
@@ -188,9 +195,10 @@ A removal applies at once, in any phase:
 - When another holder leaves in the strategy phase, the Naalu player gets the
   token back, if they are still in the game.
 
-The other players keep one strategy card each, also when four or fewer
-players remain, as the TI4 rules say. The table can remove players until one
-player remains.
+The other players keep the number of strategy cards each that the game started
+with. So a game that started with five or more players keeps one card each,
+also when four or fewer players remain, as the TI4 rules say. The table can
+remove players until one player remains.
 
 Rejected: deleting the entries of a removed player, because the record is
 what the app exists to keep. Rejected: keeping the player in the round as a
@@ -231,8 +239,8 @@ what the tap does, and undo reverts a mis-tap.
 Per-player completion times inside the window are recorded, so a player who
 consistently soaks the whole secondary window shows up in the stats.
 
-Only one strategic action per player per round, so at most one window per player
-per action phase.
+Only one strategic action per strategy card per round, so at most one window
+per card per action phase.
 
 The top bar stays usable while the window is open, so the table can pause, undo,
 or move the speaker. Rejected: covering the top bar with the window, because the
@@ -301,7 +309,7 @@ the totals stay honest.
 | **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive; remove a player who leaves |
 | **Strategy Phase**  | Card selection in speaker order; sets initiative                         |
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
-| ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
+| ↳ *rail rows*       | Show each player's strategy cards; blue = still to play, grey ✓ = used   |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
 | **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles, new speaker for Politics |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
@@ -375,7 +383,6 @@ Two rules make corrections tractable:
 
 The first release builds the must-have list below, with these exceptions:
 
-- 5–8 players only. Games with 3–4 players wait for the turn-order rule.
 - No history list and no duration editing. Undo stays in the top bar.
 - No seat re-ordering after setup.
 - No agenda vote tally.

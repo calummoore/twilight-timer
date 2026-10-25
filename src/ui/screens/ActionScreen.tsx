@@ -17,7 +17,7 @@ export function ActionScreen(props: {
   alarming: boolean
   onSilence: () => void
   onEndTurn: () => void
-  onPlayCard: () => void
+  onPlayCard: (card: number) => void
   onPass: () => void
 }) {
   const { game, view } = props
@@ -32,10 +32,13 @@ export function ActionScreen(props: {
   const over = isOver(turn)
   const totalMs =
     view.rail.find((r) => r.playerId === view.activeId)?.totalMs ?? 0
-  const card = cardName(view.activeCard)
   const faction = factionName(player?.factionId ?? null)
+  // At 3 or 4 players, each card has its own button.
+  const cards = view.activeCards
+  const unplayed = cards.filter((c) => !c.played).map((c) => cardName(c.card))
 
-  const pass = () => (view.cardPlayed ? props.onPass() : setConfirmPass(true))
+  const pass = () =>
+    unplayed.length === 0 ? props.onPass() : setConfirmPass(true)
 
   return (
     <div className="body">
@@ -92,31 +95,36 @@ export function ActionScreen(props: {
             </div>
           </>
         )}
-        <div className="acts">
+        <div className={`acts ${cards.length > 1 ? 'two' : ''}`}>
           <button
             className={`big ${over ? 'red' : ''}`}
             onClick={props.onEndTurn}
           >
             END TURN
           </button>
+          {cards.map(({ card, played }) => (
+            <button
+              key={card}
+              className="sec hl"
+              disabled={played}
+              onClick={() => props.onPlayCard(card)}
+            >
+              <span className="k">Strategic action</span>
+              {played
+                ? `${cardName(card)} (${card}) played ✓`
+                : `Play ${cardName(card)} (${card}) ▸`}
+            </button>
+          ))}
           <button
-            className="sec hl"
-            disabled={view.cardPlayed}
-            onClick={props.onPlayCard}
-          >
-            <span className="k">Strategic action</span>
-            {view.cardPlayed
-              ? `${card} (${view.activeCard}) played ✓`
-              : `Play ${card} (${view.activeCard}) ▸`}
-          </button>
-          <button
-            className={`sec ${view.cardPlayed ? '' : 'muted'}`}
+            className={`sec ${unplayed.length === 0 ? '' : 'muted'}`}
             onClick={pass}
           >
             <span className="k">
-              {view.cardPlayed
+              {unplayed.length === 0
                 ? 'Out for the round'
-                : 'Strategy card not played yet'}
+                : unplayed.length === 1
+                  ? 'Strategy card not played yet'
+                  : 'Strategy cards not played yet'}
             </span>
             Pass
           </button>
@@ -129,7 +137,7 @@ export function ActionScreen(props: {
       />
       {confirmPass && (
         <Dialog
-          title={`Pass before playing ${card}?`}
+          title={`Pass before playing ${unplayed.join(' and ')}?`}
           confirm="Pass anyway"
           danger
           onCancel={() => setConfirmPass(false)}
@@ -138,8 +146,10 @@ export function ActionScreen(props: {
             props.onPass()
           }}
         >
-          The rules say a player passes only after their strategic action. Pass
-          anyway if the table agrees.
+          {unplayed.length > 1
+            ? 'The rules say a player passes only after both strategic actions.'
+            : 'The rules say a player passes only after their strategic action.'}{' '}
+          Pass anyway if the table agrees.
         </Dialog>
       )}
     </div>

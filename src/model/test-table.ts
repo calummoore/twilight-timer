@@ -23,6 +23,9 @@ export const NAALU_PLAYERS: Player[] = PLAYERS.map((p) =>
   p.id === 'sam' ? { ...p, factionId: 'naalu' } : p,
 )
 
+/** Jaz, Kira, Tom, and Priya: a four-player table, with two cards each. */
+export const FOUR_PLAYERS: Player[] = PLAYERS.slice(0, 4)
+
 /** Cards for speaker Jaz. Initiative: Tom, Wren, Jaz, Sam, Kira, Priya. */
 export const PICKS: Record<string, number> = {
   jaz: 3,
@@ -31,6 +34,14 @@ export const PICKS: Record<string, number> = {
   priya: 7,
   sam: 4,
   wren: 2,
+}
+
+/** Two cards each, in pick order. Initiative: Tom 1, Priya 2, Jaz 3, Kira 5. */
+export const FOUR_PICKS: Record<string, number[]> = {
+  jaz: [3, 8],
+  kira: [5, 6],
+  tom: [1, 7],
+  priya: [2, 4],
 }
 
 export const LIMITS_ON: Settings = { ...DEFAULT_SETTINGS, enforceLimits: true }
@@ -75,13 +86,25 @@ export function table(
 
 export type Table = ReturnType<typeof table>
 
-/** Every player picks in pick order, `ms` apart, then the action phase starts. */
-export function playStrategy(t: Table, picks = PICKS, ms = 10 * SEC): void {
-  for (const id of t.view().pickOrder) {
-    const card = picks[id]
-    if (card === undefined) continue
-    t.wait(ms)
-    t.act({ kind: 'cardPicked', playerId: id, card })
+/**
+ * Every player picks in pick order, `ms` apart, then the action phase starts.
+ * With two cards each, the picks go round the pick order twice.
+ */
+export function playStrategy(
+  t: Table,
+  picks: Record<string, number | number[]> = PICKS,
+  ms = 10 * SEC,
+): void {
+  const cards = (id: string) => [picks[id] ?? []].flat()
+  const order = t.view().pickOrder
+  const rounds = Math.max(...order.map((id) => cards(id).length))
+  for (let k = 0; k < rounds; k++) {
+    for (const id of order) {
+      const card = cards(id)[k]
+      if (card === undefined) continue
+      t.wait(ms)
+      t.act({ kind: 'cardPicked', playerId: id, card })
+    }
   }
   t.act({ kind: 'phaseStepped' })
 }
