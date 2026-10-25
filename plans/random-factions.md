@@ -1,0 +1,218 @@
+# Random faction deal
+
+Status: Active. The branch `calummoore/player-faction-auto-assign` has no
+pull request yet. The plan closes when its PR merges.
+
+On the setup screen, BEGIN GAME stays off until every seat has a faction.
+So each game needs five to eight faction picks, also each test game. Many
+TI4 tables also deal factions at random. This change adds a random deal to
+the Game panel of the setup screen. A tap gives each seat with no faction a
+random faction that no other seat holds. The deal uses only the factions of
+the base game and of the expansions that the table chooses. The same choice
+limits the faction list of each seat.
+
+The base game has 17 factions, Prophecy of Kings has 7, and Thunder's Edge
+has 5. The Council Keleres came in Codex III, a free print-at-home pack.
+The Thunder's Edge box also includes it. Retail listings say that Thunder's
+Edge needs only the base game. Sources:
+[the Thunder's Edge announcement](https://www.fantasyflightgames.com/en/news/2025/7/31/thunders-edge/)
+and [the Thunder's Edge wiki page](https://twilight-imperium.fandom.com/wiki/Thunder's_Edge).
+
+The change does not cover player counts or colours, although 7 or 8
+players and the orange and pink colours need Prophecy of Kings. The deal
+applies no faction rules. For example, the Council Keleres needs at least
+one of Mentak, Xxcha, and Argent Flight out of play, and the table fixes
+such a deal by hand. The change also does not cover a random speaker, a
+faction draft, or the Twilight's Fall mode of Thunder's Edge, which uses no
+normal factions.
+
+Decisions:
+
+- 2026-10-25, Cal: add a random faction deal, which "really helps with
+  manual testing", and ask the table which expansions it plays with. The
+  deal is a product feature for every table, not a test tool, because many
+  tables deal factions at random. Cal answered the decisions below on this
+  basis.
+- 2026-10-25, Cal: decision 1, option A. The deal fills only the seats with
+  no faction, and its button shows only while a seat has no faction.
+  Alternatives: B, deal a new faction to every seat at each tap, and C, fill
+  the empty seats, then re-deal every seat. Reason: one tap still fills a
+  new setup, and the deal never discards a faction that a player chose.
+- 2026-10-25, Cal: decision 2, option B. The Game panel shows one chip for
+  each expansion, next to the random deal. The app saves the choice with
+  the settings. Alternatives: A, a panel on the Settings screen with a
+  read-only row on setup, and C, a picker at the first tap of the deal.
+  Reason: the choice sits next to the button that uses it, and the table
+  sees it at every setup.
+- 2026-10-25, Cal: decision 3, option B. Three chips: Prophecy of Kings,
+  Thunder's Edge, and Council Keleres. The base game has no chip, because
+  it is always in play. Alternatives: A, two chips with the Keleres in
+  Thunder's Edge, and C, one choice of version. Reason: each chip names the
+  factions that it adds, so every collection fits, also a printed Codex III.
+- 2026-10-25, Cal: decision 4, option B. The faction list of each seat
+  shows only the factions of the base game and the chosen expansions. A
+  seat keeps the faction that it holds when its expansion turns off.
+  Alternative: A, the chips limit only the deal. Reason: one setting then
+  means "the factions we play with", and a shorter list is faster to use
+  on the iPad.
+- 2026-10-25, Cal: decision 5, option A. All three chips start on.
+  Alternative: B, only Prophecy of Kings on. Reason: nothing changes for a
+  table that never touches the chips.
+- 2026-10-25, Cal: create the plan, then build only the mockup milestone.
+  Milestone 1 and the milestones after Milestone 2 wait for Cal.
+
+Contract owners:
+
+- The product spec at `docs/product.md`.
+- The mockup at `docs/mockups/index.html`.
+- The [workspace README](../README.md).
+
+## Design
+
+- `src/model/factions.ts`: each faction gets its game set, which is the
+  base game or one of three expansions. A list of the expansions gives each
+  its id and its name: `pok`, `te`, and `keleres`. The faction ids do not
+  change.
+- The settings get `expansions`: one on or off value for each expansion,
+  all on by default. The parser falls back to the default for each value
+  that is missing or broken.
+- The settings key stays `ti4tempo.settings.v1`. The versioned-key rule in
+  `AGENTS.md` is for saved games. Settings saved by an older build load
+  with every expansion on, and an older build ignores the new field. When
+  an older build saves its settings, the choice returns to the default.
+- A new module, `src/model/deal.ts`, holds three pure functions:
+  - The factions in play: the factions of the base game and the chosen
+    expansions, in name order.
+  - The choices of one seat: the factions in play, and the faction that
+    the seat holds when its expansion is off, in name order.
+  - The deal: it gives each empty seat inside the seat count a faction
+    from the factions in play that no row holds. Rows past the seat count
+    keep their factions, and the deal leaves those factions out, so a
+    larger count later has no duplicate. When the pool runs out, the
+    remaining seats stay empty. With the base game always in play, the
+    pool cannot run out at 8 seats.
+- The caller passes the random source, as it passes the time. The screen
+  passes `Math.random`, and the tests pass a fixed sequence.
+- The setup screen:
+  - The Game panel shows the "Expansions" label and the three chips above
+    BEGIN GAME. A tap turns a chip on or off and saves the settings.
+  - While a seat has no faction, the panel shows the hint and the button
+    "Random factions for empty seats", above BEGIN GAME.
+  - The summary rows of the Game panel scroll when the panel is full. So
+    the chips, the deal, and BEGIN GAME always stay in view.
+  - Each faction list shows the choices of its seat.
+  - The setup screen gets a callback that saves changed settings.
+    `App.tsx` passes its settings change handler.
+  - The new mockup classes move to `src/styles/mockup/setup.css`.
+- The saved game does not change. It stores faction ids, and the
+  expansions matter only at setup.
+- The setup screen has no phone variant. The phone companion has no setup
+  screen, and the iPad stage scales to fit the window.
+
+## Milestone 1: Documentation and spec
+
+State the expansions, the faction lists, and the deal as requirements
+before the code changes.
+
+- [ ] Update "Factions" in `docs/product.md`: the expansion chips and
+      their default, the faction list of each seat, and the random deal
+      for the empty seats. Add each decision in force with its rejected
+      alternative.
+- [ ] Update the Setup row of the iPad screens table in `docs/product.md`.
+- [ ] Add the expansions and the deal to the setup item of the key
+      features in `README.md`.
+
+## Milestone 2: Mockup
+
+Tags: mockup
+
+Show the expansion chips and the deal on the setup screens before the
+screens change.
+
+- [x] Setup — New Game: add the "Expansions" label and the three chips
+      above BEGIN GAME, all on.
+- [x] Setup — Faction Missing: add the chips, and the button "Random
+      factions for empty seats" below the hint.
+- [x] Add the screen "Setup — Random Factions": a new setup with no
+      faction picked. Thunder's Edge and Council Keleres are off.
+  - The time limits show their default, off. With no Naalu faction
+    picked, the Naalu row is hidden.
+- [x] Update the setup notes for the chips, the faction lists, and the
+      deal.
+- [x] With the chips and the deal, the Game panel of Setup — Faction
+      Missing ran past the bottom of the iPad frame. Let the panel shrink,
+      and let its summary rows scroll, so that BEGIN GAME stays in view.
+- [x] Render the setup screens in headless Chrome with no script error.
+      Save the screenshots under `.context/random-factions/mockup/`.
+- Evidence: `.context/random-factions/mockup/render.log` and the
+  screenshots beside it. All 24 screens render with no script error. On
+  each setup screen, the Game panel ends inside the frame.
+
+## Milestone 3: Game model
+
+Give each faction its game set, store the expansions, and add the deal.
+
+- [ ] `factions.ts`: the game set of each faction and the list of
+      expansions.
+- [ ] `settings.ts` and `parse.ts`: the `expansions` setting, all on by
+      default.
+- [ ] `deal.ts`: the factions in play, the choices of one seat, and the
+      deal.
+- [ ] Add `deal.ts` to the key code in `README.md`.
+- [ ] Unit tests:
+  - [ ] The factions in play: 30 with every expansion on, the 17 of the
+        base game with every expansion off, and each expansion adds only
+        its own factions.
+  - [ ] The choices of a seat add its faction when its expansion is off,
+        in name order. They add nothing for an empty seat.
+  - [ ] The deal fills only the empty seats inside the seat count and
+        keeps every held faction. No faction repeats across all rows,
+        also the rows past the count.
+  - [ ] The deal gives only factions in play. When the pool runs out,
+        the remaining seats stay empty.
+  - [ ] The deal takes its picks from the random source. A fixed
+        sequence gives a fixed deal.
+  - [ ] Stored settings without `expansions`, or with a broken value,
+        load with every expansion on. A saved choice loads as saved.
+
+## Milestone 4: Setup screen
+
+Tags: ui
+
+Show the chips, the faction lists, and the deal as the mockup shows them.
+
+- [ ] The chips in the Game panel. A tap saves the settings.
+- [ ] The button "Random factions for empty seats", shown while a seat
+      has no faction. It calls the deal with `Math.random`.
+- [ ] Each faction list shows the choices of its seat.
+- [ ] Let the Game panel shrink and its summary rows scroll, as the
+      mockup does.
+- [ ] Move the new mockup classes to `src/styles/mockup/setup.css`.
+- [ ] Keep `SetupScreen.tsx` near 200 lines. Move the seat row to its own
+      component if the screen passes 250 lines.
+- [ ] Scratch smoke test, not committed: build, serve the preview, and
+      drive headless Chrome. Save the log and the screenshots under
+      `.context/random-factions/smoke/`.
+  - [ ] The deal fills every empty seat with a different faction, and
+        BEGIN GAME turns on. A hand pick stays.
+  - [ ] With Thunder's Edge off, no faction list shows its factions, and
+        the deal gives none of them.
+  - [ ] The chips keep their state after a reload.
+
+## Milestone 5: Verification, commit, and review
+
+Run the checks, push, and review the branch.
+
+- [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
+- [ ] Commit with Conventional Commits and push the branch.
+- [ ] Open the PR and link it in the status paragraph.
+- [ ] Review the complete local diff against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
+
+## Post-merge follow-up (non-blocking)
+
+- [ ] Check that the deploy step passed on `main`.
+- [ ] On the iPad, turn Thunder's Edge off, deal the factions, and begin a
+      game.
