@@ -237,30 +237,35 @@ Tags: ui
 
 Show the reason control and the rule-check time as the mockup shows them.
 
-- [ ] Move the pause overlay from `GameScreen.tsx` into its own screen
+- [x] Move the pause overlay from `GameScreen.tsx` into its own screen
       component. Read the open pause from the view.
-- [ ] Add the reason control. A tap sets the reason at the time of the
+- [x] Add the reason control. A tap sets the reason at the time of the
       tap. Show the running time of an open rule check.
-- [ ] Port the pause styles from the mockup to `src/styles/mockup/`, and
+- [x] Port the pause styles from the mockup to `src/styles/mockup/`, and
       remove their copies from `src/styles/app.css`:
-  - [ ] `.pause-card`, `.reasons`, `.reason-time`, and `.big.small`.
-  - [ ] `.stat-grid.five`, for the fifth stat tile.
-  - [ ] `.overlay` and `.dialog`: the mockup holds them in its Naalu block,
+  - [x] `.pause-card`, `.reasons`, `.reason-time`, and `.big.small`.
+  - [x] `.stat-grid.five`, for the fifth stat tile.
+  - [x] `.overlay` and `.dialog`: the mockup holds them in its Naalu block,
         but the Naalu port left them in `src/styles/app.css`.
-- [ ] Post-game stats: the time and the count of rule checks, from a
+- [x] Post-game stats: the time and the count of rule checks, from a
       component in its own file.
-- [ ] Scratch smoke test, not committed: build, serve the preview, and
+- [x] Scratch smoke test, not committed: build, serve the preview, and
       drive it in headless Chrome.
-  - [ ] Pause, and see Pause selected. Select Rule check, then Pause, and
+  - [x] Pause, and see Pause selected. Select Rule check, then Pause, and
         see that the game stays paused.
-  - [ ] Select Rule check again, reload, and see Rule check still selected.
-  - [ ] Resume, pause again, and see Pause selected.
-  - [ ] End the game. Check the rule-check time and a count of 2 on the
+  - [x] Select Rule check again, reload, and see Rule check still selected.
+  - [x] Resume, pause again, and see Pause selected.
+  - [x] End the game. Check the rule-check time and a count of 2 on the
         post-game stats.
-  - [ ] Load a saved version 3 game with a pause. Check that it loads with
+  - [x] Load a saved version 3 game with a pause. Check that it loads with
         no rule checks.
-  - [ ] Save the log and the screenshots under
+  - [x] Save the log and the screenshots under
         `.context/pause-reasons/smoke/`.
+- The pause card is `src/ui/screens/PauseOverlay.tsx`, the tiles are
+  `src/ui/screens/ReasonTiles.tsx`, and `src/ui/reasons.ts` holds the
+  words for each reason.
+- Evidence: `.context/pause-reasons/smoke/smoke.log` and the screenshots
+  beside it. All 22 checks passed, with no console error.
 
 ## Milestone 6: Verification, commit, and review
 

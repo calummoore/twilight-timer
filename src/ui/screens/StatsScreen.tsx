@@ -3,6 +3,7 @@ import { gameStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
 import { pc } from '../colour'
 import { clock, percent, plural, words } from '../format'
+import { ReasonTiles } from './ReasonTiles'
 
 export function StatsScreen(props: {
   game: GameView
@@ -75,7 +76,7 @@ export function StatsScreen(props: {
             plural(stats.reactionCount, 'reaction window'),
           ].join(' · ')}
         </div>
-        <div className="stat-grid" style={{ marginTop: 22 }}>
+        <div className="stat-grid five" style={{ marginTop: 22 }}>
           <div className="stat">
             <div className="l">Longest round</div>
             <div className="v num">
@@ -111,6 +112,7 @@ export function StatsScreen(props: {
               {plural(stats.overLimitCount, 'time')} over a limit
             </div>
           </div>
+          <ReasonTiles totals={game.reasonTotals} />
         </div>
         <div
           style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 18 }}

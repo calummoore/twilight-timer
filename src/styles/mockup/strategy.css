@@ -29,6 +29,12 @@
 /* naalu 0 token: the strip button and the picker dialog. The remove-player dialog uses the same player options. */
 .order-strip .tokb{margin-left:auto}
 .tokb b{color:var(--pc); font-weight:800; font-size:13px}
+.overlay{position:absolute; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px); display:grid; place-items:center; z-index:10}
+.dialog{width:520px; background:#121a24; border:1px solid var(--line2); border-radius:20px; padding:28px}
+.dialog h3{font-size:25px; font-weight:750}
+.dialog p{font-size:14.5px; color:var(--dim); margin-top:10px; line-height:1.55}
+.dialog .heir{margin-top:16px; color:#f0cf6a}
+.dialog .btns{display:flex; gap:12px; margin-top:24px; justify-content:flex-end}
 .tokopts{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:18px}
 .tokopt{display:flex; align-items:center; gap:9px; padding:13px 14px; border:1px solid var(--line2); border-radius:11px;
   background:#0b111a; color:var(--txt); font-family:var(--f); font-size:15px; font-weight:650; cursor:pointer; text-align:left}
