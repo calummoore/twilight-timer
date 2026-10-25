@@ -147,6 +147,9 @@ Run the checks, push, and review the branch.
       the game. Its dialogs open as a bottom sheet on a phone, and the
       mockup draws its screens in every frame. Justifications:
       `.context/phone-version/merge-notes.md`.
+- [x] Leave a 10 px gap between the top bar buttons and the phase line on a
+      phone, as Cal asked on 2026-10-25. A later rule had reset the gap.
+      Evidence: `.context/phone-version/merge/topgap/`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
