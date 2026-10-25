@@ -45,6 +45,8 @@
   cursor:pointer; box-shadow:0 8px 0 #0a5f58, 0 14px 30px rgba(18,168,156,.28)}
 .big:active{transform:translateY(3px); box-shadow:0 5px 0 #0a5f58}
 .big.red{background:linear-gradient(180deg,#ff6b5e,#d63c30); color:#2a0704; box-shadow:0 8px 0 #7d211a,0 14px 30px rgba(214,60,48,.28)}
+/* The solid shadow draws an 8 px edge under the big button. The margin keeps the full gap from the edge to the buttons below. */
+.acts .big{margin-bottom:8px}
 .sec{background:var(--panel2); border:1px solid var(--line2); color:var(--txt); font-family:var(--f);
   font-size:15px; font-weight:600; padding:17px; border-radius:11px; cursor:pointer; text-align:left}
 .sec:hover{border-color:#3d5168; background:var(--panel3)}
