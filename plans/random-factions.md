@@ -1,6 +1,6 @@
 # Random faction deal
 
-Status: Active. [PR #14](https://github.com/calummoore/twilight-timer/pull/14)
+Status: Active. [PR #15](https://github.com/calummoore/twilight-timer/pull/15)
 is open. The plan closes when its PR merges.
 
 On the setup screen, BEGIN GAME stays off until every seat has a faction.
@@ -77,6 +77,9 @@ Decisions:
   each rule from the mockup sets its own alignment. Reason: a right
   default removes the class of drift, and it centres BEGIN GAME, BEGIN
   ACTION PHASE, and END TURN, as the mockup shows.
+- 2026-10-25, Cal: asked for a new PR after PR #14 closed without a merge.
+  PR #15 replaces PR #14, as option B of review 4 finding 9 says.
+  Alternative: A, reopen PR #14.
 
 Contract owners:
 
@@ -265,8 +268,13 @@ Run the checks, push, and review the branch.
     sides. Justifications:
     `.context/random-factions/merge/justifications.md`. The description
     of PR #14 holds them.
-  - Open PRs #11, #12, and #13 also change the spec, the mockup, the
-    README, and `src/model/parse.ts`. PR #11 also changes
+  - 2026-10-25: merged `046492d`, PR #12, the turn end when the reaction
+    window closes, in `859fae3`. The one conflict, the iPad screen list of
+    the mockup, keeps both sides. Justifications:
+    `.context/random-factions/merge-2/justifications.md`. The description
+    of PR #15 holds both merges.
+  - Open PRs #11 and #13 also change the spec, the mockup, the README,
+    and `src/model/parse.ts`. PR #11 also changes
     `src/ui/screens/SetupGamePanel.tsx`. PR #13 also changes
     `src/model/storage.test.ts` and `src/styles/app.css`. Expect
     conflicts when they merge.
@@ -291,7 +299,7 @@ Run the checks, push, and review the branch.
   - Review 4 checked the whole branch at 789d692, with the model and the
     setup code. The code has no finding. It found 1 process finding.
     Report: `.context/random-factions/review-4.md`.
-  - 9. PR #14 is closed without a merge. Severity Medium, effort Small. Recommended: A, ask Cal, then reopen PR #14 with a `feat` title and a description for Milestones 3 and 4.
+  - 9. PR #14 is closed without a merge. Cal asked for a new PR on 2026-10-25, which applies option B: PR #15 replaces PR #14.
   - Findings 1, 5, and 6: Cal chose B, A, and B on 2026-10-25, as the
     decisions record. Milestone 1 holds finding 1, Milestones 3 and 4
     hold the checks of finding 5, and the line below applies finding 6.
