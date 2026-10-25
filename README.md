@@ -22,6 +22,10 @@ in the futex account, at https://twilight-timer.futex.workers.dev.
 ## Docs
 
 - [Product spec](docs/product.md): requirements, decisions, and the MVP scope.
+- [Game rules and model](docs/game-rules.md), [Screens](docs/screens.md),
+  and [Multiplayer](docs/multiplayer.md): the linked spec pages.
+- [Architecture](docs/architecture.md): the components and the flow of a
+  change.
 - [Mockup](docs/mockups/index.html): open it in a browser.
 - [Plans](plans/)
 

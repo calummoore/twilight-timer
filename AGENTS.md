@@ -48,6 +48,14 @@ skill at that moment instead of guessing the rule.
   Prettier skips it. Keep its class names in step with the mockup.
 - Saved games use versioned `localStorage` keys. Change the version when
   the stored shape changes.
+- Server logic is pure model code. The room module in `src/model/` holds
+  the logic of the game server object, and the Durable Object in `worker/`
+  only connects it to `partyserver`. So the room tests stay Vitest unit
+  tests of `src/model/`. Cal decided this on 2026-10-25.
+- Before a merge that changes sync, run a scratch smoke test: headless
+  Chrome plays one round with a table device and two player devices
+  against the local server. Do not commit it. Cal decided this on
+  2026-10-25.
 - A push to `main` deploys to Cloudflare. CI needs the repository variable
   `CLOUDFLARE_ACCOUNT_ID` and the repository secret `CLOUDFLARE_API_TOKEN`.
 

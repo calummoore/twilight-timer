@@ -222,29 +222,30 @@ second tap names a target that no longer runs, so the model rejects it.
 State the requirements and the decisions for shared games, device roles,
 and their screens. Add an architecture doc for the new components.
 
-- [ ] Update `docs/product.md`.
-  - [ ] Move the phone companion and live sync into the scope, as player
+- [x] Split `docs/product.md`, which passed 250 lines, into linked pages:
+      `game-rules.md`, `screens.md`, and the new `multiplayer.md`.
+- [x] Update the product spec pages: `product.md`, `multiplayer.md`,
+      `screens.md`, and `game-rules.md`.
+  - [x] Move the phone companion and live sync into the scope, as player
         mode and table mode. Keep push notifications as an add-on.
-  - [ ] Add the requirements for sharing, the join code, the table link,
+  - [x] Add the requirements for sharing, the join code, the table link,
         roles, views, seats, and seat moves.
-  - [ ] Add the requirements for simultaneous taps, the one clock, offline
+  - [x] Add the requirements for simultaneous taps, the one clock, offline
         play on the table device, and games and codes that never expire.
-  - [ ] State that table mode never gets private data. List private
+  - [x] State that table mode never gets private data. List private
         comments and a pre-selected card as later features.
-  - [ ] Update the screen tables for table mode and player mode. Name the
+  - [x] Update the screen tables for table mode and player mode. Name the
         Join screen, the seat move flow, and the error states.
-  - [ ] Update the data model sketch for actions that name their target.
-  - [ ] State that a lost table link cannot be replaced, and that the
+  - [x] Update the data model sketch for actions that name their target.
+  - [x] State that a lost table link cannot be replaced, and that the
         table link screen asks the host to keep it.
-  - [ ] Record decisions 10, 11, 12, 21, 30, 35, 36, and 40 as decisions
+  - [x] Record decisions 10, 11, 12, 21, 30, 35, 36, and 40 as decisions
         in force.
-- [ ] Add `docs/architecture.md`: the components, the flow of a change,
+- [x] Add `docs/architecture.md`: the components, the flow of a change,
       and the roles. Record decision 9 and the rejected options.
-- [ ] Update `README.md`: the features, the sync service, local
-      development, and the key code.
-- [ ] Update `AGENTS.md`: the new commands and the outcomes of decisions
-      13, 14, and 16. State that server logic is pure model code in the
-      room module.
+- [x] Link the new spec pages from `README.md`.
+- [x] Update `AGENTS.md`: the outcomes of decisions 13, 14, and 16. State
+      that server logic is pure model code in the room module.
 
 ## Milestone 2: Mockups
 
@@ -348,7 +349,7 @@ for the game size: `.context/multiplayer-live-sync/game-size.md`.
 - [ ] Add `partyserver`. Add the Worker entry, the Durable Object binding,
       and its SQLite migration to `wrangler.jsonc`. Keep the static files.
 - [ ] Add the Cloudflare Vite plugin, so that `npm run dev` runs the Worker
-      and the object locally.
+      and the object locally. Name the new commands in `AGENTS.md`.
 - [ ] The object loads its shared-game record on start through the parser
       and the version steps. It applies changes with the model, stores the
       record after each change, and sends each connection its view.
@@ -417,6 +418,8 @@ Build the player mode screens of the mockup.
 
 Run the checks, push, and review the branch.
 
+- [ ] Update `README.md`: the features, the sync service, local
+      development, and the key code.
 - [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [ ] Decision 14: in headless Chrome, play one round with a table device
       and two player devices against the local server. Commit nothing.
