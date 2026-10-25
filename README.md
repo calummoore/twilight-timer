@@ -6,8 +6,9 @@ phase, with enough of the round structure to know whose turn it is. The
 repository is `twilight-timer`.
 
 Each push to `main` deploys the app to the Cloudflare Worker `twilight-timer`
-in the futex account, at https://twilight-timer.futex.workers.dev. Each pull
-request gets a preview link; see [Pull request previews](#pull-request-previews).
+in the futex account. The app opens at https://ti4.nexus; see
+[Custom domain](#custom-domain). Each pull request gets a preview link; see
+[Pull request previews](#pull-request-previews).
 
 ## Key features
 
@@ -59,7 +60,8 @@ runs `wrangler deploy`, which uploads `dist/` as static assets.
 One-time setup:
 
 1. In the futex Cloudflare account, create an API token from the "Edit
-   Cloudflare Workers" template.
+   Cloudflare Workers" template. Under "Zone Resources", include the
+   `ti4.nexus` zone.
 2. Run `gh secret set CLOUDFLARE_API_TOKEN -R calummoore/twilight-timer` and
    paste the token.
 3. Run `gh variable set CLOUDFLARE_ACCOUNT_ID -R calummoore/twilight-timer --body <account-id>`.
@@ -70,6 +72,27 @@ the workflow.
 
 To deploy by hand, run `npx wrangler login`, then `npm run build` and
 `npm run deploy`.
+
+### Custom domain
+
+Cal bought `ti4.nexus` through Cloudflare on 2026-10-25 as the domain of the
+app. The `routes` entry in `wrangler.jsonc` makes it a Custom Domain of the
+Worker. Each deploy attaches the domain. Cloudflare makes its DNS record and
+its certificate.
+
+- The `ti4.nexus` zone must be in the futex account, with the Worker.
+- The API token needs the permission Zone > Workers Routes > Edit on the
+  `ti4.nexus` zone. Without it, the deploy job fails at the Custom Domain
+  step. The new version is then live only at the workers.dev URL.
+- Each deploy removes the Custom Domains that `wrangler.jsonc` does not
+  name. Add a domain in `wrangler.jsonc`, not in the dashboard.
+- Do not add a DNS record for `ti4.nexus` by hand. In CI, Wrangler replaces
+  a record that conflicts with the Custom Domain.
+- `"workers_dev": true` keeps https://twilight-timer.futex.workers.dev on.
+  When a route is set, Wrangler turns that URL off unless the setting is
+  true.
+- The browser keeps saved games for each origin. A game saved at the
+  workers.dev URL does not show at `ti4.nexus`.
 
 ### Pull request previews
 
@@ -97,6 +120,8 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   2026-10-23. The `cleanup` job installs from the default branch, so it runs
   no pull request code.
 - A preview has its own origin, so it keeps its own saved games.
+- Previews stay on workers.dev. `preview_urls` controls them, apart from
+  `workers_dev` and the Custom Domain.
 - Workers Previews need Preview URLs on the Worker. `"preview_urls": true` in
   `wrangler.jsonc` keeps them on at each deploy. `wrangler preview` also needs
   the `previews` block in `wrangler.jsonc`.
