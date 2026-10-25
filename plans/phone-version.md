@@ -130,8 +130,8 @@ Replace the scaled stage with the responsive layout from the mockups.
 
 Run the checks, push, and review the branch.
 
-- [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits and push the branch.
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+- [x] Commit with Conventional Commits and push the branch.
 - [x] Merge `origin/main` into the branch, which brings in PRs #2 to #10:
       the Politics speaker choice, Mark all done, the safe-area stage, and
       the Naalu "0" token with the required faction list. The branch keeps
@@ -176,6 +176,7 @@ Run the checks, push, and review the branch.
   - `src/ui/screens/StatsScreen.tsx`: the Between rounds bar has low contrast against its track. Separate branch.
   - `docs/mockups/index.html`: the file is built from sources in `~/tools/mock/`, outside the repository, so a new build can lose a direct edit. Separate branch.
   - `docs/mockups/index.html`: a script comment says that overlays open under the top bar, but only the reaction window does, as in finding 24. Separate branch.
+  - `docs/mockups/index.html`: in the upright iPad frame, the stats top bar wraps the text of its four buttons, because of the two Later export buttons. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
