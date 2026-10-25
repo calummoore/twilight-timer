@@ -728,6 +728,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .hero .alarm{padding:9px 10px 9px 12px; margin-bottom:12px; gap:10px}
   .hero .alarm .s{font-size:11.5px}
   .hero .acts{gap:10px; margin-top:16px}
+  .acts.two{display:flex; flex-wrap:wrap}
+  .acts.two .big{flex-basis:100%}
+  .acts.two .sec{flex:1 1 0}
   .hero .big{font-size:24px; padding:21px 16px}
   .hero .sec{padding:12px 14px; font-size:14.5px}
   .rail{background:none; border:none; border-radius:0}
@@ -1388,7 +1391,7 @@ S.overtime = {t:'Action Phase — Limit Exceeded', d:'ipad', note:
 S.actionFour = {t:'Action Phase — Four Players', d:'ipad', note:
  `In a four-player game each player holds <b>two</b> strategy cards and takes <b>one turn</b> in each cycle, at their lower card. Each rail row shows both cards: blue while still to play, grey with a ✓ once used. On a turn the player can play <b>either</b> card that is still blue, so the hero shows a play button for each card. A strategic action is the whole turn: closing its window ends the turn, so the second card waits for a <b>later turn</b>. Kira played Trade on an earlier turn and can play Warfare now. Pass stays a warning until both cards are played. Tom played both cards and has passed.`,
  mnote:
- `The same four-player turn in the narrow layout. The two card buttons and Pass share the row under End Turn, and each rail row shows both cards.`,
+ `The same four-player turn in the narrow layout. The two card buttons and Pass share the row under End Turn, and each rail row shows both cards. On a small phone, Pass takes its own row when the three buttons do not fit.`,
  h:actionScreen(false, false, true)};
 
 /* ── 6. Reaction window ── */

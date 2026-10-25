@@ -109,6 +109,9 @@
   .hero .alarm{padding:9px 10px 9px 12px; margin-bottom:12px; gap:10px}
   .hero .alarm .s{font-size:11.5px}
   .hero .acts{gap:10px; margin-top:16px}
+  .acts.two{display:flex; flex-wrap:wrap}
+  .acts.two .big{flex-basis:100%}
+  .acts.two .sec{flex:1 1 0}
   .hero .big{font-size:24px; padding:21px 16px}
   .hero .sec{padding:12px 14px; font-size:14.5px}
   .rail{background:none; border:none; border-radius:0}
