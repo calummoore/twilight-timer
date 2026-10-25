@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { LIMITS_ON, MIN, SEC, playStrategy, table } from './test-table'
+import {
+  LIMITS_ON,
+  MIN,
+  SEC,
+  olderTable,
+  playStrategy,
+  table,
+} from './test-table'
 
 function actionTable() {
   const t = table()
@@ -60,11 +67,16 @@ describe('undo', () => {
       t.act({ kind: 'reactionDone', playerId: id })
     t.wait(8 * SEC)
     t.act({ kind: 'reactionDone', playerId: 'wren' })
-    t.wait(5 * SEC)
+    t.wait(5 * SEC) // the mark ended Tom's turn, so Wren's clock runs
     t.undo()
-    expect(t.view().view).toMatchObject({
+    const view = t.view()
+    expect(view.view).toMatchObject({
+      activeId: 'tom',
       reaction: { doneCount: 4, elapsedMs: 8 * SEC },
     })
+    expect(
+      view.entries.some((e) => e.kind === 'turn' && e.playerId === 'wren'),
+    ).toBe(false)
   })
 
   it('restores an open reaction window when an extension is undone late', () => {
@@ -80,7 +92,7 @@ describe('undo', () => {
       reaction: {
         elapsedMs: 110 * SEC,
         limitMs: 2 * MIN,
-        pausedTurnMs: 10 * SEC,
+        turnMs: 10 * SEC,
       },
     })
   })
@@ -116,8 +128,8 @@ describe('undo', () => {
     expect(t.view().gameMs).toBe(atTap)
   })
 
-  it('keeps a self-closed reaction window closed when a later tap is undone', () => {
-    const t = table(LIMITS_ON) // the window limit is 2:00
+  it('keeps a window closed when a later tap is undone, in an older game', () => {
+    const t = olderTable(LIMITS_ON) // the window closes itself at 2:00
     playStrategy(t)
     t.wait(10 * SEC)
     t.act({ kind: 'strategyCardPlayed' })

@@ -69,7 +69,7 @@ function step(s: FoldState, a: Action, ms: number): boolean {
         return false
       }
       r.done.set(a.playerId, ms - r.startMs)
-      if (r.done.size === r.others.length) closeReaction(s, ms)
+      if (r.done.size === r.others.length) endReaction(s, ms, a.at)
       return true
     }
     case 'reactionExtended':
@@ -78,7 +78,7 @@ function step(s: FoldState, a: Action, ms: number): boolean {
       return true
     case 'reactionClosed':
       if (!s.reaction) return false
-      closeReaction(s, ms)
+      endReaction(s, ms, a.at)
       return true
     case 'statusStepToggled':
       if (s.phase !== 'status') return false
@@ -234,6 +234,15 @@ function playStrategyCard(s: FoldState, ms: number, wall: number): boolean {
     others: s.seats.filter((other) => other !== id),
   }
   return true
+}
+
+/**
+ * A tap closes the reaction window. The strategic action was the action of
+ * the turn, so the turn ends too, except in a game from an older build.
+ */
+function endReaction(s: FoldState, ms: number, wall: number): void {
+  closeReaction(s, ms)
+  if (s.game.windowEndsTurn) endTurn(s, false, ms, wall)
 }
 
 function startSummary(s: FoldState, ms: number): void {

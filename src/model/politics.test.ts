@@ -55,12 +55,10 @@ describe('Politics reaction window', () => {
       elapsedMs: 10 * SEC,
     })
     expect(reaction(t)).toMatchObject({
-      pausedTurnMs: 20 * SEC,
+      turnMs: 20 * SEC,
       speakerChoice: { chosenId: 'tom' },
     })
-    t.act({ kind: 'reactionClosed' })
-    t.wait(3 * SEC)
-    t.act({ kind: 'turnEnded' })
+    t.act({ kind: 'reactionClosed' }) // Jaz's turn ends
     const view = t.view()
     const closed = view.entries.filter((e) => !e.running)
     expect(closed.at(-2)).toMatchObject({
@@ -72,8 +70,10 @@ describe('Politics reaction window', () => {
     expect(closed.at(-1)).toMatchObject({
       kind: 'turn',
       playerId: 'jaz',
-      durationMs: 23 * SEC,
+      durationMs: 20 * SEC,
     })
+    // Initiative still follows the cards, so Sam goes next.
+    expect(view.view).toMatchObject({ activeId: 'sam' })
     // The agenda vote and the next strategy phase follow the new speaker.
     expect(view.speakerId).toBe('tom')
     expect(view.voteOrder).toEqual([
@@ -111,7 +111,7 @@ describe('Politics reaction window', () => {
       elapsedMs: 10 * SEC,
     })
     expect(reaction(t)).toMatchObject({
-      pausedTurnMs: 20 * SEC,
+      turnMs: 20 * SEC,
       speakerChoice: { chosenId: null },
     })
   })

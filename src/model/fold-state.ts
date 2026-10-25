@@ -186,10 +186,13 @@ export function closeReaction(s: FoldState, ms: number): void {
   s.suspended = null
 }
 
-/** A reaction window with a limit closes itself when the limit passes. */
+/**
+ * In a game from an older build, a window with a limit closes itself when
+ * the limit passes. Otherwise the window stays open and counts overtime.
+ */
 export function expireReaction(s: FoldState, ms: number): void {
   const r = s.reaction
-  if (!r || r.limitMs === null) return
+  if (!r || r.limitMs === null || s.game.windowEndsTurn) return
   const end = r.startMs + r.limitMs + r.extraMs
   if (ms >= end) closeReaction(s, end)
 }

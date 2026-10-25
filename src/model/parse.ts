@@ -16,10 +16,14 @@ type Fields = Record<string, unknown>
 /**
  * Narrows stored data to a game, or returns null when it is not valid.
  * Version 1, from builds before the Naalu token, loads with no token owner.
+ * Versions 1 and 2, from builds before a window close ended the turn, load
+ * with the window rule of those builds.
  */
 export function parseGame(raw: unknown): Game | null {
-  if (!isFields(raw) || (raw.version !== 1 && raw.version !== 2)) return null
-  const legacy = raw.version === 1
+  if (!isFields(raw)) return null
+  const { version } = raw
+  if (version !== 1 && version !== 2 && version !== 3) return null
+  const legacy = version === 1
   const players = listOf(raw.players, (p) => parsePlayer(p, legacy))
   const actions = listOf(raw.actions, parseAction)
   const pauses = listOf(raw.pauses, parseInterval)
@@ -34,12 +38,15 @@ export function parseGame(raw: unknown): Game | null {
   if (owner !== null && (typeof owner !== 'string' || !isPlayer(owner))) {
     return null
   }
+  const windowEndsTurn = version === 3 ? raw.windowEndsTurn : false
+  if (typeof windowEndsTurn !== 'boolean') return null
   return {
-    version: 2,
+    version: 3,
     startedAt,
     players,
     firstSpeakerId,
     naaluTokenOwnerId: owner,
+    windowEndsTurn,
     actions,
     pauses,
     voids,

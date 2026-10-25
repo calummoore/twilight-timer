@@ -49,14 +49,11 @@ export function isOver(timer: TimerView | null): boolean {
   )
 }
 
-/**
- * Sounds the alarm once when a limit passes. The reaction window closes
- * itself at its limit, so it does not alarm.
- */
+/** Sounds the alarm once when a limit passes, also for a reaction window. */
 export function useAlarm(timer: TimerView | null, settings: Settings) {
   const fired = useRef<string | null>(null)
   const [silenced, setSilenced] = useState<string | null>(null)
-  const over = isOver(timer) && timer?.kind !== 'reaction'
+  const over = isOver(timer)
   const key = timer?.key ?? null
   useEffect(() => {
     if (!over || key === null || fired.current === key) return

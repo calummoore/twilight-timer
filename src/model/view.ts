@@ -36,8 +36,10 @@ export interface ReactionView {
   elapsedMs: number
   /** Window length with extensions, or null when no limit applies. */
   limitMs: number | null
-  /** The active player's turn time, paused while the window is open. */
-  pausedTurnMs: number
+  /** The active player's turn time, stopped while the window is open. */
+  turnMs: number
+  /** True when closing the window ends the turn. False in an older game. */
+  endsTurn: boolean
   tiles: ReactionTile[]
   doneCount: number
   /** The new speaker, for Politics only. */

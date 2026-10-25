@@ -158,9 +158,9 @@ then every *other* player may spend a command token to resolve the secondary.
 That's real table time that belongs to nobody in particular.
 
 So: playing a strategy card **stops the active player's clock** and opens a
-**reaction window** — a separate, fixed-duration timer that is not charged to any
-individual player. Each other player gets a tile they tap to mark themselves
-done (whether they resolved the secondary or declined it).
+**reaction window** — a separate timer that is not charged to any individual
+player. Each other player gets a tile they tap to mark themselves done (whether
+they resolved the secondary or declined it).
 
 When the card is **Politics (3)**, the window also asks for the **new speaker**,
 because the primary ability hands the token to a player who does not hold it.
@@ -172,14 +172,30 @@ Rejected: opening the Speaker & Seating screen when Politics is played, because
 it hides the window and takes two taps. Rejected: requiring the choice before
 the window opens, because a forced step blocks the table after a mis-tap.
 
-The window closes when **either**:
-- every other player has marked themselves done, **or**
-- the window timer expires
-
-The table can also close the window early with **Mark all done**. It marks
+The window closes when every other player has marked themselves done. The
+table can also close the window early with **Mark all done**. It marks
 every player who is still waiting as done at that moment, and the window closes
 at once. Rejected: a warning before the window closes, because the label says
 what the tap does, and undo reverts a mis-tap.
+
+Closing the window **ends the active player's turn**, because the strategic
+action is their action for the turn. The next unpassed player in initiative
+order starts their turn at once. The turn that ends keeps only the time before
+the card was played. When every other player has passed, the same player starts
+a new turn. Rejected: resuming the active player's turn after the window,
+because the rules give them no further action, and the wait for End Turn would
+go on their clock. Rejected: ending the turn only on Mark all done, because the
+last player who marks done leaves the window in the same state.
+
+With a window limit, the window stays open past the limit, as every other limit
+does: the clock turns red, counts overtime, and the alarm sounds. Only a tap
+closes the window. Rejected: closing the window when its limit passes, because
+the turn would then end without a tap, and the next player's clock would run
+while players still resolve the secondary.
+
+A game saved by a build before these rules keeps the rules of that build:
+closing the window resumes the turn, and the window closes itself when its
+limit passes.
 
 Per-player completion times inside the window are recorded, so a player who
 consistently soaks the whole secondary window shows up in the stats.
@@ -256,7 +272,7 @@ the totals stay honest.
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
 | ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
-| **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles, new speaker for Politics |
+| **Reaction Window** | Overlay: window countdown, per-player done tiles, new speaker for Politics |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
 | **Agenda Phase**    | Discussion timer, speaker-order voting with per-player timers            |
 | **Round Summary**   | Per-player time this round, split by phase                               |
