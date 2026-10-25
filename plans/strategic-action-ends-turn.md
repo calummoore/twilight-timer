@@ -38,12 +38,21 @@ Decisions:
 - 2026-10-25: the MARK ALL DONE label stays. The window header says "their
   turn took 0:10" in place of "their clock is paused at 0:10", because the
   clock does not run again in that turn.
+- 2026-10-25, Cal: review finding 2, option A. The undo test of a late
+  extension undo also runs on an older game. Alternative: B, run every
+  window and undo test that does not depend on the rule under both rules.
+  Reason: one short test brings back the exact case.
+- 2026-10-25, Cal: review decision 3, option B. `AGENTS.md` gets a rule:
+  when a game rule changes, search `src/ui/` and the mockup for text that
+  states the old rule. Alternatives: A, no rule, and C, the same check
+  under "Review focus". Reason: the author finds a stale text before the
+  review, which saves a fix round.
 
 Contract owners:
 
 - The product spec at `docs/product.md`.
 - The mockup at `docs/mockups/index.html`.
-- The [workspace README](../README.md).
+- The [workspace README](../README.md) and `AGENTS.md`.
 
 ## Design
 
@@ -173,11 +182,31 @@ Run the checks, push, and review the branch.
     `.context/strategic-action-ends-turn/review-1.md`.
   - Review 2 checked fix commit f035c51: finding 1 is resolved, and it found
     no new finding. Report: `.context/strategic-action-ends-turn/review-2.md`.
-  - 2. Undo test lost its older-game window case. Severity Low, effort Small. Recommended: A, an older-game copy of the test.
-  - Decision for Cal, from finding 1: a rule in `AGENTS.md` to search the screen texts and the mockup when a game rule changes. Effort Small. Previous examples: Naalu review findings 3, 4, and 5.
+  - 2. Undo test lost its older-game window case. Severity Low, effort Small. Recommended: A, an older-game copy of the test. Cal chose A on 2026-10-25. Done in Milestone 6.
+  - Decision for Cal, from finding 1: a rule in `AGENTS.md` to search the screen texts and the mockup when a game rule changes. Effort Small. Previous examples: Naalu review findings 3, 4, and 5. Cal chose B on 2026-10-25. Done in Milestone 6.
   - `docs/mockups/index.html`: the Settings "Vote" row says "in speaker order", but voting starts at the speaker's left. Separate branch.
   - `docs/mockups/index.html`: the live clock of the "Reaction Window (overlay)" screen turns red at 0:00, but its label still says "Window remaining · 2:00". Separate branch.
   - `plans/naalu-initiative-token.md` and `plans/mvp-review-follow-ups.md`: the status lines say that PR #7 and PR #2 are open, but both merged on 2026-10-23. Separate branch.
+
+## Milestone 6: Review decisions
+
+Apply Cal's answers to review finding 2 and review decision 3.
+
+- [x] Finding 2, option A: run the undo test of a late extension undo on a
+      new game and on an older game.
+- [x] Check that the older-game case fails when the window limit check
+      ignores undo voids.
+- [x] Decision 3, option B: add the screen-text rule to "Repository rules"
+      in `AGENTS.md`.
+- [x] Apply the new rule to this change: search `src/ui/` and the mockup
+      for text that states the old window rules. Nothing else is stale.
+- [x] Run the complete gate, commit, and push.
+  Evidence: `.context/strategic-action-ends-turn/check-3.log`.
+- [ ] Review the new commits against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
+- Evidence: `.context/strategic-action-ends-turn/undo-probe.log`.
 
 ## Post-merge follow-up (non-blocking)
 
