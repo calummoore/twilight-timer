@@ -210,6 +210,18 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .kv span{color:var(--dim)} .kv b{font-weight:600}
 .fld.sel.none{color:var(--faint)}
 .setup-need{font-size:12.5px; color:var(--warn); text-align:center; margin-bottom:10px}
+/* expansions: one chip for each, and the random deal for the empty seats */
+.exps{margin-bottom:14px}
+.exps .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-bottom:8px}
+.exp-row{display:flex; flex-wrap:wrap; gap:6px}
+.exp{display:flex; align-items:center; gap:6px; padding:7px 12px 7px 10px; border:1px solid var(--line2); border-radius:20px;
+  background:#0a0f16; color:var(--faint); font-family:var(--f); font-size:12.5px; font-weight:600; cursor:pointer}
+.exp::before{content:"+"; width:10px; text-align:center; font-weight:800}
+.exp.on{border-color:#2b6b66; background:#0b1c1f; color:var(--txt)}
+.exp.on::before{content:"✓"; color:var(--accent)}
+.deal{width:100%; margin-bottom:12px; padding:13px; border:1px solid var(--line2); border-radius:11px; background:var(--panel2);
+  color:var(--txt); font-family:var(--f); font-size:15px; font-weight:650; text-align:center; cursor:pointer}
+.deal:hover{border-color:#3d5168; background:var(--panel3)}
 
 /* settings */
 .set-row{display:grid; grid-template-columns:1fr 200px 62px; gap:14px; align-items:center; padding:15px 18px;
@@ -631,8 +643,13 @@ const topBar = (phase, extra='') => `
 const S = {};
 
 /* ── 1. Setup ── */
-// missing: Wren has not picked a faction yet, so BEGIN GAME is off.
-const setupScreen = missing => `<div class="space"></div><div class="lay">
+// empty: the seats with no faction yet. While a seat has none, BEGIN GAME is off,
+// and the random deal can fill the empty seats.
+// sets: the expansions that are on. The base game is always in play.
+// limits: the time limits are on. The panel summary scrolls when it is full.
+const EXPANSIONS = [['pok','Prophecy of Kings'], ['te',"Thunder's Edge"], ['keleres','Council Keleres']];
+const ALL_SETS = EXPANSIONS.map(([k])=>k);
+const setupScreen = (empty=[], sets=ALL_SETS, limits=true) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">Load last game</button><button class="ibtn">⚙ Settings</button></div>
   <div class="content"><div class="setup-grid">
@@ -643,7 +660,7 @@ const setupScreen = missing => `<div class="space"></div><div class="lay">
       </div>
       <div style="overflow:auto;flex:1;min-height:0">
       ${Object.entries(P).map(([id,d])=>{
-        const none = missing && id==='wren';
+        const none = empty.includes(id);
         return `
         <div class="seat ${d.speaker?'sp':''}" style="${col(id)}">
           <div class="drag">⠿</div>
@@ -656,16 +673,17 @@ const setupScreen = missing => `<div class="space"></div><div class="lay">
         </div>`}).join('')}
       </div>
     </div>
-    <div class="pnl" style="display:flex;flex-direction:column">
+    <div class="pnl" style="display:flex;flex-direction:column;min-height:0">
       <div class="pnl-h">Game</div>
-      <div style="padding:16px 18px;flex:1">
+      <div style="padding:16px 18px;flex:1;min-height:0;overflow:auto">
         <div class="kv"><span>Players</span><b>6</b></div>
         <div class="kv"><span>Strategy cards each</span><b>1</b></div>
         <div class="kv"><span>Speaker</span><b>Jaz</b></div>
-        <div class="kv"><span>Naalu 0 token</span><b>Sam</b></div>
-        <div class="kv"><span>Time limits</span><b style="color:var(--warn)">Enabled</b></div>
+        ${empty.includes('sam')?'':'<div class="kv"><span>Naalu 0 token</span><b>Sam</b></div>'}
+        ${limits?`<div class="kv"><span>Time limits</span><b style="color:var(--warn)">Enabled</b></div>
         <div class="kv"><span>Turn limit</span><b>3:00</b></div>
-        <div class="kv" style="border:none"><span>Reaction window</span><b>2:00</b></div>
+        <div class="kv" style="border:none"><span>Reaction window</span><b>2:00</b></div>`
+        :'<div class="kv"><span>Time limits</span><b>Off</b></div>'}
         <div style="font-size:12px;color:var(--faint);line-height:1.6;margin-top:18px">
           Seat order is the physical ring. The <b style="color:var(--dim)">speaker ★</b> is a pointer into it —
           move it and the strategy pick order and agenda voting order both re-derive.</div>
@@ -673,19 +691,26 @@ const setupScreen = missing => `<div class="space"></div><div class="lay">
           At 3–4 players each player picks <b style="color:var(--dim)">two</b> strategy cards and takes a turn at each initiative number. The app handles this automatically.</div>
       </div>
       <div style="padding:16px 18px">
-        ${missing?'<div class="setup-need">Pick a faction for every seat to begin.</div>':''}
+        <div class="exps"><div class="lbl">Expansions</div><div class="exp-row">
+          ${EXPANSIONS.map(([k,n])=>`<button class="exp ${sets.includes(k)?'on':''}">${n}</button>`).join('')}
+        </div></div>
+        ${missing?'<div class="setup-need">Pick a faction for every seat to begin.</div><button class="deal">Random factions for empty seats</button>':''}
         <button class="big" style="width:100%;font-size:23px;padding:20px${missing?';opacity:.45':''}" ${missing?'disabled':''}>BEGIN GAME</button>
       </div>
     </div>
-  </div></div></div>`;
+  </div></div></div>`; };
 
 S.setup = {t:'Setup — New Game', d:'ipad', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the list of official factions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round.`,
- h:setupScreen(false)};
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game.`,
+ h:setupScreen()};
 
 S.setupMissing = {t:'Setup — Faction Missing', d:'ipad', note:
- `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet.`,
- h:setupScreen(true)};
+ `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
+ h:setupScreen(['wren'])};
+
+S.setupDeal = {t:'Setup — Random Factions', d:'ipad', note:
+ `A new setup, before any seat has a faction. This table plays with the base game and Prophecy of Kings, so <b>Thunder's Edge</b> and <b>Council Keleres</b> are off. Every faction list then offers only the 24 factions of those two boxes, and so does the deal. The time limits show their default, off. <b>Random factions for empty seats</b> gives each empty seat a different faction, and BEGIN GAME turns on. The button shows only while a seat has no faction, so it never replaces a faction that a player picked. A seat keeps its faction when its expansion turns off.`,
+ h:setupScreen(Object.keys(P), ['pok'], false)};
 
 /* ── 2. Settings ── */
 const setRow = (lb,ds,val,on,off) => `<div class="set-row ${off?'off':''}">
@@ -1470,7 +1495,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['iPad — table device', ['setup','setupMissing','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','paused','pausedRule','reaction','reactionOver','politics','status','agenda','round','history','stats','join']],
+  ['iPad — table device', ['setup','setupMissing','setupDeal','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','paused','pausedRule','reaction','reactionOver','politics','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);

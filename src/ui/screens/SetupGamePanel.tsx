@@ -1,7 +1,12 @@
-import type { Settings } from '../../model/settings'
+import { EXPANSIONS } from '../../model/factions'
+import type { Expansions, Settings } from '../../model/settings'
 import { clock } from '../format'
 
-/** The Game panel of the setup screen: what the game starts with. */
+/**
+ * The Game panel of the setup screen: what the game starts with. Its summary
+ * rows scroll when the panel is full, so the expansions, the deal, and BEGIN
+ * GAME stay in view.
+ */
 export function SetupGamePanel(props: {
   count: number
   speakerName: string
@@ -10,16 +15,30 @@ export function SetupGamePanel(props: {
   /** A seat has no faction yet, so the game cannot begin. */
   factionsMissing: boolean
   settings: Settings
+  onExpansions: (expansions: Expansions) => void
+  /** Gives each seat with no faction a random faction in play. */
+  onDeal: () => void
   onBegin: () => void
 }) {
   const { settings } = props
+  const { expansions } = settings
   const limit = (key: 'turn' | 'reactionWindow') =>
     settings.limits[key].on ? clock(settings.limits[key].ms) : 'Off'
 
   return (
-    <div className="pnl" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div
+      className="pnl"
+      style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}
+    >
       <div className="pnl-h">Game</div>
-      <div style={{ padding: '16px 18px', flex: 1 }}>
+      <div
+        style={{
+          padding: '16px 18px',
+          flex: 1,
+          minHeight: 0,
+          overflow: 'auto',
+        }}
+      >
         <div className="kv">
           <span>Players</span>
           <b>{props.count}</b>
@@ -66,10 +85,35 @@ export function SetupGamePanel(props: {
         </div>
       </div>
       <div style={{ padding: '16px 18px' }}>
-        {props.factionsMissing && (
-          <div className="setup-need">
-            Pick a faction for every seat to begin.
+        <div className="exps">
+          <div className="lbl">Expansions</div>
+          <div className="exp-row">
+            {EXPANSIONS.map(({ id, name }) => {
+              const on = expansions[id]
+              return (
+                <button
+                  key={id}
+                  className={`exp ${on ? 'on' : ''}`}
+                  aria-pressed={on}
+                  onClick={() =>
+                    props.onExpansions({ ...expansions, [id]: !on })
+                  }
+                >
+                  {name}
+                </button>
+              )
+            })}
           </div>
+        </div>
+        {props.factionsMissing && (
+          <>
+            <div className="setup-need">
+              Pick a faction for every seat to begin.
+            </div>
+            <button className="deal" onClick={props.onDeal}>
+              Random factions for empty seats
+            </button>
+          </>
         )}
         <button
           className="big"
