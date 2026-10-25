@@ -98,6 +98,24 @@ select.fld {
 .seat {
   grid-template-columns: 26px 34px 216px 1fr max-content 44px;
 }
+/* The seat rows take their columns from one grid, so the faction column has
+   one width in every row, also when one seat keeps a faction that the other
+   lists leave out. Under subgrid, the padding and the border of a row take
+   12px from its first and last columns, so those columns are 12px wider. A
+   browser without subgrid keeps the columns of each row. */
+.seat-list {
+  display: grid;
+  grid-template-columns: 38px 34px 216px 1fr max-content 56px;
+  column-gap: 11px;
+  align-content: start;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+.seat-list .seat {
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
 .seat-move {
   display: flex;
   flex-direction: column;

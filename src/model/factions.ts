@@ -1,40 +1,56 @@
 /**
+ * The expansions that add factions to the base game. The Council Keleres has
+ * its own choice: it came in Codex III, and the Thunder's Edge box also holds
+ * it.
+ */
+export const EXPANSIONS = [
+  { id: 'pok', name: 'Prophecy of Kings' },
+  { id: 'te', name: "Thunder's Edge" },
+  { id: 'keleres', name: 'Council Keleres' },
+] as const
+
+export type ExpansionId = (typeof EXPANSIONS)[number]['id']
+
+/** The base game, or the expansion that adds a faction. */
+export type GameSet = 'base' | ExpansionId
+
+/**
  * The official factions: the base game, Prophecy of Kings, the codices, and
- * Thunder's Edge, in name order. Saved games store the id, so an id never
- * changes.
+ * Thunder's Edge, in name order, each with its game set. Saved games store
+ * the id, so an id never changes.
  */
 export const FACTIONS = [
-  { id: 'arborec', name: 'Arborec' },
-  { id: 'argent', name: 'Argent Flight' },
-  { id: 'letnev', name: 'Barony of Letnev' },
-  { id: 'saar', name: 'Clan of Saar' },
-  { id: 'keleres', name: 'Council Keleres' },
-  { id: 'crimson', name: 'Crimson Rebellion' },
-  { id: 'deepwrought', name: 'Deepwrought Scholarate' },
-  { id: 'muaat', name: 'Embers of Muaat' },
-  { id: 'hacan', name: 'Emirates of Hacan' },
-  { id: 'empyrean', name: 'Empyrean' },
-  { id: 'sol', name: 'Federation of Sol' },
-  { id: 'firmament', name: 'Firmament / Obsidian' },
-  { id: 'creuss', name: 'Ghosts of Creuss' },
-  { id: 'l1z1x', name: 'L1Z1X Mindnet' },
-  { id: 'bastion', name: 'Last Bastion' },
-  { id: 'mahact', name: 'Mahact Gene-Sorcerers' },
-  { id: 'mentak', name: 'Mentak Coalition' },
-  { id: 'naalu', name: 'Naalu Collective' },
-  { id: 'naazrokha', name: 'Naaz-Rokha Alliance' },
-  { id: 'nekro', name: 'Nekro Virus' },
-  { id: 'nomad', name: 'Nomad' },
-  { id: 'ralnel', name: 'Ral Nel Consortium' },
-  { id: 'sardakk', name: "Sardakk N'orr" },
-  { id: 'titans', name: 'Titans of Ul' },
-  { id: 'jolnar', name: 'Universities of Jol-Nar' },
-  { id: 'cabal', name: "Vuil'raith Cabal" },
-  { id: 'winnu', name: 'Winnu' },
-  { id: 'xxcha', name: 'Xxcha Kingdom' },
-  { id: 'yin', name: 'Yin Brotherhood' },
-  { id: 'yssaril', name: 'Yssaril Tribes' },
-] as const
+  { id: 'arborec', name: 'Arborec', set: 'base' },
+  { id: 'argent', name: 'Argent Flight', set: 'pok' },
+  { id: 'letnev', name: 'Barony of Letnev', set: 'base' },
+  { id: 'saar', name: 'Clan of Saar', set: 'base' },
+  { id: 'keleres', name: 'Council Keleres', set: 'keleres' },
+  { id: 'crimson', name: 'Crimson Rebellion', set: 'te' },
+  { id: 'deepwrought', name: 'Deepwrought Scholarate', set: 'te' },
+  { id: 'muaat', name: 'Embers of Muaat', set: 'base' },
+  { id: 'hacan', name: 'Emirates of Hacan', set: 'base' },
+  { id: 'empyrean', name: 'Empyrean', set: 'pok' },
+  { id: 'sol', name: 'Federation of Sol', set: 'base' },
+  { id: 'firmament', name: 'Firmament / Obsidian', set: 'te' },
+  { id: 'creuss', name: 'Ghosts of Creuss', set: 'base' },
+  { id: 'l1z1x', name: 'L1Z1X Mindnet', set: 'base' },
+  { id: 'bastion', name: 'Last Bastion', set: 'te' },
+  { id: 'mahact', name: 'Mahact Gene-Sorcerers', set: 'pok' },
+  { id: 'mentak', name: 'Mentak Coalition', set: 'base' },
+  { id: 'naalu', name: 'Naalu Collective', set: 'base' },
+  { id: 'naazrokha', name: 'Naaz-Rokha Alliance', set: 'pok' },
+  { id: 'nekro', name: 'Nekro Virus', set: 'base' },
+  { id: 'nomad', name: 'Nomad', set: 'pok' },
+  { id: 'ralnel', name: 'Ral Nel Consortium', set: 'te' },
+  { id: 'sardakk', name: "Sardakk N'orr", set: 'base' },
+  { id: 'titans', name: 'Titans of Ul', set: 'pok' },
+  { id: 'jolnar', name: 'Universities of Jol-Nar', set: 'base' },
+  { id: 'cabal', name: "Vuil'raith Cabal", set: 'pok' },
+  { id: 'winnu', name: 'Winnu', set: 'base' },
+  { id: 'xxcha', name: 'Xxcha Kingdom', set: 'base' },
+  { id: 'yin', name: 'Yin Brotherhood', set: 'base' },
+  { id: 'yssaril', name: 'Yssaril Tribes', set: 'base' },
+] as const satisfies readonly { id: string; name: string; set: GameSet }[]
 
 export type FactionId = (typeof FACTIONS)[number]['id']
 

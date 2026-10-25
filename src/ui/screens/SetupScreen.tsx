@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { FACTIONS, NAALU, type FactionId } from '../../model/factions'
+import { dealFactions } from '../../model/deal'
+import { NAALU, type FactionId } from '../../model/factions'
 import {
   COLOURS,
   DEFAULT_PLAYERS,
@@ -7,16 +8,10 @@ import {
   MIN_PLAYERS,
   type Colour,
 } from '../../model/rules'
-import type { Settings } from '../../model/settings'
+import type { Expansions, Settings } from '../../model/settings'
 import type { Player } from '../../model/types'
-import { pc } from '../colour'
 import { SetupGamePanel } from './SetupGamePanel'
-
-interface Row {
-  name: string
-  colour: Colour
-  factionId: FactionId | null
-}
+import { SetupSeat, type SeatRow } from './SetupSeat'
 
 const COUNTS = Array.from(
   { length: MAX_PLAYERS - MIN_PLAYERS + 1 },
@@ -30,10 +25,13 @@ export function SetupScreen(props: {
   onDismissNotice: () => void
   onLoadLast: () => void
   onSettings: () => void
+  /** Saves changed settings, for example the expansions in play. */
+  onSettingsChange: (settings: Settings) => void
   onBegin: (players: Player[], speakerId: string) => void
 }) {
+  const { expansions } = props.settings
   const [count, setCount] = useState(DEFAULT_PLAYERS)
-  const [rows, setRows] = useState<Row[]>(() =>
+  const [rows, setRows] = useState<SeatRow[]>(() =>
     COLOURS.map((colour) => ({ name: '', colour, factionId: null })),
   )
   const [speaker, setSpeaker] = useState(0)
@@ -43,7 +41,7 @@ export function SetupScreen(props: {
   // The game begins only when every seat has a faction.
   const factionsMissing = seats.some((row) => row.factionId === null)
 
-  const update = (i: number, patch: Partial<Row>) =>
+  const update = (i: number, patch: Partial<SeatRow>) =>
     setRows((all) =>
       all.map((row, j) => (j === i ? { ...row, ...patch } : row)),
     )
@@ -77,6 +75,17 @@ export function SetupScreen(props: {
             : row,
       )
     })
+
+  // The random source runs in the tap, not in a state updater, because
+  // React can run an updater twice.
+  const deal = () => {
+    const held = rows.map((row) => row.factionId)
+    const dealt = dealFactions(held, count, expansions, Math.random)
+    setRows(rows.map((row, i) => ({ ...row, factionId: dealt[i] ?? null })))
+  }
+
+  const changeExpansions = (next: Expansions) =>
+    props.onSettingsChange({ ...props.settings, expansions: next })
 
   const move = (i: number, by: number) => {
     const j = i + by
@@ -150,79 +159,21 @@ export function SetupScreen(props: {
                 ))}
               </div>
             </div>
-            <div style={{ overflow: 'auto', flex: 1, minHeight: 0 }}>
+            <div className="seat-list">
               {seats.map((row, i) => (
-                <div
+                <SetupSeat
                   key={i}
-                  className={`seat ${i === speaker ? 'sp' : ''}`}
-                  style={pc(row.colour)}
-                >
-                  <div className="seat-move">
-                    <button
-                      aria-label="Move up"
-                      disabled={i === 0}
-                      onClick={() => move(i, -1)}
-                    >
-                      ▲
-                    </button>
-                    <button
-                      aria-label="Move down"
-                      disabled={i === count - 1}
-                      onClick={() => move(i, 1)}
-                    >
-                      ▼
-                    </button>
-                  </div>
-                  <div className="sn">
-                    Seat
-                    <br />
-                    {i + 1}
-                  </div>
-                  <div className="swatches">
-                    {COLOURS.map((colour) => (
-                      <button
-                        key={colour}
-                        aria-label={colour}
-                        className={`sw ${colour === row.colour ? 'on' : ''}`}
-                        style={pc(colour)}
-                        onClick={() => pickColour(i, colour)}
-                      />
-                    ))}
-                  </div>
-                  <input
-                    className="fld"
-                    value={row.name}
-                    placeholder={`Player ${i + 1}`}
-                    onChange={(e) => update(i, { name: e.target.value })}
-                  />
-                  <select
-                    className={`fld sel ${row.factionId ? '' : 'none'}`}
-                    aria-label="Faction"
-                    value={row.factionId ?? ''}
-                    onChange={(e) => {
-                      const faction = FACTIONS.find(
-                        (f) => f.id === e.target.value,
-                      )
-                      pickFaction(i, faction?.id ?? null)
-                    }}
-                  >
-                    <option value="" disabled>
-                      Faction
-                    </option>
-                    {FACTIONS.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.name}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    className={`spk ${i === speaker ? 'on' : ''}`}
-                    aria-label="Make speaker"
-                    onClick={() => setSpeaker(i)}
-                  >
-                    ★
-                  </button>
-                </div>
+                  index={i}
+                  row={row}
+                  last={i === count - 1}
+                  speaker={i === speaker}
+                  expansions={expansions}
+                  onMove={(by) => move(i, by)}
+                  onColour={(colour) => pickColour(i, colour)}
+                  onName={(name) => update(i, { name })}
+                  onFaction={(factionId) => pickFaction(i, factionId)}
+                  onSpeaker={() => setSpeaker(i)}
+                />
               ))}
             </div>
           </div>
@@ -232,6 +183,8 @@ export function SetupScreen(props: {
             naaluName={naalu < 0 ? null : nameOf(naalu)}
             factionsMissing={factionsMissing}
             settings={props.settings}
+            onExpansions={changeExpansions}
+            onDeal={deal}
             onBegin={begin}
           />
         </div>

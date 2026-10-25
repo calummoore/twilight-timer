@@ -1,6 +1,11 @@
-import { FACTIONS, isFactionId, type FactionId } from './factions'
+import { EXPANSIONS, FACTIONS, isFactionId, type FactionId } from './factions'
 import { COLOURS, type Colour } from './rules'
-import { ALARM_SOUNDS, DEFAULT_SETTINGS, type Settings } from './settings'
+import {
+  ALARM_SOUNDS,
+  DEFAULT_SETTINGS,
+  type Expansions,
+  type Settings,
+} from './settings'
 import {
   TIMER_KEYS,
   type Action,
@@ -78,7 +83,16 @@ export function parseSettings(raw: unknown): Settings {
     alarmSound: sound ?? d.alarmSound,
     keepAwake: bool(raw.keepAwake, d.keepAwake),
     showCumulative: bool(raw.showCumulative, d.showCumulative),
+    expansions: parseExpansions(raw.expansions),
   }
+}
+
+/** Each expansion that is missing or broken falls back to its default alone. */
+function parseExpansions(raw: unknown): Expansions {
+  const fields: Fields = isFields(raw) ? raw : {}
+  const out = { ...DEFAULT_SETTINGS.expansions }
+  for (const { id } of EXPANSIONS) out[id] = bool(fields[id], out[id])
+  return out
 }
 
 function parsePlayer(raw: unknown, legacy: boolean): Player | null {
