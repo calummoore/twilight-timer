@@ -163,11 +163,18 @@ Run the checks, push, and review the branch.
 
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
   Evidence: `.context/strategic-action-ends-turn/check.log`.
-- [ ] Commit with Conventional Commits and push the branch.
+- [x] Commit with Conventional Commits and push the branch.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 1 of 9f97715 found 2 findings. Fixed: 1, the Settings help text
+    said that the window closes at its limit. Report:
+    `.context/strategic-action-ends-turn/review-1.md`.
+  - 2. Undo test lost its older-game window case. Severity Low, effort Small. Recommended: A, an older-game copy of the test.
+  - Decision for Cal, from finding 1: a rule in `AGENTS.md` to search the screen texts and the mockup when a game rule changes. Effort Small. Previous examples: Naalu review findings 3, 4, and 5.
+  - `docs/mockups/index.html`: the Settings "Vote" row says "in speaker order", but voting starts at the speaker's left. Separate branch.
+  - `docs/mockups/index.html`: the live clock of the "Reaction Window (overlay)" screen turns red at 0:00, but its label still says "Window remaining · 2:00". Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
