@@ -52,36 +52,52 @@ export function DurationStepper({
   )
 }
 
+export interface DialogConfirm {
+  label: string
+  onConfirm: () => void
+  danger?: boolean
+  /** The button shows, but a tap does nothing, for example before a choice. */
+  disabled?: boolean
+}
+
+/**
+ * The shell of every modal dialog: a title, a line of text, optional
+ * controls, and Cancel. A dialog without `confirm` acts in its controls.
+ */
 export function Dialog({
   title,
   children,
+  content,
   confirm,
-  onConfirm,
   onCancel,
-  danger = false,
 }: {
   title: string
+  /** The text below the title. */
   children: ReactNode
-  confirm: string
-  onConfirm: () => void
+  /** Controls below the text, for example a choice of players. */
+  content?: ReactNode
+  confirm?: DialogConfirm
   onCancel: () => void
-  danger?: boolean
 }) {
   return (
     <div className="overlay" role="dialog" aria-modal="true" aria-label={title}>
       <div className="dialog">
         <h3>{title}</h3>
         <p>{children}</p>
+        {content}
         <div className="btns">
           <button className="ibtn" onClick={onCancel}>
             Cancel
           </button>
-          <button
-            className={`big small ${danger ? 'red' : ''}`}
-            onClick={onConfirm}
-          >
-            {confirm}
-          </button>
+          {confirm && (
+            <button
+              className={`big small ${confirm.danger ? 'red' : ''}`}
+              disabled={confirm.disabled}
+              onClick={confirm.onConfirm}
+            >
+              {confirm.label}
+            </button>
+          )}
         </div>
       </div>
     </div>

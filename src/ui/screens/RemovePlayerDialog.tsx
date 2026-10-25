@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { leftOf } from '../../model/orders'
 import type { Player } from '../../model/types'
-import { PlayerOptions } from '../controls'
-
-const TITLE = 'Who leaves the game?'
+import { Dialog, PlayerOptions } from '../controls'
 
 /** Removes a player who is eliminated or goes home. A second tap confirms. */
 export function RemovePlayerDialog(props: {
@@ -26,36 +24,33 @@ export function RemovePlayerDialog(props: {
   const heir = props.players.find((p) => p.id === heirId)
 
   return (
-    <div className="overlay" role="dialog" aria-modal="true" aria-label={TITLE}>
-      <div className="dialog">
-        <h3>{TITLE}</h3>
-        <p>
-          They take no more picks, turns, reactions, or votes. Their time so far
-          stays in the stats.
-        </p>
-        <PlayerOptions
-          players={props.players}
-          chosenId={chosenId}
-          onChoose={setChosenId}
-        />
-        {chosen && heir && (
-          <p className="heir">
-            ★ The speaker token passes to {heir.name}, on {chosen.name}’s left.
-          </p>
-        )}
-        <div className="btns">
-          <button className="ibtn" onClick={props.onClose}>
-            Cancel
-          </button>
-          <button
-            className="big small red"
-            disabled={!chosen}
-            onClick={() => chosen && props.onRemove(chosen.id)}
-          >
-            {chosen ? `Remove ${chosen.name}` : 'Remove'}
-          </button>
-        </div>
-      </div>
-    </div>
+    <Dialog
+      title="Who leaves the game?"
+      content={
+        <>
+          <PlayerOptions
+            players={props.players}
+            chosenId={chosenId}
+            onChoose={setChosenId}
+          />
+          {chosen && heir && (
+            <p className="heir">
+              ★ The speaker token passes to {heir.name}, on {chosen.name}’s
+              left.
+            </p>
+          )}
+        </>
+      }
+      confirm={{
+        label: chosen ? `Remove ${chosen.name}` : 'Remove',
+        danger: true,
+        disabled: !chosen,
+        onConfirm: () => chosen && props.onRemove(chosen.id),
+      }}
+      onCancel={props.onClose}
+    >
+      They take no more picks, turns, reactions, or votes. Their time so far
+      stays in the stats.
+    </Dialog>
   )
 }
