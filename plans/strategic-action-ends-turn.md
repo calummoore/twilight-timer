@@ -47,6 +47,14 @@ Decisions:
   states the old rule. Alternatives: A, no rule, and C, the same check
   under "Review focus". Reason: the author finds a stale text before the
   review, which saves a fix round.
+- 2026-10-25: merge of PR #9, player removal. PR #9 took version 3 and
+  the `.v3` keys, so this change moves saved games to version 4 under
+  `.v4` keys. Versions 1 to 3 load with the old window rule, because
+  their builds resumed the turn when the window closed.
+- 2026-10-25: merge of PR #9. In a game with the new rule, the removal of
+  the last player a window waits for ends the turn, as the last MARK DONE
+  does. Reason: decision 1B, because every player is done. In an older
+  game the removal resumes the turn, as PR #9 built it.
 
 Contract owners:
 
@@ -57,16 +65,17 @@ Contract owners:
 ## Design
 
 - The stored game gets `windowEndsTurn`. `startGame` sets it to true. The
-  parser gives false to a version 1 or version 2 game, so that its log
-  folds as before.
-- The saved game moves to version 3 under new `.v3` keys. When a `.v3` key
-  is empty, load reads the `.v2` key, then the `.v1` key. Save and archive
-  remove the older keys that they replace.
+  parser gives false to a version 1, 2, or 3 game, so that its log folds
+  as before.
+- The saved game moves to version 4 under new `.v4` keys. When a `.v4` key
+  is empty, load reads the `.v3` key, then the `.v2` key, then the `.v1`
+  key. Save and archive remove the older keys that they replace.
 - In a game with the new rule, a tap that closes the window ends the turn:
-  the last `reactionDone`, or `reactionClosed`. The window entry closes,
-  then the turn entry closes at the same moment, and the next unpassed
-  player in initiative order starts a turn. The turn entry keeps only the
-  time before the card was played.
+  the last `reactionDone`, `reactionClosed`, or the removal of the last
+  player the window waits for. The turn entry closes where the window
+  began, with only the time before the card was played. Then the window
+  entry closes, and the next unpassed player in initiative order starts a
+  turn, as when the card player leaves during the window.
 - When every other player has passed, the next turn belongs to the same
   player. Their turn count goes up by one, as for an END TURN.
 - In a game with the new rule, the window does not close itself at its
@@ -202,11 +211,38 @@ Apply Cal's answers to review finding 2 and review decision 3.
       for text that states the old window rules. Nothing else is stale.
 - [x] Run the complete gate, commit, and push.
   Evidence: `.context/strategic-action-ends-turn/check-3.log`.
-- [ ] Review the new commits against `origin/main` with the
+- [x] Review the new commits against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 3 of 3f2953f and 68487c4: both commits do what Cal chose. Its
+    one finding, a stale PR description, follows the `git-commit` rule,
+    so the description is updated with each push. Report:
+    `.context/strategic-action-ends-turn/review-3.md`.
+  - `src/model/fold.ts`: no test fails when the window limit check of the
+    fold ignores undo voids, also on `origin/main`. Separate branch.
 - Evidence: `.context/strategic-action-ends-turn/undo-probe.log`.
+
+## Milestone 7: Merge of main with player removal
+
+PR #9 on `main` adds the removal of a player who leaves the game, with the
+saved-game version 3. Merge it, and keep both features.
+
+- [x] Move this change's saved games to version 4 under `.v4` keys. Load
+      versions 1 to 3 with the old window rule.
+- [x] Share one window close step between the fold and the removal, so
+      that a window whose card player left starts the next turn once.
+- [x] In a game with the new rule, end the turn when the removal of the
+      last player a window waits for closes it.
+- [x] Keep the overlay text for a card player who left the game.
+- [x] Run main's removal tests that assert the old rule on an older game,
+      with every assertion kept. Add the same cases under the new rule.
+- [x] Run the complete gate on the merged tree, commit the merge, and run
+      the merge audit. Evidence:
+      `.context/strategic-action-ends-turn/check-merge.log`.
+- [ ] Push, and review the merge with the `implementation-review` skill.
+      Report the findings, then apply the review-fix rule: fix the
+      `Auto-fix: yes` findings, re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 
