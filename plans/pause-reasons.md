@@ -2,8 +2,9 @@
 
 Status: Active. [PR #13](https://github.com/calummoore/twilight-timer/pull/13)
 is open. The plan closes when its PR merges. Cal answered decisions 1 to 3
-on 2026-10-25. Review findings 2, 4, 6, 8, 10, and 11 wait for Cal.
-Milestones 7 to 11 make rule checks count as game time.
+on 2026-10-25. Review findings 2, 4, and 10 wait for Cal. Milestones 7
+to 11 make rule checks count as game time, and Milestone 14 applies
+findings 6 and 8.
 
 The table can pause the game from the top bar. A pause stops every clock
 and charges nobody. The app stores each pause as a start time and an end
@@ -95,6 +96,16 @@ Decisions:
   window rule of its build. A version 4 game from main keeps its window
   rule and has no rule checks. Only a version 5 game must store the window
   rule.
+- 2026-10-25, Cal: review finding 6, option B. A model function gives the
+  post-game stats from the view, with the rule-check time, and a unit test
+  checks that their total equals the game clock. Alternative: A, make the
+  rule-check parameter of `gameStats` required.
+- 2026-10-25, Cal: review finding 8, option B. Rename `gameClock` to
+  `entryClock`, and say "entry ms" in its comments, so that "game" names
+  only the clock with rule checks. Alternative: A, change only the
+  comments.
+- 2026-10-25, Cal: review finding 11, ignore. The commit title of 6ab9dcf
+  stays, because a squash merge keeps it off `main`.
 
 Contract owners:
 
@@ -409,10 +420,10 @@ Show rule checks as game time as the mockup shows them.
     rule. No further fix round runs. Report:
     `.context/pause-reasons/review-4.md`.
   - 4. Round summary game total now counts rule checks. Severity Low, effort Small. Recommended: A, the spec says that the round summary game total is the game clock, with rule checks.
-  - 6. Post-game rule-check total has no test. Severity Low, effort Small. Recommended: B, a model function that gives the post-game stats from the view, with a unit test.
-  - 8. `gameClock` no longer gives the game clock. Severity Low, effort Medium. Recommended: B, rename it to `entryClock` and say "entry ms" in the comments.
+  - 6. Post-game rule-check total has no test. Severity Low, effort Small. Recommended: B, a model function that gives the post-game stats from the view, with a unit test. Cal chose B on 2026-10-25: Milestone 14.
+  - 8. `gameClock` no longer gives the game clock. Severity Low, effort Medium. Recommended: B, rename it to `entryClock` and say "entry ms" in the comments. Cal chose B on 2026-10-25: Milestone 14.
   - 10. Review focus excludes rule checks in undone ranges. Severity Low, effort Small. Recommended: A, "Plain pause time, and undone time outside rule checks, are not game time." in `AGENTS.md`.
-  - 11. Fix commit title passes 50 characters. Severity Low, effort Small. Recommended: A, keep the commit and squash-merge PR #13.
+  - 11. Fix commit title passes 50 characters. Severity Low, effort Small. Recommended: A, keep the commit and squash-merge PR #13. Cal on 2026-10-25: ignore.
   - `docs/mockups/index.html`: "Where the game went" has no "Between rounds" row, but the app has one. Separate branch.
   - `docs/mockups/index.html`: "Where the game went" writes times under an hour as "0:58:00", but the app writes "58:00". Separate branch.
 
@@ -453,6 +464,29 @@ the expansion choice. It does not change the saved game.
   `.context/pause-reasons/merge-3/justifications.md`. Evidence beside it:
   `verify-spec.log`, `tests.log`, `audit-merge.log`, `check.log`, and
   `smoke/smoke.log` with 36 of 36 checks.
+
+## Milestone 14: Review findings 6 and 8
+
+Apply Cal's answers to review findings 6 and 8. Both keep the behaviour.
+
+- [x] Finding 6: `postGameStats` in `stats.ts` takes the view and gives the
+      post-game stats with the rule-check time. The post-game stats screen
+      calls it.
+- [x] Finding 6: a unit test plays a rule check to the game end and checks
+      that the post-game total equals the game clock.
+- [x] Finding 8: rename `gameClock` to `entryClock` in `time.ts`,
+      `fold.ts`, `derive.ts`, and `time.test.ts`. Say "entry ms" in the
+      comments of `time.ts` and `fold-state.ts`.
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+- Evidence: `.context/pause-reasons/findings-6-8/`: `mutation.log`, the new
+  test fails when `postGameStats` drops the rule-check time; `check.log`;
+  and `smoke/smoke.log` with 36 of 36 checks.
+- [ ] Commit with Conventional Commits, push the branch, and update the
+      pull request description.
+- [ ] Review the complete local diff against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
 
 ## Post-merge follow-up (non-blocking)
 
