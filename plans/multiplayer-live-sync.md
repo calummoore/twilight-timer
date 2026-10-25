@@ -35,8 +35,8 @@ Decisions:
 - 2026-10-25, Cal: keep all multiplayer work in one plan. This replaces a
   split into three plans from the same day.
 
-Open decisions, each with its recommended option. Their numbers follow the
-plan review findings.
+Open decisions, proposed on 2026-10-23 and 2026-10-25, each with its
+recommended option. Their numbers follow the plan review findings.
 
 9. Sync service. A: Firebase RTDB and Auth. B: Firestore. C: Cloudflare
    Durable Objects. D: Convex. E: the table iPad as host. Recommended: C.
@@ -158,11 +158,14 @@ second tap names a target that no longer runs, so the model rejects it.
 - Each stored game marks its time base: device or server. One helper gives
   `now` from that mark. Sharing moves a solo game to server time, so the
   running clock does not jump. Stop sharing needs no shift.
-- The object and the devices read a stored game through the same parser
-  and version steps. The step that adds the time base also adds the empty
-  private part.
-- Each device keeps the game, its pending changes, and the last offset in
-  `localStorage`, so a reload restores them.
+- The object keeps one shared-game record: the game, the answered tap
+  ids, the server record, the closed state, and the game id. It stores
+  and loads only that record.
+- Each device keeps one device record in `localStorage`. It holds the
+  game, the pending changes, the last offset, the code, and the game id.
+  It also holds the role and the secrets of the device.
+- Both records pass the same parser and version steps. The step that adds
+  the time base also adds the empty private part.
 - The table device works offline, as today. When the connection returns,
   it sends its pending changes in order. The object rejects those that are
   no longer legal, and the device shows a notice.
@@ -292,6 +295,8 @@ fixed times and a fixed random source.
         another seat.
 - [ ] Outbox: the pending changes in order, the game with them applied,
       and the next step after an answer: done, or drop with a notice.
+- [ ] Records: the shared-game record of the object and the device record,
+      each read through the parser and the version steps.
 - [ ] Time base: move a game to server time, and give `now` for a game
       from its time base. The mark and the empty private part come in one
       new stored version. Its migration step reads a game without the mark
@@ -300,8 +305,9 @@ fixed times and a fixed random source.
       the newest limits of the game.
 - [ ] Codes and links: make a code, a game id, and a table secret, read
       typed input, and parse both links.
-- [ ] Add "Allow phone companions" to the stored settings, with a parser
-      default, so the settings key keeps version 1.
+- [ ] Add "Allow phone companions" to the stored settings, on by default
+      as the mockup shows. A parser default keeps the settings key at
+      version 1.
 - [ ] Player views: who acts now and their clock, the turns before mine,
       my totals and card, my reaction tile, and my game stats.
 
@@ -314,9 +320,9 @@ for the game size: `.context/multiplayer-live-sync/game-size.md`.
       and its SQLite migration to `wrangler.jsonc`. Keep the static files.
 - [ ] Add the Cloudflare Vite plugin, so that `npm run dev` runs the Worker
       and the object locally.
-- [ ] The object loads the game on start through the parser and the
-      version steps. It applies changes with the model, stores each
-      change, and sends each connection its view.
+- [ ] The object loads its shared-game record on start through the parser
+      and the version steps. It applies changes with the model, stores the
+      record after each change, and sends each connection its view.
 - [ ] The object tracks connections for presence. It handles seat claims,
       move requests, approvals, releases, the code and its expiry, and the
       table secret.
@@ -336,7 +342,8 @@ Connect the app to the sync server. No screen uses the client yet.
       clock offset and the connection state.
 - [ ] Publish: shift the game to server time, reserve a code, and upload
       the game. Stop sharing keeps the game on the table device.
-- [ ] Send the outbox in order, and keep it in `localStorage`.
+- [ ] Keep the device record in `localStorage`, and send the outbox in
+      order.
 - [ ] Claim a seat, request a move, approve or release a seat, and join
       with the table link.
 - [ ] A device that finds its game closed, or another game id behind its
@@ -352,6 +359,8 @@ Build the table device parts of the mockup.
       button when "Allow phone companions" is off.
 - [ ] Build the Join screen: the player QR, the code, the link, the table
       link, the seat rows, move approval, Release seat, and Stop sharing.
+- [ ] Add the "Allow phone companions" switch to Settings, as the mockup
+      shows.
 - [ ] Show the notice for a dropped tap.
 - [ ] In a shared game, Settings shows the newest limits of the game and
       changes only the edited timer.
@@ -386,14 +395,19 @@ Run the checks, push, and review the branch.
   - Plan review 1 of dbde952 found 8 findings. Fixed: 2, 3, 4, 5, and 7. Finding 1 got option A and stays open. Report: `.context/multiplayer-live-sync/review-1.md`.
   - Plan review 2 of 97fb703 found 4 findings, 17 to 20. Fixed: 17, 18, and 19, and the rest of 3 and 4. Report: `.context/multiplayer-live-sync/review-2.md`.
   - Plan review 3 of 9850502 found 8 findings, 22 to 29. Fixed: 22, 23, 25, 26, 27, and 29. Decision 30 is the wider fix of finding 23. Report: `.context/multiplayer-live-sync/review-3.md`.
+  - Plan review 4 of 4128a52 found 4 findings, 31 to 34. Fixed: 31 and 32. Report: `.context/multiplayer-live-sync/review-4.md`.
   - 1. A code holder can erase the game. Severity High, effort Small. Recommended: close it, because decision 21 covers it: the join code opens player mode only, and table mode needs the table link.
   - 24. A lost table device cannot recover. Severity Medium, effort Small. Recommended: A, the Join screen asks the host to save the table link, and the docs state the limit.
   - 6. CI steps for the rules are missing. Severity Low, effort Small. Recommended: A, a CI test step, the rules deploy first, and Cal's credential. It applies only if decision 9 picks A.
   - 8. Join mockup names a domain the app lacks. Severity Low, effort Small. Recommended: A, show the deployed address.
   - 20. Finding 1 line cites an unrecorded option. Severity Low, effort Small. Recommended: A, record option D in the review report.
   - 28. Server tests have no CI step. Severity Low, effort Small. Recommended: A, run them in `npm run check`. It applies only if decision 13 picks B.
+  - 33. No TODO builds decision 30. Severity Low, effort Small. Recommended: A, add "Decision 30:" TODOs to Milestones 5 and 6.
+  - 34. No test keeps secrets out of table views. Severity Low, effort Small. Recommended: A, test that no view holds a secret.
   - Follow-up: make the open game the one source of the limits in force. Effort Small. Covers finding 3. Previous examples: none.
   - `docs/mockups/index.html`: the Waiting note says "3 turns away", but its screen says "2 turns away". Separate branch.
+  - `plans/multiplayer-live-sync.md`: the role rule lets player mode send only the changes of decision 12, so it rejects a seat claim. Separate branch.
+  - `plans/multiplayer-live-sync.md`: a second reaction extension from another table device names a clock that still runs, so it applies twice. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
