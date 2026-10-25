@@ -6,14 +6,19 @@ phase, with enough of the round structure to know whose turn it is. The
 repository is `twilight-timer`.
 
 Each push to `main` deploys the app to the Cloudflare Worker `twilight-timer`
-in the futex account, at https://twilight-timer.futex.workers.dev.
+in the futex account, at https://twilight-timer.futex.workers.dev. Each pull
+request gets a preview link; see [Pull request previews](#pull-request-previews).
 
 ## Key features
 
-- Setup for 5 to 8 players: name, colour, faction, seat, and the speaker.
+- Setup for 5 to 8 players: name, colour, faction from the official list, seat,
+  and the speaker.
 - Strategy picks in speaker order, with trade goods on unpicked cards.
 - The action-phase chess clock: End Turn, the strategic action, and Pass.
-- A reaction window for secondary abilities that is charged to nobody.
+- The Naalu "0" token puts the Naalu player first. Gift of Prescience can move
+  it for one round.
+- A reaction window for secondary abilities that is charged to nobody. For
+  Politics, it also asks for the new speaker.
 - The status checklist, and clocks for agenda discussion and each vote.
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause, a round summary, and game stats.
@@ -61,19 +66,44 @@ the workflow.
 To deploy by hand, run `npx wrangler login`, then `npm run build` and
 `npm run deploy`.
 
+### Pull request previews
+
+The same workflow gives each pull request a preview. Its `preview` job builds
+the pull request head commit of each run. A rerun builds the same commit
+again. Then the job runs `wrangler versions upload` with the alias
+`pr-<number>`. This adds a version of the Worker but does not deploy it, so
+production does not change.
+
+The preview opens at `https://pr-<number>-twilight-timer.futex.workers.dev`.
+A bot comment on the pull request gives this link and a link to the exact
+commit. Each successful preview run updates the comment.
+
+- Pull requests from forks get no preview, because their runs get no secrets.
+  A run without the Cloudflare secrets skips the preview with a warning.
+- Package code from a pull request runs before review in the same job as the
+  upload step, which holds `CLOUDFLARE_API_TOKEN`. Cal accepted this risk on
+  2026-10-23.
+- A preview has its own origin, so it keeps its own saved games.
+- The workflow does not delete previews. A preview stays online after its pull
+  request closes.
+- Previews need Preview URLs on the Worker. `"preview_urls": true` in
+  `wrangler.jsonc` keeps them on at each deploy.
+
 ## Key code
 
 - `src/model/` holds the game as a pure fold over an append-only action log.
   - `types.ts`: the actions, the stored game, and the timed entries.
+  - `factions.ts`: the official factions and the ids that saved games store.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
   - `commands.ts`: start, act, undo, pause, resume, and limit changes.
   - `stats.ts`: round and game stats.
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
+    The parser also reads games saved by older builds.
 - `src/ui/GameScreen.tsx` connects the model to the screens.
 - `src/ui/screens/` has one component per screen.
-- `src/ui/Stage.tsx` is the app root: it fills the window and is a CSS size
-  container.
+- `src/ui/Stage.tsx` is the app root: it fills the window's safe area and is a
+  CSS size container.
 - `src/styles/mockup/` holds the CSS ported from the mockup.
   `responsive.css` holds the container queries that arrange each screen for
   the space. `src/styles/app.css` and `src/styles/screens.css` hold app-only

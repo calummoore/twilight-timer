@@ -10,18 +10,18 @@ export const SEC = 1000
 export const MIN = 60 * SEC
 
 export const PLAYERS: Player[] = [
-  { id: 'jaz', name: 'Jaz', colour: 'blue', faction: 'Federation of Sol' },
-  { id: 'kira', name: 'Kira', colour: 'red', faction: 'Embers of Muaat' },
-  { id: 'tom', name: 'Tom', colour: 'green', faction: 'Arborec' },
-  {
-    id: 'priya',
-    name: 'Priya',
-    colour: 'yellow',
-    faction: 'Emirates of Hacan',
-  },
-  { id: 'sam', name: 'Sam', colour: 'purple', faction: 'Nekro Virus' },
-  { id: 'wren', name: 'Wren', colour: 'orange', faction: 'Argent Flight' },
+  { id: 'jaz', name: 'Jaz', colour: 'blue', factionId: 'sol' },
+  { id: 'kira', name: 'Kira', colour: 'red', factionId: 'muaat' },
+  { id: 'tom', name: 'Tom', colour: 'green', factionId: 'arborec' },
+  { id: 'priya', name: 'Priya', colour: 'yellow', factionId: 'hacan' },
+  { id: 'sam', name: 'Sam', colour: 'purple', factionId: 'nekro' },
+  { id: 'wren', name: 'Wren', colour: 'orange', factionId: 'argent' },
 ]
+
+/** The same table with Sam as the Naalu, who holds the "0" token. */
+export const NAALU_PLAYERS: Player[] = PLAYERS.map((p) =>
+  p.id === 'sam' ? { ...p, factionId: 'naalu' } : p,
+)
 
 /** Cards for speaker Jaz. Initiative: Tom, Wren, Jaz, Sam, Kira, Priya. */
 export const PICKS: Record<string, number> = {
@@ -38,9 +38,10 @@ export const LIMITS_ON: Settings = { ...DEFAULT_SETTINGS, enforceLimits: true }
 export function table(
   settings: Settings = DEFAULT_SETTINGS,
   speakerId = 'jaz',
+  players: Player[] = PLAYERS,
 ) {
   let now = T0
-  let game: Game = startGame(PLAYERS, speakerId, settings, now)
+  let game: Game = startGame(players, speakerId, settings, now)
   return {
     get game() {
       return game

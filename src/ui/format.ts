@@ -12,16 +12,20 @@ export function countdown(ms: number): string {
   return clock(Math.ceil(Math.max(0, ms) / 1000) * 1000)
 }
 
+/** "1 round" or "2 rounds". Give `many` when the plural is not word + "s". */
+export function plural(count: number, word: string, many = `${word}s`): string {
+  return `${count} ${count === 1 ? word : many}`
+}
+
 /** "2 hours 44 minutes", or "58 minutes 43 seconds" under one hour. */
 export function words(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000))
   const h = Math.floor(total / 3600)
   const m = Math.floor((total % 3600) / 60)
   const s = total % 60
-  const unit = (n: number, name: string) => `${n} ${name}${n === 1 ? '' : 's'}`
   return h > 0
-    ? `${unit(h, 'hour')} ${unit(m, 'minute')}`
-    : `${unit(m, 'minute')} ${unit(s, 'second')}`
+    ? `${plural(h, 'hour')} ${plural(m, 'minute')}`
+    : `${plural(m, 'minute')} ${plural(s, 'second')}`
 }
 
 export function percent(part: number, whole: number): string {

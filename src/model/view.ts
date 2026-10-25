@@ -1,3 +1,4 @@
+import type { InitiativeSlot } from './orders'
 import type { EntryKind, Entry, Player } from './types'
 
 /** The clock that runs now. `key` stays the same while one entry runs. */
@@ -11,6 +12,8 @@ export interface TimerView {
 
 export interface RailRow {
   playerId: string
+  /** The strategy card number, or 0 for the holder of the Naalu token. */
+  initiative: number
   card: number
   state: 'active' | 'passed' | 'waiting'
   cardPlayed: boolean
@@ -37,6 +40,18 @@ export interface ReactionView {
   pausedTurnMs: number
   tiles: ReactionTile[]
   doneCount: number
+  /** The new speaker, for Politics only. */
+  speakerChoice: SpeakerChoice | null
+}
+
+/** Politics hands the speaker token to a player who does not hold it. */
+export interface SpeakerChoice {
+  /** The speaker when the window opened. */
+  fromId: string
+  /** Every other player, in seat order. */
+  options: string[]
+  /** The new speaker, or null until a player takes the token. */
+  chosenId: string | null
 }
 
 export interface VoterRow {
@@ -54,6 +69,12 @@ export type PhaseView =
       owners: Record<number, string>
       /** Trade goods on each card that nobody has picked yet. */
       tradeGoods: Record<number, number>
+      /** The players who picked, in initiative order. */
+      order: InitiativeSlot[]
+      /** The Naalu player, or null when the game has no Naalu token. */
+      naaluTokenOwnerId: string | null
+      /** The player who holds the Naalu token this round. */
+      naaluTokenHolderId: string | null
     }
   | {
       phase: 'action'
@@ -61,6 +82,7 @@ export type PhaseView =
       turnNumber: number
       rail: RailRow[]
       passedCount: number
+      activeInitiative: number
       activeCard: number
       cardPlayed: boolean
       reaction: ReactionView | null

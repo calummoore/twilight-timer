@@ -1,7 +1,8 @@
+import { factionName } from '../../model/factions'
 import { cardName } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
-import { clock } from '../format'
+import { clock, plural } from '../format'
 
 type ActionView = Extract<PhaseView, { phase: 'action' }>
 
@@ -35,7 +36,7 @@ export function InitiativeRail(props: {
             >
               {active && <b className="chip now">Turn</b>}
               {row.state === 'passed' && <b className="chip pass">Passed</b>}
-              <div className="in num">{row.card}</div>
+              <div className="in num">{row.initiative}</div>
               <div className="who">
                 <div className="nm">
                   <i />
@@ -46,7 +47,9 @@ export function InitiativeRail(props: {
                     {row.cardPlayed ? '✓ ' : ''}
                     {cardName(row.card)}
                   </span>
-                  <span className="fac">{player?.faction}</span>
+                  <span className="fac">
+                    {factionName(player?.factionId ?? null)}
+                  </span>
                 </div>
               </div>
               <div className="tm">
@@ -60,7 +63,7 @@ export function InitiativeRail(props: {
                 <div className="b num">
                   {active
                     ? `this turn ${clock(turnMs)}`
-                    : `${row.turns} ${row.turns === 1 ? 'turn' : 'turns'}`}
+                    : plural(row.turns, 'turn')}
                 </div>
               </div>
             </div>

@@ -11,9 +11,9 @@ import {
   openVoteSegment,
   startAgenda,
   startTurn,
+  turnOrder,
   type FoldState,
 } from './fold-state'
-import { initiativeOrder } from './orders'
 import { AGENDAS_PER_ROUND, STATUS_STEPS, isStrategyCard } from './rules'
 import { limitAt } from './settings'
 import { gameClock, mergeIntervals } from './time'
@@ -48,6 +48,8 @@ function step(s: FoldState, a: Action, ms: number): boolean {
   switch (a.kind) {
     case 'speakerMoved':
       return moveSpeaker(s, a.playerId, ms, a.at)
+    case 'naaluTokenMoved':
+      return moveNaaluToken(s, a.playerId)
     case 'custodiansSet':
       if (s.custodiansRemoved === a.removed) return false
       s.custodiansRemoved = a.removed
@@ -129,6 +131,17 @@ function moveSpeaker(s: FoldState, id: string, ms: number, wall: number) {
   return true
 }
 
+/**
+ * Gift of Prescience: another player holds the token for this round. The
+ * token returns to its owner when the next round starts.
+ */
+function moveNaaluToken(s: FoldState, id: string): boolean {
+  if (s.phase !== 'strategy' || s.game.naaluTokenOwnerId === null) return false
+  if (!s.seats.includes(id) || id === s.naaluTokenHolderId) return false
+  s.naaluTokenHolderId = id
+  return true
+}
+
 function pickCard(
   s: FoldState,
   id: string,
@@ -150,11 +163,11 @@ function stepPhase(s: FoldState, ms: number, wall: number): boolean {
   switch (s.phase) {
     case 'strategy': {
       if (s.picks.size < s.seats.length) return false
-      const first = initiativeOrder(s.picks)[0]
+      const first = turnOrder(s)[0]
       if (!first) return false
       close(s, ms, wall)
       s.phase = 'action'
-      startTurn(s, first, ms)
+      startTurn(s, first.playerId, ms)
       return true
     }
     case 'status':
@@ -169,6 +182,7 @@ function stepPhase(s: FoldState, ms: number, wall: number): boolean {
       s.passed = new Set()
       s.scPlayed = new Set()
       s.turnCounts = new Map()
+      s.naaluTokenHolderId = s.game.naaluTokenOwnerId
       s.round += 1
       s.phase = 'strategy'
       openStrategySegment(s, ms)
@@ -212,6 +226,7 @@ function playStrategyCard(s: FoldState, ms: number, wall: number): boolean {
   s.reaction = {
     card,
     byId: id,
+    speakerAtStart: s.speakerId,
     startMs: ms,
     limitMs: limitAt(s.game.limitsLog, 'reactionWindow', wall),
     extraMs: 0,

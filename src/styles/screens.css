@@ -15,10 +15,3 @@
 .card:disabled {
   cursor: default;
 }
-
-.rw {
-  z-index: 4;
-}
-.scrim {
-  z-index: 3;
-}

@@ -1,7 +1,7 @@
 import { roundStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
 import { pc } from '../colour'
-import { clock, percent, words } from '../format'
+import { clock, percent, plural, words } from '../format'
 
 export function RoundSummaryScreen(props: {
   game: GameView
@@ -49,8 +49,7 @@ export function RoundSummaryScreen(props: {
             <div className="l">Reaction windows</div>
             <div className="v num">{clock(stats.reactionMs)}</div>
             <div className="s">
-              {stats.reactionCount}{' '}
-              {stats.reactionCount === 1 ? 'window' : 'windows'}
+              {plural(stats.reactionCount, 'window')}
               {stats.reactionCount > 0 &&
                 ` · avg ${clock(stats.reactionMs / stats.reactionCount)}`}
             </div>
@@ -66,8 +65,7 @@ export function RoundSummaryScreen(props: {
               {clock(stats.overtimeMs)}
             </div>
             <div className="s">
-              {stats.overLimitCount}{' '}
-              {stats.overLimitCount === 1 ? 'time' : 'times'} over a limit
+              {plural(stats.overLimitCount, 'time')} over a limit
             </div>
           </div>
         </div>

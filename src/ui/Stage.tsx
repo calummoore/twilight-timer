@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 
 /**
- * The app root. It fills the window and is a size container, so the screen
- * styles can arrange each screen for the space that the app has.
+ * The app root. It fills the window's safe area and is a size container, so
+ * the screen styles can arrange each screen for the space that the app has.
  */
 export function Stage({ children }: { children: ReactNode }) {
   return (

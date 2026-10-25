@@ -58,6 +58,9 @@ export function GameScreen(props: {
               dispatch({ kind: 'cardPicked', playerId, card })
             }
             onSpeaker={() => setOverlay('seating')}
+            onMoveNaaluToken={(playerId) =>
+              dispatch({ kind: 'naaluTokenMoved', playerId })
+            }
             onBegin={() => dispatch({ kind: 'phaseStepped' })}
           />
         )
@@ -136,6 +139,7 @@ export function GameScreen(props: {
           reaction={reaction}
           onDone={(playerId) => dispatch({ kind: 'reactionDone', playerId })}
           onExtend={(ms) => dispatch({ kind: 'reactionExtended', ms })}
+          onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
           onUndo={onUndo}
           onClose={() => dispatch({ kind: 'reactionClosed' })}
         />

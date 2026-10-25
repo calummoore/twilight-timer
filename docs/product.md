@@ -44,8 +44,8 @@ round structure to know whose turn it is and when it's legal to pass.
 
 ## Core concepts
 
-The round structure, seating and the speaker, initiative order, passing, the
-reaction window, time limits and overtime, and corrections are in
+The round structure, seating and the speaker, factions, initiative order,
+passing, the reaction window, time limits and overtime, and corrections are in
 [Core concepts](concepts.md).
 
 ---
@@ -64,9 +64,10 @@ Rejected: one fixed iPad layout, scaled to fit the window, because on a phone
 its text and buttons are too small to read or tap. Rejected: separate phone and
 iPad layouts, chosen by window size, because the two drift apart.
 
-The top bar stays usable while a reaction window is open, so the table can
-pause, undo, or move the speaker token. The pause overlay and the confirmation
-dialogs cover the top bar, because they freeze the game or wait for an answer.
+The top bar stays usable while a reaction window is open, as
+[The reaction window](concepts.md#the-reaction-window) says. The pause overlay
+and the confirmation dialogs cover the top bar, because they freeze the game or
+wait for an answer.
 
 | Screen              | Purpose                                                                 |
 | ------------------- | ----------------------------------------------------------------------- |
@@ -77,7 +78,7 @@ dialogs cover the top bar, because they freeze the game or wait for an answer.
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
 | ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
-| **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles                   |
+| **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles, new speaker for Politics |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
 | **Agenda Phase**    | Discussion timer, speaker-order voting with per-player timers            |
 | **Round Summary**   | Per-player time this round, split by phase                               |
@@ -161,8 +162,8 @@ From the should-have list, the MVP adds the pause.
 - [ ] Setup: 3–8 players with name, colour, faction, seat order, speaker
 - [ ] Speaker movable at any time; strategy pick and agenda voting orders derive
       from it automatically. Seats re-orderable as a correction.
-- [ ] Strategy phase: assign cards 1–8, derive initiative order, handle
-      two-cards-each at 3–4 players
+- [ ] Strategy phase: assign cards 1–8, derive initiative order with the Naalu
+      "0" token, handle two-cards-each at 3–4 players
 - [ ] Action phase chess clock with one-tap End Turn
 - [ ] Pass tracking with skip-on-pass and illegal-pass warning
 - [ ] Reaction window with per-player done marking

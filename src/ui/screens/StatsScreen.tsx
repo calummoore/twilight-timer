@@ -2,7 +2,7 @@ import { cardName } from '../../model/rules'
 import { gameStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
 import { pc } from '../colour'
-import { clock, percent, words } from '../format'
+import { clock, percent, plural, words } from '../format'
 
 export function StatsScreen(props: {
   game: GameView
@@ -54,8 +54,7 @@ export function StatsScreen(props: {
     <div className="lay">
       <div className="top stack">
         <div className="round">
-          <b>Game complete</b> · {stats.rounds}{' '}
-          {stats.rounds === 1 ? 'round' : 'rounds'}
+          <b>Game complete</b> · {plural(stats.rounds, 'round')}
         </div>
         <div className="spacer" />
         <button className="ibtn" onClick={props.onUndo}>
@@ -68,8 +67,12 @@ export function StatsScreen(props: {
       <div className="content">
         <div className="h1">{words(game.gameMs)}</div>
         <div className="h1s">
-          {game.players.length} players · {stats.rounds} rounds · {stats.turns}{' '}
-          turns · {stats.reactionCount} reaction windows
+          {[
+            plural(game.players.length, 'player'),
+            plural(stats.rounds, 'round'),
+            plural(stats.turns, 'turn'),
+            plural(stats.reactionCount, 'reaction window'),
+          ].join(' · ')}
         </div>
         <div className="stat-grid" style={{ marginTop: 22 }}>
           <div className="stat">
@@ -103,7 +106,9 @@ export function StatsScreen(props: {
             >
               {clock(stats.overtimeMs)}
             </div>
-            <div className="s">{stats.overLimitCount} times over a limit</div>
+            <div className="s">
+              {plural(stats.overLimitCount, 'time')} over a limit
+            </div>
           </div>
         </div>
         <div className="split" style={{ '--side': '400px' }}>

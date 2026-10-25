@@ -1,3 +1,4 @@
+import { FACTIONS, isFactionId, type FactionId } from './factions'
 import { COLOURS, type Colour } from './rules'
 import { ALARM_SOUNDS, DEFAULT_SETTINGS, type Settings } from './settings'
 import {
@@ -12,10 +13,14 @@ import {
 
 type Fields = Record<string, unknown>
 
-/** Narrows stored data to a game, or returns null when it is not valid. */
+/**
+ * Narrows stored data to a game, or returns null when it is not valid.
+ * Version 1, from builds before the Naalu token, loads with no token owner.
+ */
 export function parseGame(raw: unknown): Game | null {
-  if (!isFields(raw) || raw.version !== 1) return null
-  const players = listOf(raw.players, parsePlayer)
+  if (!isFields(raw) || (raw.version !== 1 && raw.version !== 2)) return null
+  const legacy = raw.version === 1
+  const players = listOf(raw.players, (p) => parsePlayer(p, legacy))
   const actions = listOf(raw.actions, parseAction)
   const pauses = listOf(raw.pauses, parseInterval)
   const voids = listOf(raw.voids, parseInterval)
@@ -23,12 +28,18 @@ export function parseGame(raw: unknown): Game | null {
   const { startedAt, firstSpeakerId } = raw
   if (!players || !actions || !pauses || !voids || !limitsLog) return null
   if (!isNumber(startedAt) || typeof firstSpeakerId !== 'string') return null
-  if (!players.some((p) => p.id === firstSpeakerId)) return null
+  const isPlayer = (id: unknown) => players.some((p) => p.id === id)
+  if (!isPlayer(firstSpeakerId)) return null
+  const owner = legacy ? null : raw.naaluTokenOwnerId
+  if (owner !== null && (typeof owner !== 'string' || !isPlayer(owner))) {
+    return null
+  }
   return {
-    version: 1,
+    version: 2,
     startedAt,
     players,
     firstSpeakerId,
+    naaluTokenOwnerId: owner,
     actions,
     pauses,
     voids,
@@ -51,13 +62,27 @@ export function parseSettings(raw: unknown): Settings {
   }
 }
 
-function parsePlayer(raw: unknown): Player | null {
+function parsePlayer(raw: unknown, legacy: boolean): Player | null {
   if (!isFields(raw)) return null
-  const { id, name, colour, faction } = raw
+  const { id, name, colour, faction, factionId } = raw
   const c: Colour | undefined = COLOURS.find((x) => x === colour)
   if (typeof id !== 'string' || typeof name !== 'string' || !c) return null
-  if (typeof faction !== 'string') return null
-  return { id, name, colour: c, faction }
+  if (legacy) {
+    // Version 1 stored the faction as the text that a player typed.
+    if (typeof faction !== 'string') return null
+    return { id, name, colour: c, factionId: factionFromText(faction) }
+  }
+  if (factionId !== null && !isFactionId(factionId)) return null
+  return { id, name, colour: c, factionId }
+}
+
+/** A typed faction name or id from the list, in any letter case, or null. */
+function factionFromText(text: string): FactionId | null {
+  const key = text.trim().toLowerCase()
+  const match = FACTIONS.find(
+    (f) => f.id === key || f.name.toLowerCase() === key,
+  )
+  return match?.id ?? null
 }
 
 function parseAction(raw: unknown): Action | null {
@@ -71,6 +96,7 @@ function parseAction(raw: unknown): Action | null {
         : null
     case 'reactionDone':
     case 'speakerMoved':
+    case 'naaluTokenMoved':
       return id ? { kind: raw.kind, at, playerId: id } : null
     case 'reactionExtended':
       return isNumber(ms) ? { kind: raw.kind, at, ms } : null

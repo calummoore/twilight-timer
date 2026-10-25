@@ -33,25 +33,60 @@ The speaker votes last because they break ties.
 
 Because both are derived, **moving the speaker token is the only action needed** —
 the app never asks anyone to re-order anything. This matters because the token
-genuinely moves during play: the Politics (3) primary ability hands it to another
-player, and some agendas elect a new speaker. The token is editable from the
-speaker chip in the top bar, visible on every in-game screen.
+genuinely moves during play: the Politics (3) primary ability hands it to a
+player who does not hold it, and some agendas elect a new speaker. The token is
+editable from the speaker chip in the top bar, visible on every in-game screen.
 
-The token never moves on its own, also not at the start of a round. In the MVP,
-a player moves it by hand from the speaker chip. Rejected: passing the token
+The token never moves on its own, also not at the start of a round. A player
+moves it in one of two places: the Speaker & Seating screen, which the speaker
+chip opens, or the new speaker choice in a Politics reaction window (see
+[The reaction window](#the-reaction-window)). Rejected: passing the token
 automatically each round, because the TI4 rules move it only through Politics
-and a few other cards. A later version can open the speaker picker when Politics
-is played.
+and a few other cards.
 
 Re-ordering the seats themselves is possible but deliberately understated. It is
 a correction for a setup mistake — people do not swap chairs mid-game — so it
 lives behind a secondary control rather than in the main flow.
 
+## Factions
+
+Each player picks their faction at setup from the list of official factions.
+The list holds every faction of the base game, its expansions, and the codices.
+The game cannot begin until every seat has a faction. The app stores the faction
+itself, not a typed name, so a rule that depends on a faction can find its
+player. Two players cannot hold the same faction: taking a faction that another
+seat holds swaps the two, as colours do.
+
+Rejected: a free-text faction field, because the app cannot apply a faction rule
+to a name that a player typed. A faction outside the official list cannot be
+entered. Rejected: an optional faction, because a forgotten Naalu faction would
+put the Naalu player in card order for the whole game, with no fix after the
+start.
+
+A game saved by an older build can hold a player without a faction, because
+those builds did not require one.
+
 ## Initiative order
 
-Strategy card number **is** turn order. The app takes the card assignments from
-the strategy phase and derives the action phase running order from them — no
-separate ordering step.
+Strategy card number **is** turn order, with one exception: the Naalu "0" token
+below. The app takes the card assignments from the strategy phase and derives
+the action phase running order from them — no separate ordering step.
+
+At the end of each strategy phase, the Naalu Collective player puts the "0"
+token on their strategy card. Their initiative becomes 0, so they go first in
+the action phase. The rail and the active player's card show initiative 0. The
+strategy card keeps its number and its name everywhere else, for example on the
+strategic action.
+
+The Naalu promissory note, Gift of Prescience, gives the token to its holder for
+one round instead. The table moves the token from the strategy screen before the
+action phase begins, and undo takes the move back. The token returns to the
+Naalu player when the next round starts. Rejected: leaving the note out, because
+a round with the note would then have the wrong turn order and charge the wrong
+clocks.
+
+A game without a Naalu player has no token. A game saved by a build without the
+token keeps card order for every player, because its log follows that rule.
 
 - **5–6 players (and 7–8 with PoK):** one card each
 - **3–4 players:** two cards each; a player takes a turn at each of their
@@ -86,15 +121,34 @@ So: playing a strategy card **stops the active player's clock** and opens a
 individual player. Each other player gets a tile they tap to mark themselves
 done (whether they resolved the secondary or declined it).
 
+When the card is **Politics (3)**, the window also asks for the **new speaker**,
+because the primary ability hands the token to a player who does not hold it.
+It offers every player except the one who held the token when the window
+opened, the Politics player included. One tap moves the token, and a tap on
+another player changes the choice. The choice is optional: the window closes as
+usual without it, and the speaker chip still moves the token afterwards.
+Rejected: opening the Speaker & Seating screen when Politics is played, because
+it hides the window and takes two taps. Rejected: requiring the choice before
+the window opens, because a forced step blocks the table after a mis-tap.
+
 The window closes when **either**:
 - every other player has marked themselves done, **or**
 - the window timer expires
+
+The table can also close the window early with **Mark all done**. It marks
+every player who is still waiting as done at that moment, and the window closes
+at once. Rejected: a warning before the window closes, because the label says
+what the tap does, and undo reverts a mis-tap.
 
 Per-player completion times inside the window are recorded, so a player who
 consistently soaks the whole secondary window shows up in the stats.
 
 Only one strategic action per player per round, so at most one window per player
 per action phase.
+
+The top bar stays usable while the window is open, so the table can pause, undo,
+or move the speaker. Rejected: covering the top bar with the window, because the
+table can need a break during a window.
 
 ## Time limits and overtime
 
@@ -114,9 +168,9 @@ under a master "enforce time limits" switch.
 Game state is a fold over an **append-only log of actions**. The log records
 every game tap: card picks, turns ended, passes, strategy cards played,
 reaction marks and window changes, phase steps, status steps, the Custodians
-switch, votes, agenda resolutions, speaker moves, and the game end. So undo can
-take back any tap. Pauses and time-limit changes are kept beside the log, not in
-it.
+switch, votes, agenda resolutions, speaker moves, Naalu token moves, and the
+game end. So undo can take back any tap. Pauses and time-limit changes are kept
+beside the log, not in it.
 
 Because state is *derived*, it is never edited directly. There are exactly two
 correction operations, and deliberately no others:

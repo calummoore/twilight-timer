@@ -132,6 +132,12 @@ Run the checks, push, and review the branch.
 
 - [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [ ] Commit with Conventional Commits and push the branch.
+- [x] Merge `origin/main` into the branch, which brings in PRs #2 to #10:
+      the Politics speaker choice, Mark all done, the safe-area stage, and
+      the Naalu "0" token with the required faction list. The branch keeps
+      the responsive stage, and the stage contains the fixed overlays inside
+      the safe area. The mockup and the ported CSS carry main's screens.
+      Justifications for each path: `.context/phone-version/merge-notes.md`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
@@ -146,7 +152,7 @@ Run the checks, push, and review the branch.
   - 14. Limit changes do not reach an open reaction window. Severity Low, effort Small. Recommended: A, state the current rule in `docs/concepts.md`.
   - 15. No model tests for top bar taps during a window. Severity Low, effort Small. Recommended: A, three model tests.
   - 16. Top bar defines the phase labels twice. Severity Low, effort Small. Recommended: B, one phase table.
-  - Decision: make the seat list its own size container, so that each seat row picks its form from its own width (finding 18, option C). Effort Small. Covers findings 10 and 18.
+  - Decision: make the seat list its own size container, so that each seat row picks its form from its own width (finding 18, option C). Effort Small. Covers findings 10 and 18. Since the merge of `origin/main`, tight seat rows also clip long official faction names, at about 1024 px wide and on phones held sideways.
   - `docs/product.md`: "Must have (v1, iPad only)" and "Live sync between iPad and phones" still name only the iPad. Separate branch.
   - `src/styles/mockup/reaction.css`: with long player names, the three-column tile grid is wider than the window at about 601 to 650 px. Separate branch.
   - `docs/mockups/index.html`: the demo reaction clock counts into overtime, but the app closes the window at its limit. Separate branch.

@@ -47,16 +47,20 @@ skill at that moment instead of guessing the rule.
 - `src/styles/mockup/` is ported from `docs/mockups/index.html`, and
   Prettier skips it. Keep its class names in step with the mockup.
 - Saved games use versioned `localStorage` keys. Change the version when
-  the stored shape changes.
+  the stored shape changes. Keep reading the keys and the shapes of older
+  versions, so that a saved game from an older build still loads.
 - A push to `main` deploys to Cloudflare. CI needs the repository variable
   `CLOUDFLARE_ACCOUNT_ID` and the repository secret `CLOUDFLARE_API_TOKEN`.
+- Each pull request from this repository gets a preview at
+  `https://pr-<number>-twilight-timer.futex.workers.dev`. A bot comment on
+  the pull request gives the link.
 
 ## Product
 
 - Screens live in `src/ui/screens/`, one component per screen. Shared
   controls live in `src/ui/controls.tsx`. There is no shared UI library.
 - The app is responsive. A phone, an iPad, and a computer show the same
-  screens. The stage fills the window and is a CSS size container.
+  screens. The stage fills the window's safe area and is a CSS size container.
   `src/styles/mockup/responsive.css` holds the container queries, word for
   word from the mockup: two columns on a wide screen, and one column on an
   upright iPad or a phone.
