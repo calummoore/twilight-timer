@@ -1644,6 +1644,8 @@ const PG = [
   {id:'sam',   tot:1920, turns:22, worst:344, ot:0, ots:0, left:6}, // Sam left the game in round 6
 ];
 const PGTOT = 15600, PGMAX = 3400;
+// The table columns after Player. A phone shows each name next to its value.
+const PG_COLS = {turns:'Turns', average:'Avg turn', worst:'Worst turn', overLimit:'Over limit', share:'Share'};
 // Where the game went, in seconds. The rows add up to the 7:30:00 game total.
 const WHERE = [
   ['Action phase — own turns', 15600, 'var(--c-blue)'],
@@ -1683,12 +1685,12 @@ S.stats = {t:'Post-game Stats', d:'ipad', note:
         <div class="legend"><span><b style="background:var(--c-blue)"></b>Within limit</span>
           <span><b style="background:var(--danger)"></b>Overtime</span></div>
         <table class="tbl" style="margin-top:20px">
-          <thead><tr><th>Player</th><th>Turns</th><th>Avg turn</th><th>Worst turn</th><th>Over limit</th><th>Share</th></tr></thead>
+          <thead><tr><th>Player</th>${Object.values(PG_COLS).map(c=>`<th>${c}</th>`).join('')}</tr></thead>
           <tbody>${PG.map(r=>`<tr><td><div class="pl" style="${col(r.id)}"><i></i>${P[r.id].name}${r.left?`<span style="font-weight:400;font-size:11.5px;color:var(--faint)">Left in round ${r.left}</span>`:''}</div></td>
-            <td class="num" data-l="Turns">${r.turns}</td>
-            <td class="num" data-l="Avg turn">${fmt(r.tot/r.turns)}</td><td class="num" data-l="Worst turn">${fmt(r.worst)}</td>
-            <td class="num" data-l="Over limit" style="${r.ot?'color:var(--danger)':'color:var(--faint)'}">${r.ot?r.ot+' · '+fmt(r.ots):'—'}</td>
-            <td class="num" data-l="Share">${Math.round(r.tot/PGTOT*100)}%</td></tr>`).join('')}</tbody>
+            <td class="num" data-l="${PG_COLS.turns}">${r.turns}</td>
+            <td class="num" data-l="${PG_COLS.average}">${fmt(r.tot/r.turns)}</td><td class="num" data-l="${PG_COLS.worst}">${fmt(r.worst)}</td>
+            <td class="num" data-l="${PG_COLS.overLimit}" style="${r.ot?'color:var(--danger)':'color:var(--faint)'}">${r.ot?r.ot+' · '+fmt(r.ots):'—'}</td>
+            <td class="num" data-l="${PG_COLS.share}">${Math.round(r.tot/PGTOT*100)}%</td></tr>`).join('')}</tbody>
         </table></div>
       </div>
       <div class="col">

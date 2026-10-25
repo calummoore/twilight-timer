@@ -44,6 +44,10 @@ Decisions:
   top bar. Reason: the overlay freezes the game and a dialog waits for an
   answer, so an Undo behind them would change the game under them. Cal can
   widen finding 5 to them.
+- 2026-10-25, Cal: finding 25 = B. Each label set that two layouts show has
+  one list: the stats column names, and the top bar phase names of finding
+  16. Alternative: A, one list for the stats columns only. Reason: one
+  pattern settles both findings.
 - Open, for Cal: review 1 findings 4, 7, and 8.
 
 Contract owners:
@@ -166,8 +170,8 @@ Run the checks, push, and review the branch.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
   - 14. Limit changes do not reach an open reaction window. Severity Low, effort Small. Recommended: A, state the current rule in `docs/concepts.md`.
   - 15. No model tests for top bar taps during a window. Severity Low, effort Small. Recommended: A, three model tests.
-  - 16. Top bar defines the phase labels twice. Severity Low, effort Small. Recommended: B, one phase table.
-  - 25. Stats column labels are defined twice. Severity Low, effort Small. Recommended: B, one list for each label set, which also settles 16.
+  - 16. Top bar defines the phase labels twice. Decided 2026-10-25 with finding 25: one phase table.
+  - 25. Stats column labels are defined twice. Decided 2026-10-25: B, one list for each label set. The app and the mockup render the same labels as before. Evidence: `.context/phone-version/finding-25/`.
   - Follow-up: give every field 16 px text at every size, finding 21 option C. Effort Small. Covers finding 21. Previous examples: none found.
   - Decision: make the seat list its own size container, so that each seat row picks its form from its own width (finding 18, option C). Effort Small. Covers findings 10 and 18. Since the merge of `origin/main`, tight seat rows also clip long official faction names, at about 1024 px wide and on phones held sideways. Since the 16 px fields of finding 21, phones clip 4 to 6 of the 6 longest names.
   - `docs/product.md`: "Must have (v1, iPad only)" and "Live sync between iPad and phones" still name only the iPad. Separate branch.

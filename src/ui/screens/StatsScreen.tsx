@@ -4,6 +4,15 @@ import type { GameView } from '../../model/view'
 import { pc } from '../colour'
 import { clock, percent, plural, words } from '../format'
 
+/** The table columns after Player. A phone shows each name next to its value. */
+const COLUMNS = {
+  turns: 'Turns',
+  average: 'Avg turn',
+  worst: 'Worst turn',
+  overLimit: 'Over limit',
+  share: 'Share',
+} as const
+
 export function StatsScreen(props: {
   game: GameView
   onUndo: () => void
@@ -156,11 +165,9 @@ export function StatsScreen(props: {
                 <thead>
                   <tr>
                     <th>Player</th>
-                    <th>Turns</th>
-                    <th>Avg turn</th>
-                    <th>Worst turn</th>
-                    <th>Over limit</th>
-                    <th>Share</th>
+                    {Object.values(COLUMNS).map((name) => (
+                      <th key={name}>{name}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -180,18 +187,18 @@ export function StatsScreen(props: {
                           )}
                         </div>
                       </td>
-                      <td className="num" data-l="Turns">
+                      <td className="num" data-l={COLUMNS.turns}>
                         {p.turns}
                       </td>
-                      <td className="num" data-l="Avg turn">
+                      <td className="num" data-l={COLUMNS.average}>
                         {clock(p.averageMs)}
                       </td>
-                      <td className="num" data-l="Worst turn">
+                      <td className="num" data-l={COLUMNS.worst}>
                         {clock(p.worstMs)}
                       </td>
                       <td
                         className="num"
-                        data-l="Over limit"
+                        data-l={COLUMNS.overLimit}
                         style={{
                           color: p.overLimitCount
                             ? 'var(--danger)'
@@ -202,7 +209,7 @@ export function StatsScreen(props: {
                           ? `${p.overLimitCount} · ${clock(p.limitOvertimeMs)}`
                           : '—'}
                       </td>
-                      <td className="num" data-l="Share">
+                      <td className="num" data-l={COLUMNS.share}>
                         {percent(p.share, 1)}
                       </td>
                     </tr>
