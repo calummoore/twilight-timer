@@ -1,7 +1,7 @@
 # Random faction deal
 
-Status: Active. The branch `calummoore/player-faction-auto-assign` has no
-pull request yet. The plan closes when its PR merges.
+Status: Active. [PR #14](https://github.com/calummoore/twilight-timer/pull/14)
+is open. The plan closes when its PR merges.
 
 On the setup screen, BEGIN GAME stays off until every seat has a faction.
 So each game needs five to eight faction picks, also each test game. Many
@@ -254,14 +254,15 @@ Run the checks, push, and review the branch.
   - 2026-10-25: merged `b6f658d`, PR #9, player removal, in `075896f`.
     The one conflict, the iPad screen list of the mockup, keeps both
     sides. Justifications:
-    `.context/random-factions/merge/justifications.md`.
+    `.context/random-factions/merge/justifications.md`. The description
+    of PR #14 holds them.
   - Open PRs #11 and #12 also change the spec, the mockup, the README,
     and `src/model/parse.ts`. PR #11 also changes
     `src/ui/screens/SetupGamePanel.tsx`. Expect conflicts when they
     merge.
 - [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [ ] Commit with Conventional Commits and push the branch.
-- [ ] Open the PR and link it in the status paragraph.
+- [x] Open the PR and link it in the status paragraph.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
