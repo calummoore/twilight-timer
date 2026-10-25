@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { startGame } from './commands'
 import { derive } from './derive'
 import { factionName } from './factions'
 import { DEFAULT_SETTINGS } from './settings'
@@ -9,6 +10,7 @@ import {
   FOUR_PLAYERS,
   MIN,
   NAALU_PLAYERS,
+  PLAYERS,
   SEC,
   T0,
   olderTable,
@@ -17,7 +19,7 @@ import {
 } from './test-table'
 import type { Game } from './types'
 
-/** Builds before version 5 gave each player one card and logged no card. */
+/** Main's builds before version 5 gave each player one card and logged no card. */
 function cardlessLog(game: Game) {
   return game.actions.map((a) =>
     a.kind === 'strategyCardPlayed' ? { kind: a.kind, at: a.at } : a,
@@ -71,7 +73,7 @@ function asVersion3(game: Game) {
   return { ...asVersion2(game), version: 3 }
 }
 
-/** Version 4 stores the window rule, but no card for a strategic action. */
+/** Main's version 4 stores the window rule, but no card for a strategic action. */
 function asVersion4(game: Game) {
   return { ...game, version: 4, actions: cardlessLog(game) }
 }
@@ -206,7 +208,9 @@ describe('saved games of older versions', () => {
     playStrategy(t)
     t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
     const game = t.game
+    const empty = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
     const broken = [
+      ['4', { ...asVersion4(empty), windowEndsTurn: 'yes' }],
       ['4', { ...asVersion4(game), windowEndsTurn: 'yes' }],
       // With no window rule and no card, it is from neither version 4 build.
       ['4', { ...asVersion2(game), version: 4 }],
