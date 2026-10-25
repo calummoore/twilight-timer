@@ -254,7 +254,13 @@ saved-game version 3. Merge it, and keep both features.
   - 5. No undo test for the removal close. Severity Low, effort Small. Recommended: B, one undo test of a removal that closes the window.
   - Decision for Cal, from finding 4: a rule in `AGENTS.md` for a merge that moves the saved-game version: take the next free version, and keep reading the shape that the branch saved before. Effort Small. Previous examples: review 3, and Milestone 10 of the Naalu plan.
   - `docs/mockups/index.html`: the reaction note says that a player who left shows a Left tile, but no window screen draws the Left chip or the "left the game" header. Separate branch.
-- [ ] Re-review the fix of findings 4 and 6 once.
+- [x] Re-review the fix of findings 4 and 6 once.
+  - Review 5 checked fix commit 41b8162: findings 4 and 6 are resolved. It
+    found 2 findings. Finding 8, a stale PR description, follows the
+    `git-commit` rule, so the description is updated. Report:
+    `.context/strategic-action-ends-turn/review-5.md`. Review 5 numbers
+    them 1 and 2.
+  - 9. Comments name the early builds "this change". Severity Low, effort Small. Recommended: A, name the builds by feature in the `windowRule` comment and the storage test.
 
 ## Post-merge follow-up (non-blocking)
 
