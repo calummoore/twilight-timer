@@ -164,6 +164,11 @@ Run the checks, push, and review the branch.
 - [x] Leave a 10 px gap between the top bar buttons and the phase line on a
       phone, as Cal asked on 2026-10-25. A later rule had reset the gap.
       Evidence: `.context/phone-version/merge/topgap/`.
+- [x] Merge `origin/main` again for PRs #12 and #15: closing the reaction
+      window ends the turn, and setup gets the expansions and a random
+      faction deal. The seat list subgrid takes the responsive columns, and
+      a phone keeps its seat cards. Justifications:
+      `.context/phone-version/merge-notes.md`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,

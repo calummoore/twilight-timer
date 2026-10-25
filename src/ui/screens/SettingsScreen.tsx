@@ -16,7 +16,8 @@ const TIMERS: { key: TimerKey; label: string; about: string }[] = [
   {
     key: 'reactionWindow',
     label: 'Reaction window',
-    about: 'Secondary abilities after a strategy card. Closes when time is up.',
+    about:
+      'Secondary abilities after a strategy card is played. Charged to nobody.',
   },
   {
     key: 'agendaDiscussion',

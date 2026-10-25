@@ -71,14 +71,14 @@ wait for an answer.
 
 | Screen              | Purpose                                                                 |
 | ------------------- | ----------------------------------------------------------------------- |
-| **Setup**           | Player count, names, colours, factions, seating order, speaker token     |
+| **Setup**           | Player count, names, colours, factions, expansions, random faction deal, seating order, speaker token |
 | **Settings**        | Time limits, alarm, display options                                      |
 | **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive; remove a player who leaves |
 | **Strategy Phase**  | Card selection in speaker order; sets initiative                         |
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
 | ↳ *rail rows*       | Show each player's strategy card; blue = still to play, grey ✓ = used    |
 | **Action Overtime** | Same screen in its expired state — red, alarming, counting up            |
-| **Reaction Window** | Overlay: fixed-window countdown, per-player done tiles, new speaker for Politics |
+| **Reaction Window** | Overlay: window countdown, per-player done tiles, new speaker for Politics |
 | **Status Phase**    | Table timer + the seven status steps as a checklist                      |
 | **Agenda Phase**    | Discussion timer, speaker-order voting with per-player timers            |
 | **Round Summary**   | Per-player time this round, split by phase                               |
@@ -159,7 +159,9 @@ From the should-have list, the MVP adds the pause.
 
 ### Must have (v1, iPad only)
 
-- [ ] Setup: 3–8 players with name, colour, faction, seat order, speaker
+- [ ] Setup: 3–8 players with name, colour, faction, seat order, speaker. The
+      expansions in play limit the factions, and a random deal fills the seats
+      without one.
 - [ ] Speaker movable at any time; strategy pick and agenda voting orders derive
       from it automatically. Seats re-orderable as a correction.
 - [ ] Remove a player who leaves the game, and keep their recorded time

@@ -210,6 +210,18 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .kv span{color:var(--dim)} .kv b{font-weight:600}
 .fld.sel.none{color:var(--faint)}
 .setup-need{font-size:12.5px; color:var(--warn); text-align:center; margin-bottom:10px}
+/* expansions: one chip for each, and the random deal for the empty seats */
+.exps{margin-bottom:14px}
+.exps .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-bottom:8px}
+.exp-row{display:flex; flex-wrap:wrap; gap:6px}
+.exp{display:flex; align-items:center; gap:6px; padding:7px 12px 7px 10px; border:1px solid var(--line2); border-radius:20px;
+  background:#0a0f16; color:var(--faint); font-family:var(--f); font-size:12.5px; font-weight:600; cursor:pointer}
+.exp::before{content:"+"; width:10px; text-align:center; font-weight:800}
+.exp.on{border-color:#2b6b66; background:#0b1c1f; color:var(--txt)}
+.exp.on::before{content:"✓"; color:var(--accent)}
+.deal{width:100%; margin-bottom:12px; padding:13px; border:1px solid var(--line2); border-radius:11px; background:var(--panel2);
+  color:var(--txt); font-family:var(--f); font-size:15px; font-weight:650; text-align:center; cursor:pointer}
+.deal:hover{border-color:#3d5168; background:var(--panel3)}
 
 /* settings */
 .set-row{display:grid; grid-template-columns:1fr 200px 62px; gap:14px; align-items:center; padding:15px 18px;
@@ -530,6 +542,12 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .setup-help b{color:var(--dim)}
 /* The faction column grows to fit the longest faction name before the name column takes the rest. */
 .seat{grid-template-columns:26px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 44px}
+/* The seat rows share the columns of the seat list, so the faction column has one width in every row, also when one seat
+   keeps a faction that the other lists leave out. Under subgrid, the padding and the border of a row take 12 px from its
+   first and last columns, so those columns are 12 px wider. A browser without subgrid keeps the columns of each row. */
+.seat-list{display:grid; grid-template-columns:38px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 56px;
+  column-gap:11px; align-content:start}
+.seat-list .seat{grid-column:1 / -1; grid-template-columns:subgrid}
 .seat .swatches{flex-wrap:wrap}
 .seat-move{display:flex; flex-direction:column; gap:2px}
 .seat-move b{color:var(--faint); font-size:11px; font-weight:400; line-height:1; padding:3px 0; border-radius:5px; text-align:center}
@@ -814,7 +832,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   /* setup and settings */
   .count{gap:6px}
   .count b{padding:10px 0}
-  .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
+  /* a phone: each seat row is a card with its own grid, so the list has one column */
+  .seat-list{grid-template-columns:minmax(0,1fr)}
+  .seat-list .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
     padding:10px 10px 10px 8px}
   .seat .seat-move{grid-area:mv}
   .seat .sn{grid-area:sn}
@@ -1004,8 +1024,13 @@ const topBar = (phase, extra='') => {
 const S = {};
 
 /* ── 1. Setup ── */
-// missing: Wren has not picked a faction yet, so BEGIN GAME is off.
-const setupScreen = missing => `<div class="space"></div><div class="lay">
+// empty: the seats with no faction yet. While a seat has none, BEGIN GAME is off,
+// and the random deal can fill the empty seats.
+// sets: the expansions that are on. The base game is always in play.
+// limits: the time limits are on. The panel summary scrolls when it is full.
+const EXPANSIONS = [['pok','Prophecy of Kings'], ['te',"Thunder's Edge"], ['keleres','Council Keleres']];
+const ALL_SETS = EXPANSIONS.map(([k])=>k);
+const setupScreen = (empty=[], sets=ALL_SETS, limits=true) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">Load last game</button><button class="ibtn">⚙<span class="word"> Settings</span></button></div>
   <div class="content"><div class="setup-grid">
@@ -1014,9 +1039,9 @@ const setupScreen = missing => `<div class="space"></div><div class="lay">
         <div class="setup-label">Players · in seat order, clockwise around the table</div>
         <div class="count">${[3,4].map(n=>`<b class="later">${n}</b>`).join('')}${[5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
       </div>
-      <div class="scroll grow">
+      <div class="seat-list scroll grow">
       ${Object.entries(P).map(([id,d])=>{
-        const none = missing && id==='wren';
+        const none = empty.includes(id);
         return `
         <div class="seat ${d.speaker?'sp':''}" style="${col(id)}">
           <div class="seat-move"><b class="${d.seat===1?'off':''}">▲</b><b class="${d.seat===6?'off':''}">▼</b></div>
@@ -1029,39 +1054,49 @@ const setupScreen = missing => `<div class="space"></div><div class="lay">
         </div>`}).join('')}
       </div>
     </div>
-    <div class="pnl" style="display:flex;flex-direction:column">
+    <div class="pnl" style="display:flex;flex-direction:column;min-height:0">
       <div class="pnl-h">Game</div>
-      <div class="grow" style="padding:16px 18px">
+      <div class="grow scroll" style="padding:16px 18px">
         <div class="kv"><span>Players</span><b>6</b></div>
         <div class="kv"><span>Strategy cards each</span><b>1</b></div>
         <div class="kv"><span>Speaker</span><b>Jaz</b></div>
-        <div class="kv"><span>Naalu 0 token</span><b>Sam</b></div>
-        <div class="kv"><span>Time limits</span><b style="color:var(--warn)">Enabled</b></div>
+        ${empty.includes('sam')?'':'<div class="kv"><span>Naalu 0 token</span><b>Sam</b></div>'}
+        ${limits?`<div class="kv"><span>Time limits</span><b style="color:var(--warn)">Enabled</b></div>
         <div class="kv"><span>Turn limit</span><b>3:00</b></div>
-        <div class="kv" style="border:none"><span>Reaction window</span><b>2:00</b></div>
+        <div class="kv" style="border:none"><span>Reaction window</span><b>2:00</b></div>`
+        :'<div class="kv"><span>Time limits</span><b>Off</b></div>'}
         <div class="setup-help">Seat order is the physical ring. The <b>speaker ★</b> picks first in the strategy phase and votes
           last in the agenda phase.</div>
         <div class="setup-help later">At 3–4 players each player picks <b>two</b> strategy cards and takes a turn at each
           initiative number.${LATER}</div>
       </div>
       <div style="padding:16px 18px">
-        ${missing?'<div class="setup-need">Pick a faction for every seat to begin.</div>':''}
+        <div class="exps"><div class="lbl">Expansions</div><div class="exp-row">
+          ${EXPANSIONS.map(([k,n])=>`<button class="exp ${sets.includes(k)?'on':''}">${n}</button>`).join('')}
+        </div></div>
+        ${missing?'<div class="setup-need">Pick a faction for every seat to begin.</div><button class="deal">Random factions for empty seats</button>':''}
         <button class="big lg" style="width:100%" ${missing?'disabled':''}>BEGIN GAME</button>
       </div>
     </div>
-  </div></div></div>`;
+  </div></div></div>`; };
 
 S.setup = {t:'Setup — New Game', d:'ipad', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the list of official factions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. Dashed, dimmed controls marked <b>Later</b> are designed but not in the app yet: here, games with 3 or 4 players.`,
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game. Dashed, dimmed controls marked <b>Later</b> are designed but not in the app yet: here, games with 3 or 4 players.`,
  mnote:
  `On a narrow screen, the Game panel moves under the seats, and the screen scrolls. On a phone, each seat row becomes a card: the arrows and the seat number on the left, the swatches and the speaker ★ on top, and the name and faction fields under them. Every control of the iPad row is still there.`,
- h:setupScreen(false)};
+ h:setupScreen()};
 
 S.setupMissing = {t:'Setup — Faction Missing', d:'ipad', note:
- `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet.`,
+ `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
  mnote:
- `The same check in the narrow layout. The message sits above BEGIN GAME, at the end of the Game panel.`,
- h:setupScreen(true)};
+ `The same check in the narrow layout. The message and the deal button sit above BEGIN GAME, at the end of the Game panel.`,
+ h:setupScreen(['wren'])};
+
+S.setupDeal = {t:'Setup — Random Factions', d:'ipad', note:
+ `A new setup, before any seat has a faction. This table plays with the base game and Prophecy of Kings, so <b>Thunder's Edge</b> and <b>Council Keleres</b> are off. Every faction list then offers only the 24 factions of those two boxes, and so does the deal. The time limits show their default, off. <b>Random factions for empty seats</b> gives each empty seat a different faction, and BEGIN GAME turns on. The button shows only while a seat has no faction, so it never replaces a faction that a player picked. A seat keeps its faction when its expansion turns off.`,
+ mnote:
+ `The same setup in the narrow layout. The expansion chips wrap, and the deal button sits above BEGIN GAME.`,
+ h:setupScreen(Object.keys(P), ['pok'], false)};
 
 /* ── 2. Settings ── */
 const setRow = (lb,ds,ctl,tog,cls='') => `<div class="set-row ${cls}">
@@ -1071,7 +1106,7 @@ const tog = on => `<div class="tog ${on?'on':''}"></div>`;
 const step = v => `<div class="stepper"><i>−</i><b class="num">${v}</b><i>+</i></div>`;
 const TIMERS = [
   ['Turn limit','A single player turn in the action phase.','3:00',true],
-  ['Reaction window','Secondary abilities after a strategy card. Closes when time is up.','2:00',true],
+  ['Reaction window','Secondary abilities after a strategy card is played. Charged to nobody.','2:00',true],
   ['Agenda discussion','Per agenda, before voting opens.','4:00',true],
   ['Vote','Per player, from the speaker’s left.','1:00',true],
   ['Status phase','Whole table, across all seven steps.','5:00',false],
@@ -1325,9 +1360,16 @@ const RW_POL = [
   {id:'wren',  done:false},
 ];
 const WINDOWS = {
-  trade:{by:'kira', card:5, paused:'1:47', t:92,  tiles:RW},
-  pol:  {by:'jaz',  card:3, paused:'0:52', t:101, tiles:RW_POL, from:'jaz', to:'tom'},
+  trade:{by:'kira', card:5, turn:'1:47', t:92,  tiles:RW},
+  over: {by:'kira', card:5, turn:'1:47', over:18, tiles:RW},
+  pol:  {by:'jaz',  card:3, turn:'0:52', t:101, tiles:RW_POL, from:'jaz', to:'tom'},
 };
+// past its limit the window stays open and counts overtime
+const rwClock = w => w.over
+  ? `<div class="t num over" data-clock="over" data-t="${w.over}">+${fmtL(w.over)}</div>
+        <div class="l">Over the 2:00 window limit</div>`
+  : `<div class="t num" data-clock="down" data-t="${w.t}" data-limit="120" data-bar="rwb">${fmtL(w.t)}</div>
+        <div class="l">Window remaining · 2:00</div>`;
 // everyone but the speaker when the window opened can take the token
 const speakerRow = (from, to) => `
     <div class="rw-spk">
@@ -1339,11 +1381,10 @@ const reactionScreen = w => `${actionScreen(false, true)}<div class="scrim"></di
     <div class="rw-h" style="${col(w.by)}">
       <div><div class="lbl">Strategic action · secondary abilities</div>
         <h3>${CARDNAME[w.card]} <span style="color:var(--faint);font-weight:600">(${w.card})</span></h3>
-        <div class="by"><i></i>Played by ${P[w.by].name} · their clock is paused at <b class="num" style="color:var(--dim);margin-left:4px">${w.paused}</b></div></div>
-      <div class="rw-clock"><div class="t num" data-clock="down" data-t="${w.t}" data-limit="120" data-bar="rwb">${fmtL(w.t)}</div>
-        <div class="l">Window remaining · 2:00</div></div>
+        <div class="by"><i></i>Played by ${P[w.by].name} · their turn took <b class="num" style="color:var(--dim);margin-left:4px">${w.turn}</b></div></div>
+      <div class="rw-clock">${rwClock(w)}</div>
     </div>
-    <div class="rw-bar"><i id="rwb" style="width:${Math.round(w.t/120*100)}%"></i></div>${w.to?speakerRow(w.from, w.to):''}
+    <div class="rw-bar"><i id="rwb" style="width:${w.over?0:Math.round(w.t/120*100)}%"></i></div>${w.to?speakerRow(w.from, w.to):''}
     <div class="tiles">
       ${w.tiles.map(r=>`<div class="tile ${r.done?'done':'wait'}" style="${col(r.id)}">
         ${r.passed?'<span class="pchip">Passed</span>':''}
@@ -1355,7 +1396,7 @@ const reactionScreen = w => `${actionScreen(false, true)}<div class="scrim"></di
       <div class="tile tile-idle"><div>Active player <br>does not react</div></div>
     </div>
     <div class="rw-f">
-      <div class="note"><b style="color:var(--dim)">${w.tiles.filter(r=>r.done).length} of ${w.tiles.length} done.</b> The window closes when the last player marks done.</div>
+      <div class="note"><b style="color:var(--dim)">${w.tiles.filter(r=>r.done).length} of ${w.tiles.length} done.</b> The window closes and ${P[w.by].name}'s turn ends when the last player marks done.</div>
       <div class="spacer"></div>
       <button class="ibtn">＋ Add 1:00</button>
       <button class="ibtn">↺ Undo last</button>
@@ -1364,13 +1405,19 @@ const reactionScreen = w => `${actionScreen(false, true)}<div class="scrim"></di
   </div>`;
 
 S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
- `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a fixed window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked <b>or</b> the timer expires, whichever comes first. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. A player who leaves the game during the window counts as done, and their tile shows <b>Left</b>. When the player who played the card leaves, their turn ends, and the next turn starts when the window closes. The top bar stays above the window, so the table can <b>pause</b> for a break, undo, or move the speaker during it.`,
+ `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Closing the window <b>ends Kira's turn</b>, because the strategic action was her action for the turn, and the next player's clock starts at once. Her turn keeps the 1:47 before she played the card. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. A player who leaves the game during the window counts as done, and their tile shows <b>Left</b>. When the player who played the card leaves, their turn ends, and the next turn starts when the window closes. The top bar stays above the window, so the table can <b>pause</b> for a break, undo, or move the speaker during it.`,
  mnote:
  `The window opens under the top bar, so Pause, Undo, and Settings stay in reach. On a phone, it is a sheet, and each reacting player gets a row with a large Mark Done button.`,
  h:reactionScreen(WINDOWS.trade)};
 
+S.reactionOver = {t:'Reaction Window — Over Limit', d:'ipad', note:
+ `The same window once its limit passes. As with every limit, expiry is soft: the window clock turns red and <b>counts overtime upward</b>, and an alarm sounds. The window stays open and nothing advances, so Sam and Wren can still mark done, and the overtime goes into the round and post-game stats. Only a tap closes the window and ends Kira's turn, so undo can always take the close back. <b>＋ Add 1:00</b> moves the limit.`,
+ mnote:
+ `The same overtime window in the narrow layout. On a phone, the red overtime clock sits above the tiles of the sheet.`,
+ h:reactionScreen(WINDOWS.over)};
+
 S.politics = {t:'Reaction Window — Politics', d:'ipad', note:
- `Politics (3) is the one strategy card that moves the speaker token: its primary ability hands the token to any player who does not hold it, the Politics player included. So its window adds a <b>new speaker</b> row above the tiles, listing everyone except the speaker when the window opened. One tap moves the token, a tap on another player changes the choice, and <b>Undo last</b> reverts it. Before the first tap the row reads "Tap the player who takes the token from Jaz." The choice is optional: the window still closes when the last player marks done, and the speaker chip still works afterwards.`,
+ `Politics (3) is the one strategy card that moves the speaker token: its primary ability hands the token to any player who does not hold it, the Politics player included. So its window adds a <b>new speaker</b> row above the tiles, listing everyone except the speaker when the window opened. One tap moves the token, a tap on another player changes the choice, and <b>Undo last</b> reverts it. Before the first tap the row reads "Tap the player who takes the token from Jaz." The choice is optional: the window still closes, and Jaz's turn still ends, when the last player marks done. The speaker chip still works afterwards.`,
  mnote:
  `On a phone, the new speaker row puts its label above the players, and the players wrap three to a line.`,
  h:reactionScreen(WINDOWS.pol)};
@@ -1881,7 +1928,7 @@ S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Table device · iPad and phone', ['setup','setupMissing','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','reaction','politics','passWarn','paused','status','agenda','round','history','stats','join']],
+  ['Table device · iPad and phone', ['setup','setupMissing','setupDeal','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','action','overtime','reaction','reactionOver','politics','passWarn','paused','status','agenda','round','history','stats','join']],
   ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);

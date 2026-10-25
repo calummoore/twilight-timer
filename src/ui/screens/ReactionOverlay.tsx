@@ -3,7 +3,7 @@ import { cardName } from '../../model/rules'
 import type { Player } from '../../model/types'
 import type { GameView, ReactionView, SpeakerChoice } from '../../model/view'
 import { pc } from '../colour'
-import { clock, countdown } from '../format'
+import { clock, timerText } from '../format'
 
 const EXTEND_MS = 60_000
 
@@ -19,7 +19,8 @@ export function ReactionOverlay(props: {
   const { game, reaction: r } = props
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const by = byId.get(r.byId)
-  const remaining = r.limitMs === null ? null : r.limitMs - r.elapsedMs
+  const seated = game.seated.includes(r.byId)
+  const time = timerText(r.elapsedMs, r.limitMs, true)
 
   return (
     <>
@@ -37,14 +38,14 @@ export function ReactionOverlay(props: {
             <div className="by">
               <i />
               Played by {by?.name} ·{' '}
-              {game.seated.includes(r.byId) ? (
+              {seated ? (
                 <>
-                  their clock is paused at{' '}
+                  {r.endsTurn ? 'their turn took' : 'their clock is paused at'}{' '}
                   <b
                     className="num"
                     style={{ color: 'var(--dim)', marginLeft: 4 }}
                   >
-                    {clock(r.pausedTurnMs)}
+                    {clock(r.turnMs)}
                   </b>
                 </>
               ) : (
@@ -53,21 +54,17 @@ export function ReactionOverlay(props: {
             </div>
           </div>
           <div className="rw-clock">
-            <div className="t num">
-              {remaining === null ? clock(r.elapsedMs) : countdown(remaining)}
+            <div className={`t num ${time.over ? 'over' : ''}`}>
+              {time.text}
             </div>
-            <div className="l">
-              {r.limitMs === null
-                ? 'Window open'
-                : `Window remaining · ${clock(r.limitMs)}`}
-            </div>
+            <div className="l">{clockLabel(r.limitMs, time.over)}</div>
           </div>
         </div>
         <div className="rw-bar">
           {r.limitMs !== null && (
             <i
               style={{
-                width: `${(Math.max(0, remaining ?? 0) / r.limitMs) * 100}%`,
+                width: `${(Math.max(0, r.limitMs - r.elapsedMs) / r.limitMs) * 100}%`,
               }}
             />
           )}
@@ -127,7 +124,14 @@ export function ReactionOverlay(props: {
             <b style={{ color: 'var(--dim)' }}>
               {r.doneCount} of {r.tiles.length} done.
             </b>{' '}
-            The window closes when the last player marks done.
+            {r.endsTurn && seated ? (
+              <>
+                The window closes and {by?.name}’s turn ends when the last
+                player marks done.
+              </>
+            ) : (
+              'The window closes when the last player marks done.'
+            )}
           </div>
           <div className="spacer" />
           {r.limitMs !== null && (
@@ -145,6 +149,14 @@ export function ReactionOverlay(props: {
       </div>
     </>
   )
+}
+
+/** The line under the window clock. Past the limit, the window stays open. */
+function clockLabel(limitMs: number | null, over: boolean): string {
+  if (limitMs === null) return 'Window open'
+  return over
+    ? `Over the ${clock(limitMs)} window limit`
+    : `Window remaining · ${clock(limitMs)}`
 }
 
 /** Politics: one tap hands the speaker token to a player. */

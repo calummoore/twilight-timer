@@ -1,10 +1,10 @@
 import { tokenOwner } from './fold-orders'
 import {
   close,
-  closeReaction,
+  endReaction,
+  endSuspendedTurn,
   followOrder,
   nextTurn,
-  toEntry,
   type FoldState,
 } from './fold-state'
 import { leftOf } from './orders'
@@ -54,12 +54,9 @@ function leaveReaction(
 ): void {
   const r = s.reaction
   if (!r) return
-  if (id === r.byId && s.suspended) {
-    s.entries.push(toEntry(s, s.suspended, s.suspended.startMs, wall, false))
-    s.suspended = null
-  }
+  if (id === r.byId) endSuspendedTurn(s, wall)
   if (r.others.includes(id) && !r.done.has(id)) {
     r.done.set(id, ms - r.startMs)
-    if (r.done.size === r.others.length) closeReaction(s, ms)
+    if (r.done.size === r.others.length) endReaction(s, ms, wall)
   }
 }

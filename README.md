@@ -12,13 +12,14 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 ## Key features
 
 - Setup for 5 to 8 players: name, colour, faction from the official list, seat,
-  and the speaker.
+  and the speaker. The table chooses its expansions, and one tap deals random
+  factions to the empty seats.
 - Strategy picks in speaker order, with trade goods on unpicked cards.
 - The action-phase chess clock: End Turn, the strategic action, and Pass.
 - The Naalu "0" token puts the Naalu player first. Gift of Prescience can move
   it for one round.
-- A reaction window for secondary abilities that is charged to nobody. For
-  Politics, it also asks for the new speaker.
+- A reaction window for secondary abilities that is charged to nobody.
+  Closing it ends the turn. For Politics, it also asks for the new speaker.
 - The status checklist, and clocks for agenda discussion and each vote.
 - The table can remove a player who leaves mid-game. Their recorded time
   stays in the stats.
@@ -95,7 +96,10 @@ commit. Each successful preview run updates the comment.
 
 - `src/model/` holds the game as a pure fold over an append-only action log.
   - `types.ts`: the actions, the stored game, and the timed entries.
-  - `factions.ts`: the official factions and the ids that saved games store.
+  - `factions.ts`: the official factions and the ids that saved games store,
+    and the expansion of each faction.
+  - `deal.ts`: the factions in play for the chosen expansions, the choices
+    of one seat, and the random deal for the empty seats.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
     `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
     player who leaves.

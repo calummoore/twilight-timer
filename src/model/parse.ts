@@ -1,6 +1,11 @@
-import { FACTIONS, isFactionId, type FactionId } from './factions'
+import { EXPANSIONS, FACTIONS, isFactionId, type FactionId } from './factions'
 import { COLOURS, type Colour } from './rules'
-import { ALARM_SOUNDS, DEFAULT_SETTINGS, type Settings } from './settings'
+import {
+  ALARM_SOUNDS,
+  DEFAULT_SETTINGS,
+  type Expansions,
+  type Settings,
+} from './settings'
 import {
   TIMER_KEYS,
   type Action,
@@ -14,12 +19,14 @@ import {
 type Fields = Record<string, unknown>
 
 /** The stored versions that this build reads. Older versions load as the newest. */
-const VERSIONS: readonly unknown[] = [1, 2, 3]
+const VERSIONS: readonly unknown[] = [1, 2, 3, 4]
 
 /**
  * Narrows stored data to a game, or returns null when it is not valid.
  * Version 1, from builds before the Naalu token, loads with no token owner.
  * Version 2, from builds before player removal, has the shape of version 3.
+ * Versions 1 to 3, from builds before a window close ended the turn, load
+ * with the window rule of those builds, unless they store the rule.
  */
 export function parseGame(raw: unknown): Game | null {
   if (!isFields(raw) || !VERSIONS.includes(raw.version)) return null
@@ -38,17 +45,30 @@ export function parseGame(raw: unknown): Game | null {
   if (owner !== null && (typeof owner !== 'string' || !isPlayer(owner))) {
     return null
   }
+  const windowEndsTurn = windowRule(raw.version, raw.windowEndsTurn)
+  if (windowEndsTurn === null) return null
   return {
-    version: 3,
+    version: 4,
     startedAt,
     players,
     firstSpeakerId,
     naaluTokenOwnerId: owner,
+    windowEndsTurn,
     actions,
     pauses,
     voids,
     limitsLog,
   }
+}
+
+/**
+ * A version 4 game must store the window rule. An older game has the old
+ * rule, except a game that this change saved as version 3 before main took
+ * that version: it stores the rule.
+ */
+function windowRule(version: unknown, stored: unknown): boolean | null {
+  if (typeof stored === 'boolean') return stored
+  return version === 4 ? null : false
 }
 
 /** Reads stored settings. Missing or broken fields fall back to defaults. */
@@ -63,7 +83,16 @@ export function parseSettings(raw: unknown): Settings {
     alarmSound: sound ?? d.alarmSound,
     keepAwake: bool(raw.keepAwake, d.keepAwake),
     showCumulative: bool(raw.showCumulative, d.showCumulative),
+    expansions: parseExpansions(raw.expansions),
   }
+}
+
+/** Each expansion that is missing or broken falls back to its default alone. */
+function parseExpansions(raw: unknown): Expansions {
+  const fields: Fields = isFields(raw) ? raw : {}
+  const out = { ...DEFAULT_SETTINGS.expansions }
+  for (const { id } of EXPANSIONS) out[id] = bool(fields[id], out[id])
+  return out
 }
 
 function parsePlayer(raw: unknown, legacy: boolean): Player | null {

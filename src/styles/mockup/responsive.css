@@ -217,7 +217,9 @@
   /* setup and settings */
   .count{gap:6px}
   .count b{padding:10px 0}
-  .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
+  /* a phone: each seat row is a card with its own grid, so the list has one column */
+  .seat-list{grid-template-columns:minmax(0,1fr)}
+  .seat-list .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
     padding:10px 10px 10px 8px}
   .seat .seat-move{grid-area:mv}
   .seat .sn{grid-area:sn}
