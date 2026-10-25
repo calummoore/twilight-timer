@@ -1,7 +1,15 @@
-import { act, pause, resume, setLimits, startGame, undo } from './commands'
+import {
+  act,
+  pause,
+  resume,
+  setLimits,
+  setPauseReason,
+  startGame,
+  undo,
+} from './commands'
 import { derive } from './derive'
 import { DEFAULT_SETTINGS, type Settings } from './settings'
-import type { ActionInput, Game, Limits, Player } from './types'
+import type { ActionInput, Game, Limits, PauseReason, Player } from './types'
 
 /** Test support: a six-player table with a fake clock. */
 
@@ -63,6 +71,10 @@ export function table(
     },
     resume() {
       game = resume(game, now)
+    },
+    /** Sets the reason of the open pause, or null for a plain pause. */
+    pauseReason(reason: PauseReason | null) {
+      game = setPauseReason(game, reason, now)
     },
     setLimits(enforce: boolean, limits: Limits) {
       game = setLimits(game, enforce, limits, now)

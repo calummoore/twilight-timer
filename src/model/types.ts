@@ -41,6 +41,23 @@ export interface Interval {
   to: number | null
 }
 
+/** Why the table paused. A pause without a reason is a plain pause. */
+export const PAUSE_REASONS = ['ruleCheck'] as const
+export type PauseReason = (typeof PAUSE_REASONS)[number]
+
+/** A part of a pause with a reason, such as one rule check. */
+export interface ReasonRange extends Interval {
+  reason: PauseReason
+}
+
+/**
+ * A pause, with its reason ranges, oldest first, each inside the pause. The
+ * time outside every range is plain pause time, which no stat counts.
+ */
+export interface Pause extends Interval {
+  reasons: ReasonRange[]
+}
+
 /** One tap at the table. `at` is the wall-clock time in ms. */
 export type Action =
   | { kind: 'cardPicked'; at: number; playerId: string; card: number }
@@ -73,7 +90,7 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 3
+  version: 4
   startedAt: number
   /** Seat order, clockwise. */
   players: Player[]
@@ -85,7 +102,7 @@ export interface Game {
    */
   naaluTokenOwnerId: string | null
   actions: Action[]
-  pauses: Interval[]
+  pauses: Pause[]
   voids: Interval[]
   limitsLog: LimitsChange[]
 }

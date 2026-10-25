@@ -1,4 +1,4 @@
-import { canUndo, isPaused } from './commands'
+import { canUndo } from './commands'
 import { foldGame } from './fold'
 import { currentPicker, tokenOwner, turnOrder } from './fold-orders'
 import {
@@ -9,6 +9,7 @@ import {
   type Reaction,
 } from './fold-state'
 import { pickOrder, voteOrder } from './orders'
+import { openPause, reasonTotals } from './pauses'
 import { POLITICS, STRATEGY_CARDS } from './rules'
 import { gameClock, mergeIntervals } from './time'
 import type { Entry, Game } from './types'
@@ -39,7 +40,8 @@ export function derive(game: Game, now: number): GameView {
     voteOrder: voteOrder(s.seats, s.speakerId),
     custodiansRemoved: s.custodiansRemoved,
     gameMs: ms,
-    paused: isPaused(game),
+    pause: openPause(game.pauses, now),
+    reasonTotals: reasonTotals(game.pauses, now),
     canUndo: canUndo(game),
     timer: timerView(s, ms, now),
     entries,

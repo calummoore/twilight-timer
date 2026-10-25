@@ -51,10 +51,11 @@ Decisions:
   touches a spec page of more than about 250 lines.
 - 2026-10-25: the default option shows as "Pause", the word that Cal used.
   A plain pause has no reason, so the saved game stores no reason for it.
-- 2026-10-25: the saved game moves to version 3 under `.v3` keys, as the
-  saved-game rule in `AGENTS.md` requires. When a `.v3` key is empty, load
-  reads its `.v2` key, then its `.v1` key. A version 1 or 2 game has no
-  rule checks.
+- 2026-10-25: the saved game moves to version 4 under `.v4` keys, as the
+  saved-game rule in `AGENTS.md` requires. Main took version 3 for player
+  removals in PR #9 while this plan was open. When a `.v4` key is empty,
+  load reads its `.v3` key, then `.v2`, then `.v1`. A game of version 1, 2,
+  or 3 has no rule checks.
 - 2026-10-25: a saved reason range that the parser cannot use is dropped,
   and the game stays valid. Its time counts as a plain pause. Reason: the
   reason only labels time, and the global rules prefer to continue on
@@ -77,7 +78,7 @@ Contract owners:
   `PauseReason`. A `ReasonRange` is an `Interval` with a `reason`. A
   `Pause` is an `Interval` with `reasons`: its reason ranges, oldest first,
   each inside the pause. A pause with no range is a plain pause.
-  `Game.pauses` holds `Pause` items, and `Game.version` becomes 3. `voids`
+  `Game.pauses` holds `Pause` items, and `Game.version` becomes 4. `voids`
   keep the plain `Interval`.
 - `pause` opens a pause with no reason range. The new command
   `setPauseReason(game, reason, now)` takes a reason, or null for a plain
@@ -96,11 +97,11 @@ Contract owners:
   `now`. A range counts only inside its pause, so a broken saved range
   cannot count more than its pause. `derive` puts the totals in the view.
   `stats.ts` keeps the entry stats. It has 183 lines now.
-- `parse.ts` reads versions 1, 2, and 3. A version 1 or 2 pause gets no
-  reason range. In a version 3 pause, a missing range list becomes empty,
+- `parse.ts` reads versions 1 to 4. A pause of version 1, 2, or 3 gets no
+  reason range. In a version 4 pause, a missing range list becomes empty,
   and a broken range or a range with an unknown reason is dropped.
-  `storage.ts` puts the `.v3` keys in front of the `.v2` and `.v1` keys.
-  Save and archive remove the older keys, as before.
+  `storage.ts` puts the `.v4` keys in front of the `.v3`, `.v2`, and `.v1`
+  keys. Save and archive remove the older keys, as before.
 - The pause overlay moves from `GameScreen.tsx` into its own screen
   component. It gets an accessible single-choice control with Pause, the
   default, and one option for each reason. One label map in `src/ui/`
@@ -110,7 +111,7 @@ Contract owners:
   its count, as the mockup shows. The tiles come from a component in its
   own file, because `StatsScreen.tsx` has 254 lines.
 - The mockup holds the pause card styles, with the class names of
-  `src/styles/app.css`. Milestone 4 ports them to `src/styles/mockup/` and
+  `src/styles/app.css`. Milestone 5 ports them to `src/styles/mockup/` and
   removes the copies from `src/styles/app.css`.
 
 ## Milestone 1: Documentation and spec
@@ -172,44 +173,65 @@ Show the pause screen and the rule-check time before the screens change.
 - Evidence: `.context/pause-reasons/mockup/*.png` and `render.log`. No
   screen has a script error.
 
-## Milestone 3: Game model
+## Milestone 3: Merge origin/main
+
+Main added the removal of a player who leaves the game (PR #9), with
+saved-game version 3. Merge it before the model changes, and keep both
+sides of each conflict.
+
+- [x] Commit Milestones 1 and 2: a86328e, 5b03115, and e3865f2.
+- [x] Merge `origin/main` at b6f658d. Resolve `docs/product.md` by
+      splitting main's spec again, then put the pause edits back. Keep
+      both sides in the mockup navigation and the post-game stats note.
+- [x] Check the merge: the spec pages hold main's text word for word, the
+      links work, the mockup has no script error, and the unit tests pass.
+- [x] Move this plan to saved-game version 4, because main took version 3.
+- Merge commit 114d814. Justifications:
+  `.context/pause-reasons/merge/justifications.md`. The PR description
+  copies them. Evidence: `verify-spec.log` and `audit-merge.log` beside it.
+
+## Milestone 4: Game model
 
 Store the rule checks of each pause, total their time, and keep the saved
 games of older builds loading.
 
-- [ ] `types.ts` and `commands.ts`: the reasons, `ReasonRange`, `Pause`,
-      version 3, `setPauseReason`, and a `resume` that ends the open range.
-- [ ] `derive` and the view: the open pause with its reason, and the totals
+- [x] `types.ts` and `commands.ts`: the reasons, `ReasonRange`, `Pause`,
+      version 4, `setPauseReason`, and a `resume` that ends the open range.
+- [x] `derive` and the view: the open pause with its reason, and the totals
       for each reason.
-- [ ] `pauses.ts`: the totals.
-- [ ] `parse.ts` and `storage.ts`: version 3 under the `.v3` keys, with the
-      `.v2` and `.v1` fallback.
-- [ ] `test-table.ts`: a step that sets the pause reason.
-- [ ] Unit tests with the fake clock:
-  - [ ] A new pause has no reason, also after a pause with a rule check.
-  - [ ] A rule check starts at the tap that selects it. A tap on Pause ends
+- [x] `pauses.ts`: the totals.
+- [x] `parse.ts` and `storage.ts`: version 4 under the `.v4` keys, with the
+      `.v3`, `.v2`, and `.v1` fallback.
+- [x] `test-table.ts`: a step that sets the pause reason.
+- [x] Unit tests with the fake clock:
+  - [x] A new pause has no reason, also after a pause with a rule check.
+  - [x] A rule check starts at the tap that selects it. A tap on Pause ends
         it, and the game stays paused. Resume ends an open rule check.
-  - [ ] Two rule checks in one pause count as two.
-  - [ ] A reason change while the game runs returns the same game. A tap on
+  - [x] Two rule checks in one pause count as two.
+  - [x] A reason change while the game runs returns the same game. A tap on
         the current reason returns the same game.
-  - [ ] A reason change moves no clock: the game time, the timer, the
+  - [x] A reason change moves no clock: the game time, the timer, the
         entries, and the pause clock stay the same.
-  - [ ] The totals give the time and the count of rule checks, with no
+  - [x] The totals give the time and the count of rule checks, with no
         plain pause time. An open rule check counts up to `now`.
-  - [ ] A rule check inside a range that a later undo voids counts in full.
-  - [ ] A saved range that reaches outside its pause counts only inside
+  - [x] A rule check inside a range that a later undo voids counts in full.
+  - [x] A saved range that reaches outside its pause counts only inside
         the pause.
-  - [ ] A version 3 game loads with its rule checks. A version 2 game loads
-        from its `.v2` key with no rule checks. A version 1 game still
-        loads.
-  - [ ] Save and archive remove the `.v2` and `.v1` keys.
-  - [ ] A range with an unknown reason, a broken range, and a missing range
-        list load as no rule check. A version 4 game is invalid.
-- [ ] Move the existing storage tests from the `.v2` keys to the `.v3`
+  - [x] A version 4 game loads with its rule checks. A version 3 game loads
+        from its `.v3` key with no rule checks. Versions 1 and 2 still
+        load.
+  - [x] Save and archive remove the `.v3`, `.v2`, and `.v1` keys.
+  - [x] A range with an unknown reason, a broken range, and a missing range
+        list load as no rule check. A version 5 game is invalid.
+- [x] Move the existing storage tests from the `.v3` keys to the `.v4`
       keys, with the same assertions. The unknown-version test moves from
-      version 3 to version 4.
+      version 4 to version 5.
+- `src/model/pauses.test.ts` holds the pause tests, and
+  `src/model/storage.test.ts` the version 4 tests. Evidence:
+  `.context/pause-reasons/mutations.log`: each of eight broken pause rules
+  makes at least one test fail.
 
-## Milestone 4: Screens
+## Milestone 5: Screens
 
 Tags: ui
 
@@ -235,12 +257,12 @@ Show the reason control and the rule-check time as the mockup shows them.
   - [ ] Resume, pause again, and see Pause selected.
   - [ ] End the game. Check the rule-check time and a count of 2 on the
         post-game stats.
-  - [ ] Load a saved version 2 game with a pause. Check that it loads with
+  - [ ] Load a saved version 3 game with a pause. Check that it loads with
         no rule checks.
   - [ ] Save the log and the screenshots under
         `.context/pause-reasons/smoke/`.
 
-## Milestone 5: Verification, commit, and review
+## Milestone 6: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 

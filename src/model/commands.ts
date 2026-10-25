@@ -1,7 +1,15 @@
 import { NAALU } from './factions'
 import { foldGame } from './fold'
 import type { Settings } from './settings'
-import type { ActionInput, Game, Limits, Player } from './types'
+import type {
+  ActionInput,
+  Game,
+  Limits,
+  Pause,
+  PauseReason,
+  Player,
+  ReasonRange,
+} from './types'
 
 export function startGame(
   players: Player[],
@@ -10,7 +18,7 @@ export function startGame(
   now: number,
 ): Game {
   return {
-    version: 3,
+    version: 4,
     startedAt: now,
     players,
     firstSpeakerId: speakerId,
@@ -55,17 +63,53 @@ export function canUndo(game: Game): boolean {
   return game.actions.length > 0 && !isPaused(game)
 }
 
+/** Starts a plain pause: a pause with no reason. */
 export function pause(game: Game, now: number): Game {
   if (isPaused(game)) return game
-  return { ...game, pauses: [...game.pauses, { from: now, to: null }] }
+  const plain: Pause = { from: now, to: null, reasons: [] }
+  return { ...game, pauses: [...game.pauses, plain] }
 }
 
+/** Ends the open pause, and its open reason range with it. */
 export function resume(game: Game, now: number): Game {
   if (!isPaused(game)) return game
-  const pauses = game.pauses.map((p) =>
-    p.to === null ? { from: p.from, to: Math.max(now, p.from) } : p,
-  )
+  const pauses = game.pauses.map((p) => {
+    if (p.to !== null) return p
+    const to = Math.max(now, lastTime(p))
+    return { ...p, to, reasons: endRanges(p.reasons, to) }
+  })
   return { ...game, pauses }
+}
+
+/**
+ * Gives the open pause a reason from `now` on, or makes the rest of it a
+ * plain pause with null. The open reason range ends at `now`. Returns the
+ * same game when no pause is open or when the reason does not change.
+ */
+export function setPauseReason(
+  game: Game,
+  reason: PauseReason | null,
+  now: number,
+): Game {
+  const index = game.pauses.findIndex((p) => p.to === null)
+  const open = game.pauses[index]
+  if (!open) return game
+  const current = open.reasons.find((r) => r.to === null)?.reason ?? null
+  if (reason === current) return game
+  const at = Math.max(now, lastTime(open))
+  const reasons = endRanges(open.reasons, at)
+  if (reason !== null) reasons.push({ reason, from: at, to: null })
+  return { ...game, pauses: game.pauses.with(index, { ...open, reasons }) }
+}
+
+/** The latest time in a pause, so that its ranges stay in order. */
+function lastTime(p: Pause): number {
+  const last = p.reasons.at(-1)
+  return Math.max(p.from, last?.to ?? last?.from ?? p.from)
+}
+
+function endRanges(ranges: readonly ReasonRange[], at: number): ReasonRange[] {
+  return ranges.map((r) => (r.to === null ? { ...r, to: at } : r))
 }
 
 /** Limits apply from now on. Closed entries keep the limit of their time. */

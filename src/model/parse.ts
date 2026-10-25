@@ -2,31 +2,35 @@ import { FACTIONS, isFactionId, type FactionId } from './factions'
 import { COLOURS, type Colour } from './rules'
 import { ALARM_SOUNDS, DEFAULT_SETTINGS, type Settings } from './settings'
 import {
+  PAUSE_REASONS,
   TIMER_KEYS,
   type Action,
   type Game,
   type Interval,
   type Limits,
   type LimitsChange,
+  type Pause,
   type Player,
+  type ReasonRange,
 } from './types'
 
 type Fields = Record<string, unknown>
 
 /** The stored versions that this build reads. Older versions load as the newest. */
-const VERSIONS: readonly unknown[] = [1, 2, 3]
+const VERSIONS: readonly unknown[] = [1, 2, 3, 4]
 
 /**
  * Narrows stored data to a game, or returns null when it is not valid.
  * Version 1, from builds before the Naalu token, loads with no token owner.
  * Version 2, from builds before player removal, has the shape of version 3.
+ * Version 3, from builds before pause reasons, has no rule checks.
  */
 export function parseGame(raw: unknown): Game | null {
   if (!isFields(raw) || !VERSIONS.includes(raw.version)) return null
   const legacy = raw.version === 1
   const players = listOf(raw.players, (p) => parsePlayer(p, legacy))
   const actions = listOf(raw.actions, parseAction)
-  const pauses = listOf(raw.pauses, parseInterval)
+  const pauses = listOf(raw.pauses, parsePause)
   const voids = listOf(raw.voids, parseInterval)
   const limitsLog = listOf(raw.limitsLog, parseLimitsChange)
   const { startedAt, firstSpeakerId } = raw
@@ -39,7 +43,7 @@ export function parseGame(raw: unknown): Game | null {
     return null
   }
   return {
-    version: 3,
+    version: 4,
     startedAt,
     players,
     firstSpeakerId,
@@ -130,6 +134,28 @@ function parseInterval(raw: unknown): Interval | null {
   if (!isFields(raw) || !isNumber(raw.from)) return null
   if (raw.to !== null && !isNumber(raw.to)) return null
   return { from: raw.from, to: raw.to }
+}
+
+/**
+ * A pause and its reason ranges. A pause from before version 4 has no
+ * ranges. A range that cannot be read is dropped, so its time counts as a
+ * plain pause and the game still loads.
+ */
+function parsePause(raw: unknown): Pause | null {
+  const range = parseInterval(raw)
+  if (!range || !isFields(raw)) return null
+  const reasons = Array.isArray(raw.reasons)
+    ? raw.reasons.flatMap((r: unknown) => parseReasonRange(r) ?? [])
+    : []
+  return { ...range, reasons }
+}
+
+function parseReasonRange(raw: unknown): ReasonRange | null {
+  const range = parseInterval(raw)
+  const reason = isFields(raw)
+    ? PAUSE_REASONS.find((r) => r === raw.reason)
+    : undefined
+  return range && reason ? { reason, ...range } : null
 }
 
 function parseLimitsChange(raw: unknown): LimitsChange | null {
