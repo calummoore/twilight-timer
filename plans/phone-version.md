@@ -175,6 +175,11 @@ Run the checks, push, and review the branch.
   - Review 4 ran on the branch after the two merges of `origin/main`, at commit `33d0eb4`. Its findings 1 to 5 are numbered 21 to 25 here. Fixed: 21, 16 px fields where an iPhone shows the app; 23, the layout helpers move to `layout.css`; and 24, two comments name only the reaction window. Report: `.context/phone-version/review-4.md`. Evidence: `.context/phone-version/merge/fields-after-arrow.log`.
   - Review 5 re-checked the fix commit `f328463`: findings 21, 23, and 24 are resolved. New finding 26, upright iPads cut long faction names, is fixed with option B: the 16 px fields apply to phones only. New finding 27 asked for the follow-up line of finding 21 below. Report: `.context/phone-version/review-5.md`. Evidence: `.context/phone-version/merge/fields-after-26.log`.
   - 22. Undo and Pause scroll off sideways phones. Decided 2026-10-25: B. Evidence: `.context/phone-version/finding-22/`.
+  - Review 6 checked commits `9c4fae6`, `60bd775`, `d6af04b`, and `a460113`. No finding is Auto-fix yes. Report: `.context/phone-version/review-6.md`.
+  - 28. Sticky top bar covers clocks on small sideways phones. Severity Medium, effort Small. Recommended: D, the compact phone top bar up to 760 px wide or 500 px tall, which also fixes the two top bar problems from 601 to 730 px wide below. Evidence: `.context/phone-version/finding-22/topbar-D.log`.
+  - 29. Decisions 22 and 19 live only in the plan. Severity Low, effort Small. Recommended: A, add both to `docs/product.md`.
+  - 30. Reaction window sticky rule has no effect now. Severity Low, effort Small. Recommended: B, one sticky base rule for the top bar.
+  - 31. Phone phase line gap is set twice. Severity Low, effort Small. Recommended: B, side margins in place of the shorthand.
   - 4. Phone History and Join have no way in. Severity Low, effort Small. Recommended: B, add the controls.
   - 7. Up and down keys block keyboard scrolling. Severity Low, effort Small. Recommended: A, use the I and P keys.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
@@ -194,6 +199,8 @@ Run the checks, push, and review the branch.
   - `docs/mockups/index.html`: the file is built from sources in `~/tools/mock/`, outside the repository, so a new build can lose a direct edit. Separate branch.
   - `docs/mockups/index.html`: a script comment says that overlays open under the top bar, but only the reaction window does, as in finding 24. Separate branch.
   - `docs/mockups/index.html`: in the upright iPad frame, the stats top bar wraps the text of its four buttons, because of the two Later export buttons. Separate branch.
+  - `src/styles/mockup/responsive.css`: from 601 to 629 px wide, the two-row top bar is wider than the window, so the screen scrolls sideways. Option D of finding 28 covers it.
+  - `src/styles/mockup/responsive.css`: from 601 to about 730 px wide, the speaker chip and Undo wrap, so the top bar is 124 to 141 px tall. Option D of finding 28 covers it.
 
 ## Post-merge follow-up (non-blocking)
 
