@@ -80,8 +80,8 @@ export interface Game {
   firstSpeakerId: string
   /**
    * The Naalu player, who gets the Naalu "0" token back each round while
-   * they are in the game, or null. A game from an older build has null,
-   * because its log follows card order.
+   * they are in the game, or null. A version 1 game, from a build before
+   * the Naalu token, has null, because its log follows card order.
    */
   naaluTokenOwnerId: string | null
   actions: Action[]

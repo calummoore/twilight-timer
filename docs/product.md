@@ -85,7 +85,7 @@ new speaker choice in a Politics reaction window (see
 TI4 rules: when the speaker leaves the game, the token passes to the player on
 their left (see [Players who leave](#players-who-leave)). Rejected: passing the
 token automatically each round, because the TI4 rules move it only through
-Politics and a few other cards.
+Politics, a few other cards, and a speaker who leaves the game.
 
 Re-ordering the seats themselves is possible but deliberately understated. It is
 a correction for a setup mistake — people do not swap chairs mid-game — so it
