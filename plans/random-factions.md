@@ -60,6 +60,23 @@ Decisions:
   table that never touches the chips.
 - 2026-10-25, Cal: create the plan, then build only the mockup milestone.
   Milestone 1 and the milestones after Milestone 2 wait for Cal.
+- 2026-10-25, Cal: review 1 finding 1, option B. Write Milestone 1 now,
+  from the five recorded decisions. Alternative: A, write it after the
+  mockup review. Reason: the spec text depends on nothing open. This
+  replaces the wait for Milestone 1 in the entry above.
+- 2026-10-25, Cal: review 1 finding 5, option A. Add the three missing
+  checks to Milestones 3 and 4. Alternative: B, also a model function for
+  the deal button rule. Reason: the deal button uses the condition that
+  turns BEGIN GAME off, so a smoke check is enough.
+- 2026-10-25, Cal: review 2 finding 6, option B. One decision line under
+  the review TODO tracks the button reset. Alternative: A, keep the
+  outside-scope line beside it.
+- 2026-10-25, Cal: decision 7, option B. The app button reset centres
+  button labels, and only the rules that need it set left alignment. A
+  separate branch does it and checks every button rule. Alternative: A,
+  each rule from the mockup sets its own alignment. Reason: a right
+  default removes the class of drift, and it centres BEGIN GAME, BEGIN
+  ACTION PHASE, and END TURN, as the mockup shows.
 
 Contract owners:
 
@@ -119,13 +136,18 @@ Contract owners:
 State the expansions, the faction lists, and the deal as requirements
 before the code changes.
 
-- [ ] Update "Factions" in `docs/product.md`: the expansion chips and
+- [x] Update "Factions" in `docs/product.md`: the expansion chips and
       their default, the faction list of each seat, and the random deal
       for the empty seats. Add each decision in force with its rejected
       alternative.
-- [ ] Update the Setup row of the iPad screens table in `docs/product.md`.
-- [ ] Add the expansions and the deal to the setup item of the key
+- [x] Update the Setup row of the iPad screens table in `docs/product.md`.
+- [x] Add the expansions and the deal to the setup item of the key
       features in `README.md`.
+- [x] Add the expansions and the deal to the setup item of the must-have
+      list in `docs/product.md`.
+- `docs/product.md` has 419 lines, past the target of about 250 lines in
+  the documentation skill. Decision 8, a split into linked pages, waits
+  for Cal.
 
 ## Milestone 2: Mockup
 
@@ -179,6 +201,8 @@ Give each faction its game set, store the expansions, and add the deal.
         sequence gives a fixed deal.
   - [ ] Stored settings without `expansions`, or with a broken value,
         load with every expansion on. A saved choice loads as saved.
+  - [ ] A broken value for one expansion falls back for that expansion
+        only. The other values load as saved.
 
 ## Milestone 4: Setup screen
 
@@ -207,8 +231,12 @@ Show the chips, the faction lists, and the deal as the mockup shows them.
       `.context/random-factions/smoke/`.
   - [ ] The deal fills every empty seat with a different faction, and
         BEGIN GAME turns on. A hand pick stays.
-  - [ ] With Thunder's Edge off, no faction list shows its factions, and
-        the deal gives none of them.
+  - [ ] With Thunder's Edge off, the list of each seat without a Thunder's
+        Edge faction shows none of its factions. The deal gives none of
+        them.
+  - [ ] A seat that holds a Thunder's Edge faction keeps it when Thunder's
+        Edge turns off, and its list still shows that faction.
+  - [ ] The deal button goes away when every seat has a faction.
   - [ ] Every seat row keeps one faction column width while a seat keeps
         a faction outside the chosen expansions.
   - [ ] The chips keep their state after a reload.
@@ -232,12 +260,11 @@ Run the checks, push, and review the branch.
   - Review 2 checked fix commit 1bfe11a: findings 2, 3, and 4 are
     resolved. It found 1 finding. No further fix round runs. Report:
     `.context/random-factions/review-2.md`.
-  - 1. Spec does not state the chips or deal. Severity Medium, effort Small. Recommended: B, write Milestone 1 now.
-  - 5. Tests miss three decided behaviours. Severity Low, effort Small. Recommended: A, add the three checks to the plan.
-  - 6. Button reset follow-up needs a decision. Severity Low, effort Small. Recommended: B, one decision line in place of the follow-up line and the `src/styles/app.css` line.
-  - Follow-up: give the app button reset a centred label default, and set left alignment only in the rules that need it. Effort Medium. Covers finding 3. Previous examples: the left BEGIN GAME in `plans/naalu-initiative-token.md`, Milestone 9.
+  - Findings 1, 5, and 6: Cal chose B, A, and B on 2026-10-25, as the
+    decisions record. Milestone 1 holds finding 1, Milestones 3 and 4
+    hold the checks of finding 5, and the line below applies finding 6.
+  - Decision 7, the wider fix of finding 3: Cal chose B. `src/styles/app.css`: the button reset centres button labels, and only the rules that need it set left alignment. This also centres BEGIN GAME, BEGIN ACTION PHASE, and END TURN, which sit at the left today, as Milestone 9 of `plans/naalu-initiative-token.md` records. Effort Medium. Separate branch.
   - `docs/mockups/index.html`: the setup seat rows show a drag handle and six colour swatches, but the app has move buttons and eight colours. Separate branch.
-  - `src/styles/app.css`: the button reset puts BEGIN GAME, BEGIN ACTION PHASE, and END TURN at the left, but the mockup centres them. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
 
