@@ -40,7 +40,11 @@ export interface ReactionView {
   limitMs: number | null
   /** The active player's turn time, stopped while the window is open. */
   turnMs: number
-  /** True when closing the window ends the turn. False in an older game. */
+  /**
+   * The game rule: true when closing the window ends the card player's turn,
+   * false in an older game. The turn of a card player who left has already
+   * ended, so the screens also check that the card player is seated.
+   */
   endsTurn: boolean
   tiles: ReactionTile[]
   doneCount: number

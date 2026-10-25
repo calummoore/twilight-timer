@@ -184,9 +184,9 @@ export function reactionEntry(
 }
 
 /**
- * Closes the reaction window and resumes the suspended turn. When the player
- * who opened the window has left, the next turn starts instead, unless
- * `advance` is false.
+ * Closes the reaction window and resumes the suspended turn. When no turn is
+ * suspended, because the card player left or `endReaction` ended the turn,
+ * the next turn starts instead, unless `advance` is false.
  */
 export function closeReaction(s: FoldState, ms: number, advance = true): void {
   if (!s.reaction) return

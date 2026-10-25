@@ -202,6 +202,32 @@ describe('storage', () => {
     },
   )
 
+  it('keeps the window rule that a version 3 game of this change stored', () => {
+    const store = memoryStore()
+    const t = table()
+    playStrategy(t)
+    t.wait(10 * SEC)
+    t.act({ kind: 'strategyCardPlayed' })
+    t.act({ kind: 'reactionClosed' }) // Tom's turn ends
+    t.wait(20 * SEC)
+    t.act({ kind: 'turnEnded' }) // Wren's turn ends
+    // Before main took version 3, this change saved its games as version 3.
+    const early = JSON.stringify({ ...t.game, version: 3 })
+    store.data.set('ti4tempo.game.v3', early)
+    const game = gameOf(loadGame(store))
+    expect(game).toEqual(t.game)
+    const view = derive(game, T0 + 2 * MIN)
+    expect(view.entries.filter((e) => e.kind === 'turn')).toMatchObject([
+      { playerId: 'tom', durationMs: 10 * SEC },
+      { playerId: 'wren', durationMs: 20 * SEC },
+      { playerId: 'jaz', running: true },
+    ])
+    // A broken rule in an older game falls back to the old rule.
+    const broken = { ...asVersion3(t.game), windowEndsTurn: 'yes' }
+    store.data.set('ti4tempo.game.v3', JSON.stringify(broken))
+    expect(gameOf(loadGame(store))).toMatchObject({ windowEndsTurn: false })
+  })
+
   it.each([
     ['1', asVersion1],
     ['2', asVersion2],

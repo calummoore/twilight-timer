@@ -50,7 +50,9 @@ Decisions:
 - 2026-10-25: merge of PR #9, player removal. PR #9 took version 3 and
   the `.v3` keys, so this change moves saved games to version 4 under
   `.v4` keys. Versions 1 to 3 load with the old window rule, because
-  their builds resumed the turn when the window closed.
+  their builds resumed the turn when the window closed. The exception is
+  a game that this change saved as version 3 before the merge: it stores
+  the rule, and it keeps it.
 - 2026-10-25: merge of PR #9. In a game with the new rule, the removal of
   the last player a window waits for ends the turn, as the last MARK DONE
   does. Reason: decision 1B, because every player is done. In an older
@@ -66,7 +68,8 @@ Contract owners:
 
 - The stored game gets `windowEndsTurn`. `startGame` sets it to true. The
   parser gives false to a version 1, 2, or 3 game, so that its log folds
-  as before.
+  as before. A version 3 game that stores the field keeps it, because this
+  change saved its games as version 3 before main took that version.
 - The saved game moves to version 4 under new `.v4` keys. When a `.v4` key
   is empty, load reads the `.v3` key, then the `.v2` key, then the `.v1`
   key. Save and archive remove the older keys that they replace.
@@ -240,9 +243,18 @@ saved-game version 3. Merge it, and keep both features.
 - [x] Run the complete gate on the merged tree, commit the merge, and run
       the merge audit. Evidence:
       `.context/strategic-action-ends-turn/check-merge.log`.
-- [ ] Push, and review the merge with the `implementation-review` skill.
+- [x] Push, and review the merge with the `implementation-review` skill.
       Report the findings, then apply the review-fix rule: fix the
       `Auto-fix: yes` findings, re-review once, and report the rest.
+  - Review 4 of the merge found 3 findings. Fixed: 4, a version 3 game that
+    this change saved before the merge lost its window rule, and 6, two
+    stale code comments. Report:
+    `.context/strategic-action-ends-turn/review-4.md`. Review 4 numbers
+    them 1 to 3.
+  - 5. No undo test for the removal close. Severity Low, effort Small. Recommended: B, one undo test of a removal that closes the window.
+  - Decision for Cal, from finding 4: a rule in `AGENTS.md` for a merge that moves the saved-game version: take the next free version, and keep reading the shape that the branch saved before. Effort Small. Previous examples: review 3, and Milestone 10 of the Naalu plan.
+  - `docs/mockups/index.html`: the reaction note says that a player who left shows a Left tile, but no window screen draws the Left chip or the "left the game" header. Separate branch.
+- [ ] Re-review the fix of findings 4 and 6 once.
 
 ## Post-merge follow-up (non-blocking)
 

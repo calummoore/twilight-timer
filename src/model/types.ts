@@ -88,7 +88,8 @@ export interface Game {
    * True when a tap that closes a reaction window also ends the turn. The
    * window then stays open past its limit, so that only a tap ends a turn.
    * A version 1 to 3 game, from an older build, has false: its window close
-   * resumed the turn, and its window closed itself at its limit.
+   * resumed the turn, and its window closed itself at its limit. A version 3
+   * game that stores the field keeps it.
    */
   windowEndsTurn: boolean
   actions: Action[]
