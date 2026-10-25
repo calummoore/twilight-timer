@@ -1,8 +1,10 @@
 # Retry-safe actions
 
 Status: Active. Draft on the branch `calummoore/firebase-multiplayer-plan`.
-It is the first step of the [multiplayer plan](multiplayer-live-sync.md),
-and it starts when Cal accepts that plan.
+It is the first of three multiplayer plans, before
+[live sync](multiplayer-live-sync.md) and
+[multiplayer screens](multiplayer-screens.md). It starts when Cal accepts
+the live sync plan.
 
 TI4 Tempo keeps each game as an append-only log of taps, and each device
 folds the log into state. In a shared game, a device that loses a write
@@ -14,6 +16,7 @@ race runs its tap again on the newer state. Some taps then apply twice:
   player.
 - An undo that names only the log length can remove the action of another
   device.
+- A device that loses a reply sends the same tap again.
 
 This plan makes every action name its target, so that the fold rejects a
 repeat. It adds no sync. The stored game changes shape, so both game keys
@@ -27,7 +30,7 @@ Decisions:
   Alternative: add only the acting player, or a name without the player.
   Reason: plan reviews 1 and 2 found repeats that each partial name misses.
 
-Open decision, proposed on 2026-10-23, numbered as in the multiplayer plan:
+Open decision, proposed on 2026-10-23, numbered as in the live sync plan:
 
 16. Storage keys. A: versioned keys, as today. B: one unversioned key per
     slot, as MVP review finding 6 proposes. Recommended: B.
@@ -51,6 +54,8 @@ Make every action safe to apply again on a newer state.
       a clock carries that name. The fold rejects the action when another
       clock runs. Replace `statusStepToggled` with `statusStepSet`.
 - [ ] Undo names the action that it removes, not only the log length.
+- [ ] Each action carries a tap id, so that a resent tap gets its first
+      answer.
 - [ ] Update the parser, and pass the new fields from `GameScreen.tsx`.
 - [ ] Build the migration as ordered version steps, each tested with a
       recorded game. The first step moves the current game and the last
