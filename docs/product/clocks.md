@@ -60,6 +60,10 @@ The top bar stays usable while the window is open, so the table can pause, undo,
 or move the speaker. Rejected: covering the top bar with the window, because the
 table can need a break during a window.
 
+The window has no undo control of its own. Rejected: an Undo last button in the
+window footer, because it does the same as the Undo in the top bar, which stays
+in view.
+
 ## Time limits and overtime
 
 All limits are **off by default**. When on, expiry is soft:
