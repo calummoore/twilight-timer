@@ -99,8 +99,8 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   the `previews` block in `wrangler.jsonc`.
 - Cal chose Workers Previews on 2026-10-25, so that CI can delete each
   preview. Rejected: aliases from `wrangler versions upload`, because
-  Cloudflare cannot delete them. The alias previews of pull requests #4 to #15
-  stay online for this reason.
+  Cloudflare cannot delete them. The alias previews of pull requests #4 and #6
+  to #15 stay online for this reason.
 
 ## Key code
 

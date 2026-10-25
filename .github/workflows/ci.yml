@@ -12,13 +12,15 @@ on:
 permissions:
   contents: read
 
-# One run per branch at a time. Pull request runs cancel older runs; main
-# runs queue, so that two deploys never overlap. The run for a closed pull
-# request cancels its preview run, so the preview does not come back after
-# the cleanup.
+# One run per pull request and one run for main at a time. Pull request runs
+# cancel older runs; main runs queue, so that two deploys never overlap. The
+# run for a closed pull request cancels its preview run, so the preview does
+# not come back after the cleanup. The group uses the pull request number,
+# not github.ref, because a close by a merge sets github.ref to the base
+# branch.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   # The marker finds the comment of an earlier run, so that each pull request
@@ -116,7 +118,10 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          # Not PR_NUMBER: Wrangler reads PR_NUMBER, and then it skips the
+          # GitHub event file, which also gives the URL and the title of the
+          # pull request.
+          PULL_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.json
         run: |
@@ -128,8 +133,8 @@ jobs:
           # pull request run, that is the test merge commit, but this job
           # builds the head commit.
           GITHUB_SHA="${HEAD_SHA}" npx wrangler preview \
-            --name "pr-${PR_NUMBER}" \
-            --message "Preview of pull request #${PR_NUMBER} at ${HEAD_SHA:0:7}"
+            --name "pr-${PULL_NUMBER}" \
+            --message "Preview of pull request #${PULL_NUMBER} at ${HEAD_SHA:0:7}"
           result=$(jq -c 'select(.type == "preview")' "${WRANGLER_OUTPUT_FILE_PATH}")
           preview_url=$(jq -r '.preview_urls[0] // empty' <<< "${result}")
           deployment_url=$(jq -r '.deployment_urls[0] // empty' <<< "${result}")
