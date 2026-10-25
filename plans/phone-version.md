@@ -48,6 +48,16 @@ Decisions:
   one list: the stats column names, and the top bar phase names of finding
   16. Alternative: A, one list for the stats columns only. Reason: one
   pattern settles both findings.
+- 2026-10-25, Cal: finding 22 = B. The top bar stays at the top at every
+  height, so Undo and Pause stay in reach on a phone held sideways.
+  Alternatives: A, record that the bar scrolls away under 500 px tall; C, a
+  one-row bar for short windows; D, upright-only phones with a prompt to turn
+  a sideways phone. Reason: Undo stays permanent, as the design principles
+  say. The bar covers the active player's name when End Turn is in view.
+- 2026-10-25, Cal: decision 19 = A. The faction menu may cut a long faction
+  name in a tight seat row. Alternatives: B and D, a wider faction menu; C,
+  a seat list that is its own size container. Reason: the open menu list
+  shows each full name, so the table can still pick and check a faction.
 - Open, for Cal: review 1 findings 4, 7, and 8.
 
 Contract owners:
@@ -164,7 +174,7 @@ Run the checks, push, and review the branch.
   - Review 3 re-checked the fix commit `01fb447`: findings 9 to 13 and 17 are resolved. New finding 18, colour swatches wrap and stretch the seat rows, is fixed with option B. Verification after it found the 320 and 360 px wide phones scrolled sideways on two screens; the same commit fixes that. Report: `.context/phone-version/review-3/`.
   - Review 4 ran on the branch after the two merges of `origin/main`, at commit `33d0eb4`. Its findings 1 to 5 are numbered 21 to 25 here. Fixed: 21, 16 px fields where an iPhone shows the app; 23, the layout helpers move to `layout.css`; and 24, two comments name only the reaction window. Report: `.context/phone-version/review-4.md`. Evidence: `.context/phone-version/merge/fields-after-arrow.log`.
   - Review 5 re-checked the fix commit `f328463`: findings 21, 23, and 24 are resolved. New finding 26, upright iPads cut long faction names, is fixed with option B: the 16 px fields apply to phones only. New finding 27 asked for the follow-up line of finding 21 below. Report: `.context/phone-version/review-5.md`. Evidence: `.context/phone-version/merge/fields-after-26.log`.
-  - 22. Undo and Pause scroll off sideways phones. Severity Medium, effort Small. Recommended: B, the top bar sticks at every height. On 2026-10-25 Cal asked whether phones can stay upright only. That is option D: a sideways phone shows a prompt to turn it upright, because a web app cannot lock the rotation on an iPhone. Waiting for Cal to confirm.
+  - 22. Undo and Pause scroll off sideways phones. Decided 2026-10-25: B. Evidence: `.context/phone-version/finding-22/`.
   - 4. Phone History and Join have no way in. Severity Low, effort Small. Recommended: B, add the controls.
   - 7. Up and down keys block keyboard scrolling. Severity Low, effort Small. Recommended: A, use the I and P keys.
   - 8. Mockup file grows past 2,000 lines. Severity Low, effort Small. Recommended: A, record an exception in `AGENTS.md`.
@@ -173,7 +183,7 @@ Run the checks, push, and review the branch.
   - 16. Top bar defines the phase labels twice. Decided 2026-10-25 with finding 25: one phase table.
   - 25. Stats column labels are defined twice. Decided 2026-10-25: B, one list for each label set. The app and the mockup render the same labels as before. Evidence: `.context/phone-version/finding-25/`.
   - Follow-up: give every field 16 px text at every size, finding 21 option C. Effort Small. Covers finding 21. Previous examples: none found.
-  - Decision: make the seat list its own size container, so that each seat row picks its form from its own width (finding 18, option C). Effort Small. Covers findings 10 and 18. Since the merge of `origin/main`, tight seat rows also clip long official faction names, at about 1024 px wide and on phones held sideways. Since the 16 px fields of finding 21, phones clip 4 to 6 of the 6 longest names. Option C does not help upright phones, which already use the card form. Cal asked for examples on 2026-10-25: `.context/phone-version/decision-19/`, with simulations of option B and of option D, the faction menu on its own line in the phone card.
+  - Decision 19, the seat list as its own size container (finding 18, option C), and the cut faction names: decided 2026-10-25, A. The cut names stay. Examples: `.context/phone-version/decision-19/`.
   - `docs/product.md`: "Must have (v1, iPad only)" and "Live sync between iPad and phones" still name only the iPad. Separate branch.
   - `src/styles/mockup/reaction.css`: with long player names, the three-column tile grid is wider than the window at about 601 to 650 px. Separate branch.
   - `docs/mockups/index.html`: the demo reaction clock counts into overtime, but the app closes the window at its limit. Separate branch.

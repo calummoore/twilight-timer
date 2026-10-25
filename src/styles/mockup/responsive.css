@@ -54,10 +54,8 @@
   .hero .bigclock{margin-top:20px; font-size:clamp(64px, min(24cqh, 26cqw), 186px)}
   .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
 }
-/* A phone held sideways: the two-row top bar scrolls away, so the clock and End Turn fit on the screen. The fields get
-   16 px text, as on an upright phone. */
+/* A phone held sideways: the fields get 16 px text, as on an upright phone. */
 @container app (max-height: 500px){
-  .top.game{position:relative}
   .fld, .fld.sel{font-size:16px}
 }
 
