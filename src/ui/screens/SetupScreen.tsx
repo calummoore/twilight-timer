@@ -123,15 +123,17 @@ export function SetupScreen(props: {
             Load last game
           </button>
         )}
-        <button className="ibtn" onClick={props.onSettings}>
-          ⚙ Settings
+        <button
+          className="ibtn"
+          onClick={props.onSettings}
+          aria-label="Settings"
+        >
+          ⚙<span className="word"> Settings</span>
         </button>
       </div>
       <div className="content">
         <div className="setup-grid">
-          <div
-            style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}
-          >
+          <div className="col">
             {props.notice && (
               <div className="notice">
                 {props.notice}
@@ -140,7 +142,7 @@ export function SetupScreen(props: {
                 </button>
               </div>
             )}
-            <div style={{ marginBottom: 16 }}>
+            <div>
               <div className="setup-label">
                 Players · in seat order, clockwise around the table
               </div>
@@ -159,7 +161,7 @@ export function SetupScreen(props: {
                 ))}
               </div>
             </div>
-            <div className="seat-list">
+            <div className="seat-list scroll grow">
               {seats.map((row, i) => (
                 <SetupSeat
                   key={i}

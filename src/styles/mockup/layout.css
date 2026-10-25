@@ -1,0 +1,28 @@
+/* Ported from docs/mockups/index.html: the layout helpers that the screens use in place of inline grids. Prettier skips
+   this folder, so it stays easy to compare with the mockup. */
+
+/* ─────────── layout helpers: the screens use these in place of inline grids ─────────── */
+.split{display:grid; grid-template-columns:1fr var(--side,420px); gap:18px}
+.col{display:flex; flex-direction:column; gap:16px; min-height:0}
+.col > *{margin-top:0; margin-bottom:0}
+.grow{flex:1; min-height:0}
+.scroll{overflow:auto; min-height:0}
+.foot{display:flex; gap:12px; padding:0 22px 20px; flex:none}
+.foot .big{flex:1}
+.foot .ibtn{padding:18px 24px}
+.tools{display:flex; gap:16px}
+.ph-now{display:none}
+.evr{display:flex; align-items:center}
+
+/* The top bar stays above a reaction window, so the table can still pause, undo or move the speaker. */
+.top.game{position:relative; z-index:5}
+.rw{inset:calc(var(--top-h, 68px) + 16px) 60px 30px; overflow-y:auto}
+.rw .tiles{flex:1 0 auto}
+:has(.rw) .top.game{position:sticky; top:0}
+/* Overlays stay put while a narrow screen scrolls under them. */
+.scrim, .rw{position:fixed}
+
+/* The seating ring keeps its proportions at any width. */
+.ringwrap{width:100%; max-width:500px; height:auto; aspect-ratio:500/410}
+.ringwrap::before{width:60%; height:56%}
+.ringwrap .cc{width:46%}

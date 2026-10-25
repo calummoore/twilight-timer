@@ -32,14 +32,7 @@ export function SetupGamePanel(props: {
       style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}
     >
       <div className="pnl-h">Game</div>
-      <div
-        style={{
-          padding: '16px 18px',
-          flex: 1,
-          minHeight: 0,
-          overflow: 'auto',
-        }}
-      >
+      <div className="grow scroll" style={{ padding: '16px 18px' }}>
         <div className="kv">
           <span>Players</span>
           <b>{props.count}</b>
@@ -121,8 +114,8 @@ export function SetupGamePanel(props: {
           </>
         )}
         <button
-          className="big"
-          style={{ width: '100%', fontSize: 23, padding: 20 }}
+          className="big lg"
+          style={{ width: '100%' }}
           disabled={props.factionsMissing}
           onClick={props.onBegin}
         >

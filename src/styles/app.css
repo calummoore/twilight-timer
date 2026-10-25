@@ -1,4 +1,6 @@
-/* App-only styles: the scaled stage and controls. */
+/* App-only styles: the button reset, the full-window stage, fields, and the
+   load notice. mockup/controls.css holds the controls that the mockup draws
+   too. */
 
 button {
   font: inherit;
@@ -35,13 +37,11 @@ select {
   cursor: default;
 }
 
-/*
- * The app is drawn at iPad size and scaled to fit the window's safe area, so
- * the status bar and the home indicator do not cover it. Stage.tsx sets the
- * transform. Do not centre the stage with grid `place-items: center`: when
- * the window is smaller than the stage, the grid cell starts at the top left,
- * and the scale then pushes the stage off the right and bottom edges.
- */
+/* The app fills the window's safe area, so the status bar and the home
+   indicator do not cover it. The stage is a size container, and the container
+   queries in mockup/responsive.css arrange each screen for its size. A size
+   container does not hold fixed boxes, so layout containment keeps the fixed
+   overlays inside the safe area too. */
 .viewport {
   position: fixed;
   top: env(safe-area-inset-top, 0px);
@@ -53,25 +53,19 @@ select {
 }
 .stage {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1194px;
-  height: 834px;
+  inset: 0;
   overflow: hidden;
+  container: app / size;
+  contain: layout;
 }
 
-.clock-over {
-  color: var(--danger);
-}
-.big:disabled {
-  opacity: 0.45;
-  cursor: default;
+/* The reset above makes buttons inherit text-align; the mockup centres the
+   big buttons. */
+.big {
+  text-align: center;
 }
 .sec:disabled {
   opacity: 0.45;
-}
-.sec.muted .k {
-  color: var(--warn);
 }
 .fld {
   width: 100%;
@@ -87,45 +81,9 @@ select.fld {
   background-repeat: no-repeat;
   background-position: right 10px center;
 }
-
-/* Setup rows: up and down buttons replace the drag handle. The faction
-   column fits the longest faction name. */
-.seat {
-  grid-template-columns: 26px 34px 216px 1fr max-content 44px;
-}
-/* The seat rows take their columns from one grid, so the faction column has
-   one width in every row, also when one seat keeps a faction that the other
-   lists leave out. Under subgrid, the padding and the border of a row take
-   12px from its first and last columns, so those columns are 12px wider. A
-   browser without subgrid keeps the columns of each row. */
-.seat-list {
-  display: grid;
-  grid-template-columns: 38px 34px 216px 1fr max-content 56px;
-  column-gap: 11px;
-  align-content: start;
-  overflow: auto;
-  flex: 1;
-  min-height: 0;
-}
-.seat-list .seat {
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-}
-.seat-move {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.seat-move button {
-  color: var(--faint);
-  font-size: 11px;
-  line-height: 1;
-  padding: 3px 0;
-  border-radius: 5px;
-  text-align: center;
-}
-.seat-move button:disabled {
-  opacity: 0.25;
+/* The phone seat rows set their own padding. Keep the room for the arrow. */
+.seat select.fld {
+  padding-right: 26px;
 }
 
 .notice {

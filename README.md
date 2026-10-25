@@ -1,9 +1,9 @@
 # TI4 Tempo
 
 A shared-table time tracker for Twilight Imperium 4th Edition. It runs on one
-iPad in the middle of the table. It is a chess clock for the action phase, with
-enough of the round structure to know whose turn it is. The repository is
-`twilight-timer`.
+iPad or phone in the middle of the table. It is a chess clock for the action
+phase, with enough of the round structure to know whose turn it is. The
+repository is `twilight-timer`.
 
 Each push to `main` deploys the app to the Cloudflare Worker `twilight-timer`
 in the futex account, at https://twilight-timer.futex.workers.dev. Each pull
@@ -29,11 +29,14 @@ request gets a preview link; see [Pull request previews](#pull-request-previews)
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.
 - The game saves in the browser after every tap, and the screen stays awake.
+- The same screens on a phone, an iPad, and a computer, arranged for the space.
 
 ## Docs
 
 - [Product spec](docs/product.md): requirements, decisions, and the MVP scope.
-- [Mockup](docs/mockups/index.html): open it in a browser.
+- [Mockup](docs/mockups/index.html): open it in a browser. It draws each table
+  screen once, in an iPad, an upright iPad, and a phone frame. A link such as
+  `#action/phone` opens one frame. **Later** marks a control that is not built.
 - [Plans](plans/)
 
 ## Get started
@@ -112,5 +115,9 @@ commit. Each successful preview run updates the comment.
     The parser also reads games saved by older builds.
 - `src/ui/GameScreen.tsx` connects the model to the screens.
 - `src/ui/screens/` has one component per screen.
+- `src/ui/Stage.tsx` is the app root: it fills the window's safe area and is a
+  CSS size container.
 - `src/styles/mockup/` holds the CSS ported from the mockup.
+  `responsive.css` holds the container queries that arrange each screen for
+  the space, and `layout.css` holds the layout helpers that the screens use.
   `src/styles/app.css` and `src/styles/screens.css` hold app-only styles.

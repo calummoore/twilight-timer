@@ -47,14 +47,10 @@
 .spkopt .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .spkopt.on{border-color:#8a7530; background:#1a1509; color:#f0cf6a; box-shadow:0 0 0 1px #8a7530; cursor:default}
 
-/* pause: the card sits in the .overlay of the naalu picker, which covers the top bar too */
-.pause-card{text-align:center}
-.pause-card .t{font-size:120px; font-weight:800; letter-spacing:-.05em; line-height:.9}
-.pause-card .l{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin:14px 0 34px}
+/* pause: the reason buttons on the pause card, and the time of the chosen reason */
 .reasons{display:flex; gap:8px; width:440px; margin:0 auto}
 .reasons button{flex:1; padding:16px 0; border:1px solid var(--line2); border-radius:11px; background:var(--panel2);
   font-family:var(--f); font-size:17px; font-weight:650; color:var(--dim); cursor:pointer}
 .reasons button.on{background:var(--accent); border-color:var(--accent); color:#04211f; cursor:default}
 .reason-time{height:20px; margin:14px 0 30px; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent)}
 .reason-time b{font-size:16px; font-weight:700; letter-spacing:0; margin-left:8px}
-.big.small{grid-column:auto; font-size:19px; padding:16px 26px}

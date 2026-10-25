@@ -4,7 +4,7 @@ import { derive } from '../model/derive'
 import type { Settings } from '../model/settings'
 import type { ActionInput, Game } from '../model/types'
 import { Dialog } from './controls'
-import { useAlarm, useClock, useWakeLock } from './hooks'
+import { useAlarm, useClock, useHeight, useWakeLock } from './hooks'
 import { ActionScreen } from './screens/ActionScreen'
 import { AgendaScreen } from './screens/AgendaScreen'
 import { PauseOverlay } from './screens/PauseOverlay'
@@ -28,6 +28,7 @@ export function GameScreen(props: {
 }) {
   const [now, refresh] = useClock(250)
   const [overlay, setOverlay] = useState<Overlay>(null)
+  const [barHeight, barRef] = useHeight<HTMLDivElement>()
   const g = derive(props.game, now)
   const { alarming, silence } = useAlarm(g.timer, props.settings)
   useWakeLock(props.settings.keepAwake && g.view.phase !== 'ended')
@@ -116,8 +117,12 @@ export function GameScreen(props: {
   const reaction = g.view.phase === 'action' ? g.view.reaction : null
 
   return (
-    <div className="lay">
+    <div
+      className="lay"
+      style={barHeight === null ? undefined : { '--top-h': `${barHeight}px` }}
+    >
       <TopBar
+        ref={barRef}
         round={g.round}
         phase={g.view.phase}
         speakerName={speakerName}

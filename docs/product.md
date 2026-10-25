@@ -2,8 +2,8 @@
 
 A shared-table time tracker for **Twilight Imperium (4th Edition)**.
 
-It sits on an iPad in the middle of the table and answers the question every TI4
-group eventually asks: *where did six hours go?*
+It sits on an iPad or a phone in the middle of the table and answers the
+question every TI4 group eventually asks: *where did six hours go?*
 
 ---
 
@@ -56,7 +56,22 @@ The core concepts have their own pages:
 
 ## Screens
 
-### iPad (the table device)
+### Table device
+
+The table device runs the game. It can be an iPad, a phone, or a computer.
+Every table device shows the same screens, with the same information and
+controls. Only the layout changes. It follows the space that the app has, not
+the type of device. On a narrow screen, the columns of a screen stack, and the
+screen scrolls.
+
+Rejected: one fixed iPad layout, scaled to fit the window, because on a phone
+its text and buttons are too small to read or tap. Rejected: separate phone and
+iPad layouts, chosen by window size, because the two drift apart.
+
+The top bar stays usable while a reaction window is open, as
+[The reaction window](product/clocks.md#the-reaction-window) says. The pause overlay
+and the confirmation dialogs cover the top bar, because they freeze the game or
+wait for an answer.
 
 | Screen              | Purpose                                                                 |
 | ------------------- | ----------------------------------------------------------------------- |
@@ -80,7 +95,7 @@ The core concepts have their own pages:
 
 Explicitly a **later phase**. The tabletop device is fully functional alone; the
 phone is an enhancement, never a dependency. If a phone drops off, that player
-uses the iPad exactly as before.
+uses the table device exactly as before.
 
 | Screen              | Purpose                                                           |
 | ------------------- | ----------------------------------------------------------------- |
@@ -168,6 +183,8 @@ From the should-have list, the MVP adds the pause.
 
 ### Should have
 
+- [ ] The same screens on a phone, an iPad, and a computer, with a layout that
+      follows the space
 - [ ] Pause the whole game (food, rules argument, someone's on the phone), and
       time rule checks during a pause
 - [ ] Export a game as JSON / CSV
@@ -209,3 +226,8 @@ legibility at real size and real viewing distance.
 
 The prototype has live timers, so the action phase and reaction window can be
 watched running rather than just looked at.
+
+Each table screen is drawn once and shown in three frames: an iPad, an upright
+iPad, and a phone. Switch with the buttons above the screen, or open a link such
+as `mockups/index.html#action/phone`. A control marked **Later** is designed but
+is not in the app yet.

@@ -219,7 +219,7 @@ Run the checks, push, and review the branch.
   - Review 1 found 10 findings. Fixed: 2, 4, 7, 8, and 9. Report:
     `.context/ti4-tempo-mvp/review-1.md`.
   - 1. Undo does not restore clocks after some taps. Severity Medium, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
-  - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).
+  - 3. Pause is hidden while a reaction window is open. Severity Medium, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md). [phone-version.md](phone-version.md) Milestones 2 and 3 keep the top bar usable at every size.
   - 5. Model tests skip key undo and attribution paths. Severity Low, effort Medium. Decided 2026-10-23: A, example tests, in [MVP review follow-ups](mvp-review-follow-ups.md).
   - 6. A version bump would hide saved games silently. Resolved on 2026-10-23: Cal kept versioned keys, and load reads the keys of older versions. See decision 1 of `plans/naalu-initiative-token.md`.
   - 10. Stats screen prints "1 rounds" and "1 times". Severity Low, effort Small. Decided 2026-10-23: B, in [MVP review follow-ups](mvp-review-follow-ups.md).

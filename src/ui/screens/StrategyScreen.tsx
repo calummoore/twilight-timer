@@ -41,7 +41,7 @@ export function StrategyScreen(props: {
         style={{ display: 'flex', flexDirection: 'column' }}
       >
         <div className="picker" style={pc(picker?.colour)}>
-          <div>
+          <div className="who-box">
             <div className="lbl">
               {picker
                 ? `Now picking · ${taken + 1} of ${picks}${second ? ' · second card' : ''}`
@@ -55,11 +55,7 @@ export function StrategyScreen(props: {
           <div className="picker-help">
             Order follows the speaker. Tap a card to assign it.
           </div>
-          <button
-            className="ibtn spkb"
-            style={{ marginLeft: 6, padding: '10px 14px' }}
-            onClick={props.onSpeaker}
-          >
+          <button className="ibtn spkb" onClick={props.onSpeaker}>
             ★ Speaker: {byId.get(game.speakerId)?.name} · change
           </button>
           {clock && (
@@ -68,7 +64,7 @@ export function StrategyScreen(props: {
             </div>
           )}
         </div>
-        <div className="cards" style={{ flex: 1 }}>
+        <div className="cards grow">
           {STRATEGY_CARDS.map((card) => {
             const owner = byId.get(view.owners[card.number] ?? '')
             const goods = view.tradeGoods[card.number] ?? 0
@@ -131,10 +127,9 @@ export function StrategyScreen(props: {
           )}
         </div>
       </div>
-      <div style={{ padding: '0 22px 20px' }}>
+      <div className="foot">
         <button
           className="big"
-          style={{ width: '100%' }}
           disabled={remaining > 0}
           onClick={props.onBegin}
         >

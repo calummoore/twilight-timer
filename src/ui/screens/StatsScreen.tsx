@@ -5,6 +5,15 @@ import { pc } from '../colour'
 import { clock, percent, plural, words } from '../format'
 import { ReasonTiles } from './ReasonTiles'
 
+/** The table columns after Player. A phone shows each name next to its value. */
+const COLUMNS = {
+  turns: 'Turns',
+  average: 'Avg turn',
+  worst: 'Worst turn',
+  overLimit: 'Over limit',
+  share: 'Share',
+} as const
+
 export function StatsScreen(props: {
   game: GameView
   onUndo: () => void
@@ -56,7 +65,7 @@ export function StatsScreen(props: {
 
   return (
     <div className="lay">
-      <div className="top">
+      <div className="top stack">
         <div className="round">
           <b>Game complete</b> · {plural(stats.rounds, 'round')}
         </div>
@@ -116,9 +125,7 @@ export function StatsScreen(props: {
           </div>
           <ReasonTiles totals={game.reasonTotals} gameMs={stats.totalMs} />
         </div>
-        <div
-          style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 18 }}
-        >
+        <div className="split" style={{ '--side': '400px' }}>
           <div className="pnl">
             <div className="pnl-h">
               Own-turn time by player{' '}
@@ -162,11 +169,9 @@ export function StatsScreen(props: {
                 <thead>
                   <tr>
                     <th>Player</th>
-                    <th>Turns</th>
-                    <th>Avg turn</th>
-                    <th>Worst turn</th>
-                    <th>Over limit</th>
-                    <th>Share</th>
+                    {Object.values(COLUMNS).map((name) => (
+                      <th key={name}>{name}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -186,11 +191,18 @@ export function StatsScreen(props: {
                           )}
                         </div>
                       </td>
-                      <td className="num">{p.turns}</td>
-                      <td className="num">{clock(p.averageMs)}</td>
-                      <td className="num">{clock(p.worstMs)}</td>
+                      <td className="num" data-l={COLUMNS.turns}>
+                        {p.turns}
+                      </td>
+                      <td className="num" data-l={COLUMNS.average}>
+                        {clock(p.averageMs)}
+                      </td>
+                      <td className="num" data-l={COLUMNS.worst}>
+                        {clock(p.worstMs)}
+                      </td>
                       <td
                         className="num"
+                        data-l={COLUMNS.overLimit}
                         style={{
                           color: p.overLimitCount
                             ? 'var(--danger)'
@@ -201,14 +213,16 @@ export function StatsScreen(props: {
                           ? `${p.overLimitCount} · ${clock(p.limitOvertimeMs)}`
                           : '—'}
                       </td>
-                      <td className="num">{percent(p.share, 1)}</td>
+                      <td className="num" data-l={COLUMNS.share}>
+                        {percent(p.share, 1)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="col">
             <div className="pnl">
               <div className="pnl-h">Where the game went</div>
               <div style={{ padding: '16px 18px' }}>
@@ -230,7 +244,7 @@ export function StatsScreen(props: {
                 ))}
               </div>
             </div>
-            <div className="pnl" style={{ flex: 1 }}>
+            <div className="pnl grow">
               <div className="pnl-h">Longest turns</div>
               <div style={{ padding: '8px 18px 16px' }}>
                 {stats.longestTurns.map((t) => (

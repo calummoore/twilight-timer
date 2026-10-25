@@ -64,8 +64,11 @@ skill at that moment instead of guessing the rule.
 
 - Screens live in `src/ui/screens/`, one component per screen. Shared
   controls live in `src/ui/controls.tsx`. There is no shared UI library.
-- The app targets an iPad in landscape: a 1194 by 834 stage, scaled to fit
-  the window.
+- The app is responsive. A phone, an iPad, and a computer show the same
+  screens. The stage fills the window's safe area and is a CSS size container.
+  `src/styles/mockup/responsive.css` holds the container queries, word for
+  word from the mockup: two columns on a wide screen, and one column on an
+  upright iPad or a phone.
 
 ## Review focus
 

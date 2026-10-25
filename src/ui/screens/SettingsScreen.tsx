@@ -95,15 +95,17 @@ export function SettingsScreen(props: {
             const limit = settings.limits[key]
             return (
               <div key={key} className={`set-row ${limit.on ? '' : 'off'}`}>
-                <div>
+                <div className="txt">
                   <div className="lb">{label}</div>
                   <div className="ds">{about}</div>
                 </div>
-                <DurationStepper
-                  label={label}
-                  ms={limit.ms}
-                  onChange={(ms) => setTimer(key, { ms })}
-                />
+                <div className="ctl">
+                  <DurationStepper
+                    label={label}
+                    ms={limit.ms}
+                    onChange={(ms) => setTimer(key, { ms })}
+                  />
+                </div>
                 <Toggle
                   label={label}
                   on={limit.on}
@@ -116,14 +118,14 @@ export function SettingsScreen(props: {
         <div className="pnl" style={{ marginTop: 16 }}>
           <div className="pnl-h">When time is up</div>
           <div className="set-row">
-            <div>
+            <div className="txt">
               <div className="lb">Alarm sound</div>
               <div className="ds">
                 The clock turns red and counts overtime. Nothing ends on its
                 own.
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="ctl" style={{ display: 'flex', gap: 8 }}>
               <select
                 className="fld sel"
                 value={settings.alarmSound}
@@ -160,11 +162,11 @@ export function SettingsScreen(props: {
         <div className="pnl" style={{ marginTop: 16 }}>
           <div className="pnl-h">Display</div>
           <div className="set-row">
-            <div>
+            <div className="txt">
               <div className="lb">Keep screen awake</div>
-              <div className="ds">Stops the iPad sleeping mid-game.</div>
+              <div className="ds">Stops the screen sleeping mid-game.</div>
             </div>
-            <div />
+            <div className="ctl" />
             <Toggle
               label="Keep screen awake"
               on={settings.keepAwake}
@@ -172,14 +174,14 @@ export function SettingsScreen(props: {
             />
           </div>
           <div className="set-row">
-            <div>
+            <div className="txt">
               <div className="lb">Show game time on the rail</div>
               <div className="ds">
                 Off shows only the current turn, which some groups find less
                 competitive.
               </div>
             </div>
-            <div />
+            <div className="ctl" />
             <Toggle
               label="Show game time on the rail"
               on={settings.showCumulative}

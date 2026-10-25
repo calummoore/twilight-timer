@@ -1,21 +1,22 @@
+import type { Ref } from 'react'
 import type { Phase } from '../model/types'
 import { clock } from './format'
 
-const PILLS = [
-  { phase: 'strategy', label: 'Strategy' },
-  { phase: 'action', label: 'Action' },
-  { phase: 'status', label: 'Status' },
-  { phase: 'agenda', label: 'Agenda' },
-] as const
+/**
+ * Each phase: the name that the bar shows, and its place in the game. A phone
+ * shows the name next to the round, in place of the pill.
+ */
+const PHASES: Record<Phase, { name: string; step: number }> = {
+  strategy: { name: 'Strategy', step: 1 },
+  action: { name: 'Action', step: 2 },
+  status: { name: 'Status', step: 3 },
+  agenda: { name: 'Agenda', step: 4 },
+  summary: { name: 'Summary', step: 5 },
+  ended: { name: 'Game over', step: 6 },
+}
 
-const ORDER: Phase[] = [
-  'strategy',
-  'action',
-  'status',
-  'agenda',
-  'summary',
-  'ended',
-]
+/** The phases of a round, which the pill shows. */
+const PILLS: Phase[] = ['strategy', 'action', 'status', 'agenda']
 
 /** A solid gear with eight teeth and a round hole, in a 24 by 24 box. */
 const GEAR_PATH =
@@ -31,22 +32,28 @@ export interface TopBarProps {
   onUndo: () => void
   onPause: () => void
   onSettings: () => void
+  /** Measures the bar, so that the reaction window can open under it. */
+  ref?: Ref<HTMLDivElement>
 }
 
-export function TopBar(props: TopBarProps) {
-  const at = ORDER.indexOf(props.phase)
+export function TopBar({ ref, ...props }: TopBarProps) {
+  const at = PHASES[props.phase].step
   return (
-    <div className="top">
+    <div className="top game" ref={ref}>
       <div className="round">
         Round <b>{props.round}</b>
+        <span className="ph-now">
+          {' · '}
+          <b>{PHASES[props.phase].name}</b>
+        </span>
       </div>
       <div className="phase-pill">
-        {PILLS.map((pill) => {
-          const i = ORDER.indexOf(pill.phase)
-          const cls = i === at ? 'on' : i < at ? 'done' : ''
+        {PILLS.map((phase) => {
+          const { name, step } = PHASES[phase]
+          const cls = step === at ? 'on' : step < at ? 'done' : ''
           return (
-            <span key={pill.phase} className={cls}>
-              {pill.label}
+            <span key={phase} className={cls}>
+              {name}
             </span>
           )
         })}
@@ -58,21 +65,27 @@ export function TopBar(props: TopBarProps) {
       <div className="gt">
         Game <b className="num">{clock(props.gameMs)}</b>
       </div>
-      <button className="ibtn" onClick={props.onUndo} disabled={!props.canUndo}>
-        ↺ Undo
-      </button>
-      <button className="ibtn" onClick={props.onPause}>
-        ⏸ Pause
-      </button>
-      <button
-        className="ibtn icon"
-        onClick={props.onSettings}
-        aria-label="Settings"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path fillRule="evenodd" d={GEAR_PATH} />
-        </svg>
-      </button>
+      <div className="tools">
+        <button
+          className="ibtn"
+          onClick={props.onUndo}
+          disabled={!props.canUndo}
+        >
+          ↺ Undo
+        </button>
+        <button className="ibtn" onClick={props.onPause} aria-label="Pause">
+          ⏸<span className="word"> Pause</span>
+        </button>
+        <button
+          className="ibtn icon"
+          onClick={props.onSettings}
+          aria-label="Settings"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fillRule="evenodd" d={GEAR_PATH} />
+          </svg>
+        </button>
+      </div>
     </div>
   )
 }

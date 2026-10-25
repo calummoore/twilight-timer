@@ -29,12 +29,9 @@ export function AgendaScreen(props: {
   const last = view.agenda >= AGENDAS_PER_ROUND
 
   return (
-    <div
-      className="content"
-      style={{ display: 'grid', gridTemplateColumns: '1fr 430px', gap: 18 }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        <div className="agenda-card">
+    <div className="content split agenda" style={{ '--side': '430px' }}>
+      <div className="col">
+        <div className="agenda-card ag-card">
           <div className="k">
             Agenda {view.agenda} of {AGENDAS_PER_ROUND}
           </div>
@@ -51,13 +48,8 @@ export function AgendaScreen(props: {
           </p>
         </div>
         <div
-          className="pnl"
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: 0,
-          }}
+          className="pnl grow ag-votes"
+          style={{ display: 'flex', flexDirection: 'column' }}
         >
           <div className="pnl-h">
             Voting · from the speaker’s left, speaker last
@@ -65,7 +57,7 @@ export function AgendaScreen(props: {
               {voted} of {view.voters.length} voted
             </span>
           </div>
-          <div style={{ padding: 14, overflow: 'auto' }}>
+          <div className="scroll" style={{ padding: 14 }}>
             {view.voters.map((v, i) => (
               <div
                 key={v.playerId}
@@ -101,13 +93,10 @@ export function AgendaScreen(props: {
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div className="pnl">
+      <div className="col side">
+        <div className="pnl ag-disc">
           <div className="tabletimer" style={{ padding: '22px 0 18px' }}>
-            <div
-              className={`t num ${discussionOver ? 'clock-over' : ''}`}
-              style={{ fontSize: 78 }}
-            >
+            <div className={`t num md ${discussionOver ? 'clock-over' : ''}`}>
               {clock(discussionMs)}
             </div>
             <div className="l">
@@ -121,7 +110,7 @@ export function AgendaScreen(props: {
             </div>
           </div>
         </div>
-        <div className="pnl" style={{ flex: 1 }}>
+        <div className="pnl grow ag-now">
           <div className="pnl-h">
             {view.stage === 'resolving'
               ? 'Every player has voted'
@@ -152,11 +141,7 @@ export function AgendaScreen(props: {
             </div>
           )}
         </div>
-        <button
-          className="big"
-          style={{ fontSize: 20, padding: 19 }}
-          onClick={props.onResolve}
-        >
+        <button className="big md ag-resolve" onClick={props.onResolve}>
           {last ? 'RESOLVE → END ROUND' : `RESOLVE → AGENDA ${view.agenda + 1}`}
         </button>
       </div>

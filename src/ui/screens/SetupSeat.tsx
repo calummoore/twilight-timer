@@ -64,13 +64,13 @@ export function SetupSeat(props: {
         ))}
       </div>
       <input
-        className="fld"
+        className="fld name"
         value={row.name}
         placeholder={`Player ${index + 1}`}
         onChange={(e) => props.onName(e.target.value)}
       />
       <select
-        className={`fld sel ${row.factionId ? '' : 'none'}`}
+        className={`fld sel fac ${row.factionId ? '' : 'none'}`}
         aria-label="Faction"
         value={row.factionId ?? ''}
         onChange={(e) => {
