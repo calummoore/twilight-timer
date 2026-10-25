@@ -34,6 +34,11 @@ Decisions:
   cheaper before the first release.
 - 2026-10-25, Cal: keep all multiplayer work in one plan. This replaces a
   split into three plans from the same day.
+- 2026-10-25, Cal: decision 35 is A. Keep every shared game for now, and
+  never reuse a code. Alternatives: B, delete a game 30 days after its
+  last change, and C, after 7 days. Reason: storage is small, and deletion
+  can come later. This replaces the plan rule that a code expires 7 days
+  after its game last changed.
 
 Open decisions, proposed on 2026-10-23 and 2026-10-25, each with its
 recommended option. Their numbers follow the plan review findings.
@@ -57,6 +62,8 @@ recommended option. Their numbers follow the plan review findings.
     slot, as MVP review finding 6 proposes. Recommended: B.
 30. Old pages after a deploy. A: no check. B: a protocol version check
     makes an older page reload. Recommended: B.
+36. Join code format. A: four letters and digits, as the mockup shows. B:
+    six digits. C: six letters and digits. Recommended: B.
 
 Contract owners: `docs/product.md`, the new `docs/architecture.md`, the
 mockup at `docs/mockups/index.html`, the [README](../README.md), and
@@ -73,7 +80,7 @@ Terms:
   today. It never gets private player data.
 - **Player mode:** a device role that acts only for its own seat. It sees
   the public game and the private data of that seat.
-- **Join code:** four characters that open player mode for a shared game.
+- **Join code:** a short code that opens player mode for a shared game.
   The join link and the QR code hold the same code.
 - **Table link:** a link with a long secret that opens table mode.
 - **Change:** one request from a device: an action, an undo, a pause, a
@@ -183,11 +190,11 @@ second tap names a target that no longer runs, so the model rejects it.
   has the link, the game cannot get a new table device. Finding 24 is open
   on this risk.
 - A code has four characters from `23456789ABCDEFGHJKMNPQRSTUVWXYZ`, as the
-  mockup shows. The join link is `/join/{code}`. The table link adds the
-  secret.
-- Sharing picks a random code. The object of that code refuses it while a
-  live game holds it, and the device tries another. A code expires seven
-  days after its game last changed.
+  mockup shows. Decision 36 can change the format. The join link is
+  `/join/{code}`. The table link adds the secret.
+- Sharing picks a random code. The object of that code refuses it when it
+  already holds a game, and the device tries another. A code never
+  expires, and the sync service keeps every shared game.
 - Each shared game has a random game id, and every view carries it. A
   device that finds another game id behind its code sends nothing more.
 - Stop sharing closes the game. The object then rejects every change, and
@@ -217,14 +224,14 @@ and their screens. Add an architecture doc for the new components.
   - [ ] Add the requirements for sharing, the join code, the table link,
         roles, views, seats, and seat moves.
   - [ ] Add the requirements for simultaneous taps, the one clock, offline
-        play on the table device, and the code lifetime.
+        play on the table device, and games and codes that never expire.
   - [ ] State that table mode never gets private data. List private
         comments and a pre-selected card as later features.
   - [ ] Update the screen tables for table mode and player mode. Name the
         Join screen, the seat move flow, and the error states.
   - [ ] Update the data model sketch for actions that name their target.
-  - [ ] Record decisions 10, 11, 12, 21, and 30 and the code format as
-        decisions in force.
+  - [ ] Record decisions 10, 11, 12, 21, 30, 35, and 36 as decisions in
+        force.
 - [ ] Add `docs/architecture.md`: the components, the flow of a change,
       and the roles. Record decision 9 and the rejected options.
 - [ ] Update `README.md`: the features, the sync service, local
@@ -247,8 +254,8 @@ the Join screen, the roles, the connection states, and most phone states.
       connected, offline, or not joined, a move request with Approve, and
       Release seat.
 - [ ] A notice on every device for a tap that another device made first.
-- [ ] Phone Join: an unknown code, an expired code, and no connection. The
-      QR card tells the player to use the phone camera.
+- [ ] Phone Join: an unknown code, a game that is no longer shared, and no
+      connection. The QR card tells the player to use the phone camera.
 - [ ] Phone Claim seat: claim a free seat, or ask the table to move a held
       seat and wait for approval.
 - [ ] Phone Waiting for the other phases, a reconnecting banner, and a
@@ -324,8 +331,7 @@ for the game size: `.context/multiplayer-live-sync/game-size.md`.
       and the version steps. It applies changes with the model, stores the
       record after each change, and sends each connection its view.
 - [ ] The object tracks connections for presence. It handles seat claims,
-      move requests, approvals, releases, the code and its expiry, and the
-      table secret.
+      move requests, approvals, releases, the code, and the table secret.
 - [ ] Stop sharing closes the game, and the object rejects every later
       change.
 - [ ] The Worker routes a code to its object and limits code tries per
@@ -415,6 +421,7 @@ Run the checks, push, and review the branch.
       with the iPad and two phones.
 - [ ] Open a game that the MVP build saved on the iPad, and check that it
       loads.
-- [ ] Write a plan to remove old games from the sync service.
+- [ ] Decide when to delete old shared games. Decision 35 keeps them for
+      now.
 - [ ] Write a plan for private comments and a pre-selected card, the
       features that decision 21 prepares.
