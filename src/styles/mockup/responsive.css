@@ -2,6 +2,13 @@
    the layout helpers. Prettier skips this folder, so it stays easy to compare with the mockup. The mockup insets its
    screen box to the safe area of each device frame, as app.css insets the app to the browser's safe area. */
 
+/* ─────────── the game top bar chips: up to 1150 px wide ─────────── */
+/* Beside the phase pill and the tools, the words of the chips need about 1100 px with the default names, and more with
+   longer names. Up to 1150 px, the speaker chip shows the star and the name, and the device chip the dot and the name. */
+@container app (max-width: 1150px){
+  .top.game .chips .word{display:none}
+}
+
 /* ─────────── narrow: an upright iPad or a phone ─────────── */
 @container app (max-width: 900px){
   .lay{overflow-y:auto; scrollbar-width:none}
