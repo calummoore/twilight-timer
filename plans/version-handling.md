@@ -246,13 +246,14 @@ Tags: ui
       Evidence: `.context/version-handling/gate-1.log` and `gate-2.log`.
 - [x] Commit with Conventional Commits and push the branch. The merge of
       main and its one conflict: `.context/version-handling/merge-justification.md`.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest. Review 1:
       `.context/version-handling/review-1.md`, 3 findings. Fixed: 2, with
       option C, one send helper in the object that skips a closed socket.
-      Open:
+      Review 2 of the fix: `.context/version-handling/review-2.md`, no
+      findings. Open:
       - 1. Create game skips the build check. Severity Medium, effort
         Large. Recommended: C, the build in the create request, and the
         Worker still creates a game that it can read.
