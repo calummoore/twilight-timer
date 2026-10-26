@@ -17,9 +17,9 @@ same way. The spec pages
 and the decisions in force. This plan supersedes lobby decision 2 of the
 [multiplayer plan](multiplayer.md), which kept every field with the host.
 
-The change does not cover a seat re-order after Start game, which stays a
-later feature by decision 4 below, the expansions of a game after Create
-game, or remote play.
+The change does not cover a seat move after Start game, which main built
+in [Seat re-ordering](seat-reordering.md) after decision 4 below, the
+expansions of a game after Create game, or remote play.
 
 Rules from Cal with the request, 2026-10-26:
 
@@ -31,7 +31,11 @@ Rules from Cal with the request, 2026-10-26:
   that the players can choose their factions when the host leaves them
   open.
 - After Start game, the seat order, the colours, and the factions do not
-  change.
+  change. Update of the same day: PR #34, by Cal's decisions in
+  [Seat re-ordering](seat-reordering.md), lets an admin device move seats
+  after Start game on the Speaker & Seating screen. So only the colours and
+  the factions stay fixed after Start game, and this change does not touch
+  the seat moves.
 - An admin device edits one seat at a time from Players & devices, with an
   Edit button and a dialog, as the Setup screen edits a seat.
 
@@ -62,6 +66,13 @@ Decisions, all on 2026-10-26 by Cal, from the discussion of that day:
   before Start game, like the ★ of Setup. Alternative: B, no speaker
   control in the lobby. Reason: the dialog is the Setup row in another
   place, and the switch is small.
+- Decision 6, open, asked on 2026-10-26 after the second merge of main: how
+  an admin device changes the seat order in the lobby. A, a Seat number in
+  the edit dialog, as the plan first said. B, a ⠿ drag handle on the seat
+  rows of Players & devices before Start game, as the setup rows have since
+  PR #34, with one command per drop and no position in the dialog.
+  Recommended: B, because the setup rows and the ring both move by drag
+  now, and the spec rejected ▲ and ▼ beside the handle.
 
 Design decisions of the same day, from the implementation side:
 
@@ -99,9 +110,13 @@ Design decisions of the same day, from the implementation side:
 - The name rule applies to the commands and to Create game, not to stored
   rooms, so a room with two equal names from before this change still
   loads. A name is trimmed, and an empty name is not valid.
-- The seat position is a Seat number in the dialog. The player moves to
-  that position, and the seats between shift by one place. The speaker
-  stays with its player.
+- The seat position: by decision 6, a Seat number in the dialog or a drag
+  of the seat rows. In both, the player moves to the chosen place, the
+  seats between shift by one place, as a setup row does, and the speaker
+  stays with its player. Until Cal answers, no milestone builds it.
+- The edit dialog has no address, like the other dialogs, as the
+  [Addresses](../docs/product/addresses.md) page says. The claim screen
+  keeps its address, the join link, and the open seat is a state of it.
 - A save that loses a race does nothing, as every tap does. The claim
   screen stays open with the live seats, so the player sees the value that
   is now taken and picks again. The edit dialog closes on Save, and the row
@@ -119,6 +134,16 @@ input; the new commands keep it. PR #29 retired the games saved before the
 server and made the faction of a player required, so the setup gets its own
 seat type. PR #30 set the version rules: the fixture `room-v2.json` of the
 old shape already exists, and this change adds the fixture of version 3.
+
+Second update, 2026-10-26, after the second merge of main: PR #34 moves
+seats after Start game, with the game at version 7, and the setup rows
+drag by a ⠿ handle, so decision 4 is moot, the Later control is gone, and
+decision 6 above is open. PR #31 gives each screen an address: the claim
+screen is the join link, Change seat is a panel over Players & devices,
+and a dialog has no address. PR #32 reads Create game in the model, so the
+seat rules of Create game go there and the Worker stays thin. The fixture
+rule of `AGENTS.md` keeps the fixture of the old shape, so this change
+reads `room-v2.json` as version 3 and captures no new fixture.
 
 Contract owners:
 
@@ -165,9 +190,12 @@ and phone frames, with the notes of each screen.
       the line that names the seats without a faction, and the deal button.
 - [ ] Lobby on a seated phone: Edit on its own row only.
 - [ ] Edit seat dialog of an admin device before Start game: name, colour,
-      faction, Seat number, Speaker switch, Save, and Cancel. The note says
-      that after Start game only the name stays.
-- [ ] Keep the Later control of Speaker & Seating, by decision 4.
+      faction, Speaker switch, Save, and Cancel, and the Seat number when
+      decision 6 is A. The note says that after Start game only the name
+      stays.
+- [ ] When decision 6 is B: the ⠿ handle on the seat rows of the lobby on
+      an admin device, as the setup rows have.
+- [ ] The Speaker & Seating screen and the setup rows do not change.
 
 ## Milestone 3: Model and server
 
@@ -178,23 +206,25 @@ stays thin.
       with the seat type and its parser. The room version becomes 3, with
       the upgrade step from version 2 in the room chain, which reads with
       every expansion on. Start game turns the seats into players.
-- [ ] Capture `room-v3.json` from the new build, with the test that loads
-      it, and keep the test of the version 2 fixture, as `AGENTS.md` says
-      under Stored shapes and versions.
+- [ ] A test reads the fixture `room-v2.json` as a room of version 3 with
+      every expansion on, as `AGENTS.md` says under Stored shapes and
+      versions. The fixture of the old shape exists, so no capture.
 - [ ] A seat rules module: the name key, the free values of a seat, take
       a value for an admin device with the first free colour, the move to a
       Seat number, the speaker, the deal for the empty seats, and the
       problems of a setup.
 - [ ] Protocol: the claim command with the values of the seat, the edit
-      command, and the deal command, with their parsers.
+      command, the deal command, and the seat move of decision 6, with
+      their parsers.
 - [ ] Rights: edit for an admin device or for the own seat of a seated
       device, and deal for an admin device.
 - [ ] Room: the claim and edit cases with the rules of the device, also
       for the device that created the game, Start game that waits for every
       faction, a rename that updates the game, and the deal with the random
       source that the reducer takes next to the clock and the connections.
-- [ ] Worker: Create game rejects a setup that breaks the seat rules, and
-      the object passes the secure random source of the Worker to the deal.
+- [ ] Worker: the create reading of the model rejects a setup that breaks
+      the seat rules, and the object passes the secure random source of the
+      Worker to the deal.
 - [ ] Tests: the seat rules, the room cases for an admin device and for a
       seated device before and after Start game, the rights, the parsers,
       and the rooms of version 1 and 2 that still load.
@@ -208,14 +238,17 @@ Tags: ui
 - [ ] Setup: Create game without a faction on every seat, the line and the
       deal, Create game off while two seats share a name, and the
       expansions in the create request.
-- [ ] Claim seat: a tap opens the fields of the seat, Take seat sends the
-      claim with the values, and the screen stays open until the device
-      holds the seat. The device that created the game lands here after
-      Create game and claims the same way. An empty seat shows that it has
-      no faction, here and on Players & devices.
+- [ ] Claim seat: a tap opens the fields of the seat, and Take seat sends
+      the claim with the values. At the join link, the screen stays until
+      the device holds the seat, then the address becomes the game. As the
+      Change seat panel, it returns to Players & devices at once. The device
+      that created the game lands here after Create game and claims the
+      same way. An empty seat shows that it has no faction, here and on
+      Players & devices.
 - [ ] Players & devices: Edit on the rows that the device may edit, the
       edit dialog with the fields of the device's rights and of the game
-      state, START GAME that waits for every faction, and the deal button.
+      state, the seat order control of decision 6, START GAME that waits for
+      every faction, and the deal button.
 - [ ] Port the new mockup styles to `src/styles/mockup/`, with the class
       names of the mockup.
 - [ ] Smoke test with two browsers: create a game without factions, claim a
