@@ -81,6 +81,11 @@ Decision of 2026-10-26 by Cal, from the admin code discussion of that day:
   admin switch of an existing admin, on the Players & devices screen.
   Alternative: keep the requests. Reason: one switch does the job, and the
   rows stay clean.
+- Admin decision 3, 2026-10-26, Cal: a device that joins as a table device
+  is a viewer, with no seat and no admin, and an admin gives it admin with
+  the same switch as a seated device. Alternative: a table device that is
+  always an admin, from admin decision 2. Reason: one switch for every
+  device, and a new table device gets no rights without a check.
 
 Design decisions of the same day, from the implementation side:
 
@@ -140,10 +145,10 @@ revision, the server time, the game, the devices with their connection
 state, and the rights of this device; and a rejection with a reason.
 
 Rights: a device has a seat or none, and an admin flag. A device without
-a seat is a table device and is an admin. A device without a seat and
-without admin is not in the game, and sees the claim screen. A seat holder
-that loses its seat keeps admin as a table device, or leaves the game. The
-last admin cannot lose admin. The permission module takes the derived
+a seat is a table device: with admin it acts for every player, and without
+admin it is a viewer that may only take a seat. A device that has not
+joined sees the claim screen. A seat holder that loses its seat becomes a
+table device with its admin unchanged. The last admin cannot lose admin. The permission module takes the derived
 view, the device, and a command, and says whether the command is allowed.
 The object and the screens call the same function.
 
@@ -248,7 +253,23 @@ device at once.
       `.context/multiplayer/mockups/`, with `shoot.log`: 33 screens in
       three frames, no script error, and no sideways overflow.
 
-## Milestone 6: Server
+## Milestone 6: Viewer mockups
+
+Tags: mockup
+
+Draw admin decision 3: a new table device is a viewer, with the same admin
+switch as a seated device.
+
+- [x] The table device rows get the admin switch. A viewer row in the lobby
+      and in the game. The claim screen says that a table device joins as a
+      viewer.
+- [x] The chip reads Viewer on a table device without admin, and the action
+      phase on a viewer has every control disabled.
+- [x] Screenshot the changed screens in every frame. Evidence:
+      `.context/multiplayer/mockups/`, with `shoot.log`: 34 screens in
+      three frames, no script error, and no sideways overflow.
+
+## Milestone 7: Server
 
 Add the Worker, the object, and the pure model modules. The app still runs
 from `localStorage` at the end of this milestone.
@@ -272,7 +293,7 @@ from `localStorage` at the end of this milestone.
 - [ ] Smoke test: start the dev server, create a game with the API, and
       open its socket. Evidence: `.context/multiplayer/server/`.
 
-## Milestone 7: Shared table
+## Milestone 8: Shared table
 
 Tags: ui
 
@@ -283,7 +304,8 @@ mode comes in the next milestone.
       puts the seats on the server, and the device joins as a table device.
 - [ ] The lobby on the Players & devices screen, and Start game on an admin
       device. No clock runs before Start.
-- [ ] Join by code or by the `/join/<code>` link, as a table device.
+- [ ] Join by code or by the `/join/<code>` link, as a table device. The
+      new device is a viewer, and the first device gives it admin.
 - [ ] The game client hook: the socket, the reconnect, the revision, and the
       server time offset. The reconnecting state disables the controls.
 - [ ] The Players & devices screen: the code, the link, the QR code, the
@@ -299,7 +321,7 @@ mode comes in the next milestone.
 - [ ] Smoke test on the dev server: two windows, one creates and one joins
       as table, and taps show on both. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 8: Player mode
+## Milestone 9: Player mode
 
 Tags: ui
 
@@ -310,14 +332,14 @@ Seats, rights, and the disabled controls.
       that a disabled main control waits for: the strategy, action,
       reaction, status, agenda, summary, seating, settings, and stats
       screens, and the top bar.
-- [ ] Admin switches on the Players & devices screen, never taking admin
-      from the last admin.
+- [ ] Admin switches for seated and table devices on the Players & devices
+      screen, never taking admin from the last admin. The viewer state.
 - [ ] Remove the Later marks of the seated screens in the mockup.
 - [ ] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
       admin toggles work. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 9: Verification, commit, and review
+## Milestone 10: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 
