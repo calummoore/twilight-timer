@@ -74,7 +74,13 @@ Decision of 2026-10-26 by Cal, from the admin code discussion of that day:
   bar counts the open requests on admin devices. Alternatives: A, the admin
   code behind a tap; C, trust the join code. Reason, from Cal: the admin
   code is on the table for everyone to read, so approval by the existing
-  admins is the real check.
+  admins is the real check. Superseded the same day by admin decision 2.
+- Admin decision 2, 2026-10-26, Cal, after the mockup of the requests
+  looked messy: no admin request. Join as table device is instant and
+  makes the device an admin, and a seated device gets admin only with the
+  admin switch of an existing admin, on the Players & devices screen.
+  Alternative: keep the requests. Reason: one switch does the job, and the
+  rows stay clean.
 
 Design decisions of the same day, from the implementation side:
 
@@ -126,22 +132,20 @@ Components:
   game, the device's rights, and a dispatch function, as they get them
   from the local store today.
 
-Messages, from the device: hello with the device token, claim a seat, ask
-for admin or for a table seat, approve or dismiss a request, set the admin
-flag of a device, start the game, and a game command with the revision: an action input, undo, pause, resume, the
+Messages, from the device: hello with the device token, claim a seat or
+the table, set the admin flag of a device, start the game, and a game
+command with the revision: an action input, undo, pause, resume, the
 pause reason, or the time limits. From the object: the state, with the
 revision, the server time, the game, the devices with their connection
 state, and the rights of this device; and a rejection with a reason.
 
-Rights: a device has a seat or none, an admin flag, and an open request
-for admin or for a table seat, or none. A device without a seat, without
-admin, and without a request is not in the game, and sees the claim
-screen. A device without a seat and without admin, with a table request,
-is pending and may only take a seat. A seat holder that loses its seat
-keeps admin as a table device, or leaves the game. The last admin cannot
-lose admin. The permission module takes the derived view, the device, and
-a command, and says whether the command is allowed. The object and the
-screens call the same function.
+Rights: a device has a seat or none, and an admin flag. A device without
+a seat is a table device and is an admin. A device without a seat and
+without admin is not in the game, and sees the claim screen. A seat holder
+that loses its seat keeps admin as a table device, or leaves the game. The
+last admin cannot lose admin. The permission module takes the derived
+view, the device, and a command, and says whether the command is allowed.
+The object and the screens call the same function.
 
 Storage: the room is one JSON value with its own version. The game inside
 keeps the saved-game versions, so the parser reads a game that an older
@@ -230,15 +234,29 @@ the pending device.
       `.context/multiplayer/mockups/`, with `shoot.log`: 34 screens in
       three frames, no script error, and no sideways overflow.
 
-## Milestone 5: Server
+## Milestone 5: Admin switch mockups
+
+Tags: mockup
+
+Draw admin decision 2: no requests, no pending device, and Join as table
+device at once.
+
+- [x] Remove the requests, the pending device screen, the Pending chip, and
+      the badge from the mockup. The claim screen joins as a table device
+      at once. A seated device without admin sees the admin states as text.
+- [x] Screenshot the changed screens in every frame. Evidence:
+      `.context/multiplayer/mockups/`, with `shoot.log`: 33 screens in
+      three frames, no script error, and no sideways overflow.
+
+## Milestone 6: Server
 
 Add the Worker, the object, and the pure model modules. The app still runs
 from `localStorage` at the end of this milestone.
 
 - [ ] Add to `src/model/`, each with tests: the join code, the devices with
-      the requests, the last-admin rule, and the seat takeover, the
-      permission rules of the spec table, the message parser, and the room
-      reducer that applies a message to a room.
+      the last-admin rule and the seat takeover, the permission rules of the
+      spec table, the message parser, and the room reducer that applies a
+      message to a room.
 - [ ] Add `worker/`: the routes and the game object with the WebSocket
       Hibernation API and SQLite storage.
 - [ ] Configure `wrangler.jsonc`: the Worker entry, the object binding and
@@ -254,7 +272,7 @@ from `localStorage` at the end of this milestone.
 - [ ] Smoke test: start the dev server, create a game with the API, and
       open its socket. Evidence: `.context/multiplayer/server/`.
 
-## Milestone 6: Shared table
+## Milestone 7: Shared table
 
 Tags: ui
 
@@ -265,13 +283,11 @@ mode comes in the next milestone.
       puts the seats on the server, and the device joins as a table device.
 - [ ] The lobby on the Players & devices screen, and Start game on an admin
       device. No clock runs before Start.
-- [ ] Join by code or by the `/join/<code>` link. A second device asks to
-      join as a table device, and the first device approves it.
+- [ ] Join by code or by the `/join/<code>` link, as a table device.
 - [ ] The game client hook: the socket, the reconnect, the revision, and the
       server time offset. The reconnecting state disables the controls.
 - [ ] The Players & devices screen: the code, the link, the QR code, the
-      seats, the devices, and the requests with Approve and Dismiss. The top
-      bar chip opens it and counts the open requests.
+      seats, and the devices. The top bar chip opens it.
 - [ ] Recent games, Leave game, and Continue on the server for a game that
       an older build saved on the device.
 - [ ] Settings in two groups. Time limits go through the object.
@@ -283,7 +299,7 @@ mode comes in the next milestone.
 - [ ] Smoke test on the dev server: two windows, one creates and one joins
       as table, and taps show on both. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 7: Player mode
+## Milestone 8: Player mode
 
 Tags: ui
 
@@ -294,15 +310,14 @@ Seats, rights, and the disabled controls.
       that a disabled main control waits for: the strategy, action,
       reaction, status, agenda, summary, seating, settings, and stats
       screens, and the top bar.
-- [ ] Admin switches, Ask for admin, and Approve and Dismiss on the Players
-      & devices screen, never taking admin from the last admin. The pending
-      device state with its bar.
+- [ ] Admin switches on the Players & devices screen, never taking admin
+      from the last admin.
 - [ ] Remove the Later marks of the seated screens in the mockup.
 - [ ] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
       admin toggles work. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 8: Verification, commit, and review
+## Milestone 9: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 

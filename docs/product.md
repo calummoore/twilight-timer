@@ -94,8 +94,8 @@ wait for an answer.
 | **History & Undo**  | Action log; undo repeatedly to rewind, or edit any duration               |
 | **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count, rule-check time |
 | **Home**            | New game, join a game by code, recent games of this device               |
-| **Claim seat**      | Which player this device is, or ask to join as a table device             |
-| **Players & devices** | Join code, link, QR code, one row per seat with its device and its admin request; the lobby before Start game |
+| **Claim seat**      | Which player this device is, or join as a table device                   |
+| **Players & devices** | Join code, link, QR code, one row per seat with its device and its admin switch; the lobby before Start game |
 
 ---
 
@@ -184,7 +184,7 @@ From the should-have list, the MVP adds the pause.
 
 - [ ] Every game on the server, joined by a six-character code, a link, or a
       QR code
-- [ ] Table devices and seated devices, with admin requests and admin rights
+- [ ] Table devices and seated devices, with admin rights
 - [ ] A seated device acts for its own player when the game waits for them
 - [ ] Every device shows the same screens, with the controls it may not use
       disabled
