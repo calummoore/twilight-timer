@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { receive, type Caller } from './receive'
-import { BUILD, HOST, OLD_BUILD } from './test-room'
+import { receive, receiveCreate, type Caller } from './receive'
+import { BUILD, HOST, OLD_BUILD, SETUP } from './test-room'
 
 /** A connection before its hello. */
 const NEW: Caller = { token: null, build: null }
@@ -68,5 +68,42 @@ describe('what the server does with a command', () => {
     for (const raw of [broken, { type: 'teleport' }, 'ping', null]) {
       expect(receive(raw, BUILD, SAME)).toEqual({ type: 'ignore' })
     }
+  })
+})
+
+describe('what the server does with a request that creates a game', () => {
+  const create = (build?: unknown, setup: unknown = SETUP) => ({
+    token: HOST,
+    build,
+    setup,
+  })
+  const broken = { ...SETUP, speakerId: 'zed' }
+
+  it('creates every game whose setup it can read, from any build', () => {
+    for (const build of [BUILD, OLD_BUILD, undefined]) {
+      expect(receiveCreate(create(build), BUILD)).toEqual({
+        type: 'create',
+        token: HOST,
+        setup: SETUP,
+      })
+    }
+  })
+
+  it('answers outdated when it cannot read the setup of another build', () => {
+    // A later build may change the setup. Its page then reloads.
+    for (const build of [OLD_BUILD, undefined, '']) {
+      expect(receiveCreate(create(build, broken), BUILD)).toEqual({
+        type: 'outdated',
+      })
+    }
+    expect(receiveCreate(null, BUILD)).toEqual({ type: 'outdated' })
+  })
+
+  it('answers invalid when it cannot read a request of its own build', () => {
+    expect(receiveCreate(create(BUILD, broken), BUILD)).toEqual({
+      type: 'invalid',
+    })
+    const noToken = { build: BUILD, setup: SETUP }
+    expect(receiveCreate(noToken, BUILD)).toEqual({ type: 'invalid' })
   })
 })

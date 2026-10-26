@@ -3,6 +3,9 @@ import { cardsEach } from '../../model/rules'
 import type { Expansions, Settings } from '../../model/settings'
 import { clock } from '../format'
 
+/** Why Create game made no game: no answer, or a newer build of the server. */
+export type CreateFailure = 'offline' | 'outdated'
+
 /**
  * The Game panel of the setup screen: what the game starts with. Its summary
  * rows scroll when the panel is full, so the expansions, the deal, and CREATE
@@ -18,12 +21,14 @@ export function SetupGamePanel(props: {
   settings: Settings
   /** Create game waits for the server. */
   creating: boolean
-  /** The last Create game did not reach the server. */
-  failed: boolean
+  /** Why the last Create game made no game, or null. */
+  failure: CreateFailure | null
   onExpansions: (expansions: Expansions) => void
   /** Gives each seat with no faction a random faction in play. */
   onDeal: () => void
   onCreate: () => void
+  /** Reloads the page, after a reload that did not bring the new build. */
+  onReload: () => void
 }) {
   const { settings } = props
   const { expansions } = settings
@@ -120,19 +125,34 @@ export function SetupGamePanel(props: {
             </button>
           </>
         )}
-        {props.failed && !props.creating && (
+        {props.failure === 'offline' && !props.creating && (
           <div className="setup-need">
             The game could not be created. Check the connection and try again.
           </div>
         )}
-        <button
-          className="big lg"
-          style={{ width: '100%' }}
-          disabled={props.factionsMissing || props.creating}
-          onClick={props.onCreate}
-        >
-          {props.creating ? 'CREATING…' : 'CREATE GAME'}
-        </button>
+        {props.failure === 'outdated' ? (
+          <>
+            <div className="setup-need">
+              A new version is live. Reload the page.
+            </div>
+            <button
+              className="big lg"
+              style={{ width: '100%' }}
+              onClick={props.onReload}
+            >
+              RELOAD
+            </button>
+          </>
+        ) : (
+          <button
+            className="big lg"
+            style={{ width: '100%' }}
+            disabled={props.factionsMissing || props.creating}
+            onClick={props.onCreate}
+          >
+            {props.creating ? 'CREATING…' : 'CREATE GAME'}
+          </button>
+        )}
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ import {
 } from '../../model/rules'
 import type { Expansions, Settings } from '../../model/settings'
 import type { Player } from '../../model/types'
-import { SetupGamePanel } from './SetupGamePanel'
+import { SetupGamePanel, type CreateFailure } from './SetupGamePanel'
 import { SetupSeat, type SeatRow } from './SetupSeat'
 
 const COUNTS = Array.from(
@@ -22,8 +22,10 @@ export function SetupScreen(props: {
   settings: Settings
   /** Create game waits for the server. */
   creating: boolean
-  /** The last Create game did not reach the server. */
-  failed: boolean
+  /** Why the last Create game made no game, or null. */
+  failure: CreateFailure | null
+  /** Reloads the page, after a reload that did not bring the new build. */
+  onReload: () => void
   onBack: () => void
   onSettings: () => void
   /** Saves changed settings, for example the expansions in play. */
@@ -177,7 +179,8 @@ export function SetupScreen(props: {
             factionsMissing={factionsMissing}
             settings={props.settings}
             creating={props.creating}
-            failed={props.failed}
+            failure={props.failure}
+            onReload={props.onReload}
             onExpansions={changeExpansions}
             onDeal={deal}
             onCreate={create}
