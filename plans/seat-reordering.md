@@ -389,7 +389,7 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
     or ▼ the keyboard focus stays at the old index. Separate branch.
 - [x] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. Copy the merge justifications in
-      `.context/seat-reordering/merge-1.md` to `merge-4.md` into its
+      `.context/seat-reordering/merge-1.md` to `merge-5.md` into its
       description. The description asks Cal to test the preview on an iPad
       and a phone before the merge: the long press, no text selection or
       menu, no scroll during a drag, a plain tap on a seat, and reduced
@@ -425,8 +425,8 @@ Tags: ui
 
 ## Milestone 11: Verification and review of the arrow removal
 
-- [ ] Run the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits, record the approved removal, and
+- [x] Run the complete gate named in `AGENTS.md`.
+- [x] Commit with Conventional Commits, record the approved removal, and
       push the branch.
 - [ ] Review the diff of the removal with the `implementation-review`
       skill. Apply the review-fix rule.
