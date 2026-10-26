@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Departure, Player } from '../../model/types'
+import type { Departure, Game, Player } from '../../model/types'
 import { pc } from '../colour'
 import { RemovePlayerDialog } from './RemovePlayerDialog'
 import { SeatRing, type Reorder } from './SeatRing'
@@ -18,8 +18,8 @@ export function SeatingScreen(props: {
   speakerId: string
   pickOrder: string[]
   voteOrder: string[]
-  /** The revision of the game, to which a swap that waits for the server belongs. */
-  revision: number
+  /** The game of the latest state message, which ends a swap that waits. */
+  received: Game
   canUndo: boolean
   /** Whether this device may hand the speaker token to the player. */
   maySpeaker: (playerId: string) => boolean
@@ -101,7 +101,7 @@ export function SeatingScreen(props: {
             seated={props.seated}
             departures={props.departures}
             speakerId={props.speakerId}
-            revision={props.revision}
+            received={props.received}
             reorder={reorder}
             canReorder={props.canReorder}
             maySpeaker={props.maySpeaker}
@@ -135,7 +135,9 @@ export function SeatingScreen(props: {
           </div>
           <button
             className={`ibtn reorder ${reorder ? 'on' : ''}`}
-            disabled={!props.canReorder || props.seated.length < 2}
+            disabled={
+              !reorder && (!props.canReorder || props.seated.length < 2)
+            }
             onClick={() => setReorder(reorder ? null : { chosenId: null })}
           >
             {reorder ? '✓ Done' : '⠿ Re-order seats'}

@@ -1,6 +1,6 @@
 import type { Command } from '../model/protocol'
 import type { LimitSettings, Settings } from '../model/settings'
-import type { ActionInput } from '../model/types'
+import type { ActionInput, Game } from '../model/types'
 import type { GameView } from '../model/view'
 import { Dialog } from './controls'
 import type { Rights } from './rights'
@@ -18,8 +18,8 @@ export type Overlay = 'settings' | 'seating' | null
  */
 export function GameOverlays(props: {
   game: GameView
-  /** The revision of the game on the server. */
-  revision: number
+  /** The game of the latest state message from the server. */
+  received: Game
   overlay: Overlay
   onOverlay: (overlay: Overlay) => void
   /** The End game confirm is open. */
@@ -65,7 +65,7 @@ export function GameOverlays(props: {
           speakerId={g.speakerId}
           pickOrder={g.pickOrder}
           voteOrder={g.voteOrder}
-          revision={props.revision}
+          received={props.received}
           canUndo={rights.admin && g.canUndo}
           maySpeaker={(playerId) =>
             rights.may({ kind: 'speakerMoved', playerId })

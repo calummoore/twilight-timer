@@ -151,8 +151,9 @@ Contract owners:
     there does not scroll.
   - A tap selects a seat. A tap on another seat swaps the two. A tap on the
     same seat lets it go.
-  - A drop or a second tap shows the swap at once, until the next revision
-    of the game arrives from the server.
+  - A drop or a second tap shows the swap at once, until the next state of
+    the game arrives from the server, also when the server refuses the
+    swap.
   - The empty seat of a player who left does not move and takes no drop.
   - Done, a tap on the empty ring area, or Close ends the mode. The mode
     also ends when the device loses admin.
@@ -281,7 +282,16 @@ Build re-order mode and the setup handle as the mockup shows them.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
-      re-review once, and report the rest.
+      re-review once, and report the rest. Review 1 is in
+      `.context/seat-reordering/review-1.md`. It fixed findings 2 and 3.
+  - Review 1, 1. Deploy leaves older game pages stale. Severity Medium,
+    effort Small. Recommended: B, merge this branch first, and reload the
+    open game pages after its deploy.
+  - Review 1, 4. Spec and code disagree on ending the mode. Severity Low,
+    effort Small. Recommended: B, a tap anywhere outside the seats and the
+    buttons ends the mode, as decision 1 says.
+  - Outside the scope: `src/ui/useGameClient.ts`, a page drops a state
+    message that it cannot read and shows no notice. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. The description asks Cal to test
       the preview on an iPad and a phone before the merge: the long press,

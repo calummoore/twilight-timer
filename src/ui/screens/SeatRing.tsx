@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react'
-import type { Departure, Player } from '../../model/types'
+import type { Departure, Game, Player } from '../../model/types'
 import { pc } from '../colour'
-import { useConfirm } from '../hooks'
+import { usePending } from '../hooks'
 import { useSwapDrag } from '../useSwapDrag'
 
 // The seats sit on an ellipse inside a 500 by 410 box. Positions are in
@@ -34,8 +34,8 @@ export function SeatRing(props: {
   seated: string[]
   departures: Departure[]
   speakerId: string
-  /** The revision of the game, to which a swap that waits for the server belongs. */
-  revision: number
+  /** The game of the latest state message, which ends a swap that waits. */
+  received: Game
   /** Re-order mode, or null outside it. */
   reorder: Reorder | null
   /** Whether this device may swap seats now. */
@@ -48,7 +48,7 @@ export function SeatRing(props: {
 }) {
   const { reorder } = props
   // The swap shows at once, until the next state of the game arrives.
-  const [sent, setSent] = useConfirm<[string, string]>(props.revision)
+  const [sent, setSent] = usePending<[string, string]>(props.received)
   const leftIn = new Map(props.departures.map((d) => [d.playerId, d.round]))
   const speaker = props.players.find((p) => p.id === props.speakerId)
   const players = sent ? swapped(props.players, sent) : props.players
@@ -58,6 +58,8 @@ export function SeatRing(props: {
       : null
 
   const swap = (playerId: string, otherId: string) => {
+    // A drop after the device lost its right, or its connection, does nothing.
+    if (!props.canReorder) return
     props.onReorder({ chosenId: null })
     setSent([playerId, otherId])
     props.onSwap(playerId, otherId)
