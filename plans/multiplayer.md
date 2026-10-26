@@ -114,6 +114,17 @@ Design decisions of the same day, from the implementation side:
   Previews create a separate object namespace for each preview, per the
   Cloudflare docs.
 - `qrcode.react` draws the QR code as SVG, with no other dependency.
+- A disabled table tap on a device without admin, such as Start round or
+  Resolve, reads "Waiting for the table", the words of the lobby. A
+  disabled tap of one player names that player, such as "Sam's vote".
+  Rejected: no words on a disabled table tap, because a player would not
+  know why the button is off.
+- The lobby has Leave game too, so that a device can leave a game before
+  the start. Rejected: Leave game only in the running game, because a
+  phone that joined the wrong lobby could not leave it.
+- A typed code is looked up before the game opens, so that Home can say
+  that no game has it. A link opens the game at once, and the socket says
+  when no game has the code.
 
 Contract owners:
 
@@ -295,15 +306,41 @@ from `localStorage` at the end of this milestone.
       open its socket. Evidence: `.context/multiplayer/server/smoke.log`:
       16 checks passed.
 
-## Milestone 8: Shared table
+## Milestone 8: Mockups for the gaps of the UI work
+
+Tags: mockup
+
+Draw the states that the shared table and player mode need, which the
+mockup did not have yet.
+
+- [x] Home: a game that an older build saved on this device, with
+      Continue, and one that cannot be read. The join field with a code
+      that no game has.
+- [x] Opening a game: the line while the device connects, and a link whose
+      code no game has.
+- [x] Setup: Create game that cannot reach the server.
+- [x] Settings before a game: the time limits that the next game starts
+      with, without End game.
+- [x] The lobby: Leave game.
+- [x] Seated variants of the strategy, status, agenda, and round summary
+      screens, with the disabled table taps reading "Waiting for the
+      table".
+- [x] Fix the stale notes: the Home note said Begin game, and the claim
+      note said that a holder without admin comes back to the claim screen.
+- [x] Screenshot every screen in every frame. Evidence:
+      `.context/multiplayer/mockups/shoot.log`: 44 screens in three
+      frames, no script error, and no sideways overflow.
+
+## Milestone 9: Shared table
 
 Tags: ui
 
 Put the game on the server, with every device as a table device. Player
 mode comes in the next milestone.
 
-- [ ] Home screen, with New game, Join game, and Recent games. Create game
-      puts the seats on the server, and the device joins as a table device.
+- [ ] Home screen, with New game, Join game, Recent games, and the games
+      saved on this device. Create game puts the seats on the server, and
+      the device joins as a table device.
 - [ ] The lobby on the Players & devices screen, and Start game on an admin
       device. No clock runs before Start.
 - [ ] Join by code or by the `/join/<code>` link, as a table device. The
@@ -315,15 +352,17 @@ mode comes in the next milestone.
 - [ ] Recent games, Leave game, and Continue on the server for a game that
       an older build saved on the device.
 - [ ] Settings in two groups. Time limits go through the object.
-- [ ] Port the mockup styles of the Home, Claim seat, and Players & devices
-      screens, the top bar chips, and the reconnecting bar to
-      `src/styles/mockup/`, and remove their Later marks in the mockup.
+- [ ] Port the mockup styles of the Home, opening, Claim seat, and
+      Players & devices screens, the top bar chips, the notice, and the
+      reconnecting bar to `src/styles/mockup/`. Remove the Later marks of
+      the screens that this milestone builds. The claim screen and the
+      seated states keep theirs until player mode builds them.
 - [ ] Stop saving the game in `localStorage`. Keep the parser for the
       upload of an older game.
 - [ ] Smoke test on the dev server: two windows, one creates and one joins
       as table, and taps show on both. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 9: Player mode
+## Milestone 10: Player mode
 
 Tags: ui
 
@@ -336,12 +375,13 @@ Seats, rights, and the disabled controls.
       screens, and the top bar.
 - [ ] Admin switches for seated and table devices on the Players & devices
       screen, never taking admin from the last admin. The viewer state.
-- [ ] Remove the Later marks of the seated screens in the mockup.
+- [ ] Remove the Later marks of the claim screen and the seated screens in
+      the mockup.
 - [ ] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
       admin toggles work. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 10: Verification, commit, and review
+## Milestone 11: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 
