@@ -41,6 +41,11 @@ export interface GameClient {
   /** The server clock minus the device clock, in ms. */
   offset: number
   /**
+   * Asks the server for a fresh state, for example for the connections of
+   * the devices, which the server does not send when a device goes quiet.
+   */
+  refresh: () => void
+  /**
    * Sends a command on the revision that the screen shows. Without a
    * connection it does nothing: a tap is not queued.
    */
@@ -167,11 +172,18 @@ export function useGameClient(code: string, token: string): GameClient {
     [revision],
   )
 
+  const refresh = useCallback(() => {
+    const ws = socket.current
+    if (ws?.readyState !== WebSocket.OPEN) return
+    ws.send(JSON.stringify({ type: 'hello', token }))
+  }, [token])
+
   return {
     status,
     room: state?.room ?? null,
     you: state?.you ?? null,
     offset,
+    refresh,
     send,
   }
 }

@@ -10,6 +10,7 @@ import {
 } from './commands'
 import { derive } from './derive'
 import {
+  adminsAway,
   founder,
   memberOf,
   parseMember,
@@ -63,9 +64,10 @@ export function roomOfGame(code: string, game: Game, token: string): Room {
 }
 
 /**
- * Applies a command from the device of `token` at server time `now`. The
- * command must name the current revision, the device must have the right,
- * and the command must change the room.
+ * Applies a command from the device of `token` at server time `now`.
+ * `connected` holds the tokens of the devices that have a connection now.
+ * The command must name the current revision, the device must have the
+ * right, and the command must change the room.
  */
 export function applyCommand(
   room: Room,
@@ -73,11 +75,15 @@ export function applyCommand(
   rev: number,
   command: Command,
   now: number,
+  connected: ReadonlySet<string>,
 ): Outcome {
   if (rev !== room.revision) return { rejected: 'stale' }
   const device = memberOf(room.members, token)
   const view = room.game && derive(room.game, now)
-  if (!mayCommand(device, command, view)) return { rejected: 'forbidden' }
+  const away = adminsAway(roomState(room, connected).devices)
+  if (!mayCommand(device, command, view, away)) {
+    return { rejected: 'forbidden' }
+  }
   const next = change(room, token, command, now)
   return next
     ? { room: { ...next, revision: room.revision + 1 } }

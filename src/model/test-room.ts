@@ -32,6 +32,14 @@ export const SETUP: Setup = {
 export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
   let now = T0
   let current = room
+  // The devices that have no connection. Every other device is connected.
+  const away = new Set<string>()
+  const connected = (sender: string) =>
+    new Set(
+      [...current.members.map((m) => m.token), sender].filter(
+        (t) => !away.has(t) || t === sender,
+      ),
+    )
   return {
     get room() {
       return current
@@ -42,12 +50,23 @@ export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
     wait(ms: number) {
       now += ms
     },
+    /** The device of `token` loses its connection. */
+    leave(token: string) {
+      away.add(token)
+    },
     /**
      * Sends a command from the device of `token`, on the current revision
      * unless `rev` names another. Returns the rejection, or null.
      */
     send(token: string, command: Command, rev = current.revision) {
-      const out = applyCommand(current, token, rev, command, now)
+      const out = applyCommand(
+        current,
+        token,
+        rev,
+        command,
+        now,
+        connected(token),
+      )
       if ('rejected' in out) return out.rejected
       current = out.room
       return null

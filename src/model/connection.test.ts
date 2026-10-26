@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { codeOfPath, joinPath } from './code'
-import { nextOffset, retryDelay } from './connection'
+import { LIVE_MS, isLive, nextOffset, retryDelay } from './connection'
 import { gameSummary, lastActivity } from './summary'
 import { MIN, SEC, T0, playStrategy, table } from './test-table'
 
@@ -13,6 +13,14 @@ describe('the connection', () => {
     expect(offset).toBe(5 * SEC - 40)
     offset = nextOffset(offset, T0 + 7 * SEC, T0 + 2 * SEC + 900)
     expect(offset).toBe(5 * SEC - 40)
+  })
+
+  it('counts a socket as live until its last sign of life is too old', () => {
+    expect(isLive(T0, T0)).toBe(true)
+    expect(isLive(T0, T0 + LIVE_MS)).toBe(true)
+    expect(isLive(T0, T0 + LIVE_MS + 1)).toBe(false)
+    // A ping every minute, as a hidden page sends, keeps a device live.
+    expect(isLive(T0, T0 + 60 * SEC)).toBe(true)
   })
 
   it('waits longer after each failed try, up to a limit', () => {

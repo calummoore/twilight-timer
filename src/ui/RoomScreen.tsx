@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { RecentGame } from '../model/device-store'
+import { adminsAway } from '../model/devices'
 import type { Command } from '../model/protocol'
+import { mayCommand } from '../model/rights'
 import type { LimitSettings, Settings } from '../model/settings'
 import { gameSummary } from '../model/summary'
 import { GameScreen } from './GameScreen'
@@ -29,7 +31,7 @@ export function RoomScreen(props: {
   onLeave: () => void
   onNewGame: () => void
 }) {
-  const { status, room, you, offset, send } = useGameClient(
+  const { status, room, you, offset, refresh, send } = useGameClient(
     props.code,
     props.token,
   )
@@ -79,6 +81,11 @@ export function RoomScreen(props: {
     send({ type: 'limits', ...limits })
     props.onSettings({ ...props.settings, ...limits })
   }
+  // While every admin device is away, a seated device may take admin. The
+  // switches ask the same rule as the server.
+  const away = adminsAway(room.devices)
+  const mayAdmin = (deviceId: string, on: boolean) =>
+    connected && mayCommand(device, adminCommand(deviceId, on), null, away)
   const playersScreen = (round: number | null, onClose?: () => void) => (
     <PlayersScreen
       code={room.code}
@@ -88,7 +95,10 @@ export function RoomScreen(props: {
       you={you}
       connected={connected}
       admin={!!device?.admin}
+      adminsAway={away}
+      mayAdmin={mayAdmin}
       onAdmin={(deviceId, on) => send(adminCommand(deviceId, on))}
+      onRefresh={refresh}
       onChangeSeat={() => setOverlay('claim')}
       onLeave={props.onLeave}
       onStart={() => send({ type: 'start' })}
