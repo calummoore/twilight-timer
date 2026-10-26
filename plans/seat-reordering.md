@@ -439,7 +439,7 @@ Tags: ui
   - Review 7, 2. Plan edit changes a ticked TODO. Severity Low, effort
     Small. Recommended: A, restore `merge-4.md` in the ticked TODO, and
     name `merge-5.md` in the TODO below.
-- [ ] Update the description of PR #34.
+- [x] Update the description of PR #34.
 
 ## Post-merge follow-up (non-blocking)
 
