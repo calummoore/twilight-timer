@@ -1,6 +1,6 @@
 {
-  "name": "TI4 Tempo",
-  "short_name": "TI4 Tempo",
+  "name": "TI4 Nexus",
+  "short_name": "TI4 Nexus",
   "description": "A shared-table time tracker for Twilight Imperium.",
   "display": "standalone",
   "orientation": "any",

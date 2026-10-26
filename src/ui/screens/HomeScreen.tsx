@@ -41,7 +41,7 @@ export function HomeScreen(props: {
     <div className="lay">
       <div className="top">
         <div className="round">
-          <b>TI4 Tempo</b>
+          <b>TI4 Nexus</b>
         </div>
         <div className="spacer" />
         <button

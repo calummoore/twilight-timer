@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TI4 Tempo — Mockups</title>
+<title>TI4 Nexus — Mockups</title>
 <style>
 :root{
   --bg:#05070b; --panel:#0b1017; --panel2:#111925; --panel3:#18222f;
@@ -481,6 +481,10 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .home-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
 .pad{padding:18px}
 .home-help{font-size:13px; color:var(--dim); line-height:1.6; margin-bottom:16px}
+/* home: both panels take one height, and the help text takes the free height, so New game lines up with Join game */
+.home-grid > .pnl{display:flex; flex-direction:column}
+.home-grid .pad{flex-grow:1; display:flex; flex-direction:column}
+.home-grid .home-help{flex-grow:1}
 .fld.code{font-size:26px; font-weight:800; letter-spacing:.3em; text-transform:uppercase; text-align:center; padding:14px; width:100%}
 .fld.code.empty{color:var(--faint); letter-spacing:.08em; font-weight:500; font-size:15px}
 .recent{display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center; padding:12px 15px;
@@ -976,7 +980,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 
 <div class="app">
   <aside class="nav">
-    <h1>TI4 Tempo</h1>
+    <h1>TI4 Nexus</h1>
     <div class="sub">Screen mockups · Twilight Imperium 4th Ed.</div>
     <div id="navlist"></div>
     <div class="nav-foot">
@@ -2022,7 +2026,7 @@ const RECENT = [
 // cannot be read. `typed` is the code in the field, and `err` the line under it when the code opens no game.
 const SAVED = ['6 players · Round 2 · Action phase', 'Saved on this device, 18 October'];
 const homeScreen = ({saved=false, typed='', err=''}={}) => `<div class="space"></div><div class="lay">
-  <div class="top"><div class="round"><b>TI4 Tempo</b></div><div class="spacer"></div>
+  <div class="top"><div class="round"><b>TI4 Nexus</b></div><div class="spacer"></div>
     <button class="ibtn">⚙<span class="word"> Settings</span></button></div>
   <div class="content">
     <div class="home-grid">

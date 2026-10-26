@@ -1,6 +1,6 @@
 # Multiplayer
 
-Part of the [TI4 Tempo product spec](../product.md).
+Part of the [TI4 Nexus product spec](../product.md).
 
 One game runs on the server, and every device at the table joins it with a
 join code. A device is a table device, which acts for every player, or a
