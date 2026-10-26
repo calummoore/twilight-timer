@@ -62,13 +62,15 @@ Contract owners:
 
 ## Milestone 1: Documentation and rules
 
-- [ ] Remove the sentence on a game saved by an older build from
+- [x] Remove the sentence on a game saved by an older build from
       `docs/product/multiplayer.md`, and the sentence on a player without
       a faction from `docs/product/rounds.md`.
-- [ ] Update the repository rules in `CLAUDE.md`: the saved-game keys of
+- [x] Update the repository rules in `CLAUDE.md`: the saved-game keys of
       the builds before the server go, and the room reads a game of
       version 6 and later.
-- [ ] Update `README.md`: the Home feature line, and the Key code entries
+- [x] Update the stored-games line of the review focus in `CLAUDE.md`: a
+      game that an older build saved on a device no longer loads.
+- [x] Update `README.md`: the Home feature line, and the Key code entries
       of `storage.ts`, `parse.ts`, and `index.ts`.
 
 ## Milestone 2: Mockup

@@ -54,15 +54,13 @@ skill at that moment instead of guessing the rule.
   Prettier skips it. Keep its class names in step with the mockup.
 - `localStorage` keeps the data of the device under versioned keys: the
   token, the open and the recent games, and the settings. Change the version
-  when a stored shape changes, and keep reading the older shapes. The
-  saved-game keys of the builds before the server stay readable, so that a
-  device can continue such a game on the server. The keys keep the
-  `ti4tempo.` prefix of the old product name, TI4 Tempo, so that each device
-  keeps its token and its games.
+  when a stored shape changes, and keep reading the older shapes. The keys
+  keep the `ti4tempo.` prefix of the old product name, TI4 Tempo, so that
+  each device keeps its token and its games.
 - The Durable Object stores each game as a room with its own `version`.
   Change the room version when the stored room shape changes, and keep
-  reading the older rooms. The game inside the room keeps the saved-game
-  versions, so the room reads a game of every older version.
+  reading the older rooms. The game inside the room has its own saved-game
+  version. The room reads a game of version 6 and later.
 - When a merge from main brings the saved-game version that your branch
   also took, move your branch to the next free version. Keep loading the
   games that your branch saved under the old number.
@@ -95,8 +93,7 @@ skill at that moment instead of guessing the rule.
   or rule check. Plain pauses and undone ranges are not game time.
 - Undo: every clock returns to its value at the undone action. The game
   clock also keeps the rule checks in between.
-- Stored games: a stored room, and a game that an older build saved on a
-  device, still load. A saved game that cannot be read shows its notice.
+- Stored games: every stored room, and the game inside it, still load.
 
 ## Status
 

@@ -86,9 +86,6 @@ it. Rejected: a new faction for every seat at each tap, because setup has no
 undo, and the tap would discard the factions that players chose. The deal
 applies no faction rules, because the app is not a rules engine.
 
-A game saved by an older build can hold a player without a faction, because
-those builds did not require one.
-
 ## Initiative order
 
 Strategy card number **is** turn order, with one exception: the Naalu "0" token
