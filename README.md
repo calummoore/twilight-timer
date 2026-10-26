@@ -31,7 +31,8 @@ in the futex account. The app opens at https://ti4.nexus; see
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.
-- Each game lives on the server under a join code, with a link and a QR code.
+- Each game lives on the server under a join code, with a QR code and a link
+  to open or copy.
   Every device shows every tap at once, and a reload returns to the game.
 - A phone takes the seat of its player, and taps for that player when the
   game waits for them: their pick, their turn, their tile in a reaction
@@ -187,7 +188,7 @@ is deleted. If the pull request opens again, the next run makes a new preview.
     games.
   - `connection.ts`: the offset to the server clock, and the waits between
     the tries after a lost connection.
-  - `code.ts`: the join codes.
+  - `code.ts`: the join codes and their links.
   - `devices.ts`: the devices of a game, the seat takeover, and the
     last-admin rule.
   - `rights.ts`: who may tap what. The server and the screens call it.

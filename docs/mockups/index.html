@@ -522,7 +522,12 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .qr u{background:#000; border-radius:1px}
 .joincode{font-size:52px; font-weight:800; letter-spacing:.14em; margin-top:6px}
 .joinlink{font-size:15px; color:var(--dim); margin-top:12px; overflow-wrap:anywhere}
-.joinlink b{color:var(--txt); font-weight:600}
+.joinlink a{color:var(--accent); font-weight:600; text-decoration:underline; text-underline-offset:3px;
+  text-decoration-color:color-mix(in srgb,var(--accent) 45%, transparent)}
+.joinlink a:hover{text-decoration-color:currentColor}
+/* Copy link sits under the link, and turns green for a moment after it copies */
+.ibtn.copy{display:inline-flex; margin-top:14px}
+.ibtn.copy.done{color:var(--ok); border-color:#1d4a2e; background:#0d2418}
 .dev-row{display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center; padding:12px 15px;
   border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16}
 .dev-row i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
@@ -2152,7 +2157,8 @@ const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space">
       <div class="qr" id="qr" style="margin:0 auto"></div>
       <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:22px">Join code</div>
       <div class="joincode num">${CODE}</div>
-      <div class="joinlink">Scan the code, or open <b>${LINK}</b></div>
+      <div class="joinlink">Scan the code, or open <a href="https://${LINK}" target="_blank" rel="noreferrer">${LINK}</a></div>
+      <button class="ibtn copy">Copy link</button>
     </div>
     <div>${deviceRows(members, me)}</div>
   </div>
@@ -2174,7 +2180,7 @@ S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', note:
  h:playersScreen(true, SEATED, MEMBERS_LOBBY)};
 
 S.players = {t:'Players & Devices', note:
- `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. Every seat lists the device that holds it, connected or away, with the <b>admin switch</b> of that device. An admin gives admin to any other device or takes it away, but never from the last admin. A device that joins as a table device is a <b>viewer</b>: it watches the game, and the switch on its row gives it admin. The table devices come last. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
+ `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. The link opens in a new tab. <b>Copy link</b> puts the link on the clipboard, to send in a chat, and shows ✓ Copied for a moment. When the copy fails, it says so, and the next tap tries again. Every seat lists the device that holds it, connected or away, with the <b>admin switch</b> of that device. An admin gives admin to any other device or takes it away, but never from the last admin. A device that joins as a table device is a <b>viewer</b>: it watches the game, and the switch on its row gives it admin. The table devices come last. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
  mnote:
  `One column: the QR code and the code first, then the seats and the devices. On a phone this is where a player checks that their seat is theirs.`,
  h:playersScreen(false)};

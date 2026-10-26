@@ -64,6 +64,12 @@ goes straight to the claim screen of that game. Rejected: no QR code, because
 a six-character code is quick to type, but a scan is quicker and cannot be
 misread across a table.
 
+The code and the link can be selected and copied. A tap on the link opens it
+in a new tab, and Players & devices stays open. Copy link puts the link on the
+clipboard, so that a player can send it in a chat. Rejected: opening the link
+in the same tab, because the page then loads again, and during a game it
+leaves Players & devices.
+
 The join code is the only code. A device becomes an admin only when an
 admin device gives it admin, see [Admin rights](#admin-rights). The device
 that creates the game is the first admin. Rejected: an
@@ -181,9 +187,9 @@ device. The Settings screen shows the two groups apart.
   document with its own rules for every field, and the claim screen is
   needed anyway for a device that joins mid-game.
 - **Claim seat**: the seats of the game, and Join as table device.
-- **Players & devices**: the join code, the link, the QR code, and one row
-  per seat with the device that holds it, its admin switch, and its
-  connection state, then the table devices.
+- **Players & devices**: the join code, the link with Copy link, the QR code,
+  and one row per seat with the device that holds it, its admin switch, and
+  its connection state, then the table devices.
   Before Start game it is the lobby, with Start game on an admin device and
   a waiting line on every other device. Rejected: the name "Join", because
   the device joins on the claim screen, and this screen lists who is in.
