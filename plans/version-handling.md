@@ -1,9 +1,10 @@
 # Version handling
 
 Status: Completed. [PR #30](https://github.com/calummoore/twilight-timer/pull/30)
-merged on 2026-10-26. Review 1 findings 1 and 3 are decided, and branch
-`calummoore/untitled-v3` implements them. The post-merge follow-up and the
-three plan lines outside the scope stay open.
+merged on 2026-10-26. Review 1 findings 1 and 3 are decided, and
+[PR #32](https://github.com/calummoore/twilight-timer/pull/32) implements them, with two
+open review items below. The post-merge follow-up and the three plan lines
+outside the scope stay open.
 
 TI4 Nexus keeps each game in a room on the server, in one Cloudflare
 Durable Object per join code. After each change, the server sends every
@@ -269,13 +270,25 @@ Tags: ui
         build check on the socket only, and B, a refusal of every request
         of another build. Reason, from the recommendation: the only failure
         becomes a reload, and every setup that the server can read stays.
-        Branch `calummoore/untitled-v3` implements it.
+        [PR #32](https://github.com/calummoore/twilight-timer/pull/32) implements it.
       - 3. The no-overwrite rule overstates the device store. Severity
         Low, effort Small. Decided 2026-10-26, Cal: A, the rule covers
         stored games only. Alternative: B, a device store that never writes
         over a value that it cannot read. Reason, from the recommendation:
         a device needs a working token more than a value that it cannot
-        read. Branch `calummoore/untitled-v3` implements it.
+        read. [PR #32](https://github.com/calummoore/twilight-timer/pull/32) implements it.
+      - Review 3, of [PR #32](https://github.com/calummoore/twilight-timer/pull/32):
+        `.context/version-handling/review-3.md`, 3 findings. Fixed: 3. Review
+        4 of the fix: no findings. Open:
+        - 1. Create game reads the error word, not the build of the answer.
+          Severity Low, effort Small. Recommended: C, a tested model function
+          that reads the build of the answer first.
+        - 2. The outdated reload opens Home without a word. Severity Low,
+          effort Small. Recommended: A, say so in the spec and the mockup
+          note.
+        - `src/ui/api.ts` and `src/ui/screens/SetupGamePanel.tsx`: the type
+          comments say that `offline` means no answer, but it also covers
+          the invalid and busy answers. Separate branch.
       - `plans/admin-recovery.md`: the status says that PR #28 is open,
         but it merged. Separate branch.
       - `plans/multiplayer.md`: the open item "Review 1, 4" does not record
