@@ -481,6 +481,10 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .home-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
 .pad{padding:18px}
 .home-help{font-size:13px; color:var(--dim); line-height:1.6; margin-bottom:16px}
+/* home: both panels take one height, and the help text takes the free height, so New game lines up with Join game */
+.home-grid > .pnl{display:flex; flex-direction:column}
+.home-grid .pad{flex-grow:1; display:flex; flex-direction:column}
+.home-grid .home-help{flex-grow:1}
 .fld.code{font-size:26px; font-weight:800; letter-spacing:.3em; text-transform:uppercase; text-align:center; padding:14px; width:100%}
 .fld.code.empty{color:var(--faint); letter-spacing:.08em; font-weight:500; font-size:15px}
 .recent{display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center; padding:12px 15px;
