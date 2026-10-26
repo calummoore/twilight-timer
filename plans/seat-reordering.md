@@ -239,12 +239,13 @@ Show re-order mode and the setup handle before the screens change.
       shows.
 - [x] Put the long press, the tap alternative, and reduced motion in the
       note below the screen.
-- [ ] Setup: a ⠿ handle on each row, beside ▲ and ▼, in the iPad, upright
+- [x] Setup: a ⠿ handle on each row, beside ▲ and ▼, in the iPad, upright
       iPad, and phone frames, and a screen with a row held over another.
       Render them in headless Chrome.
-- [ ] Decision 2B: the re-order screen shows a seat held two seats away,
+- [x] Decision 2B: the re-order screen shows a seat held two seats away,
       with the seats between shifted into the gap. Update its notes and the
-      mode note. Render it in headless Chrome.
+      mode note. Render it in headless Chrome. The screenshots of both TODOs
+      are in `.context/seat-reordering/mockup/moves/`.
 - [x] Render the changed screens in headless Chrome. Save the screenshots
       under `.context/seat-reordering/mockup/`. The Speaker & Seating
       screens, also with reduced motion, are there.
