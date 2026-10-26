@@ -44,7 +44,12 @@ export interface AgendaState {
 
 export interface FoldState {
   game: Game
-  /** The players still in the game, in seat order. */
+  /**
+   * Every player, also those who left, in clockwise order. It starts as the
+   * seat order of the game, and seat swaps change it.
+   */
+  ring: string[]
+  /** The players still in the game, in ring order. */
   seats: string[]
   /** The players who left the game, oldest first. */
   departures: Departure[]
@@ -76,6 +81,7 @@ export interface FoldState {
 export function createState(game: Game): FoldState {
   const s: FoldState = {
     game,
+    ring: game.players.map((p) => p.id),
     seats: game.players.map((p) => p.id),
     departures: [],
     round: 1,

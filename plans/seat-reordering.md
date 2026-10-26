@@ -221,31 +221,32 @@ Show re-order mode and the setup handle before the screens change.
 
 Log a seat swap, derive the ring, and move the saved game to version 7.
 
-- [ ] Capture the version 6 fixture from the build before the bump.
-- [ ] `types.ts`: the `seatsSwapped` action and version 7.
-- [ ] The fold: `ring`, the swap with its checks, and `followOrder`.
-- [ ] The view: players in ring order, and the ring helper.
-- [ ] `parse-parts.ts`, `parse.ts`, and `commands.ts`: the action and
+- [x] Capture the version 6 fixture from the build before the bump. The
+      scratch capture is in `.context/seat-reordering/capture/`.
+- [x] `types.ts`: the `seatsSwapped` action and version 7.
+- [x] The fold: `ring`, the swap with its checks, and `followOrder`.
+- [x] The view: players in ring order, and the ring helper.
+- [x] `parse-parts.ts`, `parse.ts`, and `commands.ts`: the action and
       version 7.
-- [ ] Adapt the screens that need it, so that the build passes.
-- [ ] `README.md`: the ring helper under Key code.
-- [ ] Unit tests:
-  - [ ] A swap changes the ring, the pick order, and the voting order.
-  - [ ] A swap with a player who left, an unknown player, or the same
+- [x] Adapt the screens that need it, so that the build passes.
+- [x] `README.md`: the ring helper under Key code.
+- [x] Unit tests:
+  - [x] A swap changes the ring, the pick order, and the voting order.
+  - [x] A swap with a player who left, an unknown player, or the same
         player is rejected.
-  - [ ] A swap during a pick moves the pick clock only when the picker
+  - [x] A swap during a pick moves the pick clock only when the picker
         changes. Every moment belongs to one entry.
-  - [ ] A swap during voting moves the vote clock, and earlier votes stay.
-  - [ ] Undo of a swap returns the ring and every clock.
-  - [ ] A speaker who leaves after a swap passes the token to their new
+  - [x] A swap during voting moves the vote clock, and earlier votes stay.
+  - [x] Undo of a swap returns the ring and every clock.
+  - [x] A speaker who leaves after a swap passes the token to their new
         left neighbour.
-  - [ ] The empty seat of a player who left keeps its place.
-  - [ ] The view and the ring helper list the players in ring order.
-  - [ ] An admin device may swap seats. A seated device and a viewer may
+  - [x] The empty seat of a player who left keeps its place.
+  - [x] The view and the ring helper list the players in ring order.
+  - [x] An admin device may swap seats. A seated device and a viewer may
         not.
-  - [ ] `seatsSwapped` parses as an action and in an `act` command. A
+  - [x] `seatsSwapped` parses as an action and in an `act` command. A
         version 6 game loads as version 7.
-  - [ ] The version 6 fixture loads as version 7 and keeps its clocks.
+  - [x] The version 6 fixture loads as version 7 and keeps its clocks.
 
 ## Milestone 4: Screens
 

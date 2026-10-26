@@ -26,6 +26,10 @@ describe('messages from a device', () => {
       { type: 'act', input: { kind: 'cardPicked', playerId: 'jaz', card: 3 } },
       { type: 'act', input: { kind: 'turnEnded' } },
       { type: 'act', input: { kind: 'strategyCardPlayed', card: 5 } },
+      {
+        type: 'act',
+        input: { kind: 'seatsSwapped', playerId: 'kira', otherId: 'sam' },
+      },
       { type: 'undo' },
       { type: 'pause' },
       { type: 'resume' },
@@ -53,6 +57,14 @@ describe('messages from a device', () => {
         type: 'command',
         rev: 1,
         command: { type: 'act', input: { kind: 'cardPicked', card: 3 } },
+      },
+      {
+        type: 'command',
+        rev: 1,
+        command: {
+          type: 'act',
+          input: { kind: 'seatsSwapped', playerId: 'kira', otherId: 4 },
+        },
       },
       {
         type: 'command',
@@ -94,7 +106,7 @@ describe('the request that creates a game', () => {
     t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
     const request = { token: HOST, game: asVersion1(t.game) }
     const parsed = parseCreateRequest(wire(request))
-    expect(parsed && 'game' in parsed && parsed.game.version).toBe(6)
+    expect(parsed && 'game' in parsed && parsed.game.version).toBe(7)
   })
 
   it('rejects a setup that cannot start a game', () => {

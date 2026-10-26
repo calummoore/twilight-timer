@@ -123,6 +123,23 @@ describe('rights of a seated device', () => {
   })
 })
 
+describe('rights of an admin device', () => {
+  it('swaps two seats, which a seated device and a viewer may not', () => {
+    const view = actionTable().view()
+    const swap: ActionInput = {
+      kind: 'seatsSwapped',
+      playerId: 'tom',
+      otherId: 'kira',
+    }
+    expect(mayAct(HOST, swap, view)).toBe(true)
+    expect(mayAct(phone('tom', true), swap, view)).toBe(true)
+    // Tom's own turn does not give Tom the swap.
+    expect(mayAct(phone('tom'), swap, view)).toBe(false)
+    expect(mayAct(VIEWER, swap, view)).toBe(false)
+    expect(mayAct(undefined, swap, view)).toBe(false)
+  })
+})
+
 describe('rights of every device', () => {
   const view = actionTable().view()
   const adminOnly: Command[] = [

@@ -34,7 +34,7 @@ export function parseAction(raw: unknown): Action | null {
 /** An action as a device sends it, before it gets its time. */
 export function parseActionInput(raw: unknown): ActionInput | null {
   if (!isFields(raw)) return null
-  const { playerId, card, ms, step, removed } = raw
+  const { playerId, otherId, card, ms, step, removed } = raw
   const id = typeof playerId === 'string' ? playerId : null
   switch (raw.kind) {
     case 'cardPicked':
@@ -46,6 +46,10 @@ export function parseActionInput(raw: unknown): ActionInput | null {
     case 'naaluTokenMoved':
     case 'playerRemoved':
       return id ? { kind: raw.kind, playerId: id } : null
+    case 'seatsSwapped':
+      return id && typeof otherId === 'string'
+        ? { kind: raw.kind, playerId: id, otherId }
+        : null
     case 'reactionExtended':
       return isNumber(ms) ? { kind: raw.kind, ms } : null
     case 'statusStepToggled':

@@ -1,0 +1,344 @@
+{
+  "version": 6,
+  "startedAt": 1700000000000,
+  "players": [
+    {
+      "id": "jaz",
+      "name": "Jaz",
+      "colour": "blue",
+      "factionId": "sol"
+    },
+    {
+      "id": "kira",
+      "name": "Kira",
+      "colour": "red",
+      "factionId": "muaat"
+    },
+    {
+      "id": "tom",
+      "name": "Tom",
+      "colour": "green",
+      "factionId": "arborec"
+    },
+    {
+      "id": "priya",
+      "name": "Priya",
+      "colour": "yellow",
+      "factionId": "hacan"
+    },
+    {
+      "id": "sam",
+      "name": "Sam",
+      "colour": "purple",
+      "factionId": "naalu"
+    },
+    {
+      "id": "wren",
+      "name": "Wren",
+      "colour": "orange",
+      "factionId": "argent"
+    }
+  ],
+  "firstSpeakerId": "jaz",
+  "naaluTokenOwnerId": "sam",
+  "windowEndsTurn": true,
+  "actions": [
+    {
+      "kind": "cardPicked",
+      "playerId": "jaz",
+      "card": 3,
+      "at": 1700000010000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "kira",
+      "card": 5,
+      "at": 1700000020000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "tom",
+      "card": 1,
+      "at": 1700000030000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "priya",
+      "card": 7,
+      "at": 1700000040000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "sam",
+      "card": 4,
+      "at": 1700000050000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "wren",
+      "card": 2,
+      "at": 1700000060000
+    },
+    {
+      "kind": "phaseStepped",
+      "at": 1700000060000
+    },
+    {
+      "kind": "turnEnded",
+      "at": 1700000090000
+    },
+    {
+      "kind": "strategyCardPlayed",
+      "card": 1,
+      "at": 1700000110000
+    },
+    {
+      "kind": "reactionDone",
+      "playerId": "jaz",
+      "at": 1700000115000
+    },
+    {
+      "kind": "reactionDone",
+      "playerId": "kira",
+      "at": 1700000120000
+    },
+    {
+      "kind": "reactionExtended",
+      "ms": 30000,
+      "at": 1700000125000
+    },
+    {
+      "kind": "reactionDone",
+      "playerId": "priya",
+      "at": 1700000125000
+    },
+    {
+      "kind": "reactionClosed",
+      "at": 1700000130000
+    },
+    {
+      "kind": "turnEnded",
+      "at": 1700000350000
+    },
+    {
+      "kind": "strategyCardPlayed",
+      "card": 3,
+      "at": 1700000375000
+    },
+    {
+      "kind": "reactionClosed",
+      "at": 1700000385000
+    },
+    {
+      "kind": "strategyCardPlayed",
+      "card": 5,
+      "at": 1700000410000
+    },
+    {
+      "kind": "reactionClosed",
+      "at": 1700000420000
+    },
+    {
+      "kind": "strategyCardPlayed",
+      "card": 7,
+      "at": 1700000445000
+    },
+    {
+      "kind": "reactionClosed",
+      "at": 1700000455000
+    },
+    {
+      "kind": "passed",
+      "at": 1700000460000
+    },
+    {
+      "kind": "passed",
+      "at": 1700000465000
+    },
+    {
+      "kind": "passed",
+      "at": 1700000470000
+    },
+    {
+      "kind": "passed",
+      "at": 1700000475000
+    },
+    {
+      "kind": "passed",
+      "at": 1700000480000
+    },
+    {
+      "kind": "passed",
+      "at": 1700000485000
+    },
+    {
+      "kind": "statusStepToggled",
+      "step": 0,
+      "at": 1700000545000
+    },
+    {
+      "kind": "statusStepToggled",
+      "step": 1,
+      "at": 1700000545000
+    },
+    {
+      "kind": "custodiansSet",
+      "removed": true,
+      "at": 1700000545000
+    },
+    {
+      "kind": "phaseStepped",
+      "at": 1700000605000
+    },
+    {
+      "kind": "votingOpened",
+      "at": 1700000725000
+    },
+    {
+      "kind": "voteCast",
+      "at": 1700000737000
+    },
+    {
+      "kind": "voteCast",
+      "at": 1700000749000
+    },
+    {
+      "kind": "voteCast",
+      "at": 1700000761000
+    },
+    {
+      "kind": "voteCast",
+      "at": 1700000773000
+    },
+    {
+      "kind": "voteCast",
+      "at": 1700000785000
+    },
+    {
+      "kind": "voteCast",
+      "at": 1700000797000
+    },
+    {
+      "kind": "agendaResolved",
+      "at": 1700000797000
+    },
+    {
+      "kind": "votingOpened",
+      "at": 1700000857000
+    },
+    {
+      "kind": "speakerMoved",
+      "playerId": "kira",
+      "at": 1700000877000
+    },
+    {
+      "kind": "voteCast",
+      "at": 1700000887000
+    },
+    {
+      "kind": "agendaResolved",
+      "at": 1700000887000
+    },
+    {
+      "kind": "phaseStepped",
+      "at": 1700000947000
+    },
+    {
+      "kind": "naaluTokenMoved",
+      "playerId": "jaz",
+      "at": 1700000952000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "kira",
+      "card": 2,
+      "at": 1700000957000
+    },
+    {
+      "kind": "playerRemoved",
+      "playerId": "wren",
+      "at": 1700000977000
+    }
+  ],
+  "pauses": [
+    {
+      "from": 1700000185000,
+      "to": 1700000335000,
+      "reasons": [
+        {
+          "reason": "ruleCheck",
+          "from": 1700000245000,
+          "to": 1700000335000
+        }
+      ]
+    }
+  ],
+  "voids": [
+    {
+      "from": 1700000170000,
+      "to": 1700000175000
+    }
+  ],
+  "limitsLog": [
+    {
+      "at": 1700000000000,
+      "enforce": true,
+      "limits": {
+        "turn": {
+          "on": true,
+          "ms": 180000
+        },
+        "reactionWindow": {
+          "on": true,
+          "ms": 120000
+        },
+        "agendaDiscussion": {
+          "on": true,
+          "ms": 240000
+        },
+        "vote": {
+          "on": true,
+          "ms": 60000
+        },
+        "statusPhase": {
+          "on": false,
+          "ms": 300000
+        },
+        "strategyPick": {
+          "on": true,
+          "ms": 45000
+        }
+      }
+    },
+    {
+      "at": 1700000335000,
+      "enforce": false,
+      "limits": {
+        "turn": {
+          "on": true,
+          "ms": 180000
+        },
+        "reactionWindow": {
+          "on": true,
+          "ms": 120000
+        },
+        "agendaDiscussion": {
+          "on": true,
+          "ms": 240000
+        },
+        "vote": {
+          "on": true,
+          "ms": 60000
+        },
+        "statusPhase": {
+          "on": false,
+          "ms": 300000
+        },
+        "strategyPick": {
+          "on": true,
+          "ms": 45000
+        }
+      }
+    }
+  ]
+}

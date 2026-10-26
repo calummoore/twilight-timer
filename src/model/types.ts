@@ -75,6 +75,8 @@ export type Action =
   | { kind: 'voteCast'; at: number }
   | { kind: 'agendaResolved'; at: number }
   | { kind: 'speakerMoved'; at: number; playerId: string }
+  /** Two players swap their seats on the ring. */
+  | { kind: 'seatsSwapped'; at: number; playerId: string; otherId: string }
   | { kind: 'naaluTokenMoved'; at: number; playerId: string }
   | { kind: 'playerRemoved'; at: number; playerId: string }
   | { kind: 'gameEnded'; at: number }
@@ -91,9 +93,9 @@ export type ActionInput = Action extends infer A
  * Undo pops the last action.
  */
 export interface Game {
-  version: 6
+  version: 7
   startedAt: number
-  /** Seat order, clockwise. */
+  /** Seat order at the start, clockwise. Seat swaps change it later. */
   players: Player[]
   firstSpeakerId: string
   /**

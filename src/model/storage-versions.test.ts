@@ -41,7 +41,7 @@ describe('saved games of older versions', () => {
     store.data.set('ti4tempo.game.v1', JSON.stringify(old))
     const game = gameOf(loadGame(store))
     expect(game).toMatchObject({
-      version: 6,
+      version: 7,
       naaluTokenOwnerId: null,
       windowEndsTurn: false,
     })
@@ -95,7 +95,7 @@ describe('saved games of older versions', () => {
       t.act({ kind: 'turnEnded' })
       store.data.set(`ti4tempo.game.v${version}`, JSON.stringify(shape(t.game)))
       const game = gameOf(loadGame(store))
-      expect(game).toMatchObject({ version: 6, windowEndsTurn: false })
+      expect(game).toMatchObject({ version: 7, windowEndsTurn: false })
       // The old build resumed Tom's turn after the window, so he ended it.
       const view = derive(game, T0 + 2 * MIN)
       expect(view.entries.filter((e) => e.kind === 'turn')).toMatchObject([
@@ -155,7 +155,7 @@ describe('saved games of older versions', () => {
     },
   )
 
-  it('rejects a version 4 to 6 game without a valid window rule', () => {
+  it('rejects a version 4 to 7 game without a valid window rule', () => {
     const store = memoryStore()
     const t = table()
     playStrategy(t)
@@ -167,8 +167,10 @@ describe('saved games of older versions', () => {
       ['4', { ...asVersion4(game), windowEndsTurn: 'yes' }],
       ['5', { ...asVersion5(game), windowEndsTurn: 'yes' }],
       ['5', { ...asVersion2(game), version: 5 }],
-      ['6', { ...game, windowEndsTurn: 'yes' }],
+      ['6', { ...game, version: 6, windowEndsTurn: 'yes' }],
       ['6', { ...asVersion2(game), version: 6 }],
+      ['6', { ...game, windowEndsTurn: 'yes' }],
+      ['6', { ...asVersion2(game), version: 7 }],
     ] as const
     for (const [version, data] of broken) {
       store.data.clear()
@@ -197,8 +199,8 @@ describe('saved games of older versions', () => {
     t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
     storeGame(store, t.game)
     expect(gameOf(loadGame(store))).toEqual(t.game)
-    // A version 6 strategic action needs a card field. Only an upgraded game
-    // from an older build holds a null card.
+    // A strategic action of version 6 or later needs a card field. Only an
+    // upgraded game from an older build holds a null card.
     const actions = cardlessLog(t.game)
     store.data.set('ti4tempo.game.v6', JSON.stringify({ ...t.game, actions }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })

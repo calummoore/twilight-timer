@@ -178,8 +178,10 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   - `deal.ts`: the factions in play for the chosen expansions, the choices
     of one seat, and the random deal for the empty seats.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
-    `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
-    player who leaves.
+    `fold-orders.ts` finds who acts next, `fold-removal.ts` takes out a
+    player who leaves, and `fold-seats.ts` swaps two seats on the ring.
+  - `ring.ts`: the players of a running game in ring order, as the seat
+    swaps left it, for the screens outside the game.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
   - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
     limit changes.
@@ -189,6 +191,8 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   - `storage.ts` and `parse.ts`: the settings in `localStorage`, and the
     games that builds before the server saved there. The parser reads games
     of every older version.
+  - `fixtures/`: one game for each version bump, as the build before the
+    bump stored it. `fixtures.test.ts` loads each one.
   - `device-store.ts`: the token of the browser, and its open and recent
     games.
   - `connection.ts`: the offset to the server clock, and the waits between

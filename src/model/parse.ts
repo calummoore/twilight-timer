@@ -30,7 +30,7 @@ import type { Game } from './types'
  */
 export function parseGame(raw: unknown): Game | null {
   const game = isFields(raw) ? upgrade(raw) : null
-  if (game?.version !== 6) return null
+  if (game?.version !== 7) return null
   const players = listOf(game.players, parsePlayer)
   const actions = listOf(game.actions, parseAction)
   const pauses = listOf(game.pauses, parsePause)
@@ -47,7 +47,7 @@ export function parseGame(raw: unknown): Game | null {
     return null
   }
   return {
-    version: 6,
+    version: 7,
     startedAt,
     players,
     firstSpeakerId,
@@ -126,7 +126,14 @@ function upgrade(raw: Fields): Fields {
       // A preview of pause reasons saved version 5 with rule checks and no
       // card, before two cards each took version 5. Main's version 5 logs the
       // card, so only a missing card becomes null.
-      return { ...raw, version: 6, actions: mapList(raw.actions, missingCard) }
+      return upgrade({
+        ...raw,
+        version: 6,
+        actions: mapList(raw.actions, missingCard),
+      })
+    case 6:
+      // Builds before seat swaps have the shape of version 7.
+      return upgrade({ ...raw, version: 7 })
     default:
       return raw
   }

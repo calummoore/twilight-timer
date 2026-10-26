@@ -42,7 +42,7 @@ describe('storage', () => {
   it('rejects a saved game with an unknown version or a broken pause', () => {
     const store = memoryStore()
     const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
-    store.data.set('ti4tempo.game.v6', JSON.stringify({ ...game, version: 7 }))
+    store.data.set('ti4tempo.game.v6', JSON.stringify({ ...game, version: 8 }))
     expect(loadGame(store)).toEqual({ status: 'invalid' })
     store.data.set(
       'ti4tempo.game.v6',
