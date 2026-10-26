@@ -148,6 +148,18 @@ build compiles at the end.
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
+  - Review 1 found 1 finding. Fixed: 1, the notice of Players & devices
+    lost its style, because Milestone 2 removed `.notice` after the merge
+    of PR #28 reused it. Option A put the style back. Report:
+    `.context/retire-pre-server-games/review-1.md`.
+  - `worker/game-room.ts`: `create()` treats a stored room that
+    `parseRoom` cannot read as free, so a new game with the same code
+    overwrites it. Separate branch.
+  - `plans/admin-recovery.md`, `plans/multiplayer.md`,
+    `plans/mvp-review-follow-ups.md`, `plans/pause-reasons.md`,
+    `plans/random-factions.md`, `plans/strategic-action-ends-turn.md`,
+    `plans/three-and-four-player-games.md`: each status says Active with an
+    open pull request, but each pull request has merged. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 
