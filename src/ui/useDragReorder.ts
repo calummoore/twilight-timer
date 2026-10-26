@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type MouseEvent,
@@ -11,7 +12,7 @@ import {
 /** A move further than this, in px, is a drag or a scroll, not a tap. */
 const SLOP_PX = 8
 
-/** A point this close to an item, in px, is over it, so a gap holds the target. */
+/** A point this close to an item, in px, is over it, so a gap has a target. */
 const NEAR_PX = 12
 
 /** For each item that moves, the item whose place it takes. */
@@ -34,7 +35,10 @@ export interface DragReorderOptions {
   onDrop: (heldId: string, targetId: string) => void
 }
 
-/** A move of an item in px, for the CSS `translate` of the item. */
+/**
+ * A point in the scope element, or a move, in px. A move is the CSS
+ * `translate` of an item.
+ */
 export interface Shift {
   x: number
   y: number
@@ -66,7 +70,7 @@ interface Drag {
   overId: string | null
   /** The new places of the other items for that target. */
   places: Places
-  /** How far the pointer moved since the press, in px. */
+  /** How far the pointer moved in the scope since the press, in px. */
   shift: Shift
   /** The place of each item when the drag started, by id, in the scope. */
   homes: ReadonlyMap<string, DOMRect>
@@ -82,9 +86,9 @@ const NO_PLACES: Places = new Map()
  * away from under the pointer. Places and points count from the scope
  * element, so a layout change above it during a drag, such as a shorter
  * note when re-order mode starts, moves them with the items. A point in a
- * narrow gap keeps the nearest item. While an item is held, the scope blocks the page scroll, because iOS
- * Safari keeps the `touch-action` of a touch that has started. The click
- * after a drag or a hold is not a tap.
+ * narrow gap keeps the nearest item. While an item is held, the scope
+ * blocks the page scroll, because iOS Safari keeps the `touch-action` of a
+ * touch that has started. The click after a drag or a hold is not a tap.
  */
 export function useDragReorder(options: DragReorderOptions): DragReorder {
   const [drag, setDrag] = useState<Drag | null>(null)
@@ -92,6 +96,8 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
   const scopeEl = useRef<HTMLElement | null>(null)
   /** Ends the press that runs now, or null. */
   const endPress = useRef<(() => void) | null>(null)
+  /** Moves the held item and the target after a render, or null. */
+  const follow = useRef<(() => void) | null>(null)
   const held = useRef(false)
   const swallow = useRef(false)
 
@@ -100,6 +106,11 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
   })
   // A press that outlives the screen ends with it.
   useEffect(() => () => endPress.current?.(), [])
+  // A render can move the scope, as when re-order mode shortens the note
+  // above the ring. The held item and the target follow before the paint.
+  useLayoutEffect(() => {
+    follow.current?.()
+  })
 
   const press = (id: string, e: PointerEvent<HTMLElement>) => {
     const { holdMs, canDrag } = latest.current
@@ -108,6 +119,8 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     endPress.current?.()
     const { pointerId } = e
     const p0 = inScope(e.clientX, e.clientY)
+    /** The last point of the pointer on the page. */
+    let client: Shift = { x: e.clientX, y: e.clientY }
     let current: Drag | null = null
     let last: Shift = { x: 0, y: 0 }
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -124,13 +137,18 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     }
     const move = (ev: globalThis.PointerEvent) => {
       if (ev.pointerId !== pointerId) return
-      const p = inScope(ev.clientX, ev.clientY)
+      client = { x: ev.clientX, y: ev.clientY }
+      const p = inScope(client.x, client.y)
       last = { x: p.x - p0.x, y: p.y - p0.y }
       if (!current) {
         if (Math.hypot(last.x, last.y) <= SLOP_PX) return
         if (holdMs !== null) return end()
         start(false)
       }
+      track(p)
+    }
+    /** The held item at the move `last`, and the target at point `p`. */
+    const track = (p: Shift) => {
       if (!current) return
       const found = hit(current.homes, p.x, p.y)
       // Over the held item's own place, nothing moves.
@@ -154,8 +172,17 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     const cancel = (ev: globalThis.PointerEvent) => {
       if (ev.pointerId === pointerId) end()
     }
+    const refollow = () => {
+      if (!current) return
+      const p = inScope(client.x, client.y)
+      const shift = { x: p.x - p0.x, y: p.y - p0.y }
+      if (shift.x === current.shift.x && shift.y === current.shift.y) return
+      last = shift
+      track(p)
+    }
     const end = () => {
       clearTimeout(timer)
+      follow.current = null
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', up)
       window.removeEventListener('pointercancel', cancel)
@@ -164,6 +191,7 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     }
 
     endPress.current = end
+    follow.current = refollow
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
     window.addEventListener('pointercancel', cancel)

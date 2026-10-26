@@ -346,9 +346,9 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
 
 ## Milestone 7: Verification, commit, review, and pull request
 
-- [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits and push the branch.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+- [x] Commit with Conventional Commits and push the branch.
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest. Review 1 is in
@@ -357,7 +357,8 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
       `.context/seat-reordering/review-3.md`. It fixed findings 3 and 4,
       and its findings 1 and 2 are review 1, 4 and review 2, 1 below.
       Review 5, after decision 2B and the setup handle, fixed findings 1,
-      2, and 3.
+      2, and 3. Review 6, the re-review of that fix, fixed its findings 1
+      and 2. Reviews 1 to 6 are in `.context/seat-reordering/`.
   - Review 1, 1. Deploy leaves older game pages stale. Resolved on
     2026-10-26: PR #30 merged first, so the deploy reloads every open page.
   - Review 1, 4. Spec and code disagree on ending the mode. Severity Low,
