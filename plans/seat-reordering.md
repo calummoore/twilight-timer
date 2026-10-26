@@ -56,12 +56,10 @@ Decisions:
 Other branches that touch this change, read on 2026-10-26:
 
 - [PR #28](https://github.com/calummoore/twilight-timer/pull/28), admin
-  recovery, is open. It widens the rights table of
-  `docs/product/multiplayer.md`, adds an argument to the rights check, and
-  changes the props of the device rows. The new swap right needs no change
-  for it: a seated device that takes admin while every admin device is away
-  may swap seats, as it may do every admin tap. When it merges first, merge
-  `origin/main` and keep its table and props.
+  recovery, merged on 2026-10-26, and this branch merged it. Its wider
+  rights table and its device rows stay. A seated device that takes admin
+  while every admin device is away may swap seats, as it may do every
+  admin tap.
 - Branch `calummoore/protocol-version-handling` plans a reload of pages from
   another build. Its decision 4 asks each saved-game version bump, from the
   next one on, to commit one JSON fixture of the old shape, captured from
@@ -70,9 +68,11 @@ Other branches that touch this change, read on 2026-10-26:
   If this change merges first, its deploy freezes every open game page
   until the page reloads, because an older page cannot read a version 7
   game.
-- Branch `calummoore/retire-pre-server-games` plans a parser that reads
-  only version 6. Whichever merges second keeps the step from version 6
-  to 7, so that the game `78JVZ7` and every other stored game still load.
+- [PR #29](https://github.com/calummoore/twilight-timer/pull/29), the
+  retirement of the games saved before the server, merged on 2026-10-26,
+  and this branch merged it. The parser has no upgrade chain now. It reads
+  version 6 and 7, because a version 6 game has the shape of version 7, so
+  the game `78JVZ7` and every other stored game still load.
 
 Contract owners:
 
@@ -111,10 +111,11 @@ Contract owners:
   `setup.players`.
 - Rights: only an admin device may swap seats. `mayActFor` already refuses
   an unlisted kind to a seated device. A test pins this.
-- Saved game version 7. `parseActionInput` reads `seatsSwapped`. `upgrade`
-  moves a version 6 game to 7 with no other change, and `startGame` writes
-  version 7. The room version stays 2. No `localStorage` key changes,
-  because the app no longer saves a game on the device.
+- Saved game version 7. `parseActionInput` reads `seatsSwapped`. The
+  parser reads a game of version 6 or 7 and gives version 7, because the
+  two have the same shape, and `startGame` writes version 7. The room
+  version stays 2. No `localStorage` key changes, because the app no longer
+  saves a game on the device.
 - The version 6 fixture: a game that the test table plays on the build
   before the bump, saved as `src/model/fixtures/game-v6.json`, with a test
   that loads it as version 7 and checks its clocks.
@@ -297,10 +298,11 @@ Build re-order mode and the setup handle as the mockup shows them.
   - Outside the scope: `src/ui/useGameClient.ts`, a page drops a state
     message that it cannot read and shows no notice. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked. Put
-      its link in the status paragraph. The description asks Cal to test
-      the preview on an iPad and a phone before the merge: the long press,
-      no text selection or menu, no scroll during a drag, a plain tap on a
-      seat, and reduced motion.
+      its link in the status paragraph. Copy the merge justifications in
+      `.context/seat-reordering/merge-1.md` into its description. The
+      description asks Cal to test the preview on an iPad and a phone
+      before the merge: the long press, no text selection or menu, no
+      scroll during a drag, a plain tap on a seat, and reduced motion.
 
 ## Post-merge follow-up (non-blocking)
 
