@@ -40,13 +40,11 @@ export function SetupSeatList(props: {
           key={i}
           index={i}
           row={row}
-          last={i === props.seats.length - 1}
           speaker={i === props.speaker}
           expansions={props.expansions}
           held={drag.heldId === String(i)}
           shiftY={drag.shift(String(i))?.y ?? null}
           onGrip={(e) => drag.press(String(i), e)}
-          onMove={(by) => props.onMoveRow(i, i + by)}
           onColour={(colour) => props.onColour(i, colour)}
           onName={(name) => props.onName(i, name)}
           onFaction={(factionId) => props.onFaction(i, factionId)}

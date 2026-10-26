@@ -234,10 +234,9 @@
   .count b{padding:10px 0}
   /* a phone: each seat row is a card with its own grid, so the list has one column */
   .seat-list{grid-template-columns:minmax(0,1fr)}
-  .seat-list .seat{grid-template-columns:18px 24px 1fr 1fr 34px; grid-template-areas:"grip mv sw sw spk" "grip sn name fac fac"; gap:9px 7px;
+  .seat-list .seat{grid-template-columns:18px 24px 1fr 1fr 34px; grid-template-areas:"grip sn sw sw spk" "grip sn name fac fac"; gap:9px 7px;
     padding:10px 10px 10px 8px}
   .seat .drag{grid-area:grip}
-  .seat .seat-move{grid-area:mv}
   .seat .sn{grid-area:sn}
   .seat .swatches{grid-area:sw; gap:5px; flex-wrap:nowrap}
   .seat .sw{width:26px; height:26px; border-radius:7px}

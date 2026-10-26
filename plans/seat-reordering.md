@@ -416,11 +416,12 @@ Tags: mockup
 
 Tags: ui
 
-- [ ] `SetupSeat.tsx` and `SetupSeatList.tsx`: remove ▲ and ▼. Port the
+- [x] `SetupSeat.tsx` and `SetupSeatList.tsx`: remove ▲ and ▼. Port the
       grid without their column from the mockup, and remove their styles.
-- [ ] Scratch smoke test: drag setup rows up and down, the speaker star,
+- [x] Scratch smoke test: drag setup rows up and down, the speaker star,
       the name field, and no arrows. Save the evidence under
-      `.context/seat-reordering/smoke/`.
+      `.context/seat-reordering/smoke/`. `setup.log` holds 17 passed
+      checks.
 
 ## Milestone 11: Verification and review of the arrow removal
 

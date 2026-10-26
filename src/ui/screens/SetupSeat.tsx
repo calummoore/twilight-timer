@@ -17,14 +17,13 @@ export interface SeatRow {
 }
 
 /**
- * One seat row: the drag handle, the move buttons, the colour swatches, the
- * name, the faction, and the speaker button. The faction list offers the
- * factions in play, and the faction that the seat holds.
+ * One seat row: the drag handle, the colour swatches, the name, the faction,
+ * and the speaker button. The faction list offers the factions in play, and
+ * the faction that the seat holds.
  */
 export function SetupSeat(props: {
   index: number
   row: SeatRow
-  last: boolean
   speaker: boolean
   expansions: Expansions
   /** The row follows a drag on its handle. */
@@ -33,7 +32,6 @@ export function SetupSeat(props: {
   shiftY: number | null
   /** A press on the handle, which can start a drag. */
   onGrip: (e: PointerEvent<HTMLElement>) => void
-  onMove: (by: number) => void
   onColour: (colour: Colour) => void
   onName: (name: string) => void
   onFaction: (factionId: FactionId | null) => void
@@ -52,22 +50,6 @@ export function SetupSeat(props: {
       <span className="drag" aria-hidden="true" onPointerDown={props.onGrip}>
         <i />
       </span>
-      <div className="seat-move">
-        <button
-          aria-label="Move up"
-          disabled={index === 0}
-          onClick={() => props.onMove(-1)}
-        >
-          ▲
-        </button>
-        <button
-          aria-label="Move down"
-          disabled={props.last}
-          onClick={() => props.onMove(1)}
-        >
-          ▼
-        </button>
-      </div>
       <div className="sn">
         Seat
         <br />
