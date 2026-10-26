@@ -1,23 +1,17 @@
-import { useState } from 'react'
 import { factionName } from '../../model/factions'
 import { cardName } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
 import { Dialog, WaitLabel } from '../controls'
 import { clock } from '../format'
-import { isOver } from '../hooks'
+import { isOver, useConfirm } from '../hooks'
 import { whose, type Rights } from '../rights'
 import { InitiativeRail } from './InitiativeRail'
 
 type ActionView = Extract<PhaseView, { phase: 'action' }>
 
-/**
- * A pass that waits for its confirm: the turn in which it was asked, the
- * cards it warns about, and the tap of that moment, which names the state
- * that the device saw.
- */
+/** A pass that waits for its confirm: the cards it warns about, and the tap. */
 interface PassAsk {
-  turn: string
   unplayed: string[]
   onPass: () => void
 }
@@ -25,6 +19,8 @@ interface PassAsk {
 export function ActionScreen(props: {
   game: GameView
   view: ActionView
+  /** The revision of the game, to which a confirm belongs. */
+  revision: number
   rights: Rights
   showCumulative: boolean
   alarming: boolean
@@ -34,7 +30,9 @@ export function ActionScreen(props: {
   onPass: () => void
 }) {
   const { game, view, rights } = props
-  const [ask, setAsk] = useState<PassAsk | null>(null)
+  // A tap on another device, such as the end of this turn, closes the
+  // confirm, so it cannot pass the next player.
+  const [confirm, setAsk] = useConfirm<PassAsk>(props.revision)
   const seat = game.players.findIndex((p) => p.id === view.activeId)
   const player = game.players[seat]
   const turn = game.timer?.kind === 'turn' ? game.timer : null
@@ -48,14 +46,10 @@ export function ActionScreen(props: {
   const cards = view.activeCards
   const unplayed = cards.filter((c) => !c.played).map((c) => cardName(c.card))
 
-  const turnKey = `${game.round}:${view.activeId}:${view.turnNumber}`
   const pass = () =>
     unplayed.length === 0
       ? props.onPass()
-      : setAsk({ turn: turnKey, unplayed, onPass: props.onPass })
-  // The confirm belongs to the turn in which it opened. When a tap on another
-  // device ends the turn, it closes, so it cannot pass the next player.
-  const confirm = ask?.turn === turnKey ? ask : null
+      : setAsk({ unplayed, onPass: props.onPass })
 
   return (
     <div className="body">

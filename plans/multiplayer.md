@@ -399,10 +399,29 @@ Run the checks, push, and review the branch.
 
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [x] Commit with Conventional Commits and push the branch.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
-      re-review once, and report the rest.
+      re-review once, and report the rest. Review 1:
+      `.context/multiplayer/review-1.md`, 10 findings. Fixed: 1, 5, 6, 7, 8,
+      and 9. Review 2 of the fixes: `.context/multiplayer/review-2.md`, 4
+      findings. Fixed: 1, 2, and 3. Open:
+      - Review 1, 2. One revision drops taps that do not conflict. Severity
+        Medium, effort Small. Recommended: D, a tap that names its player or
+        its device applies while it is still valid.
+      - Review 1, 3. An older page freezes on a newer game. Severity Medium,
+        effort Small. Recommended: A, reload the page once when a state
+        cannot be read.
+      - Review 1, 4. A lost last admin blocks the game. Severity Medium,
+        effort Large. Recommended: B, a seated device may take admin while
+        no admin device is connected.
+      - Review 1, 10. A readable saved game cannot be dismissed. Severity
+        Low, effort Small. Recommended: A, Dismiss with a confirm.
+      - Review 2, 4. The fix rewrote a checked plan TODO. Severity Low,
+        effort Small. Recommended: A, keep the corrected count.
+      - Follow-up: add an unused-export check such as knip to
+        `npm run check`. Effort Large. Covers review 1 finding 8. Previous
+        examples: finding 9 of the MVP review in `plans/ti4-tempo-mvp.md`.
 
 ## Post-merge follow-up (non-blocking)
 

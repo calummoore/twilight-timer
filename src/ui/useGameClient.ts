@@ -88,7 +88,9 @@ export function useGameClient(code: string, token: string): GameClient {
         clearInterval(pings)
         ws.close()
         if (socket.current === ws) socket.current = null
-        if (current?.ws === ws) current = null
+        // An old socket ends quietly: only the current one changes the state.
+        if (current?.ws !== ws) return
+        current = null
         if (disposed || missing) return
         setStatus((s) => (s === 'open' ? 'reconnecting' : s))
         retry = setTimeout(connect, retryDelay(attempt++))
@@ -135,6 +137,9 @@ export function useGameClient(code: string, token: string): GameClient {
       const state = current?.ws.readyState
       if (state === WebSocket.OPEN) current?.ping(WAKE_TIMEOUT_MS)
       else if (state !== WebSocket.CONNECTING) {
+        // A closing socket ends through the drop path, then the next try
+        // starts at once.
+        current?.drop()
         attempt = 0
         connect()
       }

@@ -119,6 +119,7 @@ export function RoomScreen(props: {
     <>
       <GameScreen
         game={room.game}
+        revision={room.revision}
         offset={offset}
         settings={props.settings}
         onSettings={props.onSettings}

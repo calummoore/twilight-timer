@@ -10,7 +10,7 @@ import { SeatingScreen } from './screens/SeatingScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 
 /** The screens that a tap opens over the game. */
-export type Overlay = 'settings' | 'seating' | 'endGame' | null
+export type Overlay = 'settings' | 'seating' | null
 
 /**
  * Everything over the game screen: the reaction window, the screen that a
@@ -20,6 +20,9 @@ export function GameOverlays(props: {
   game: GameView
   overlay: Overlay
   onOverlay: (overlay: Overlay) => void
+  /** The End game confirm is open. */
+  ending: boolean
+  onEnding: (open: boolean) => void
   rights: Rights
   send: (command: Command) => void
   settings: Settings
@@ -79,23 +82,26 @@ export function GameOverlays(props: {
           onLimits={rights.admin ? onLimits : undefined}
           endGame={{
             allowed: rights.may({ kind: 'gameEnded' }),
-            onEnd: () => props.onOverlay('endGame'),
+            onEnd: () => {
+              close()
+              props.onEnding(true)
+            },
           }}
           onClose={close}
         />
       )}
-      {props.overlay === 'endGame' && (
+      {props.ending && (
         <Dialog
           title="End the game?"
           confirm={{
             label: 'End game',
             danger: true,
             onConfirm: () => {
-              close()
+              props.onEnding(false)
               dispatch({ kind: 'gameEnded' })
             },
           }}
-          onCancel={close}
+          onCancel={() => props.onEnding(false)}
         >
           Every clock stops and the post-game stats open. You can reopen the
           game from there.

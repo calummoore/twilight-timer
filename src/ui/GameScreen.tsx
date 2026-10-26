@@ -5,7 +5,7 @@ import { limitsNow, type Settings } from '../model/settings'
 import type { ActionInput, Game } from '../model/types'
 import { NetBar } from './controls'
 import { GameOverlays, type Overlay } from './GameOverlays'
-import { useAlarm, useClock, useHeight, useWakeLock } from './hooks'
+import { useAlarm, useClock, useConfirm, useHeight, useWakeLock } from './hooks'
 import { rightsOf } from './rights'
 import { ActionScreen } from './screens/ActionScreen'
 import { AgendaScreen } from './screens/AgendaScreen'
@@ -21,6 +21,8 @@ import { TopBar } from './TopBar'
  */
 export function GameScreen(props: {
   game: Game
+  /** The revision of the game on the server, to which a confirm belongs. */
+  revision: number
   /** The server clock minus the device clock, in ms. */
   offset: number
   settings: Settings
@@ -34,6 +36,9 @@ export function GameScreen(props: {
 }) {
   const [deviceNow] = useClock(250)
   const [overlay, setOverlay] = useState<Overlay>(null)
+  // A tap on any device closes the End game confirm, also the end of the
+  // game itself, so a reopened game does not show it again.
+  const [ending, setEnding] = useConfirm<true>(props.revision)
   const [barHeight, barRef] = useHeight<HTMLDivElement>()
   const g = derive(props.game, deviceNow + props.offset)
   const rights = rightsOf(props.device, g, props.connected)
@@ -80,6 +85,7 @@ export function GameScreen(props: {
           <ActionScreen
             game={g}
             view={v}
+            revision={props.revision}
             rights={rights}
             showCumulative={props.settings.showCumulative}
             alarming={alarming}
@@ -123,7 +129,7 @@ export function GameScreen(props: {
             game={g}
             rights={rights}
             onNextRound={() => dispatch({ kind: 'phaseStepped' })}
-            onEndGame={() => setOverlay('endGame')}
+            onEndGame={() => setEnding(true)}
           />
         )
     }
@@ -156,6 +162,8 @@ export function GameScreen(props: {
         game={g}
         overlay={overlay}
         onOverlay={setOverlay}
+        ending={ending !== null}
+        onEnding={(open) => setEnding(open ? true : null)}
         rights={rights}
         send={send}
         settings={props.settings}
