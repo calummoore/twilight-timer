@@ -220,7 +220,7 @@ legibility at real size and real viewing distance.
 The prototype has live timers, so the action phase and reaction window can be
 watched running rather than just looked at.
 
-Each table screen is drawn once and shown in three frames: an iPad, an upright
+Each screen is drawn once and shown in three frames: an iPad, an upright
 iPad, and a phone. Switch with the buttons above the screen, or open a link such
 as `mockups/index.html#action/phone`. A control marked **Later** is designed but
 is not in the app yet.

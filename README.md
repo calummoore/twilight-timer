@@ -35,7 +35,7 @@ in the futex account. The app opens at https://ti4.nexus; see
 ## Docs
 
 - [Product spec](docs/product.md): requirements, decisions, and the MVP scope.
-- [Mockup](docs/mockups/index.html): open it in a browser. It draws each table
+- [Mockup](docs/mockups/index.html): open it in a browser. It draws each
   screen once, in an iPad, an upright iPad, and a phone frame. A link such as
   `#action/phone` opens one frame. **Later** marks a control that is not built.
 - [Plans](plans/)

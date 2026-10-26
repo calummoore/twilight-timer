@@ -135,24 +135,33 @@ Tags: mockup
 Draw the new screens and the player-mode states in the iPad, the upright
 iPad, and the phone frame, in the same style as the table screens.
 
-- [ ] Home: New game, Join game with the code field, and Recent games.
-- [ ] Claim seat: the seats with their holders, and the admin code field
+- [x] Home: New game, Join game with the code field, and Recent games.
+      The recent games replace the Load last game button of the setup
+      screen, so that button is gone.
+- [x] Claim seat: the seats with their holders, and the admin code field
       for Join as table.
-- [ ] Join: replace the companion Join screen. The join code, the link, the
-      QR code, the admin code on an admin device, the seats with their
-      holders, and the devices with their rights and connection state.
-- [ ] The top bar chip with the device's seat or Table, also in the compact
-      phone bar.
-- [ ] Action phase on a seated device that waits: End Turn disabled and
+- [x] Join: replace the companion Join screen. The join code, the link, the
+      QR code, the admin code on an admin device, and one row per seat with
+      the device that holds it, its admin switch, and its connection state,
+      then the table devices.
+- [x] The top bar chip with the device's seat or Table, also in the compact
+      phone bar. On the compact bar the speaker chip shows the star and the
+      name only, so that both chips fit on one line.
+- [x] Action phase on a seated device that waits: End Turn disabled and
       naming the active player, and the reaction window with only the
       device's own tile enabled.
-- [ ] Settings in two groups: Game, for admins, and This device.
-- [ ] The reconnecting state.
-- [ ] Remove the seven companion phone screens, their catalogue section, and
+- [x] Settings in two groups: Game, for admins, and This device.
+- [x] The reconnecting state.
+- [x] Remove the seven companion phone screens, their catalogue section, and
       the "Allow phone companions" settings row. Player mode replaces them,
-      as decision 6 says.
-- [ ] Screenshot every new or changed screen in every frame. Evidence:
-      `.context/multiplayer/mockups/`.
+      as decision 6 says. Their styles went with them, and the shell lost
+      its per-screen frame field, because every screen now draws in every
+      frame.
+- [x] Screenshot every new or changed screen in every frame. Evidence:
+      `.context/multiplayer/mockups/`, with `shoot.log`: 31 screens in
+      three frames, no script error, and no sideways overflow.
+- The new screens, the chip, and the settings groups carry the Later mark
+  until milestones 4 and 5 build them.
 
 ## Milestone 3: Server
 
@@ -197,6 +206,9 @@ mode comes in the next milestone.
 - [ ] Recent games, Leave game, and Continue on the server for a game that
       an older build saved on the device.
 - [ ] Settings in two groups. Time limits go through the object.
+- [ ] Port the mockup styles of the Home, Claim seat, and Join screens, the
+      top bar chips, and the reconnecting bar to `src/styles/mockup/`, and
+      remove their Later marks in the mockup.
 - [ ] Stop saving the game in `localStorage`. Keep the parser for the
       upload of an older game.
 - [ ] Smoke test on the dev server: two windows, one creates and one joins
@@ -214,6 +226,7 @@ Seats, rights, and the disabled controls.
       reaction, status, agenda, summary, seating, settings, and stats
       screens, and the top bar.
 - [ ] Admin toggles on the Join screen, never for the last admin.
+- [ ] Remove the Later marks of the seated screens in the mockup.
 - [ ] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
       admin toggles work. Evidence: `.context/multiplayer/app/`.
