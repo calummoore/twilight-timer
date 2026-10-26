@@ -242,13 +242,28 @@ Tags: ui
 
 ## Milestone 5: Verification, commit, review, and pull request
 
-- [ ] Run the targeted tests and the complete gate named in `CLAUDE.md`.
-- [ ] Commit with Conventional Commits and push the branch. The merge of
+- [x] Run the targeted tests and the complete gate named in `CLAUDE.md`.
+      Evidence: `.context/version-handling/gate-1.log` and `gate-2.log`.
+- [x] Commit with Conventional Commits and push the branch. The merge of
       main and its one conflict: `.context/version-handling/merge-justification.md`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
-      re-review once, and report the rest.
+      re-review once, and report the rest. Review 1:
+      `.context/version-handling/review-1.md`, 3 findings. Fixed: 2, with
+      option C, one send helper in the object that skips a closed socket.
+      Open:
+      - 1. Create game skips the build check. Severity Medium, effort
+        Large. Recommended: C, the build in the create request, and the
+        Worker still creates a game that it can read.
+      - 3. The no-overwrite rule overstates the device store. Severity
+        Low, effort Small. Recommended: A, narrow the rule to stored games.
+      - `plans/admin-recovery.md`: the status says that PR #28 is open,
+        but it merged. Separate branch.
+      - `plans/multiplayer.md`: the open item "Review 1, 4" does not record
+        decision B, which PR #28 shipped. Separate branch.
+      - `plans/multiplayer.md`: the status paragraph says that PR #21 is
+        open, but it merged. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 

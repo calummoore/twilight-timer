@@ -147,8 +147,7 @@ export class GameRoom extends DurableObject<Env> {
 
   /** Sends a notice, which ends the connection, and closes the socket. */
   private notify(ws: WebSocket, type: Notice) {
-    ws.send(JSON.stringify({ build: BUILD, type } satisfies ServerMessage))
-    ws.close(1000, NOTICE_REASONS[type])
+    if (sendTo(ws, { build: BUILD, type })) ws.close(1000, NOTICE_REASONS[type])
   }
 
   /** The open sockets, without one that is closing. */
@@ -183,8 +182,7 @@ export class GameRoom extends DurableObject<Env> {
   private send(ws: WebSocket, room: Room) {
     const now = Date.now()
     const { token } = attachmentOf(ws)
-    const message = stateMessage(room, this.connected(), token, now, BUILD)
-    ws.send(JSON.stringify(message))
+    sendTo(ws, stateMessage(room, this.connected(), token, now, BUILD))
   }
 
   /**
@@ -204,8 +202,7 @@ export class GameRoom extends DurableObject<Env> {
     const now = Date.now()
     for (const ws of current) {
       const { token } = attachmentOf(ws)
-      const message = stateMessage(room, connected, token, now, BUILD)
-      ws.send(JSON.stringify(message))
+      sendTo(ws, stateMessage(room, connected, token, now, BUILD))
     }
   }
 }
@@ -215,6 +212,17 @@ const NOTICE_REASONS: Record<Notice, string> = {
   missing: 'No game has this code',
   unreadable: 'This build cannot read the game',
   outdated: 'The page runs another build',
+}
+
+/**
+ * Sends a message on a socket that is still open, and says whether it did.
+ * The object closes a socket with a notice at once, but a message that was
+ * on its way, such as the hello of the page, still arrives after the close.
+ */
+function sendTo(ws: WebSocket, message: ServerMessage): boolean {
+  if (ws.readyState !== WebSocket.OPEN) return false
+  ws.send(JSON.stringify(message))
+  return true
 }
 
 function attachmentOf(ws: WebSocket): Attachment {
