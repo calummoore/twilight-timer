@@ -77,7 +77,7 @@ describe('the stored shapes of older builds', () => {
   it('reads a game of version 6 as version 7, with no other change', () => {
     const game = parseGame(gameV6)
     expect(game?.version).toBe(7)
-    // The build before seat swaps stored version 6, which has the same shape.
+    // The build before seat moves stored version 6, which has the same shape.
     expect({ ...game, version: 6 }).toEqual(gameV6)
   })
 

@@ -100,7 +100,7 @@ describe('the stored game', () => {
     playStrategy(t)
     t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
     expect(read(t.game)).toEqual(t.game)
-    // A build before seat swaps stored version 6, which has the same shape.
+    // A build before seat moves stored version 6, which has the same shape.
     expect(read({ ...t.game, version: 6 })).toEqual(t.game)
     for (const version of [1, 2, 3, 4, 5]) {
       expect(parseGame(wire({ ...t.game, version }))).toBeNull()

@@ -68,7 +68,7 @@ interface Drag {
   places: Places
   /** How far the pointer moved since the press, in px. */
   shift: Shift
-  /** The place of each item when the drag started, by id. */
+  /** The place of each item when the drag started, by id, in the scope. */
   homes: ReadonlyMap<string, DOMRect>
 }
 
@@ -79,8 +79,10 @@ const NO_PLACES: Places = new Map()
  * a mouse. The screen says where the other items go. Each item has a
  * `data-drag-id` attribute inside the scope element. The drag finds its
  * target in the places of the items at its start, because the items slide
- * away from under the pointer. A point in a narrow gap keeps the nearest
- * item. While an item is held, the scope blocks the page scroll, because iOS
+ * away from under the pointer. Places and points count from the scope
+ * element, so a layout change above it during a drag, such as a shorter
+ * note when re-order mode starts, moves them with the items. A point in a
+ * narrow gap keeps the nearest item. While an item is held, the scope blocks the page scroll, because iOS
  * Safari keeps the `touch-action` of a touch that has started. The click
  * after a drag or a hold is not a tap.
  */
@@ -104,7 +106,8 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     if (!e.isPrimary || e.button !== 0 || !canDrag(id)) return
     // A press whose release never came ends here.
     endPress.current?.()
-    const { pointerId, clientX: x0, clientY: y0 } = e
+    const { pointerId } = e
+    const p0 = inScope(e.clientX, e.clientY)
     let current: Drag | null = null
     let last: Shift = { x: 0, y: 0 }
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -121,14 +124,15 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     }
     const move = (ev: globalThis.PointerEvent) => {
       if (ev.pointerId !== pointerId) return
-      last = { x: ev.clientX - x0, y: ev.clientY - y0 }
+      const p = inScope(ev.clientX, ev.clientY)
+      last = { x: p.x - p0.x, y: p.y - p0.y }
       if (!current) {
         if (Math.hypot(last.x, last.y) <= SLOP_PX) return
         if (holdMs !== null) return end()
         start(false)
       }
       if (!current) return
-      const found = hit(current.homes, ev.clientX, ev.clientY)
+      const found = hit(current.homes, p.x, p.y)
       // Over the held item's own place, nothing moves.
       const overId = found === id ? null : found
       const places =
@@ -166,13 +170,29 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     if (holdMs !== null) timer = setTimeout(() => start(true), holdMs)
   }
 
-  /** The place of each item that takes a drop, inside the scope. */
+  /** The top left corner of the scope element on the page. */
+  const origin = (): Shift => {
+    const r = scopeEl.current?.getBoundingClientRect()
+    return { x: r?.left ?? 0, y: r?.top ?? 0 }
+  }
+
+  /** A point of the page, counted from the scope element. */
+  const inScope = (x: number, y: number): Shift => {
+    const o = origin()
+    return { x: x - o.x, y: y - o.y }
+  }
+
+  /** The place of each item that takes a drop, counted from the scope. */
   const measure = (): Map<string, DOMRect> => {
     const homes = new Map<string, DOMRect>()
+    const o = origin()
     const items = scopeEl.current?.querySelectorAll('[data-drag-id]') ?? []
     for (const el of items) {
       const id = el.getAttribute('data-drag-id')
-      if (id !== null) homes.set(id, el.getBoundingClientRect())
+      const r = el.getBoundingClientRect()
+      if (id !== null) {
+        homes.set(id, new DOMRect(r.x - o.x, r.y - o.y, r.width, r.height))
+      }
     }
     return homes
   }

@@ -74,7 +74,7 @@ Other branches that touch this change, read on 2026-10-26:
 - [PR #28](https://github.com/calummoore/twilight-timer/pull/28), admin
   recovery, merged on 2026-10-26, and this branch merged it. Its wider
   rights table and its device rows stay. A seated device that takes admin
-  while every admin device is away may swap seats, as it may do every
+  while every admin device is away may move seats, as it may do every
   admin tap.
 - [PR #30](https://github.com/calummoore/twilight-timer/pull/30), the
   version handling, merged on 2026-10-26, and this branch merged it. A page
@@ -356,6 +356,8 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
       Review 3, after the merges of PR #28, #29, and #30, is in
       `.context/seat-reordering/review-3.md`. It fixed findings 3 and 4,
       and its findings 1 and 2 are review 1, 4 and review 2, 1 below.
+      Review 5, after decision 2B and the setup handle, fixed findings 1,
+      2, and 3.
   - Review 1, 1. Deploy leaves older game pages stale. Resolved on
     2026-10-26: PR #30 merged first, so the deploy reloads every open page.
   - Review 1, 4. Spec and code disagree on ending the mode. Severity Low,
@@ -369,10 +371,16 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
     message that it cannot read and shows no notice. Resolved on
     2026-10-26 by PR #30: a page reads the build of each message first,
     and a page of another build reloads.
+  - Review 5, 4. Setup row move has no unit test. Severity Low, effort
+    Medium. Recommended: A, move the list helpers to `src/model/orders.ts`
+    and test them. Review 5 is in `.context/seat-reordering/review-5.md`.
   - Outside the scope: `plans/admin-recovery.md`,
-    `plans/retire-pre-server-games.md`, `plans/version-handling.md`, and
-    `plans/multiplayer.md` still say that their pull requests are open,
-    but PRs #28, #29, #30, and #21 merged. Separate branch.
+    `plans/retire-pre-server-games.md`, and `plans/multiplayer.md` still
+    say that their pull requests are open, but PRs #28, #29, and #21
+    merged. Separate branch.
+  - Outside the scope: `src/ui/screens/SetupSeatList.tsx`, as the setup
+    rows of `origin/main`: the rows are keyed by their index, so after ▲
+    or ▼ the keyboard focus stays at the old index. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. Copy the merge justifications in
       `.context/seat-reordering/merge-1.md` to `merge-4.md` into its
