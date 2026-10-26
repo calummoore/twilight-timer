@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { initiativeOrder, leftOf, pickOrder, rotate, voteOrder } from './orders'
+import {
+  initiativeOrder,
+  leftOf,
+  moveInRing,
+  pickOrder,
+  rotate,
+  voteOrder,
+} from './orders'
 
 const SEATS = ['jaz', 'kira', 'tom', 'priya', 'sam', 'wren']
 const PICKS = new Map([
@@ -80,5 +87,102 @@ describe('orders', () => {
     expect(rotate([1, 2, 3], -1)).toEqual([3, 1, 2])
     expect(rotate([1, 2, 3], 4)).toEqual([2, 3, 1])
     expect(rotate([], 2)).toEqual([])
+  })
+})
+
+describe('a move in the ring', () => {
+  const move = (id: string, toId: string, seated = SEATS) =>
+    moveInRing(SEATS, seated, id, toId)
+
+  it('trades places with a neighbour, also across seat 1', () => {
+    expect(move('kira', 'tom')).toEqual([
+      'jaz',
+      'tom',
+      'kira',
+      'priya',
+      'sam',
+      'wren',
+    ])
+    expect(move('wren', 'jaz')).toEqual([
+      'wren',
+      'kira',
+      'tom',
+      'priya',
+      'sam',
+      'jaz',
+    ])
+  })
+
+  it('shifts the seats between back into the gap, the shorter way round', () => {
+    expect(move('kira', 'priya')).toEqual([
+      'jaz',
+      'tom',
+      'priya',
+      'kira',
+      'sam',
+      'wren',
+    ])
+    // Two seats back is shorter than four seats on.
+    expect(move('kira', 'wren')).toEqual([
+      'wren',
+      'jaz',
+      'tom',
+      'priya',
+      'sam',
+      'kira',
+    ])
+    expect(move('jaz', 'sam')).toEqual([
+      'wren',
+      'kira',
+      'tom',
+      'priya',
+      'jaz',
+      'sam',
+    ])
+  })
+
+  it('goes clockwise when both ways are as long', () => {
+    expect(move('jaz', 'priya')).toEqual([
+      'kira',
+      'tom',
+      'priya',
+      'jaz',
+      'sam',
+      'wren',
+    ])
+    expect(move('priya', 'jaz')).toEqual([
+      'priya',
+      'kira',
+      'tom',
+      'sam',
+      'wren',
+      'jaz',
+    ])
+  })
+
+  it('keeps the empty seats in place and skips them', () => {
+    const seated = SEATS.filter((id) => id !== 'tom')
+    expect(move('kira', 'priya', seated)).toEqual([
+      'jaz',
+      'priya',
+      'tom',
+      'kira',
+      'sam',
+      'wren',
+    ])
+    expect(move('kira', 'sam', seated)).toEqual([
+      'jaz',
+      'priya',
+      'tom',
+      'sam',
+      'kira',
+      'wren',
+    ])
+  })
+
+  it('keeps the ring when a player is not seated', () => {
+    const seated = SEATS.filter((id) => id !== 'tom')
+    expect(move('tom', 'kira', seated)).toEqual(SEATS)
+    expect(move('kira', 'zed')).toEqual(SEATS)
   })
 })

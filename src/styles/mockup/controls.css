@@ -24,17 +24,21 @@
 .setup-help b{color:var(--dim)}
 .setup-help + .setup-help{margin-top:12px}
 /* The faction column grows to fit the longest faction name before the name column takes the rest. */
-.seat{grid-template-columns:26px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 44px}
+.seat{grid-template-columns:18px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 44px}
 /* The seat rows share the columns of the seat list, so the faction column has one width in every row, also when one seat
    keeps a faction that the other lists leave out. Under subgrid, the padding and the border of a row take 12 px from its
    first and last columns, so those columns are 12 px wider. A browser without subgrid keeps the columns of each row. */
-.seat-list{display:grid; grid-template-columns:38px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 56px;
+.seat-list{display:grid; grid-template-columns:30px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 56px;
   column-gap:11px; align-content:start}
 .seat-list .seat{grid-column:1 / -1; grid-template-columns:subgrid}
 .seat .swatches{flex-wrap:wrap}
-.seat-move{display:flex; flex-direction:column; gap:2px}
-.seat-move button{color:var(--faint); font-size:11px; font-weight:400; line-height:1; padding:3px 0; border-radius:5px; text-align:center}
-.seat-move button:disabled{opacity:.25}
+/* A row moves by its handle: the held row lifts and follows the finger, and the rows between slide by one into the gap.
+   The rows slide only while a drag runs, so a drop puts them in place at once. */
+.seat-list.dragging .seat{transition:translate .2s ease}
+.seat-list .seat.held{position:relative; z-index:2; transition:none; border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 12px 30px rgba(0,0,0,.55)}
+.seat-list .seat.held .drag{cursor:grabbing}
+@media (prefers-reduced-motion: reduce){ .seat-list.dragging .seat{transition:none} }
 .picker .spkb{margin-left:6px; padding:10px 14px}
 .picker-help{font-size:12.5px; color:var(--faint); line-height:1.5; margin-left:22px; max-width:250px}
 .order-help{font-size:11.5px; color:var(--faint); margin-top:8px; line-height:1.5}

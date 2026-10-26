@@ -24,6 +24,10 @@ describe('messages from a device', () => {
       { type: 'act', input: { kind: 'cardPicked', playerId: 'jaz', card: 3 } },
       { type: 'act', input: { kind: 'turnEnded' } },
       { type: 'act', input: { kind: 'strategyCardPlayed', card: 5 } },
+      {
+        type: 'act',
+        input: { kind: 'seatMoved', playerId: 'kira', toId: 'sam' },
+      },
       { type: 'undo' },
       { type: 'pause' },
       { type: 'resume' },
@@ -55,6 +59,14 @@ describe('messages from a device', () => {
         type: 'command',
         rev: 1,
         command: { type: 'act', input: { kind: 'cardPicked', card: 3 } },
+      },
+      {
+        type: 'command',
+        rev: 1,
+        command: {
+          type: 'act',
+          input: { kind: 'seatMoved', playerId: 'kira', toId: 4 },
+        },
       },
       {
         type: 'command',
@@ -115,11 +127,12 @@ describe('the build on the wire', () => {
 })
 
 describe('the request that creates a game', () => {
-  it('reads a setup', () => {
-    expect(parseCreateRequest(wire({ token: HOST, setup: SETUP }))).toEqual({
-      token: HOST,
-      setup: SETUP,
-    })
+  it('reads a setup, and leaves the build of the page apart', () => {
+    const request = { token: HOST, build: BUILD, setup: SETUP }
+    const seats = { token: HOST, setup: SETUP }
+    expect(parseCreateRequest(wire(request))).toEqual(seats)
+    // A page from before the request named its build.
+    expect(parseCreateRequest(wire(seats))).toEqual(seats)
   })
 
   it('rejects a setup that cannot start a game', () => {

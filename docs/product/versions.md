@@ -17,20 +17,32 @@ Rejected: a notice with a Reload button before the reload, because a device
 of another version shows wrong data, and the players should not have to
 act.
 
-The server applies no tap from a device of another version. An update can
-end the connection of a device, or keep it open. A device whose connection
-ends connects again, learns of the update, and reloads. A device that keeps
-its connection learns of the update at the next change in the game: a tap,
-or a device that connects or leaves. When that change is a tap from a
-device of the older version, the tap does nothing, that device reloads, and
-the player taps again. Rejected: a device that asks the server for its
-version once a minute, and a connection check that wakes the game on the
-server, because a lost tap after an update is rare and costs one more tap.
+In a game, the server applies no tap from a device of another version. An
+update can end the connection of a device, or keep it open. A device whose
+connection ends connects again, learns of the update, and reloads. A device
+that keeps its connection learns of the update at the next change in the
+game: a tap, or a device that connects or leaves. When that change is a tap
+from a device of the older version, the tap does nothing, that device
+reloads, and the player taps again. Rejected: a device that asks the server
+for its version once a minute, and a connection check that wakes the game on
+the server, because a lost tap after an update is rare and costs one more
+tap.
 
 A device reloads by itself once for each new version. When the reload does
 not bring the version of the server, the device stops and shows "A new
 version is live", with a Reload button. So a device never reloads in a
 loop.
+
+Create game names the version of the device. The server creates every game
+whose seats it can read, also from a device of another version. That device
+reloads when it opens the game. When the server cannot read the seats from
+a device of another version, it creates nothing, and the device reloads
+once by itself. The host then enters the seats again. When that reload does
+not bring the version of the server, the setup shows "A new version is
+live", with a Reload button. Rejected: a refusal of every Create game from
+another version, because the host would enter the seats again after each
+update. Rejected: no version on Create game, because a device of an older
+version would fail to create a game until a manual reload.
 
 A code has no game, a game that the server can read, or a game that the
 server holds but cannot read, for example after a faulty update. The server

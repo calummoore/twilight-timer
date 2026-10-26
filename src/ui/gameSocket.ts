@@ -3,10 +3,8 @@ import {
   PING_INTERVAL_MS,
   PONG_TIMEOUT_MS,
   WAKE_TIMEOUT_MS,
-  checkBuild,
   nextOffset,
   retryDelay,
-  type GuardStore,
 } from '../model/connection'
 import { isFields } from '../model/parse-fields'
 import {
@@ -17,6 +15,7 @@ import {
   type ServerMessage,
 } from '../model/protocol'
 import { socketUrl } from './api'
+import { checkServerBuild } from './reload'
 
 type Timer = ReturnType<typeof setTimeout>
 
@@ -44,18 +43,6 @@ interface Connection {
   ws: WebSocket
   ping: (timeoutMs: number) => void
   drop: () => void
-}
-
-/**
- * The reload guard in `sessionStorage`, which survives a reload of the tab.
- * When the browser blocks it, the guard keeps nothing, and the page stops
- * instead of a reload.
- */
-const GUARD: GuardStore = {
-  getItem: (key) => attempt(() => sessionStorage.getItem(key), null),
-  setItem: (key, value) =>
-    attempt(() => sessionStorage.setItem(key, value), undefined),
-  removeItem: (key) => attempt(() => sessionStorage.removeItem(key), undefined),
 }
 
 /**
@@ -125,12 +112,8 @@ export function openGameSocket(
       if (!isFields(raw)) return
       // The build comes first, so a page of another build reloads even when
       // it cannot read the rest.
-      const check = checkBuild(GUARD, BUILD, buildOf(raw))
-      if (check === 'reload') {
-        end()
-        location.reload()
-        return
-      }
+      const check = checkServerBuild(buildOf(raw))
+      if (check === 'reload') return end()
       if (check === 'outdated') return finish('outdated')
       const message = parseServerMessage(raw)
       if (!message) return
@@ -181,14 +164,6 @@ export function openGameSocket(
       document.removeEventListener('visibilitychange', wake)
       window.removeEventListener('online', wake)
     },
-  }
-}
-
-function attempt<T>(run: () => T, fallback: T): T {
-  try {
-    return run()
-  } catch {
-    return fallback
   }
 }
 

@@ -195,7 +195,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 
 /* setup */
 .setup-grid{display:grid; grid-template-columns:1fr 330px; gap:18px; height:100%; min-height:0}
-.seat{display:grid; grid-template-columns:26px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
+.seat{display:grid; grid-template-columns:18px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
   padding:11px; border:1px solid var(--line); border-radius:11px; margin-bottom:9px; background:#0a0f16}
 .seat.sp{border-color:#4d4322; background:#14110a}
 .seat .sn{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); text-align:center}
@@ -452,6 +452,22 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 /* the empty seat of a player who left the game */
 .seatnode.out{opacity:.38; cursor:default}
 .seatnode.out .nm{text-decoration:line-through; text-decoration-color:var(--faint)}
+/* Re-order mode: every seat of a player in the game shakes, as on the iOS home screen. The shake turns the rotate
+   property, so the transform that places the seat stays. The held seat lifts, stops shaking, and follows the finger. The
+   seat under it slides into the gap. A device set to reduced motion shows a still dashed outline in place of the shake. */
+.ringwrap .seatnode{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+  transition:left .2s ease, top .2s ease, translate .2s ease}
+.ringwrap.reorder .seatnode:not(.out){touch-action:none; animation:shake .26s ease-in-out infinite alternate}
+.ringwrap.reorder .seatnode:nth-child(even){animation-direction:alternate-reverse}
+.ringwrap.reorder .seatnode.held{z-index:2; scale:1.08; animation:none; transition:none; border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 12px 30px rgba(0,0,0,.55)}
+@keyframes shake{from{rotate:-1.5deg} to{rotate:1.5deg}}
+@media (prefers-reduced-motion: reduce){
+  .ringwrap .seatnode{transition:none}
+  .ringwrap.reorder .seatnode:not(.out){animation:none; outline:1px dashed var(--accent); outline-offset:3px}
+}
+.ibtn.reorder{justify-content:center; padding:13px}
+.ibtn.reorder.on{color:var(--accent); border-color:#2b6b66; background:#0b1c1f}
 .ordlist{display:flex; flex-direction:column; gap:5px}
 .ordrow{display:grid; grid-template-columns:24px 1fr auto; gap:11px; align-items:center; padding:7px 12px;
   border:1px solid var(--line); border-radius:9px; background:#0a0f16; font-size:14px}
@@ -461,7 +477,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .ordrow .tag2{font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:800;
   padding:2px 7px; border-radius:20px; background:#2a2210; color:#f0cf6a}
 .ordrow.isspk{border-color:#5a4d22; background:#14110a}
-.drag{width:26px; text-align:center; color:#3d4a5a; font-size:15px; cursor:grab}
+.drag{display:grid; place-items:center; align-self:stretch; color:var(--faint); cursor:grab; touch-action:none;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+.drag i{display:block; width:10px; height:16px; background:radial-gradient(circle, currentColor 1.5px, transparent 1.8px) 0 0/5px 5.33px}
 .undo-bar{display:flex; align-items:center; gap:18px; background:#0c1620; border:1px solid #2b4a58;
   border-radius:13px; padding:15px 18px; margin-bottom:16px}
 .undo-bar .k{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
@@ -587,17 +605,21 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .setup-help b{color:var(--dim)}
 .setup-help + .setup-help{margin-top:12px}
 /* The faction column grows to fit the longest faction name before the name column takes the rest. */
-.seat{grid-template-columns:26px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 44px}
+.seat{grid-template-columns:18px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 44px}
 /* The seat rows share the columns of the seat list, so the faction column has one width in every row, also when one seat
    keeps a faction that the other lists leave out. Under subgrid, the padding and the border of a row take 12 px from its
    first and last columns, so those columns are 12 px wider. A browser without subgrid keeps the columns of each row. */
-.seat-list{display:grid; grid-template-columns:38px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 56px;
+.seat-list{display:grid; grid-template-columns:30px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 56px;
   column-gap:11px; align-content:start}
 .seat-list .seat{grid-column:1 / -1; grid-template-columns:subgrid}
 .seat .swatches{flex-wrap:wrap}
-.seat-move{display:flex; flex-direction:column; gap:2px}
-.seat-move b{color:var(--faint); font-size:11px; font-weight:400; line-height:1; padding:3px 0; border-radius:5px; text-align:center}
-.seat-move b.off{opacity:.25}
+/* A row moves by its handle: the held row lifts and follows the finger, and the rows between slide by one into the gap.
+   The rows slide only while a drag runs, so a drop puts them in place at once. */
+.seat-list.dragging .seat{transition:translate .2s ease}
+.seat-list .seat.held{position:relative; z-index:2; transition:none; border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 12px 30px rgba(0,0,0,.55)}
+.seat-list .seat.held .drag{cursor:grabbing}
+@media (prefers-reduced-motion: reduce){ .seat-list.dragging .seat{transition:none} }
 .picker .spkb{margin-left:6px; padding:10px 14px}
 .picker-help{font-size:12.5px; color:var(--faint); line-height:1.5; margin-left:22px; max-width:250px}
 .order-help{font-size:11.5px; color:var(--faint); margin-top:8px; line-height:1.5}
@@ -663,23 +685,38 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .frame.phone::before, .frame.tablet::before{content:""; position:absolute; bottom:8px; left:50%; width:138px; height:5px;
   margin-left:-69px; border-radius:3px; background:#e9eff7; opacity:.45; z-index:50}
 
+/* ─────────── the game top bar chips: up to 1150 px wide ─────────── */
+/* Beside the phase pill and the tools, the words of the chips need about 1100 px with the default names, and more with
+   longer names. Up to 1150 px, the speaker chip shows the star and the name, and the device chip the dot and the name. */
+@container app (max-width: 1150px){
+  .top.game .chips .word{display:none}
+}
+
+/* ─────────── the two-row game top bar: up to 1050 px wide ─────────── */
+/* The one-row bar needs about 1035 px with the compact chips and the default names. Up to 1050 px, the round, the phase
+   pill, and the game clock take the first row, and the chips and the tools the second. The chips span two columns, so
+   that long names fit. An extra control of a screen takes a third row. */
+@container app (max-width: 1050px){
+  .top.game{display:grid; grid-template-columns:auto 1fr auto;
+    grid-template-areas:"round pill gt" "spk spk tools" "extra extra extra"; column-gap:12px; row-gap:0; align-items:center}
+  .top.game .round{grid-area:round}
+  .top.game .phase-pill{grid-area:pill; justify-self:center}
+  .top.game .gt{grid-area:gt}
+  .top.game .chips{grid-area:spk; justify-self:start}
+  .top.game .tools{grid-area:tools; gap:8px}
+  .top.game .extra{grid-area:extra; justify-self:end}
+  .top.game .chips, .top.game .tools, .top.game .extra{margin-top:10px}
+  .top.game .spacer{display:none}
+}
+
 /* ─────────── narrow: an upright iPad or a phone ─────────── */
 @container app (max-width: 900px){
   .lay{overflow-y:auto; scrollbar-width:none}
   .lay::-webkit-scrollbar{display:none}
   .lay > *{flex:none}
   .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
-  .top.game{display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:"round pill gt" "spk extra tools";
-    column-gap:12px; row-gap:10px; align-items:center}
-  .top.game .round{grid-area:round}
-  .top.game .phase-pill{grid-area:pill; justify-self:center}
-  .top.game .gt{grid-area:gt}
-  .top.game .chips{grid-area:spk; justify-self:start}
-  .top.game .extra{grid-area:extra; justify-self:end}
   .home-grid, .claim-grid{grid-template-columns:1fr}
   .lay > .open-wait{flex:1 0 auto}
-  .top.game .tools{grid-area:tools; gap:8px}
-  .top.game .spacer{display:none}
   .content, .body, .scroll{overflow:visible; min-height:auto}
   .body{grid-template-columns:1fr; padding:14px 16px 18px}
   .split{grid-template-columns:minmax(0,1fr)}
@@ -895,9 +932,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .count b{padding:10px 0}
   /* a phone: each seat row is a card with its own grid, so the list has one column */
   .seat-list{grid-template-columns:minmax(0,1fr)}
-  .seat-list .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
+  .seat-list .seat{grid-template-columns:18px 24px 1fr 1fr 34px; grid-template-areas:"grip sn sw sw spk" "grip sn name fac fac"; gap:9px 7px;
     padding:10px 10px 10px 8px}
-  .seat .seat-move{grid-area:mv}
+  .seat .drag{grid-area:grip}
   .seat .sn{grid-area:sn}
   .seat .swatches{grid-area:sw; gap:5px; flex-wrap:nowrap}
   .seat .sw{width:26px; height:26px; border-radius:7px}
@@ -1146,8 +1183,20 @@ const S = {};
 // limits: the time limits are on. The panel summary scrolls when it is full.
 const EXPANSIONS = [['pok','Prophecy of Kings'], ['te',"Thunder's Edge"], ['keleres','Council Keleres']];
 const ALL_SETS = EXPANSIONS.map(([k])=>k);
-// failed: Create game did not reach the server.
-const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
+// The translate of a setup row during a drag. A row is as tall as the others, with a 9 px gap under it.
+const rowShift = (id, drag) => {
+  if (!drag) return '';
+  const at = k => Object.keys(P).indexOf(k), from = at(drag.held), to = at(drag.over), i = at(id);
+  if (id===drag.held) return `translate:0 calc(${to-from} * (100% + 9px) + ${drag.dy}px)`;
+  const between = from<to ? i>from && i<=to : i>=to && i<from;
+  return between ? `translate:0 calc(${from<to?-1:1} * (100% + 9px))` : '';
+};
+
+// failed: Create game did not reach the server ('offline'), or the server runs a newer version that a reload did
+// not bring ('outdated').
+// drag: the row that a finger holds by its handle, the row under the finger, and how far the finger is from the centre
+// of that row, in px. The rows between slide by one into the gap.
+const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false, drag=null) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">✕ Back</button><button class="ibtn">⚙<span class="word"> Settings</span></button></div>
   <div class="content"><div class="setup-grid">
@@ -1156,12 +1205,12 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false) => { co
         <div class="setup-label">Players · in seat order, clockwise around the table</div>
         <div class="count">${[3,4,5,6,7,8].map(n=>`<b class="${n===6?'on':''}">${n}</b>`).join('')}</div>
       </div>
-      <div class="seat-list scroll grow">
+      <div class="seat-list scroll grow ${drag?'dragging':''}">
       ${Object.entries(P).map(([id,d])=>{
         const none = empty.includes(id);
         return `
-        <div class="seat ${d.speaker?'sp':''}" style="${col(id)}">
-          <div class="seat-move"><b class="${d.seat===1?'off':''}">▲</b><b class="${d.seat===6?'off':''}">▼</b></div>
+        <div class="seat ${d.speaker?'sp':''} ${drag?.held===id?'held':''}" style="${col(id)};${rowShift(id, drag)}">
+          <div class="drag" aria-hidden="true"><i></i></div>
           <div class="sn">Seat<br>${d.seat}</div>
           <div class="swatches">${COLOURS.map(c=>
             `<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}</div>
@@ -1190,23 +1239,39 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false) => { co
           ${EXPANSIONS.map(([k,n])=>`<button class="exp ${sets.includes(k)?'on':''}">${n}</button>`).join('')}
         </div></div>
         ${missing?'<div class="setup-need">Pick a faction for every seat to create the game.</div><button class="deal">Random factions for empty seats</button>':''}
-        ${failed?'<div class="setup-need">The game could not be created. Check the connection and try again.</div>':''}
-        <button class="big lg" style="width:100%" ${missing?'disabled':''}>CREATE GAME</button>
+        ${failed==='offline'?'<div class="setup-need">The game could not be created. Check the connection and try again.</div>':''}
+        ${failed==='outdated'?'<div class="setup-need">A new version is live. Reload the page.</div>':''}
+        <button class="big lg" style="width:100%" ${missing?'disabled':''}>${failed==='outdated'?'RELOAD':'CREATE GAME'}</button>
       </div>
     </div>
   </div></div></div>`; };
 
 S.setup = {t:'Setup — New Game', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. Only at 3 or 4 players, a second line under the summary says that each player picks <b>two</b> strategy cards, and that the lower card sets their place in the turn order. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game. <b>Create game</b> then puts the seats on the server and opens the claim screen, where this device takes a seat or joins as the table device, as the first admin. Then the lobby opens, where the phones join before the host starts the game. Elsewhere, dashed and dimmed controls marked <b>Later</b> are designed but not in the app yet.`,
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. A row moves by its <b>⠿ handle</b>. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. Only at 3 or 4 players, a second line under the summary says that each player picks <b>two</b> strategy cards, and that the lower card sets their place in the turn order. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game. <b>Create game</b> then puts the seats on the server and opens the claim screen, where this device takes a seat or joins as the table device, as the first admin. Then the lobby opens, where the phones join before the host starts the game. Elsewhere, dashed and dimmed controls marked <b>Later</b> are designed but not in the app yet.`,
  mnote:
- `On a narrow screen, the Game panel moves under the seats, and the screen scrolls. On a phone, each seat row becomes a card: the arrows and the seat number on the left, the swatches and the speaker ★ on top, and the name and faction fields under them. Every control of the iPad row is still there.`,
+ `On a narrow screen, the Game panel moves under the seats, and the screen scrolls. On a phone, each seat row becomes a card: the handle and the seat number down the left edge, the swatches and the speaker ★ on top, and the name and faction fields under them. Every control of the iPad row is still there.`,
  h:setupScreen()};
+
+S.setupMove = {t:'Setup — Move a Row', note:
+ `Each row has a <b>⠿ handle</b> on its left. A drag starts at once on the handle, so the name field still takes text and
+  the swatches still take a tap. Here Wren sits at the other end of the table from where Wren's row says, so the
+  finger drags Wren's row up over Tom's. The rows from Tom to Sam <b>slide down by one</b> into the gap, and the drop
+  puts Wren in seat 3. The speaker ★ stays with its player.`,
+ mnote:
+ `On a phone, the handle runs down the left edge of each seat card. A drag on the handle does not scroll the list, and a swipe on the rest of the card does. A row further away than the screen shows moves in two drags, with a scroll between.`,
+ h:setupScreen([], ALL_SETS, true, false, {held:'wren', over:'tom', dy:14})};
 
 S.setupFailed = {t:'Setup — Create Failed', note:
  `Create game puts the seats on the server, so it needs a connection. While the request runs, the button reads CREATING and waits. When the server cannot be reached, the line above the button says so, and the seats stay as they are, so one more tap tries again. <b>Back</b> goes to Home and drops the seats.`,
  mnote:
  `The line sits above CREATE GAME, at the end of the Game panel.`,
- h:setupScreen([], ALL_SETS, true, true)};
+ h:setupScreen([], ALL_SETS, true, 'offline')};
+
+S.setupOutdated = {t:'Setup — New Version', note:
+ `Create game sends the version of this page with the seats. The server creates every game whose seats it can read, also from a page of an older version, which then reloads when it opens the game. When the server cannot read the seats of a page of another version, it creates nothing, and the page reloads once by itself, so the host enters the seats again. The host sees this state only when that reload did not bring the new version, for example from an old cache. <b>Reload</b> reloads the page.`,
+ mnote:
+ `The line sits above RELOAD, at the end of the Game panel.`,
+ h:setupScreen([], ALL_SETS, true, 'outdated')};
 
 S.setupMissing = {t:'Setup — Faction Missing', note:
  `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>CREATE GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
@@ -1291,14 +1356,27 @@ const PICK_ORDER = rot(SEATS, SPK);        // speaker picks first, then clockwis
 const VOTE_ORDER = rot(SEATS, SPK+1);      // starts left of speaker; speaker votes last
 
 // The seats sit on an ellipse inside a 500 × 410 box, given in percent so that the ring scales with the screen.
+const seatAt = i => { const a=(-90 + i*360/SEATS.length)*Math.PI/180;
+  return [(250+190*Math.cos(a))/500*100, (205+150*Math.sin(a))/410*100]; };
 // out: the player who left the game, or null. Their seat stays in the ring, empty.
-const ringNodes = out => SEATS.map((id,i)=>{
-  const a=(-90 + i*360/SEATS.length)*Math.PI/180;
-  const x=(250+190*Math.cos(a))/500*100, y=(205+150*Math.sin(a))/410*100;
-  return `<div class="seatnode ${i===SPK?'isspk':''} ${id===out?'out':''}" style="${col(id)};left:${x}%;top:${y}%">
+// The seats after `held` moves into the seat of `over`: the seats between shift one seat into the gap, the shorter way
+// round the table, or clockwise when both ways are as long.
+const moveRing = (order, held, over) => {
+  const n=order.length, from=order.indexOf(held), to=order.indexOf(over), ahead=(to-from+n)%n, step=ahead<=n-ahead?1:-1;
+  const out=[...order];
+  for(let k=from; k!==to; k=(k+step+n)%n) out[k]=order[(k+step+n)%n];
+  out[to]=held; return out;
+};
+// drag: in re-order mode, the seat that a finger holds, the seat under the finger, and how far the finger is from the
+// centre of that seat, in percent. The seats between slide one seat into the gap that the held seat left.
+const ringNodes = (out, drag=null) => { const moved = drag ? moveRing(SEATS, drag.held, drag.over) : SEATS;
+  return SEATS.map((id,i)=>{
+  const held = drag?.held===id;
+  const [x,y] = held ? seatAt(SEATS.indexOf(drag.over)).map((v,k)=>v+drag.off[k]) : seatAt(moved.indexOf(id));
+  return `<div class="seatnode ${i===SPK?'isspk':''} ${id===out?'out':''} ${held?'held':''}" style="${col(id)};left:${x}%;top:${y}%">
     ${i===SPK?'<span class="tok">★</span>':''}
     <i></i><div class="nm">${P[id].name}</div><div class="sn2">${id===out?'Left · round 3':`Seat ${i+1}`}</div></div>`;
-}).join('');
+}).join(''); };
 
 const ordList = ids => ids.map((id,i)=>{
   const spk = id===SEATS[SPK];
@@ -1307,17 +1385,18 @@ const ordList = ids => ids.map((id,i)=>{
     ${spk?'<span class="tag2">★ Speaker</span>':'<span></span>'}</div>`;
 }).join('');
 
-const seatingScreen = (out=null) => `<div class="space"></div><div class="lay">
+// drag: re-order mode, with the seat that a finger holds, as ringNodes takes it, or null.
+const seatingScreen = (out=null, drag=null) => `<div class="space"></div><div class="lay">
   <div class="top stack"><div class="round"><b>Speaker &amp; seating</b> · Round 3</div>
     <div class="spacer"></div><button class="ibtn">Remove a player</button><button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
   <div class="content split" style="--side:400px;gap:20px">
     <div class="pnl" style="display:flex;flex-direction:column">
-      <div class="pnl-h">The table <span class="pnl-note">tap a seat to move the speaker token</span></div>
+      <div class="pnl-h">The table <span class="pnl-note">${drag?'drag a seat to its place':'tap a seat to move the speaker · hold to re-order'}</span></div>
       <div style="padding:18px 0 8px">
-        <div class="ringwrap">
+        <div class="ringwrap ${drag?'reorder':''}">
           <div class="cc"><div class="l">Speaker</div><div class="v">★ Jaz</div>
             <div class="s">Picks first in the strategy phase. <br>Votes last, and breaks ties.</div></div>
-          ${ringNodes(out)}
+          ${ringNodes(out, drag)}
         </div>
       </div>
       <div style="padding:0 20px 18px;margin-top:auto">
@@ -1332,23 +1411,39 @@ const seatingScreen = (out=null) => `<div class="space"></div><div class="lay">
       <div class="pnl"><div class="pnl-h">Agenda voting order</div>
         <div class="ord-body"><div class="ordlist">${ordList(VOTE_ORDER.filter(id=>id!==out))}</div>
           <div class="order-help">Starts left of the speaker. The speaker votes last.</div></div></div>
-      <button class="ibtn later" style="justify-content:center;padding:13px">⠿ Re-order seats${LATER}</button>
-      <div class="order-help later" style="text-align:center">Seating is set once at game start. Re-order only to fix a
-        mistake — it changes both orders above.</div>
+      ${drag?'<button class="ibtn reorder on">✓ Done</button>':'<button class="ibtn reorder">⠿ Re-order seats</button>'}
+      <div class="order-help" style="text-align:center">${drag?'Or tap a seat, then its new place. Undo takes a move back.'
+        :'Move seats when the ring does not match the table.'}</div>
     </div>
   </div></div>`;
 
 S.seating = {t:'Speaker & Seating', note:
- `Seating is a <b>fixed ring</b> set at game start; the speaker is just a <b>pointer into it</b>. Both derived
+ `Seating is a <b>ring</b> set at setup; the speaker is just a <b>pointer into it</b>. Both derived
   orders fall out automatically, so moving the token is the only thing anyone ever needs to do — and the token
   does move, via Politics (3) and certain agendas. Note the two orders differ: strategy picks start <b>with</b>
   the speaker, while agenda voting starts to their <b>left and leaves the speaker until last</b>, since they
-  break ties. Re-ordering seats, marked <b>Later</b>, is deliberately understated — it's a correction for a setup
-  mistake, not something a round should ever need. <b>Remove a player</b> in the top bar is for a player who
-  is eliminated or goes home.`,
+  break ties. When the ring does not match the table, an admin device moves seats: a <b>long press</b> on a
+  seat, or <b>Re-order seats</b>, starts re-order mode. A plain tap on a seat still moves the speaker token.
+  <b>Remove a player</b> in the top bar is for a player who is eliminated or goes home.`,
  mnote:
- `The ring scales down and keeps its shape, because it is a map of the real table. The two orders sit side by side under it on a phone.`,
+ `The ring scales down and keeps its shape, because it is a map of the real table. The two orders sit side by side under it on a phone, and Re-order seats spans both.`,
  h:seatingScreen()};
+
+S.reorder = {t:'Speaker & Seating — Re-order Seats', note:
+ `Kira sits between Priya and Sam at the table, not between Jaz and Tom. A <b>long press</b> of about half a second on
+  Kira's seat starts re-order mode, as on the iOS home screen: every seat of a player in the game shakes, and Kira's
+  seat lifts and follows the finger at once. A finger that moves before the half second scrolls the screen as usual,
+  and a release before it is a plain tap that moves the speaker token. Here the finger holds Kira over Priya's seat,
+  so Tom and Priya <b>slide one seat back into the gap</b> that Kira left. The seats between always shift the shorter
+  way round the table. The drop puts Kira in seat 4 on every device, and both orders follow. Each drop is one tap in
+  the log, and <b>Undo</b> takes it back. Re-order mode stops no clock, and when a move changes the player who picks
+  or votes now, the clock moves to that player. A tap on a seat and then on another moves it there too, and a second
+  tap on the same seat lets it go, so the mode also works from a keyboard after <b>Re-order seats</b>. <b>Done</b>, a tap on the empty ring area,
+  or Close ends the mode. The empty seat of a player who left does not shake and takes no drop. A device set to
+  reduce motion shows a still dashed outline round each seat in place of the shake.`,
+ mnote:
+ `The same mode in the scaled ring. On a phone, Done sits under the two orders, so a tap on the empty ring area is the quick way out. A held seat stops the screen from scrolling until the finger lifts.`,
+ h:seatingScreen(null, {held:'kira', over:'priya', off:[-3,-4]})};
 
 // chosen: the player picked in the dialog. A speaker passes the token to their left.
 const removeDialog = chosen => {
@@ -1499,7 +1594,7 @@ const actionScreen = (over, held=false, four=false, me=TABLE) => { const mine = 
 S.action = {t:'Action Phase', note:
  `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal: Kira's Pass button warns that Trade is not played yet, and passing early asks first. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state. The chip beside the speaker names this device's seat, Table, or Viewer, and opens Players &amp; devices.`,
  mnote:
- `The rail moves under the clock. End Turn, the strategic action, and Pass stay in the hero, under the clock, as on the iPad. The top bar takes two rows. On a phone, the rail rows become tiles in initiative order, so six players fit on one screen. Up to 740 px wide, and on a phone held sideways, the top bar is compact: the phase pill becomes a thin progress line with the phase name next to the round.`,
+ `The rail moves under the clock. End Turn, the strategic action, and Pass stay in the hero, under the clock, as on the iPad. Up to 1050 px wide, the top bar takes two rows, and the chips share the second row with the tools. Up to 1150 px wide, the speaker chip shows the star and the name, and the device chip the dot and the name. On a phone, the rail rows become tiles in initiative order, so six players fit on one screen. Up to 740 px wide, and on a phone held sideways, the top bar is compact: the phase pill becomes a thin progress line with the phase name next to the round.`,
  h:actionScreen(false)};
 
 S.overtime = {t:'Action Phase — Limit Exceeded', note:
@@ -2219,7 +2314,7 @@ S.players = {t:'Players & Devices', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
+  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMove','setupMissing','setupDeal','setupFailed','setupOutdated','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','reorder','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.

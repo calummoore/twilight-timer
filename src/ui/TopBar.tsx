@@ -66,8 +66,13 @@ export function TopBar({ ref, ...props }: TopBarProps) {
           )
         })}
       </div>
+      {/* A narrow bar hides the words, so each chip keeps them in its label. */}
       <div className="chips">
-        <button className="ibtn spkb" onClick={props.onSpeaker}>
+        <button
+          className="ibtn spkb"
+          onClick={props.onSpeaker}
+          aria-label={`Speaker: ${props.speakerName}`}
+        >
           ★<span className="word"> Speaker:</span> {props.speakerName}
         </button>
         <DeviceChip
@@ -123,6 +128,7 @@ function DeviceChip(props: {
         className="ibtn youb"
         style={pc(seat.colour)}
         onClick={props.onClick}
+        aria-label={`You: ${seat.name}`}
       >
         <i />
         <span className="word">You: </span>
@@ -131,7 +137,11 @@ function DeviceChip(props: {
     )
   }
   return device?.admin ? (
-    <button className="ibtn youb table" onClick={props.onClick}>
+    <button
+      className="ibtn youb table"
+      onClick={props.onClick}
+      aria-label="Table device"
+    >
       <i />
       Table<span className="word"> device</span>
     </button>

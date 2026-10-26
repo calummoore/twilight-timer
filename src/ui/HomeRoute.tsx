@@ -15,7 +15,9 @@ export function HomeRoute(props: {
   recent: RecentGame[]
   onNewGame: () => void
   onSettings: () => void
-  /** Opens a game, by its code. */
+  /** Opens the claim screen of a game that the server found, by its code. */
+  onJoin: (code: string) => void
+  /** Opens a recent game, by its code. */
   onOpen: (code: string) => void
 }) {
   const [now] = useState(() => Date.now())
@@ -31,7 +33,7 @@ export function HomeRoute(props: {
     setBusy(true)
     const found = await lookUpGame(code)
     setBusy(false)
-    if (found === 'found') props.onOpen(code)
+    if (found === 'found') props.onJoin(code)
     else setJoinError(found === 'missing' ? missing : UNREACHABLE)
   }
 

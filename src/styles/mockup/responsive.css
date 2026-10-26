@@ -2,23 +2,38 @@
    the layout helpers. Prettier skips this folder, so it stays easy to compare with the mockup. The mockup insets its
    screen box to the safe area of each device frame, as app.css insets the app to the browser's safe area. */
 
+/* ─────────── the game top bar chips: up to 1150 px wide ─────────── */
+/* Beside the phase pill and the tools, the words of the chips need about 1100 px with the default names, and more with
+   longer names. Up to 1150 px, the speaker chip shows the star and the name, and the device chip the dot and the name. */
+@container app (max-width: 1150px){
+  .top.game .chips .word{display:none}
+}
+
+/* ─────────── the two-row game top bar: up to 1050 px wide ─────────── */
+/* The one-row bar needs about 1035 px with the compact chips and the default names. Up to 1050 px, the round, the phase
+   pill, and the game clock take the first row, and the chips and the tools the second. The chips span two columns, so
+   that long names fit. An extra control of a screen takes a third row. */
+@container app (max-width: 1050px){
+  .top.game{display:grid; grid-template-columns:auto 1fr auto;
+    grid-template-areas:"round pill gt" "spk spk tools" "extra extra extra"; column-gap:12px; row-gap:0; align-items:center}
+  .top.game .round{grid-area:round}
+  .top.game .phase-pill{grid-area:pill; justify-self:center}
+  .top.game .gt{grid-area:gt}
+  .top.game .chips{grid-area:spk; justify-self:start}
+  .top.game .tools{grid-area:tools; gap:8px}
+  .top.game .extra{grid-area:extra; justify-self:end}
+  .top.game .chips, .top.game .tools, .top.game .extra{margin-top:10px}
+  .top.game .spacer{display:none}
+}
+
 /* ─────────── narrow: an upright iPad or a phone ─────────── */
 @container app (max-width: 900px){
   .lay{overflow-y:auto; scrollbar-width:none}
   .lay::-webkit-scrollbar{display:none}
   .lay > *{flex:none}
   .top.game{position:sticky; top:0; z-index:5; background:rgba(5,7,11,.94); backdrop-filter:blur(10px)}
-  .top.game{display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:"round pill gt" "spk extra tools";
-    column-gap:12px; row-gap:10px; align-items:center}
-  .top.game .round{grid-area:round}
-  .top.game .phase-pill{grid-area:pill; justify-self:center}
-  .top.game .gt{grid-area:gt}
-  .top.game .chips{grid-area:spk; justify-self:start}
-  .top.game .extra{grid-area:extra; justify-self:end}
   .home-grid, .claim-grid{grid-template-columns:1fr}
   .lay > .open-wait{flex:1 0 auto}
-  .top.game .tools{grid-area:tools; gap:8px}
-  .top.game .spacer{display:none}
   .content, .body, .scroll{overflow:visible; min-height:auto}
   .body{grid-template-columns:1fr; padding:14px 16px 18px}
   .split{grid-template-columns:minmax(0,1fr)}
@@ -234,9 +249,9 @@
   .count b{padding:10px 0}
   /* a phone: each seat row is a card with its own grid, so the list has one column */
   .seat-list{grid-template-columns:minmax(0,1fr)}
-  .seat-list .seat{grid-template-columns:24px 1fr 1fr 34px; grid-template-areas:"mv sw sw spk" "sn name fac fac"; gap:9px 7px;
+  .seat-list .seat{grid-template-columns:18px 24px 1fr 1fr 34px; grid-template-areas:"grip sn sw sw spk" "grip sn name fac fac"; gap:9px 7px;
     padding:10px 10px 10px 8px}
-  .seat .seat-move{grid-area:mv}
+  .seat .drag{grid-area:grip}
   .seat .sn{grid-area:sn}
   .seat .swatches{grid-area:sw; gap:5px; flex-wrap:nowrap}
   .seat .sw{width:26px; height:26px; border-radius:7px}

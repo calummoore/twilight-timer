@@ -15,8 +15,8 @@ in the futex account. The app opens at https://ti4.nexus; see
 ## Key features
 
 - Setup for 3 to 8 players: name, colour, faction from the official list, seat,
-  and the speaker. The table chooses its expansions, and one tap deals random
-  factions to the empty seats.
+  and the speaker. A row moves by its ⠿ handle. The table chooses its
+  expansions, and one tap deals random factions to the empty seats.
 - Strategy picks in speaker order, with trade goods on unpicked cards. With 3
   or 4 players, each player picks two cards, and the lower card sets their
   place in the turn order.
@@ -28,6 +28,10 @@ in the futex account. The app opens at https://ti4.nexus; see
 - The status checklist, and clocks for agenda discussion and each vote.
 - The table can remove a player who leaves mid-game. Their recorded time
   stays in the stats.
+- An admin device can move seats when the ring does not match the table: a
+  long press on a seat, or Re-order seats, starts re-order mode. A drag or two
+  taps move a seat, and the seats between shift into the gap. Undo takes a
+  move back.
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.
@@ -35,6 +39,9 @@ in the futex account. The app opens at https://ti4.nexus; see
   to open or copy.
   Every device shows every tap at once, and a reload returns to the game.
   After an update of the app, every open device reloads into its game.
+- Each screen has its own address, such as `/new` or `/game/<code>/players`,
+  so Back, a reload, and a link open the same screen. See
+  [Addresses](docs/product/addresses.md).
 - A phone takes the seat of its player, and taps for that player when the
   game waits for them: their pick, their turn, their tile in a reaction
   window, and their vote. A control that the device may not use is off, and
@@ -187,8 +194,10 @@ versions.
   - `deal.ts`: the factions in play for the chosen expansions, the choices
     of one seat, and the random deal for the empty seats.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
-    `fold-orders.ts` finds who acts next, and `fold-removal.ts` takes out a
-    player who leaves.
+    `fold-orders.ts` finds who acts next, `fold-removal.ts` takes out a
+    player who leaves, and `fold-seats.ts` moves a seat on the ring.
+  - `ring.ts`: the players of a running game in ring order, as the seat
+    moves left it, for the screens outside the game.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
   - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
     limit changes.
@@ -197,13 +206,16 @@ versions.
     which count as game time.
   - `storage.ts`: the settings in `localStorage`.
   - `parse.ts` and `parse-parts.ts`: the parsers of the settings and of a
-    stored game. The parser reads a game of version 6.
+    stored game. The parser reads a game of version 6 or 7.
   - `device-store.ts`: the token of the browser, and its open and recent
     games.
+  - `routes.ts`: the address of each screen, the join link, the game that a
+    new visit to Home opens, and the screen that a game address shows to a
+    device that joined or not.
   - `connection.ts`: the offset to the server clock, the waits between the
     tries after a lost connection, and the reload guard of a page of another
     build.
-  - `code.ts`: the join codes and their links.
+  - `code.ts`: the join codes.
   - `devices.ts`: the devices of a game, the seat takeover, and the
     last-admin rule.
   - `rights.ts`: who may tap what. The server and the screens call it.
@@ -211,34 +223,46 @@ versions.
     parsers. Every message from the server, and the hello of a page, names
     its build first.
   - `receive.ts`: what the server does with each message of a device: a
-    hello or a command of another build gets the outdated message.
+    hello or a command of another build gets the outdated message. It also
+    reads Create game: the server creates every game whose setup it can
+    read, and answers outdated when it cannot read the setup of another
+    build.
   - `room.ts` and `setup.ts`: one game on the server and its reducer.
     `room-storage.ts` reads its stored shape, with the upgrade chain of the
     room, into no room, a room, or a room that cannot be read.
-  - `fixtures/`: one stored shape of each version from game version 6 and
-    room version 1 on, as its build wrote it. `fixtures.test.ts` loads each
-    one and checks its clocks.
+  - `fixtures/`: the stored shapes of game version 6 and room versions 1
+    and 2, as their builds wrote them. Each version bump adds a fixture of
+    the old shape. `fixtures.test.ts` loads each one and checks its clocks.
 - `worker/` holds the Worker.
   - `index.ts`: the routes. `POST /api/games` creates a game from a setup,
     `GET /api/games/<code>` looks a code up, and
-    `GET /api/games/<code>/socket` opens the socket of a game.
+    `GET /api/games/<code>/socket` opens the socket of a game. Every answer
+    names the build of the server.
   - `game-room.ts`: the Durable Object of one game. It applies each command
     with the model and its own clock, saves the room, and sends the state to
     every socket. Its sockets use the WebSocket Hibernation API. It never
     stores a new room over one that it cannot read.
-- `src/App.tsx` holds the routes: Home, the setup, and the game of one code,
-  which a join link `/join/<code>` opens.
+- `src/App.tsx` shows the screen of the address: Home, the setup, or the
+  game of one code. `src/ui/useRoute.ts` keeps the address, the screen, and
+  the history of the browser in step.
 - `src/build.ts` holds the build id, which `vite.config.ts` puts into the
   page and the Worker.
 - `src/ui/useGameClient.ts` holds the game of one code for the screens.
   `src/ui/gameSocket.ts` owns its socket: hello, the state, the server
   clock, pings, the reconnect, and the reload of a page of another build.
   `src/ui/api.ts` creates a game and looks a code up.
+  `src/ui/reload.ts` reloads a page of another build once, with its guard
+  in `sessionStorage`. The socket and Create game call it.
 - `src/ui/RoomScreen.tsx` shows one game: the opening line, the lobby, or the
   running game with Players & devices over it.
 - `src/ui/GameScreen.tsx` connects the model to the screens. Every control
   asks `src/ui/rights.ts`, which calls the rights of the model.
-- `src/ui/screens/` has one component per screen.
+- `src/ui/screens/` has one component per screen. `SeatRing.tsx` holds the
+  ring of Speaker & Seating, with re-order mode.
+- `src/ui/useDragReorder.ts` drags an item to the place of another, with a
+  finger, a pen, or a mouse, after a long press or at once. The screen says
+  where the other items go: the seats between on the ring, or the rows between
+  in the seat list of the setup, `SetupSeatList.tsx`.
 - `src/ui/Stage.tsx` is the app root: it fills the window's safe area and is a
   CSS size container.
 - `src/styles/mockup/` holds the CSS ported from the mockup.

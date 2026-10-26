@@ -74,6 +74,13 @@ describe('the stored shapes of older builds', () => {
     expect(clocksOf(room?.game)).toEqual(CLOCKS)
   })
 
+  it('reads a game of version 6 as version 7, with no other change', () => {
+    const game = parseGame(gameV6)
+    expect(game?.version).toBe(7)
+    // The build before seat moves stored version 6, which has the same shape.
+    expect({ ...game, version: 6 }).toEqual(gameV6)
+  })
+
   it('holds the same game in every fixture', () => {
     const game = parseGame(gameV6)
     expect(parseRoom(roomV1)?.game).toEqual(game)

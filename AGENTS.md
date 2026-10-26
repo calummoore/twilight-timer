@@ -83,8 +83,10 @@ and the server send each other only the shapes of one build.
   device keeps its token and its games.
 - Upgrades run at read time, one room at a time. Nothing lists the rooms.
 - Save writes the newest shape only.
-- A stored value that the parser rejects is unreadable, not missing.
-  Nothing overwrites it.
+- A stored room that the parser rejects is unreadable, not missing.
+  Nothing overwrites it. The room is also unreadable when the game inside
+  it is. The data of a device falls back instead: a token, recent games, or
+  settings that the device cannot read get a new value, which it saves.
 - The wire has no upgrade. The page and the server run the same build, and
   a page of another build reloads.
 - The field that carries the build never changes shape.

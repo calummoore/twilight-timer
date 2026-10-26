@@ -123,6 +123,23 @@ describe('rights of a seated device', () => {
   })
 })
 
+describe('rights of an admin device', () => {
+  it('moves a seat, which a seated device and a viewer may not', () => {
+    const view = actionTable().view()
+    const move: ActionInput = {
+      kind: 'seatMoved',
+      playerId: 'tom',
+      toId: 'kira',
+    }
+    expect(mayAct(HOST, move, view)).toBe(true)
+    expect(mayAct(phone('tom', true), move, view)).toBe(true)
+    // Tom's own turn does not give Tom the move.
+    expect(mayAct(phone('tom'), move, view)).toBe(false)
+    expect(mayAct(VIEWER, move, view)).toBe(false)
+    expect(mayAct(undefined, move, view)).toBe(false)
+  })
+})
+
 describe('rights of every device', () => {
   const view = actionTable().view()
   const adminOnly: Command[] = [
