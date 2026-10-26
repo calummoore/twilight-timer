@@ -82,11 +82,18 @@ export type ServerMessage = { build: string } & (
   | { type: Notice }
 )
 
-/** The body of the request that creates a game from a setup. */
+/** The body of the request that creates a game. It names the page's build. */
 export interface CreateRequest {
   token: string
+  build: string
   setup: Setup
 }
+
+/**
+ * Why the server created no game. The answer, like every answer of the game
+ * API, also names the build of the server.
+ */
+export type CreateError = 'invalid' | 'outdated' | 'busy'
 
 /**
  * Reads the build that a message names, before the rest of the message. The
@@ -184,7 +191,14 @@ function parseDeviceView(raw: unknown): DeviceView | null {
   return { ...device, connected: raw.connected }
 }
 
-export function parseCreateRequest(raw: unknown): CreateRequest | null {
+/**
+ * Reads the token and the setup of a create request. The build stays apart,
+ * because the server creates every game whose setup it can read, from any
+ * build.
+ */
+export function parseCreateRequest(
+  raw: unknown,
+): Omit<CreateRequest, 'build'> | null {
   if (!isFields(raw)) return null
   const token = parseToken(raw.token)
   const setup = parseSetup(raw.setup)

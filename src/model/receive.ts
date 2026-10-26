@@ -1,11 +1,18 @@
 import { isFields } from './parse-fields'
-import { buildOf, parseClientMessage, type Command } from './protocol'
+import {
+  buildOf,
+  parseClientMessage,
+  parseCreateRequest,
+  type Command,
+} from './protocol'
+import type { Setup } from './setup'
 
 /**
- * What the server does with a message from a device. The page and the
- * server must run the same build, because the page runs the model too. So
- * the server answers a page of another build with the outdated message and
- * closes the connection, and none of its commands applies.
+ * What the server does with a message from a device, and with a request
+ * that creates a game. The page and the server must run the same build,
+ * because the page runs the model too. So the server answers a page of
+ * another build with the outdated message and closes the connection, and
+ * none of its commands applies.
  */
 
 /** What the server knows of a connection, from its hello. */
@@ -58,4 +65,24 @@ export function receive(raw: unknown, build: string, caller: Caller): Receipt {
   if (message?.type !== 'command') return IGNORE
   const { rev, command } = message
   return { type: 'command', token, rev, command }
+}
+
+export type CreateReceipt =
+  | { type: 'create'; token: string; setup: Setup }
+  /** The server cannot read the setup of a page of another build. */
+  | { type: 'outdated' }
+  /** The server cannot read a request of its own build. */
+  | { type: 'invalid' }
+
+/**
+ * Reads a create request, for a server of build `build`. The server creates
+ * every game whose setup it can read, also from a page of another build,
+ * which reloads when it opens the game. When the server cannot read the
+ * setup of a page of another build, or of a page that names no build, the
+ * answer is outdated, so that the page reloads once to get this build.
+ */
+export function receiveCreate(raw: unknown, build: string): CreateReceipt {
+  const request = parseCreateRequest(raw)
+  if (request) return { type: 'create', ...request }
+  return buildOf(raw) === build ? { type: 'invalid' } : { type: 'outdated' }
 }

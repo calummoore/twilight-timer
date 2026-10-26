@@ -211,7 +211,10 @@ versions.
     parsers. Every message from the server, and the hello of a page, names
     its build first.
   - `receive.ts`: what the server does with each message of a device: a
-    hello or a command of another build gets the outdated message.
+    hello or a command of another build gets the outdated message. It also
+    reads Create game: the server creates every game whose setup it can
+    read, and answers outdated when it cannot read the setup of another
+    build.
   - `room.ts` and `setup.ts`: one game on the server and its reducer.
     `room-storage.ts` reads its stored shape, with the upgrade chain of the
     room, into no room, a room, or a room that cannot be read.
@@ -221,7 +224,8 @@ versions.
 - `worker/` holds the Worker.
   - `index.ts`: the routes. `POST /api/games` creates a game from a setup,
     `GET /api/games/<code>` looks a code up, and
-    `GET /api/games/<code>/socket` opens the socket of a game.
+    `GET /api/games/<code>/socket` opens the socket of a game. Every answer
+    names the build of the server.
   - `game-room.ts`: the Durable Object of one game. It applies each command
     with the model and its own clock, saves the room, and sends the state to
     every socket. Its sockets use the WebSocket Hibernation API. It never
@@ -234,6 +238,8 @@ versions.
   `src/ui/gameSocket.ts` owns its socket: hello, the state, the server
   clock, pings, the reconnect, and the reload of a page of another build.
   `src/ui/api.ts` creates a game and looks a code up.
+  `src/ui/reload.ts` reloads a page of another build once, with its guard
+  in `sessionStorage`. The socket and Create game call it.
 - `src/ui/RoomScreen.tsx` shows one game: the opening line, the lobby, or the
   running game with Players & devices over it.
 - `src/ui/GameScreen.tsx` connects the model to the screens. Every control
