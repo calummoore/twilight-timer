@@ -326,18 +326,20 @@ Tags: ui
 
 Show the shift into the gap on the ring, and drag setup rows by a handle.
 
-- [ ] `useDragReorder.ts`: the screen gives the places that the items take
+- [x] `useDragReorder.ts`: the screen gives the places that the items take
       for a target. Rename the hook and its attribute.
-- [ ] `SeatRing.tsx`: the seats between slide into the gap, the drop and
+- [x] `SeatRing.tsx`: the seats between slide into the gap, the drop and
       the tap move a seat, and the pending move shows at once.
-- [ ] Setup: the ⠿ handle and the row move. The speaker star stays with
+- [x] Setup: the ⠿ handle and the row move. The speaker star stays with
       its player. ▲ and ▼ stay.
-- [ ] Port the new mockup styles to `src/styles/mockup/`.
-- [ ] `README.md`: the renamed hook under Key code.
-- [ ] Scratch smoke test, not committed, in headless Chrome with touch
+- [x] Port the new mockup styles to `src/styles/mockup/`.
+- [x] `README.md`: the renamed hook under Key code.
+- [x] Scratch smoke test, not committed, in headless Chrome with touch
       emulation: move a ring seat two seats away and to a neighbour, the
       tap alternative, and Undo. Drag a setup row up and down. Save the
-      evidence under `.context/seat-reordering/smoke/`.
+      evidence under `.context/seat-reordering/smoke/`. The logs
+      `setup.log`, `ring-ipad.log`, `ring-phone.log`, `ring-desktop.log`,
+      and `refused-moves.log` hold 65 passed checks.
 
 ## Milestone 7: Verification, commit, review, and pull request
 

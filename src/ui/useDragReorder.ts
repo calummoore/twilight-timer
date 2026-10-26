@@ -11,7 +11,13 @@ import {
 /** A move further than this, in px, is a drag or a scroll, not a tap. */
 const SLOP_PX = 8
 
-export interface SwapDragOptions {
+/** A point this close to an item, in px, is over it, so a gap holds the target. */
+const NEAR_PX = 12
+
+/** For each item that moves, the item whose place it takes. */
+export type Places = ReadonlyMap<string, string>
+
+export interface DragReorderOptions {
   /**
    * How a press becomes a drag: after a hold of this many ms in place, or,
    * with null, as soon as the pointer moves past the slop. A move before the
@@ -20,6 +26,8 @@ export interface SwapDragOptions {
   holdMs: number | null
   /** Whether a press on the item may become a drag now. */
   canDrag: (id: string) => boolean
+  /** Where the other items go while the held item is over the target. */
+  arrange: (heldId: string, targetId: string) => Places
   /** A hold started a drag. */
   onHold?: () => void
   /** The held item was dropped on another item. */
@@ -32,13 +40,13 @@ export interface Shift {
   y: number
 }
 
-export interface SwapDrag {
+export interface DragReorder {
   /** The item that the pointer holds, or null. */
   heldId: string | null
   /**
    * Where an item moves during a drag: the held item follows the pointer, and
-   * the item under the pointer slides into the place that the held item left.
-   * Null for an item that stays in its place.
+   * the items that `arrange` names slide into their new places. Null for an
+   * item that stays in its place.
    */
   shift: (id: string) => Shift | null
   /** Starts a press on an item, from the item or from its handle. */
@@ -56,22 +64,27 @@ interface Drag {
   heldId: string
   /** The item under the pointer, other than the held item, or null. */
   overId: string | null
+  /** The new places of the other items for that target. */
+  places: Places
   /** How far the pointer moved since the press, in px. */
   shift: Shift
   /** The place of each item when the drag started, by id. */
   homes: ReadonlyMap<string, DOMRect>
 }
 
+const NO_PLACES: Places = new Map()
+
 /**
- * Drag one item onto another to swap them, with a pointer: a finger, a pen,
- * or a mouse. Each item has a `data-swap-id` attribute inside the scope
- * element. The drag finds its target in the places of the items at its
- * start, because the target slides away from under the pointer. While an
- * item is held, the scope blocks the page scroll, because iOS Safari keeps
- * the `touch-action` of a touch that has started. The click after a drag or
- * a hold is not a tap.
+ * Drag one item to the place of another, with a pointer: a finger, a pen, or
+ * a mouse. The screen says where the other items go. Each item has a
+ * `data-drag-id` attribute inside the scope element. The drag finds its
+ * target in the places of the items at its start, because the items slide
+ * away from under the pointer. A point in a narrow gap keeps the nearest
+ * item. While an item is held, the scope blocks the page scroll, because iOS
+ * Safari keeps the `touch-action` of a touch that has started. The click
+ * after a drag or a hold is not a tap.
  */
-export function useSwapDrag(options: SwapDragOptions): SwapDrag {
+export function useDragReorder(options: DragReorderOptions): DragReorder {
   const [drag, setDrag] = useState<Drag | null>(null)
   const latest = useRef(options)
   const scopeEl = useRef<HTMLElement | null>(null)
@@ -102,7 +115,8 @@ export function useSwapDrag(options: SwapDragOptions): SwapDrag {
       setDrag(next)
     }
     const start = (hold: boolean) => {
-      show({ heldId: id, overId: null, shift: last, homes: measure() })
+      const homes = measure()
+      show({ heldId: id, overId: null, places: NO_PLACES, shift: last, homes })
       if (hold) latest.current.onHold?.()
     }
     const move = (ev: globalThis.PointerEvent) => {
@@ -114,8 +128,16 @@ export function useSwapDrag(options: SwapDragOptions): SwapDrag {
         start(false)
       }
       if (!current) return
-      const overId = hit(current.homes, ev.clientX, ev.clientY, id)
-      show({ ...current, overId, shift: last })
+      const found = hit(current.homes, ev.clientX, ev.clientY)
+      // Over the held item's own place, nothing moves.
+      const overId = found === id ? null : found
+      const places =
+        overId === null
+          ? NO_PLACES
+          : overId === current.overId
+            ? current.places
+            : latest.current.arrange(id, overId)
+      show({ ...current, overId, places, shift: last })
     }
     const up = (ev: globalThis.PointerEvent) => {
       if (ev.pointerId !== pointerId) return
@@ -147,9 +169,9 @@ export function useSwapDrag(options: SwapDragOptions): SwapDrag {
   /** The place of each item that takes a drop, inside the scope. */
   const measure = (): Map<string, DOMRect> => {
     const homes = new Map<string, DOMRect>()
-    const items = scopeEl.current?.querySelectorAll('[data-swap-id]') ?? []
+    const items = scopeEl.current?.querySelectorAll('[data-drag-id]') ?? []
     for (const el of items) {
-      const id = el.getAttribute('data-swap-id')
+      const id = el.getAttribute('data-drag-id')
       if (id !== null) homes.set(id, el.getBoundingClientRect())
     }
     return homes
@@ -189,25 +211,29 @@ export function useSwapDrag(options: SwapDragOptions): SwapDrag {
   }
 }
 
-/** The item whose place holds the point, other than the held item. */
+/** The item whose place holds the point, or is nearest within NEAR_PX. */
 function hit(
   homes: ReadonlyMap<string, DOMRect>,
   x: number,
   y: number,
-  heldId: string,
 ): string | null {
+  let best: string | null = null
+  let bestPx = NEAR_PX
   for (const [id, r] of homes) {
-    if (id === heldId) continue
-    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return id
+    const dx = Math.max(r.left - x, 0, x - r.right)
+    const dy = Math.max(r.top - y, 0, y - r.bottom)
+    const px = Math.hypot(dx, dy)
+    if (px === 0) return id
+    if (px < bestPx) [best, bestPx] = [id, px]
   }
-  return null
+  return best
 }
 
 function shiftOf(drag: Drag, id: string): Shift | null {
   if (id === drag.heldId) return drag.shift
-  if (id !== drag.overId) return null
+  const placeId = drag.places.get(id)
   const from = drag.homes.get(id)
-  const to = drag.homes.get(drag.heldId)
+  const to = placeId === undefined ? undefined : drag.homes.get(placeId)
   if (!from || !to) return null
   return { x: centre(to).x - centre(from).x, y: centre(to).y - centre(from).y }
 }

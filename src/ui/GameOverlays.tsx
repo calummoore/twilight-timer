@@ -73,7 +73,7 @@ export function GameOverlays(props: {
           canRemove={rights.admin}
           canReorder={rights.admin}
           onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
-          onSwap={(playerId, toId) =>
+          onMove={(playerId, toId) =>
             dispatch({ kind: 'seatMoved', playerId, toId })
           }
           onRemove={(playerId) => dispatch({ kind: 'playerRemoved', playerId })}

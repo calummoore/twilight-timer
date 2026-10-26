@@ -46,3 +46,6 @@
 .ordrow .tag2{font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:800;
   padding:2px 7px; border-radius:20px; background:#2a2210; color:#f0cf6a}
 .ordrow.isspk{border-color:#5a4d22; background:#14110a}
+.drag{display:grid; place-items:center; align-self:stretch; color:var(--faint); cursor:grab; touch-action:none;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+.drag i{display:block; width:10px; height:16px; background:radial-gradient(circle, currentColor 1.5px, transparent 1.8px) 0 0/5px 5.33px}

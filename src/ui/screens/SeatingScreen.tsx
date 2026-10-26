@@ -6,7 +6,7 @@ import { SeatRing, type Reorder } from './SeatRing'
 
 /**
  * The table ring, and the two orders that derive from it. A tap on a seat
- * moves the speaker token there. Re-order mode swaps two seats, to fix a ring
+ * moves the speaker token there. Re-order mode moves seats, to fix a ring
  * that does not match the table.
  */
 export function SeatingScreen(props: {
@@ -18,23 +18,23 @@ export function SeatingScreen(props: {
   speakerId: string
   pickOrder: string[]
   voteOrder: string[]
-  /** The game of the latest state message, which ends a swap that waits. */
+  /** The game of the latest state message, which ends a move that waits. */
   received: Game
   canUndo: boolean
   /** Whether this device may hand the speaker token to the player. */
   maySpeaker: (playerId: string) => boolean
   canRemove: boolean
-  /** Whether this device may swap seats now. */
+  /** Whether this device may move seats now. */
   canReorder: boolean
   onSpeaker: (playerId: string) => void
-  onSwap: (playerId: string, otherId: string) => void
+  onMove: (playerId: string, toId: string) => void
   onRemove: (playerId: string) => void
   onUndo: () => void
   onClose: () => void
 }) {
   const [removing, setRemoving] = useState(false)
   const [reorder, setReorder] = useState<Reorder | null>(null)
-  // The mode ends when the device may no longer swap seats.
+  // The mode ends when the device may no longer move seats.
   if (reorder && !props.canReorder) setReorder(null)
   const byId = new Map(props.players.map((p) => [p.id, p]))
 
@@ -92,7 +92,7 @@ export function SeatingScreen(props: {
             The table
             <span className="pnl-note">
               {reorder
-                ? 'drag a seat onto another to swap them'
+                ? 'drag a seat to its place'
                 : 'tap a seat to move the speaker · hold to re-order'}
             </span>
           </div>
@@ -107,7 +107,7 @@ export function SeatingScreen(props: {
             maySpeaker={props.maySpeaker}
             onSpeaker={props.onSpeaker}
             onReorder={setReorder}
-            onSwap={props.onSwap}
+            onMove={props.onMove}
           />
           <div style={{ padding: '0 20px 18px', marginTop: 'auto' }}>
             <div className="note-box">
@@ -144,8 +144,8 @@ export function SeatingScreen(props: {
           </button>
           <div className="order-help" style={{ textAlign: 'center' }}>
             {reorder
-              ? 'A tap on two seats swaps them too. Undo takes a swap back.'
-              : 'Swap two seats when the ring does not match the table.'}
+              ? 'Or tap a seat, then its new place. Undo takes a move back.'
+              : 'Move seats when the ring does not match the table.'}
           </div>
         </div>
       </div>

@@ -15,7 +15,7 @@ export function PlayersScreen(props: {
   code: string
   /** The round, or null in the lobby. */
   round: number | null
-  /** The seats in clockwise order, as the seat swaps of the game left them. */
+  /** The seats in clockwise order, as the seat moves of the game left them. */
   players: Player[]
   devices: DeviceView[]
   you: string | null

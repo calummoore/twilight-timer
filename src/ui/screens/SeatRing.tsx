@@ -1,8 +1,9 @@
 import type { MouseEvent } from 'react'
+import { moveInRing } from '../../model/orders'
 import type { Departure, Game, Player } from '../../model/types'
 import { pc } from '../colour'
 import { usePending } from '../hooks'
-import { useSwapDrag } from '../useSwapDrag'
+import { useDragReorder, type Places } from '../useDragReorder'
 
 // The seats sit on an ellipse inside a 500 by 410 box. Positions are in
 // percent, so that the ring scales with the screen.
@@ -24,8 +25,9 @@ export interface Reorder {
 /**
  * The table ring. Outside re-order mode, a tap on a seat moves the speaker
  * token, and a long press starts the mode. In the mode, every seat of a
- * player in the game shakes, and a drop on another seat or a tap on two seats
- * swaps the two players. A player who left keeps an empty seat, so the other
+ * player in the game shakes. A drop on another seat, or a tap on a seat and
+ * then on another, moves the player into that seat, and the seats between
+ * shift into the gap. A player who left keeps an empty seat, so the other
  * seats keep their places.
  */
 export function SeatRing(props: {
@@ -34,49 +36,65 @@ export function SeatRing(props: {
   seated: string[]
   departures: Departure[]
   speakerId: string
-  /** The game of the latest state message, which ends a swap that waits. */
+  /** The game of the latest state message, which ends a move that waits. */
   received: Game
   /** Re-order mode, or null outside it. */
   reorder: Reorder | null
-  /** Whether this device may swap seats now. */
+  /** Whether this device may move seats now. */
   canReorder: boolean
   /** Whether this device may hand the speaker token to the player. */
   maySpeaker: (playerId: string) => boolean
   onSpeaker: (playerId: string) => void
   onReorder: (reorder: Reorder | null) => void
-  onSwap: (playerId: string, otherId: string) => void
+  onMove: (playerId: string, toId: string) => void
 }) {
   const { reorder } = props
-  // The swap shows at once, until the next state of the game arrives.
+  // The move shows at once, until the next state of the game arrives.
   const [sent, setSent] = usePending<[string, string]>(props.received)
   const leftIn = new Map(props.departures.map((d) => [d.playerId, d.round]))
   const speaker = props.players.find((p) => p.id === props.speakerId)
-  const players = sent ? swapped(props.players, sent) : props.players
+  const players = sent
+    ? moved(props.players, props.seated, sent)
+    : props.players
+  const ids = players.map((p) => p.id)
   const chosenId =
     reorder?.chosenId && props.seated.includes(reorder.chosenId)
       ? reorder.chosenId
       : null
 
-  const swap = (playerId: string, otherId: string) => {
+  const move = (playerId: string, toId: string) => {
     // A drop after the device lost its right, or its connection, does nothing.
     if (!props.canReorder) return
     props.onReorder({ chosenId: null })
-    setSent([playerId, otherId])
-    props.onSwap(playerId, otherId)
+    setSent([playerId, toId])
+    props.onMove(playerId, toId)
   }
-  const drag = useSwapDrag({
+  // The seats between slide one seat into the gap, the shorter way round.
+  const arrange = (heldId: string, targetId: string): Places => {
+    const next = moveInRing(ids, props.seated, heldId, targetId)
+    const places = new Map<string, string>()
+    next.forEach((id, i) => {
+      const home = ids[i]
+      if (id !== heldId && home !== undefined && id !== home) {
+        places.set(id, home)
+      }
+    })
+    return places
+  }
+  const drag = useDragReorder({
     holdMs: reorder ? null : HOLD_MS,
     canDrag: (id) =>
       props.canReorder && props.seated.length > 1 && props.seated.includes(id),
+    arrange,
     onHold: () => props.onReorder({ chosenId: null }),
-    onDrop: swap,
+    onDrop: move,
   })
 
   const tap = (id: string) => {
     if (!reorder) props.onSpeaker(id)
     else if (chosenId === null) props.onReorder({ chosenId: id })
     else if (chosenId === id) props.onReorder({ chosenId: null })
-    else swap(chosenId, id)
+    else move(chosenId, id)
   }
   // A tap on the ring outside the seats ends re-order mode.
   const tapRing = (e: MouseEvent<HTMLElement>) => {
@@ -105,7 +123,7 @@ export function SeatRing(props: {
             <button
               key={p.id}
               className={`seatnode ${isSpeaker ? 'isspk' : ''} ${left === undefined ? '' : 'out'} ${held ? 'held' : ''}`}
-              data-swap-id={left === undefined ? p.id : undefined}
+              data-drag-id={left === undefined ? p.id : undefined}
               style={{
                 ...pc(p.colour),
                 left: `${((CX + RX * Math.cos(angle)) / W) * 100}%`,
@@ -134,10 +152,13 @@ export function SeatRing(props: {
   )
 }
 
-/** The players with the two seats of `pair` swapped. */
-function swapped(players: Player[], [a, b]: [string, string]): Player[] {
-  const at = (id: string) => players.find((p) => p.id === id)
-  return players.map((p) =>
-    p.id === a ? (at(b) ?? p) : p.id === b ? (at(a) ?? p) : p,
-  )
+/** The players after the move of `move`: a player and the seat it takes. */
+function moved(
+  players: Player[],
+  seated: string[],
+  [id, toId]: [string, string],
+): Player[] {
+  const ring = players.map((p) => p.id)
+  const next = moveInRing(ring, seated, id, toId)
+  return next.flatMap((pid) => players.find((p) => p.id === pid) ?? [])
 }

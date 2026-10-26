@@ -253,8 +253,10 @@ versions.
   asks `src/ui/rights.ts`, which calls the rights of the model.
 - `src/ui/screens/` has one component per screen. `SeatRing.tsx` holds the
   ring of Speaker & Seating, with re-order mode.
-- `src/ui/useSwapDrag.ts` drags one item onto another to swap them, with a
-  finger, a pen, or a mouse, after a long press or at once.
+- `src/ui/useDragReorder.ts` drags an item to the place of another, with a
+  finger, a pen, or a mouse, after a long press or at once. The screen says
+  where the other items go: the seats between on the ring, or the rows between
+  in the seat list of the setup, `SetupSeatList.tsx`.
 - `src/ui/Stage.tsx` is the app root: it fills the window's safe area and is a
   CSS size container.
 - `src/styles/mockup/` holds the CSS ported from the mockup.
