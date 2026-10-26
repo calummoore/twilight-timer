@@ -1,10 +1,10 @@
-import { useState } from 'react'
 import { derive } from '../model/derive'
 import type { Command, DeviceView } from '../model/protocol'
+import type { GamePanel } from '../model/routes'
 import { limitsNow, type Settings } from '../model/settings'
 import type { ActionInput, Game } from '../model/types'
 import { NetBar } from './controls'
-import { GameOverlays, type Overlay } from './GameOverlays'
+import { GameOverlays } from './GameOverlays'
 import { useAlarm, useClock, useConfirm, useHeight, useWakeLock } from './hooks'
 import { rightsOf } from './rights'
 import { ActionScreen } from './screens/ActionScreen'
@@ -31,11 +31,17 @@ export function GameScreen(props: {
   connected: boolean
   /** This device, or undefined before it joins. */
   device: DeviceView | undefined
-  onPlayers: () => void
+  /** The panel over the game that the address names, or null. */
+  panel: GamePanel | null
+  onPanel: (panel: GamePanel) => void
+  onClosePanel: () => void
   onNewGame: () => void
 }) {
   const [deviceNow] = useClock(250)
-  const [overlay, setOverlay] = useState<Overlay>(null)
+  // Speaker & seating and Settings open here. The room shows Players &
+  // devices and Change seat over this screen.
+  const { panel, onPanel } = props
+  const overlay = panel === 'seating' || panel === 'settings' ? panel : null
   // A tap on any device closes the End game confirm, also the end of the
   // game itself, so a reopened game does not show it again.
   const [ending, setEnding] = useConfirm<true>(props.revision)
@@ -73,7 +79,7 @@ export function GameScreen(props: {
             onPick={(playerId, card) =>
               dispatch({ kind: 'cardPicked', playerId, card })
             }
-            onSpeaker={() => setOverlay('seating')}
+            onSpeaker={() => onPanel('seating')}
             onMoveNaaluToken={(playerId) =>
               dispatch({ kind: 'naaluTokenMoved', playerId })
             }
@@ -150,18 +156,18 @@ export function GameScreen(props: {
         seat={g.players.find((p) => p.id === props.device?.seat)}
         canUndo={rights.admin && g.canUndo}
         canPause={rights.admin}
-        onSpeaker={() => setOverlay('seating')}
-        onPlayers={props.onPlayers}
+        onSpeaker={() => onPanel('seating')}
+        onPlayers={() => onPanel('players')}
         onUndo={onUndo}
         onPause={() => send({ type: 'pause' })}
-        onSettings={() => setOverlay('settings')}
+        onSettings={() => onPanel('settings')}
       />
       {!props.connected && <NetBar />}
       {screen}
       <GameOverlays
         game={g}
         overlay={overlay}
-        onOverlay={setOverlay}
+        onOverlay={(next) => (next ? onPanel(next) : props.onClosePanel())}
         ending={ending !== null}
         onEnding={(open) => setEnding(open ? true : null)}
         rights={rights}

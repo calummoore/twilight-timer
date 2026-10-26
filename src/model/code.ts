@@ -26,27 +26,3 @@ export function parseCode(text: string): string | null {
   if (code.length !== CODE_LENGTH) return null
   return [...code].every((c) => CODE_CHARS.includes(c)) ? code : null
 }
-
-/** The path of the join link of a game. */
-export function joinPath(code: string): string {
-  return `/join/${code}`
-}
-
-/**
- * The join link of a game on the site at `origin`, such as
- * `https://ti4.nexus`. The text is the same link without its scheme, as the
- * screen shows it and a player reads it out.
- */
-export function joinLink(
-  origin: string,
-  code: string,
-): { url: string; text: string } {
-  const url = `${origin}${joinPath(code)}`
-  return { url, text: url.replace(/^https?:\/\//, '') }
-}
-
-/** The code of a join link path, in capitals, or null for another path. */
-export function codeOfPath(pathname: string): string | null {
-  const match = /^\/join\/([^/]+)\/?$/.exec(pathname)
-  return match?.[1] ? parseCode(match[1]) : null
-}

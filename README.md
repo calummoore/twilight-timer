@@ -35,6 +35,9 @@ in the futex account. The app opens at https://ti4.nexus; see
   to open or copy.
   Every device shows every tap at once, and a reload returns to the game.
   After an update of the app, every open device reloads into its game.
+- Each screen has its own address, such as `/new` or `/game/<code>/players`,
+  so Back, a reload, and a link open the same screen. See
+  [Addresses](docs/product/addresses.md).
 - A phone takes the seat of its player, and taps for that player when the
   game waits for them: their pick, their turn, their tile in a reaction
   window, and their vote. A control that the device may not use is off, and
@@ -200,10 +203,13 @@ versions.
     stored game. The parser reads a game of version 6.
   - `device-store.ts`: the token of the browser, and its open and recent
     games.
+  - `routes.ts`: the address of each screen, the join link, the game that a
+    new visit to Home opens, and the screen that a game address shows to a
+    device that joined or not.
   - `connection.ts`: the offset to the server clock, the waits between the
     tries after a lost connection, and the reload guard of a page of another
     build.
-  - `code.ts`: the join codes and their links.
+  - `code.ts`: the join codes.
   - `devices.ts`: the devices of a game, the seat takeover, and the
     last-admin rule.
   - `rights.ts`: who may tap what. The server and the screens call it.
@@ -230,8 +236,9 @@ versions.
     with the model and its own clock, saves the room, and sends the state to
     every socket. Its sockets use the WebSocket Hibernation API. It never
     stores a new room over one that it cannot read.
-- `src/App.tsx` holds the routes: Home, the setup, and the game of one code,
-  which a join link `/join/<code>` opens.
+- `src/App.tsx` shows the screen of the address: Home, the setup, or the
+  game of one code. `src/ui/useRoute.ts` keeps the address, the screen, and
+  the history of the browser in step.
 - `src/build.ts` holds the build id, which `vite.config.ts` puts into the
   page and the Worker.
 - `src/ui/useGameClient.ts` holds the game of one code for the screens.
