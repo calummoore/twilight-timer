@@ -493,12 +493,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .recent .d{font-size:12.5px; color:var(--dim)}
 /* home: a line under the code field when the code does not open a game */
 .home-err{font-size:12.5px; color:var(--warn); line-height:1.5; margin-top:10px}
-/* home: a game that an older build saved on this device has no code yet */
-.recent.saved{grid-template-columns:1fr auto}
-/* a saved game that cannot be read */
+/* players & devices: the notice while every admin device is away */
 .notice{display:flex; align-items:center; gap:14px; background:#241408; border:1px solid #5b3a14; border-radius:11px;
   padding:12px 15px; margin-bottom:14px; font-size:13px; color:#f0c489}
-.notice .ibtn{margin-left:auto}
 /* opening a game: one card in the middle while the device connects, or when no game has the code */
 .open-wait{display:grid; place-items:center}
 .open-card{width:min(460px,100%); text-align:center}
@@ -2027,10 +2024,8 @@ const RECENT = [
   ['K8N3VT', '4 players · 8 rounds · Game complete', 'Sunday'],
   ['DY7MP2', '6 players · 6 rounds · Game complete', '12 October'],
 ];
-// Games that an older build saved on this device, before games lived on the server: one that loads, and one that
-// cannot be read. `typed` is the code in the field, and `err` the line under it when the code opens no game.
-const SAVED = ['6 players · Round 2 · Action phase', 'Saved on this device, 18 October'];
-const homeScreen = ({saved=false, typed='', err=''}={}) => `<div class="space"></div><div class="lay">
+// `typed` is the code in the field, and `err` the line under it when the code opens no game.
+const homeScreen = ({typed='', err=''}={}) => `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>TI4 Nexus</b></div><div class="spacer"></div>
     <button class="ibtn">⚙<span class="word"> Settings</span></button></div>
   <div class="content">
@@ -2044,12 +2039,6 @@ const homeScreen = ({saved=false, typed='', err=''}={}) => `<div class="space"><
         ${err?`<div class="home-err">${err}</div>`:''}
         <button class="big lg" style="width:100%;margin-top:12px">JOIN GAME</button></div></div>
     </div>
-    ${saved?`<div class="pnl" style="margin-top:18px"><div class="pnl-h">Saved on this device</div><div class="pad" style="padding-bottom:10px">
-      <div class="home-help">This device saved a game before games had join codes. Continue it to give it a code, so that every player can join.</div>
-      <div class="recent saved"><div><div style="font-size:14.5px;font-weight:650">${SAVED[0]}</div><div class="d">${SAVED[1]}</div></div>
-        <button class="ibtn">Continue</button></div>
-      <div class="notice">The last game saved on this device could not be read.<button class="ibtn">Dismiss</button></div>
-    </div></div>`:''}
     <div class="pnl" style="margin-top:18px"><div class="pnl-h">Recent games on this device</div><div class="pad" style="padding-bottom:10px">
       ${RECENT.map(([c,d,w],i)=>`<div class="recent"><div class="code num">${c}</div>
         <div><div style="font-size:14.5px;font-weight:650">${d}</div><div class="d">${w}</div></div>
@@ -2062,12 +2051,6 @@ S.home = {t:'Home', note:
  mnote:
  `One column: New game, then Join a game, then the recent games.`,
  h:homeScreen()};
-
-S.homeSaved = {t:'Home — Saved on This Device', note:
- `A device that an older build used can hold a game in its own storage, from before games lived on the server. Home lists it under <b>Saved on this device</b>, with its players, its round, and its phase. <b>Continue</b> puts it on the server: it gets a join code, this device joins it as a table device with admin, and the game opens where it stopped, with every clock as it was. A finished game opens at its stats. The device keeps a game that it continued in its recent games, and the saved copy goes. When the server cannot be reached, a line under the saved game says so, and the copy stays. A saved game that cannot be read shows a notice in its place, and Dismiss removes it.`,
- mnote:
- `The saved games sit between Join a game and the recent games.`,
- h:homeScreen({saved:true})};
 
 S.homeCode = {t:'Home — Unknown Code', note:
  `The device asked the server for the code before it opens the game. No game has <b>7QK2HM</b>, so the line under the field says so, and the device stays on Home to fix the code. Six characters that cannot be a code, such as one with the letter O, get the same line before the device asks. When the device cannot reach the server, the line asks for a check of the connection instead.`,
@@ -2236,7 +2219,7 @@ S.players = {t:'Players & Devices', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','homeSaved','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
+  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.

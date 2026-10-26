@@ -74,7 +74,8 @@ and the server send each other only the shapes of one build.
 - Every stored shape carries its own version and has its own upgrade
   chain. A container upgrades itself, then hands the nested shape to the
   nested parser: the room parser upgrades the room, and the game parser
-  upgrades the game inside it.
+  upgrades the game inside it. The room reads a game of version 6 and
+  later.
 - Change the version when a stored shape changes, and add the upgrade step
   from the old shape. `localStorage` keeps each shape under a versioned key:
   the token, the open and the recent games, and the settings. The keys keep
@@ -90,9 +91,7 @@ and the server send each other only the shapes of one build.
 - Each version bump commits one fixture of the old shape under
   `src/model/fixtures/`, captured from the build before the bump, and a
   test that loads it. Capture the fixture before you change the shape.
-- Old upgrade steps stay until a decision retires them. The saved-game keys
-  of the builds before the server stay readable, so that a device can
-  continue such a game on the server.
+- Old upgrade steps stay until a decision retires them.
 - When a merge from main brings the saved-game version that your branch
   also took, move your branch to the next free version. Keep loading the
   games that your branch saved under the old number.
@@ -113,8 +112,7 @@ and the server send each other only the shapes of one build.
   or rule check. Plain pauses and undone ranges are not game time.
 - Undo: every clock returns to its value at the undone action. The game
   clock also keeps the rule checks in between.
-- Stored games: a stored room, and a game that an older build saved on a
-  device, still load. A saved game that cannot be read shows its notice. A
+- Stored games: every stored room, and the game inside it, still load. A
   room that the server cannot read stays stored, and shows its notice.
 - Builds: a page of another build reloads once, and the server applies no
   command from it.

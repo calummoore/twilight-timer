@@ -82,9 +82,11 @@ export type ServerMessage = { build: string } & (
   | { type: Notice }
 )
 
-/** The body of the request that creates a game, from a setup or a saved game. */
-export type CreateRequest =
-  { token: string; setup: Setup } | { token: string; game: Game }
+/** The body of the request that creates a game from a setup. */
+export interface CreateRequest {
+  token: string
+  setup: Setup
+}
 
 /**
  * Reads the build that a message names, before the rest of the message. The
@@ -185,13 +187,8 @@ function parseDeviceView(raw: unknown): DeviceView | null {
 export function parseCreateRequest(raw: unknown): CreateRequest | null {
   if (!isFields(raw)) return null
   const token = parseToken(raw.token)
-  if (!token) return null
-  if (raw.game !== undefined) {
-    const game = parseGame(raw.game)
-    return game && { token, game }
-  }
   const setup = parseSetup(raw.setup)
-  return setup && { token, setup }
+  return token !== null && setup ? { token, setup } : null
 }
 
 /** A revision is a count of changes, so it is a whole number from 0. */

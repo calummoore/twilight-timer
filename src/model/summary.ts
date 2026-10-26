@@ -14,13 +14,3 @@ export function gameSummary(game: Game | null, players: number): GameSummary {
   const s = foldGame(game)
   return { players: game.players.length, round: s.round, phase: s.phase }
 }
-
-/** The last time that a tap or a pause changed the game, in wall-clock ms. */
-export function lastActivity(game: Game): number {
-  const times = [
-    game.startedAt,
-    ...game.actions.map((a) => a.at),
-    ...game.pauses.map((p) => p.to ?? p.from),
-  ]
-  return Math.max(...times)
-}

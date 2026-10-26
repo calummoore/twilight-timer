@@ -63,6 +63,11 @@ export type BuildCheck =
 /** The build of the server that caused the last reload of the page. */
 const RELOAD_KEY = 'ti4tempo.reload.v1'
 
+/** The part of `sessionStorage` that the reload guard uses. */
+export interface GuardStore extends KeyValueStore {
+  removeItem(key: string): void
+}
+
 /**
  * Compares the build that a message from the server names, or null when it
  * names none, with the build of the page. A page of another build reloads
@@ -73,7 +78,7 @@ const RELOAD_KEY = 'ti4tempo.reload.v1'
  * reloads in a loop. A message of the page's build clears the guard.
  */
 export function checkBuild(
-  store: KeyValueStore,
+  store: GuardStore,
   page: string,
   server: string | null,
 ): BuildCheck {

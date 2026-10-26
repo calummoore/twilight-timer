@@ -18,7 +18,7 @@ import {
 } from './devices'
 import type { Command, RoomState, ServerMessage } from './protocol'
 import { mayCommand } from './rights'
-import { setupOfGame, type Setup } from './setup'
+import type { Setup } from './setup'
 import type { Game } from './types'
 
 /**
@@ -67,16 +67,6 @@ export function newRoom(code: string, setup: Setup, token: string): Room {
     members: [],
     creator: token,
   }
-}
-
-/**
- * A game that a device saved before games lived on the server. The device
- * joins it at once, as a table device with admin.
- */
-export function roomOfGame(code: string, game: Game, token: string): Room {
-  const room = newRoom(code, setupOfGame(game), token)
-  const members = takeSeat([], token, null, true)
-  return { ...room, game, members, creator: null }
 }
 
 /**

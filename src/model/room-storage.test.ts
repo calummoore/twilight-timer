@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseServerMessage } from './protocol'
-import { newRoom, roomOfGame, roomState, stateMessage } from './room'
+import { newRoom, roomState, stateMessage } from './room'
 import { parseRoom, readRoom } from './room-storage'
-import { DEFAULT_LIMITS } from './settings'
 import {
   BUILD,
   CODE,
@@ -12,9 +11,10 @@ import {
   SETUP,
   playStrategyOn,
   seatedServer,
+  tableServer,
 } from './test-room'
-import { asVersion5 } from './test-shapes'
-import { MIN, T0, table } from './test-table'
+import { withNullCards } from './test-shapes'
+import { MIN, T0, olderTable, playStrategy, table } from './test-table'
 
 /** A round trip through JSON, as storage and the socket give it. */
 const wire = (value: unknown): unknown => JSON.parse(JSON.stringify(value))
@@ -55,12 +55,23 @@ describe('the stored room', () => {
     expect(parseRoom(wire(odd))).toEqual({ ...v1, version: 2, creator: null })
   })
 
-  it('reads a room whose game an older build saved', () => {
-    const t = table()
-    t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
-    const room = roomOfGame(CODE, t.game, HOST)
-    const stored = { ...room, game: asVersion5(t.game) }
-    expect(parseRoom(wire(stored))?.game).toEqual(t.game)
+  it('reads a room whose game keeps the values of an older build', () => {
+    // The old window rule, null cards, and rule checks, one still open.
+    const t = olderTable()
+    playStrategy(t)
+    t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
+    t.act({ kind: 'reactionClosed' }) // Tom's turn resumes
+    t.pause()
+    t.pauseReason('ruleCheck')
+    t.wait(MIN)
+    t.pauseReason(null)
+    t.wait(MIN)
+    t.resume()
+    t.pause()
+    t.pauseReason('ruleCheck')
+    const room = { ...tableServer().room, game: withNullCards(t.game) }
+    expect(room.game.pauses.flatMap((p) => p.reasons)).toHaveLength(2)
+    expect(parseRoom(wire(room))).toEqual(room)
   })
 
   it('rejects a broken room', () => {
@@ -71,6 +82,7 @@ describe('the stored room', () => {
       { ...room, revision: -1 },
       { ...room, revision: 1.5 },
       { ...room, game: { version: 6 } },
+      { ...room, game: { ...table().game, version: 5 } },
       { ...room, members: [{ id: 'd1', seat: null, admin: true }] },
       { ...room, setup: { ...SETUP, speakerId: 'zed' } },
       { ...room, creator: 'short' },
@@ -78,24 +90,6 @@ describe('the stored room', () => {
       null,
     ]
     for (const raw of broken) expect(parseRoom(wire(raw))).toBeNull()
-  })
-
-  it('makes a room of a saved game, which its device joins at once as the table', () => {
-    const t = table()
-    const limits = { ...DEFAULT_LIMITS, turn: { on: true, ms: MIN } }
-    t.setLimits(true, limits)
-    const room = roomOfGame(CODE, t.game, HOST)
-    expect(room).toMatchObject({ revision: 0, game: t.game })
-    expect(room.setup).toEqual({
-      players: t.game.players,
-      speakerId: 'jaz',
-      enforceLimits: true,
-      limits,
-    })
-    expect(room.members).toEqual([
-      { id: 'd1', token: HOST, seat: null, admin: true },
-    ])
-    expect(room.creator).toBeNull()
   })
 })
 

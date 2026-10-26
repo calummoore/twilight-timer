@@ -44,9 +44,7 @@ in the futex account. The app opens at https://ti4.nexus; see
   either way. It gives admin to other devices with a switch. A table device
   without admin is a viewer. While every admin device is away, a seated
   device can take admin, so the table can finish the game.
-- Home lists the recent games of the device, and continues a game that an
-  older build saved on the device. The device then joins that game as the
-  table device, with admin.
+- Home lists the recent games of the device.
 - The screen stays awake, and the same screens show on a phone, an iPad, and
   a computer, arranged for the space.
 
@@ -197,9 +195,9 @@ versions.
   - `stats.ts`: round and game stats.
   - `pauses.ts`: the open pause, and the time and the count of rule checks,
     which count as game time.
-  - `storage.ts` and `parse.ts`: the settings in `localStorage`, and the
-    games that builds before the server saved there. The parser reads games
-    of every older version.
+  - `storage.ts`: the settings in `localStorage`.
+  - `parse.ts` and `parse-parts.ts`: the parsers of the settings and of a
+    stored game. The parser reads a game of version 6.
   - `device-store.ts`: the token of the browser, and its open and recent
     games.
   - `connection.ts`: the offset to the server clock, the waits between the
@@ -221,7 +219,7 @@ versions.
     room version 1 on, as its build wrote it. `fixtures.test.ts` loads each
     one and checks its clocks.
 - `worker/` holds the Worker.
-  - `index.ts`: the routes. `POST /api/games` creates a game,
+  - `index.ts`: the routes. `POST /api/games` creates a game from a setup,
     `GET /api/games/<code>` looks a code up, and
     `GET /api/games/<code>/socket` opens the socket of a game.
   - `game-room.ts`: the Durable Object of one game. It applies each command

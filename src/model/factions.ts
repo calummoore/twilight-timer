@@ -61,10 +61,7 @@ export function isFactionId(raw: unknown): raw is FactionId {
   return FACTIONS.some((f) => f.id === raw)
 }
 
-/**
- * The faction name. A player in a game from an older build can have no
- * faction, and then the name is an empty string.
- */
-export function factionName(id: FactionId | null): string {
-  return FACTIONS.find((f) => f.id === id)?.name ?? ''
+/** The faction name, as the official list gives it. */
+export function factionName(id: FactionId): string {
+  return FACTIONS.find((f) => f.id === id)?.name ?? id
 }

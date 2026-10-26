@@ -1,6 +1,6 @@
 import { newCode, parseCode } from '../src/model/code'
 import { parseCreateRequest } from '../src/model/protocol'
-import { newRoom, roomOfGame } from '../src/model/room'
+import { newRoom } from '../src/model/room'
 
 export { GameRoom } from './game-room'
 
@@ -8,7 +8,7 @@ export { GameRoom } from './game-room'
  * The routes of the game API. Every other path is a static asset, so the
  * Worker sees only /api/ requests.
  *
- * - POST /api/games creates a game from a setup or a saved game.
+ * - POST /api/games creates a game from a setup.
  * - GET /api/games/<code> says whether a game has the code.
  * - GET /api/games/<code>/socket opens the socket of the game.
  */
@@ -39,10 +39,7 @@ async function create(request: Request, env: Env): Promise<Response> {
   if (!body) return json({ error: 'invalid' }, 400)
   for (let i = 0; i < CODE_TRIES; i++) {
     const code = newCode(random)
-    const room =
-      'game' in body
-        ? roomOfGame(code, body.game, body.token)
-        : newRoom(code, body.setup, body.token)
+    const room = newRoom(code, body.setup, body.token)
     if (await env.GAMES.getByName(code).create(room)) {
       return json({ code }, 201)
     }

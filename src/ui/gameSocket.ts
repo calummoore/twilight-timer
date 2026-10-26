@@ -6,6 +6,7 @@ import {
   checkBuild,
   nextOffset,
   retryDelay,
+  type GuardStore,
 } from '../model/connection'
 import { isFields } from '../model/parse-fields'
 import {
@@ -15,7 +16,6 @@ import {
   type Notice,
   type ServerMessage,
 } from '../model/protocol'
-import type { KeyValueStore } from '../model/storage'
 import { socketUrl } from './api'
 
 type Timer = ReturnType<typeof setTimeout>
@@ -51,7 +51,7 @@ interface Connection {
  * When the browser blocks it, the guard keeps nothing, and the page stops
  * instead of a reload.
  */
-const GUARD: KeyValueStore = {
+const GUARD: GuardStore = {
   getItem: (key) => attempt(() => sessionStorage.getItem(key), null),
   setItem: (key, value) =>
     attempt(() => sessionStorage.setItem(key, value), undefined),
