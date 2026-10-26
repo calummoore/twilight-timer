@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { RecentGame } from '../model/device-store'
-import type { Command } from '../model/protocol'
+import { NOTICES, type Command } from '../model/protocol'
 import { ringOf } from '../model/ring'
 import { mayCommand } from '../model/rights'
 import type { LimitSettings, Settings } from '../model/settings'
@@ -49,12 +49,17 @@ export function RoomScreen(props: {
     onSeen({ code, ...gameSummary(game, players), seenAt: Date.now() })
   }, [code, game, players, onSeen])
 
-  if (status === 'missing') {
-    return <OpeningScreen code={props.code} missing onHome={props.onHome} />
-  }
-  if (!room) {
+  // A notice of the server ends the connection. The game stays in the recent
+  // games of the device.
+  const notice = NOTICES.find((n) => n === status) ?? null
+  if (notice || !room) {
     return (
-      <OpeningScreen code={props.code} missing={false} onHome={props.onHome} />
+      <OpeningScreen
+        code={props.code}
+        notice={notice}
+        onHome={props.onHome}
+        onReload={() => location.reload()}
+      />
     )
   }
   // The seats in clockwise order: the setup in the lobby, then the ring of the

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ringOf } from './ring'
-import { parseRoom } from './room'
+import { parseRoom } from './room-storage'
 import { HOST, JAZ, seatedServer } from './test-room'
 import { PLAYERS, playStrategy, table } from './test-table'
 

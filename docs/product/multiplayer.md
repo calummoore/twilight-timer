@@ -47,6 +47,9 @@ A game stays on the server, reachable by its code, without a time limit.
 Rejected: deleting old games, because a game is small, and a code must not
 be reused.
 
+Every device runs the version of the server, and reloads by itself after
+an update, as [New versions](versions.md) says.
+
 ## Codes
 
 Each game has a join code: six characters, letters and digits, without the

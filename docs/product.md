@@ -54,6 +54,9 @@ The core concepts have their own pages:
   limits and overtime, pauses, and corrections.
 - [Multiplayer](product/multiplayer.md): the game on the server, join
   codes, table and seated devices, and who may tap what.
+- [New versions](product/versions.md): one version on the server and on
+  every device, the reload after an update, and a game that the server
+  cannot read.
 
 ---
 
@@ -187,6 +190,10 @@ From the should-have list, the MVP adds the pause.
 - [ ] A seated device acts for its own player when the game waits for them
 - [ ] Every device shows the same screens, with the controls it may not use
       disabled
+- [ ] Every device runs the version of the server, and reloads by itself
+      after an update
+- [ ] A game that the server cannot read stays on the server, and every
+      device in it says so
 
 ### Explicitly out of scope
 

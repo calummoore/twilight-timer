@@ -47,236 +47,259 @@
       "kind": "cardPicked",
       "playerId": "jaz",
       "card": 3,
-      "at": 1700000010000
+      "at": 1700000012000
     },
     {
       "kind": "cardPicked",
       "playerId": "kira",
       "card": 5,
-      "at": 1700000020000
+      "at": 1700000024000
     },
     {
       "kind": "cardPicked",
       "playerId": "tom",
       "card": 1,
-      "at": 1700000030000
+      "at": 1700000036000
     },
     {
       "kind": "cardPicked",
       "playerId": "priya",
       "card": 7,
-      "at": 1700000040000
+      "at": 1700000048000
     },
     {
       "kind": "cardPicked",
       "playerId": "sam",
       "card": 4,
-      "at": 1700000050000
+      "at": 1700000060000
     },
     {
       "kind": "cardPicked",
       "playerId": "wren",
       "card": 2,
-      "at": 1700000060000
+      "at": 1700000072000
+    },
+    {
+      "kind": "naaluTokenMoved",
+      "playerId": "kira",
+      "at": 1700000072000
     },
     {
       "kind": "phaseStepped",
-      "at": 1700000060000
+      "at": 1700000072000
     },
     {
       "kind": "turnEnded",
-      "at": 1700000090000
+      "at": 1700000112000
+    },
+    {
+      "kind": "turnEnded",
+      "at": 1700000147000
     },
     {
       "kind": "strategyCardPlayed",
-      "card": 1,
-      "at": 1700000110000
+      "card": 2,
+      "at": 1700000177000
     },
     {
       "kind": "reactionDone",
       "playerId": "jaz",
-      "at": 1700000115000
-    },
-    {
-      "kind": "reactionDone",
-      "playerId": "kira",
-      "at": 1700000120000
+      "at": 1700000197000
     },
     {
       "kind": "reactionExtended",
-      "ms": 30000,
-      "at": 1700000125000
-    },
-    {
-      "kind": "reactionDone",
-      "playerId": "priya",
-      "at": 1700000125000
+      "ms": 60000,
+      "at": 1700000202000
     },
     {
       "kind": "reactionClosed",
-      "at": 1700000130000
-    },
-    {
-      "kind": "turnEnded",
-      "at": 1700000350000
+      "at": 1700000217000
     },
     {
       "kind": "strategyCardPlayed",
       "card": 3,
-      "at": 1700000375000
+      "at": 1700000287000
     },
     {
       "kind": "reactionClosed",
-      "at": 1700000385000
+      "at": 1700000312000
     },
     {
       "kind": "strategyCardPlayed",
-      "card": 5,
-      "at": 1700000410000
+      "card": 4,
+      "at": 1700000547000
     },
     {
       "kind": "reactionClosed",
-      "at": 1700000420000
+      "at": 1700000557000
     },
     {
       "kind": "strategyCardPlayed",
       "card": 7,
-      "at": 1700000445000
+      "at": 1700000577000
     },
     {
       "kind": "reactionClosed",
-      "at": 1700000455000
+      "at": 1700000587000
+    },
+    {
+      "kind": "strategyCardPlayed",
+      "card": 5,
+      "at": 1700000850000
+    },
+    {
+      "kind": "reactionClosed",
+      "at": 1700000880000
     },
     {
       "kind": "passed",
-      "at": 1700000460000
+      "at": 1700000900000
     },
     {
       "kind": "passed",
-      "at": 1700000465000
+      "at": 1700000920000
     },
     {
       "kind": "passed",
-      "at": 1700000470000
+      "at": 1700000940000
     },
     {
       "kind": "passed",
-      "at": 1700000475000
+      "at": 1700000960000
     },
     {
       "kind": "passed",
-      "at": 1700000480000
+      "at": 1700000980000
     },
     {
       "kind": "passed",
-      "at": 1700000485000
+      "at": 1700001000000
     },
     {
       "kind": "statusStepToggled",
       "step": 0,
-      "at": 1700000545000
+      "at": 1700001030000
     },
     {
       "kind": "statusStepToggled",
       "step": 1,
-      "at": 1700000545000
+      "at": 1700001030000
     },
     {
       "kind": "custodiansSet",
       "removed": true,
-      "at": 1700000545000
+      "at": 1700001030000
     },
     {
       "kind": "phaseStepped",
-      "at": 1700000605000
+      "at": 1700001150000
     },
     {
       "kind": "votingOpened",
-      "at": 1700000725000
+      "at": 1700001330000
     },
     {
       "kind": "voteCast",
-      "at": 1700000737000
+      "at": 1700001340000
     },
     {
       "kind": "voteCast",
-      "at": 1700000749000
+      "at": 1700001360000
     },
     {
       "kind": "voteCast",
-      "at": 1700000761000
+      "at": 1700001390000
     },
     {
       "kind": "voteCast",
-      "at": 1700000773000
+      "at": 1700001430000
     },
     {
       "kind": "voteCast",
-      "at": 1700000785000
+      "at": 1700001480000
     },
     {
       "kind": "voteCast",
-      "at": 1700000797000
+      "at": 1700001540000
     },
     {
       "kind": "agendaResolved",
-      "at": 1700000797000
+      "at": 1700001540000
     },
     {
-      "kind": "votingOpened",
-      "at": 1700000857000
+      "kind": "agendaResolved",
+      "at": 1700001600000
     },
     {
       "kind": "speakerMoved",
-      "playerId": "kira",
-      "at": 1700000877000
-    },
-    {
-      "kind": "voteCast",
-      "at": 1700000887000
-    },
-    {
-      "kind": "agendaResolved",
-      "at": 1700000887000
+      "playerId": "sam",
+      "at": 1700001600000
     },
     {
       "kind": "phaseStepped",
-      "at": 1700000947000
-    },
-    {
-      "kind": "naaluTokenMoved",
-      "playerId": "jaz",
-      "at": 1700000952000
-    },
-    {
-      "kind": "cardPicked",
-      "playerId": "kira",
-      "card": 2,
-      "at": 1700000957000
+      "at": 1700001630000
     },
     {
       "kind": "playerRemoved",
       "playerId": "wren",
-      "at": 1700000977000
+      "at": 1700001630000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "sam",
+      "card": 4,
+      "at": 1700001645000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "jaz",
+      "card": 3,
+      "at": 1700001660000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "kira",
+      "card": 5,
+      "at": 1700001675000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "tom",
+      "card": 1,
+      "at": 1700001690000
+    },
+    {
+      "kind": "cardPicked",
+      "playerId": "priya",
+      "card": 7,
+      "at": 1700001705000
+    },
+    {
+      "kind": "phaseStepped",
+      "at": 1700001705000
+    },
+    {
+      "kind": "turnEnded",
+      "at": 1700001885000
     }
   ],
   "pauses": [
     {
-      "from": 1700000185000,
-      "to": 1700000335000,
+      "from": 1700000322000,
+      "to": 1700000502000,
       "reasons": [
         {
           "reason": "ruleCheck",
-          "from": 1700000245000,
-          "to": 1700000335000
+          "from": 1700000382000,
+          "to": 1700000502000
         }
       ]
     }
   ],
   "voids": [
     {
-      "from": 1700000170000,
-      "to": 1700000175000
+      "from": 1700000602000,
+      "to": 1700000610000
     }
   ],
   "limitsLog": [
@@ -311,12 +334,12 @@
       }
     },
     {
-      "at": 1700000335000,
-      "enforce": false,
+      "at": 1700001705000,
+      "enforce": true,
       "limits": {
         "turn": {
           "on": true,
-          "ms": 180000
+          "ms": 120000
         },
         "reactionWindow": {
           "on": true,

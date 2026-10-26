@@ -15,6 +15,11 @@ export const JAZ = 'jaz-token-00000000002'
 export const KIRA = 'kira-token-0000000003'
 export const LAPTOP = 'laptop-token-00000004'
 
+/** The build of the server, and of a page that runs the same build. */
+export const BUILD = 'a1b2c3d'
+/** The build before it, which a page that a deploy left open runs. */
+export const OLD_BUILD = '9f8e7d6'
+
 export const SETUP: Setup = {
   players: PLAYERS,
   speakerId: 'jaz',

@@ -28,11 +28,11 @@ export type Command =
   | { type: 'limits'; enforceLimits: boolean; limits: Limits }
 
 /**
- * From a device. Hello names the browser, and each command names the
- * revision that the device saw.
+ * From a device. Hello names the browser and the build of the page, and each
+ * command names the revision that the device saw.
  */
 export type ClientMessage =
-  | { type: 'hello'; token: string }
+  | { type: 'hello'; token: string; build: string }
   | { type: 'command'; rev: number; command: Command }
 
 /** A device of the game, and whether it is connected now. */
@@ -56,8 +56,16 @@ export interface RoomState {
   adminsAway: boolean
 }
 
-/** From the server: the state, or that no game has the code. */
-export type ServerMessage =
+/**
+ * The messages from the server that end the connection: no game has the
+ * code, the server cannot read the game under the code, or the page runs
+ * another build than the server.
+ */
+export const NOTICES = ['missing', 'unreadable', 'outdated'] as const
+export type Notice = (typeof NOTICES)[number]
+
+/** From the server: the state, or a notice. Each names the server's build. */
+export type ServerMessage = { build: string } & (
   | {
       type: 'state'
       /** The server clock when it sent the state, in ms. */
@@ -71,7 +79,8 @@ export type ServerMessage =
       creator: boolean
       room: RoomState
     }
-  | { type: 'missing' }
+  | { type: Notice }
+)
 
 /** The body of the request that creates a game from a setup. */
 export interface CreateRequest {
@@ -79,11 +88,23 @@ export interface CreateRequest {
   setup: Setup
 }
 
+/**
+ * Reads the build that a message names, before the rest of the message. The
+ * `build` field keeps its shape in every build, so that a page or a server
+ * of another build still reads it. Returns null when it has none.
+ */
+export function buildOf(raw: unknown): string | null {
+  if (!isFields(raw) || typeof raw.build !== 'string') return null
+  return raw.build === '' ? null : raw.build
+}
+
 export function parseClientMessage(raw: unknown): ClientMessage | null {
   if (!isFields(raw)) return null
   if (raw.type === 'hello') {
     const token = parseToken(raw.token)
-    return token === null ? null : { type: 'hello', token }
+    const build = buildOf(raw)
+    if (token === null || build === null) return null
+    return { type: 'hello', token, build }
   }
   if (raw.type !== 'command' || !isRevision(raw.rev)) return null
   const command = parseCommand(raw.command)
@@ -129,15 +150,17 @@ function parseCommand(raw: unknown): Command | null {
 }
 
 export function parseServerMessage(raw: unknown): ServerMessage | null {
-  if (!isFields(raw)) return null
-  if (raw.type === 'missing') return { type: 'missing' }
+  const build = buildOf(raw)
+  if (!isFields(raw) || build === null) return null
+  const notice = NOTICES.find((n) => n === raw.type)
+  if (notice) return { build, type: notice }
   const { serverTime, you } = raw
   if (raw.type !== 'state' || !isNumber(serverTime)) return null
   if (you !== null && typeof you !== 'string') return null
   // A state without the flag reads as a device that did not create the game.
   const creator = raw.creator === true
   const room = parseRoomState(raw.room)
-  return room && { type: 'state', serverTime, you, creator, room }
+  return room && { build, type: 'state', serverTime, you, creator, room }
 }
 
 function parseRoomState(raw: unknown): RoomState | null {

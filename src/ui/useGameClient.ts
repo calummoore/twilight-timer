@@ -1,17 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  PING_INTERVAL_MS,
-  PONG_TIMEOUT_MS,
-  WAKE_TIMEOUT_MS,
-  nextOffset,
-  retryDelay,
-} from '../model/connection'
-import {
-  parseServerMessage,
-  type Command,
-  type RoomState,
-} from '../model/protocol'
-import { socketUrl } from './api'
+import { BUILD } from '../build'
+import type { Command, Notice, RoomState } from '../model/protocol'
+import { openGameSocket, type GameSocket } from './gameSocket'
 
 export type GameStatus =
   /** The device waits for the first state of the game. */
@@ -20,17 +10,11 @@ export type GameStatus =
   | 'open'
   /** The device has the game, but no connection. Its taps wait. */
   | 'reconnecting'
-  /** No game has the code. */
-  | 'missing'
-
-type Timer = ReturnType<typeof setTimeout>
-
-/** One socket of the hook, with the ways to check it and to end it. */
-interface Connection {
-  ws: WebSocket
-  ping: (timeoutMs: number) => void
-  drop: () => void
-}
+  /**
+   * The connection ended for good: no game has the code, the server cannot
+   * read the game, or a reload did not bring the server's build.
+   */
+  | Notice
 
 export interface GameClient {
   status: GameStatus
@@ -54,11 +38,7 @@ export interface GameClient {
   send: (command: Command) => void
 }
 
-/**
- * The socket of one game: hello with the token of the browser, the state of
- * the game, the offset to the server clock, pings that find a dead
- * connection, and new tries after a lost connection.
- */
+/** The game of one code, from its socket, as the screens show it. */
 export function useGameClient(code: string, token: string): GameClient {
   const [status, setStatus] = useState<GameStatus>('connecting')
   const [state, setState] = useState<{
@@ -67,119 +47,36 @@ export function useGameClient(code: string, token: string): GameClient {
     creator: boolean
   } | null>(null)
   const [offset, setOffset] = useState(0)
-  const socket = useRef<WebSocket | null>(null)
+  const socket = useRef<GameSocket | null>(null)
 
   useEffect(() => {
-    let disposed = false
-    let missing = false
-    let attempt = 0
-    let retry: Timer | undefined
-    // The socket now, or null while the device waits to try again.
-    let current: Connection | null = null
-
-    // Each socket has its own timers, and one way to end: drop. A close, a
-    // missed pong, and the end of the hook all drop the socket, so a dead
-    // connection shows at once, and an old socket cannot touch a new one.
-    const connect = () => {
-      clearTimeout(retry)
-      if (disposed || missing) return
-      const ws = new WebSocket(socketUrl(code))
-      let sample: number | null = null
-      let deadline: Timer | undefined
-      let pings: Timer | undefined
-      let dropped = false
-
-      const drop = () => {
-        if (dropped) return
-        dropped = true
-        clearTimeout(deadline)
-        clearInterval(pings)
-        ws.close()
-        if (socket.current === ws) socket.current = null
-        // An old socket ends quietly: only the current one changes the state.
-        if (current?.ws !== ws) return
-        current = null
-        if (disposed || missing) return
-        setStatus((s) => (s === 'open' ? 'reconnecting' : s))
-        retry = setTimeout(connect, retryDelay(attempt++))
-      }
-      // A socket that does not answer a ping in time is dead.
-      const ping = (timeoutMs: number) => {
-        if (dropped || ws.readyState !== WebSocket.OPEN) return
-        ws.send('ping')
-        clearTimeout(deadline)
-        deadline = setTimeout(drop, timeoutMs)
-      }
-
-      current = { ws, ping, drop }
-      socket.current = ws
-      ws.addEventListener('open', () => {
-        if (dropped) return
-        attempt = 0
-        ws.send(JSON.stringify({ type: 'hello', token }))
-        pings = setInterval(() => ping(PONG_TIMEOUT_MS), PING_INTERVAL_MS)
-      })
-      ws.addEventListener('message', (event: MessageEvent<unknown>) => {
-        if (dropped) return
-        clearTimeout(deadline)
-        const data = typeof event.data === 'string' ? event.data : ''
-        const message = parseServerMessage(parseJson(data))
-        if (!message) return
-        if (message.type === 'missing') {
-          missing = true
-          setStatus('missing')
-          return
-        }
-        sample = nextOffset(sample, message.serverTime, Date.now())
-        setOffset(sample)
-        const { room, you, creator } = message
+    const opened = openGameSocket(code, token, {
+      onState: ({ room, you, creator }, offset) => {
+        setOffset(offset)
         setState({ room, you, creator })
         setStatus('open')
-      })
-      ws.addEventListener('close', drop)
-    }
-
-    // A phone that wakes up, or a browser that is online again, checks its
-    // connection at once instead of at the next ping.
-    const wake = () => {
-      if (disposed || missing || document.visibilityState !== 'visible') return
-      const state = current?.ws.readyState
-      if (state === WebSocket.OPEN) current?.ping(WAKE_TIMEOUT_MS)
-      else if (state !== WebSocket.CONNECTING) {
-        // A closing socket ends through the drop path, then the next try
-        // starts at once.
-        current?.drop()
-        attempt = 0
-        connect()
-      }
-    }
-
-    connect()
-    document.addEventListener('visibilitychange', wake)
-    window.addEventListener('online', wake)
+      },
+      onLost: () => setStatus((s) => (s === 'open' ? 'reconnecting' : s)),
+      onEnd: setStatus,
+    })
+    socket.current = opened
     return () => {
-      disposed = true
-      clearTimeout(retry)
-      current?.drop()
-      document.removeEventListener('visibilitychange', wake)
-      window.removeEventListener('online', wake)
+      socket.current = null
+      opened.close()
     }
   }, [code, token])
 
   const revision = state?.room.revision ?? null
   const send = useCallback(
     (command: Command) => {
-      const ws = socket.current
-      if (revision === null || ws?.readyState !== WebSocket.OPEN) return
-      ws.send(JSON.stringify({ type: 'command', rev: revision, command }))
+      if (revision === null) return
+      socket.current?.send({ type: 'command', rev: revision, command })
     },
     [revision],
   )
 
   const refresh = useCallback(() => {
-    const ws = socket.current
-    if (ws?.readyState !== WebSocket.OPEN) return
-    ws.send(JSON.stringify({ type: 'hello', token }))
+    socket.current?.send({ type: 'hello', token, build: BUILD })
   }, [token])
 
   return {
@@ -190,13 +87,5 @@ export function useGameClient(code: string, token: string): GameClient {
     offset,
     refresh,
     send,
-  }
-}
-
-function parseJson(text: string): unknown {
-  try {
-    return JSON.parse(text)
-  } catch {
-    return null
   }
 }
