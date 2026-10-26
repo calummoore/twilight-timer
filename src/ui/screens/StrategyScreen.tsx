@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { STRATEGY_CARDS } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
+import { WaitLabel } from '../controls'
 import { plural, timerText } from '../format'
+import type { Rights } from '../rights'
 import { NaaluTokenPicker } from './NaaluTokenPicker'
 
 type StrategyView = Extract<PhaseView, { phase: 'strategy' }>
@@ -10,12 +12,13 @@ type StrategyView = Extract<PhaseView, { phase: 'strategy' }>
 export function StrategyScreen(props: {
   game: GameView
   view: StrategyView
+  rights: Rights
   onPick: (playerId: string, card: number) => void
   onSpeaker: () => void
   onMoveNaaluToken: (playerId: string) => void
   onBegin: () => void
 }) {
-  const { game, view } = props
+  const { game, view, rights } = props
   const [picking, setPicking] = useState(false)
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const picker = view.pickerId ? byId.get(view.pickerId) : undefined
@@ -33,6 +36,10 @@ export function StrategyScreen(props: {
   const waiting = game.pickOrder.filter(
     (id) => !Object.values(view.owners).includes(id),
   )
+  // A seated device picks only on its own pick.
+  const pickable = (card: number) =>
+    !!picker && rights.may({ kind: 'cardPicked', playerId: picker.id, card })
+  const begin = { kind: 'phaseStepped' } as const
 
   return (
     <>
@@ -55,7 +62,11 @@ export function StrategyScreen(props: {
           <div className="picker-help">
             Order follows the speaker. Tap a card to assign it.
           </div>
-          <button className="ibtn spkb" onClick={props.onSpeaker}>
+          <button
+            className="ibtn spkb"
+            disabled={!rights.admin}
+            onClick={props.onSpeaker}
+          >
             ★ Speaker: {byId.get(game.speakerId)?.name} · change
           </button>
           {clock && (
@@ -68,12 +79,13 @@ export function StrategyScreen(props: {
           {STRATEGY_CARDS.map((card) => {
             const owner = byId.get(view.owners[card.number] ?? '')
             const goods = view.tradeGoods[card.number] ?? 0
+            const mine = !owner && pickable(card.number)
             return (
               <button
                 key={card.number}
-                className={`card ${owner ? 'taken' : 'next'}`}
+                className={`card ${owner ? 'taken' : mine ? 'next' : ''}`}
                 style={pc(owner?.colour)}
-                disabled={!!owner || !picker}
+                disabled={!mine}
                 onClick={() => picker && props.onPick(picker.id, card.number)}
               >
                 {!owner && goods > 0 && <div className="tg">+{goods} TG</div>}
@@ -86,7 +98,11 @@ export function StrategyScreen(props: {
                   </div>
                 ) : (
                   <div className="free">
-                    {picker ? `Tap to assign to ${picker.name}` : 'Not picked'}
+                    {!picker
+                      ? 'Not picked'
+                      : mine
+                        ? `Tap to assign to ${picker.name}`
+                        : `${picker.name}’s pick`}
                   </div>
                 )}
               </button>
@@ -119,6 +135,7 @@ export function StrategyScreen(props: {
             <button
               className="ibtn tokb"
               style={pc(holder?.colour)}
+              disabled={!rights.admin}
               onClick={() => setPicking(true)}
             >
               <b>0</b>
@@ -130,9 +147,12 @@ export function StrategyScreen(props: {
       <div className="foot">
         <button
           className="big"
-          disabled={remaining > 0}
+          disabled={remaining > 0 || !rights.may(begin)}
           onClick={props.onBegin}
         >
+          {remaining === 0 && (
+            <WaitLabel waitsFor={rights.waits(begin, null)} />
+          )}
           {remaining > 0
             ? `BEGIN ACTION PHASE — ${plural(remaining, 'pick').toUpperCase()} REMAINING`
             : 'BEGIN ACTION PHASE'}

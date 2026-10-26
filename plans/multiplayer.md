@@ -338,29 +338,36 @@ Tags: ui
 Put the game on the server, with every device as a table device. Player
 mode comes in the next milestone.
 
-- [ ] Home screen, with New game, Join game, Recent games, and the games
+- [x] Home screen, with New game, Join game, Recent games, and the games
       saved on this device. Create game puts the seats on the server, and
       the device joins as a table device.
-- [ ] The lobby on the Players & devices screen, and Start game on an admin
+- [x] The lobby on the Players & devices screen, and Start game on an admin
       device. No clock runs before Start.
-- [ ] Join by code or by the `/join/<code>` link, as a table device. The
+- [x] Join by code or by the `/join/<code>` link, as a table device. The
       new device is a viewer, and the first device gives it admin.
-- [ ] The game client hook: the socket, the reconnect, the revision, and the
+- [x] The game client hook: the socket, the reconnect, the revision, and the
       server time offset. The reconnecting state disables the controls.
-- [ ] The Players & devices screen: the code, the link, the QR code, the
+- [x] The Players & devices screen: the code, the link, the QR code, the
       seats, and the devices. The top bar chip opens it.
-- [ ] Recent games, Leave game, and Continue on the server for a game that
+- [x] Recent games, Leave game, and Continue on the server for a game that
       an older build saved on the device.
-- [ ] Settings in two groups. Time limits go through the object.
-- [ ] Port the mockup styles of the Home, opening, Claim seat, and
+- [x] Settings in two groups. Time limits go through the object.
+- [x] Port the mockup styles of the Home, opening, Claim seat, and
       Players & devices screens, the top bar chips, the notice, and the
       reconnecting bar to `src/styles/mockup/`. Remove the Later marks of
       the screens that this milestone builds. The claim screen and the
       seated states keep theirs until player mode builds them.
-- [ ] Stop saving the game in `localStorage`. Keep the parser for the
+- [x] Stop saving the game in `localStorage`. Keep the parser for the
       upload of an older game.
-- [ ] Smoke test on the dev server: two windows, one creates and one joins
-      as table, and taps show on both. Evidence: `.context/multiplayer/app/`.
+- [x] Gate every control with the rights of the device, because a device
+      that joins is a viewer with every control off. A disabled main
+      control names the player that the game waits for, or the table.
+- [x] Smoke test on the dev server: two windows, one creates and one joins
+      as table, and taps show on both. Evidence:
+      `.context/multiplayer/app/smoke-m9.log`: 22 checks passed. The lost
+      connection ran on the production build in `vite preview`, because the
+      dev server reloads the page when it restarts:
+      `.context/multiplayer/app/smoke-m9-reconnect.log`: 6 checks passed.
 
 ## Milestone 10: Player mode
 

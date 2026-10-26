@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { startGame } from './commands'
 import { DEFAULT_SETTINGS } from './settings'
-import { archiveGame, loadGame, loadLastGame, saveGame } from './storage'
+import { forgetGame, forgetLastGame, loadGame, loadLastGame } from './storage'
+import { onServer } from './test-room'
 import {
   asPreviewVersion4,
   asPreviewVersion5,
@@ -10,11 +11,11 @@ import {
   asVersion5,
   withNullCards,
 } from './test-shapes'
-import { gameOf, memoryStore } from './test-store'
+import { gameOf, memoryStore, storeGame } from './test-store'
 import { MIN, PLAYERS, T0, olderTable, playStrategy, table } from './test-table'
 
 describe('saved games and pause reasons', () => {
-  it('saves and loads the rule checks of each pause', () => {
+  it('loads the rule checks of each pause, and the server keeps them', () => {
     const store = memoryStore()
     const t = table()
     t.pause()
@@ -25,9 +26,10 @@ describe('saved games and pause reasons', () => {
     t.resume()
     t.pause()
     t.pauseReason('ruleCheck') // still open when the game saves
-    saveGame(store, t.game)
+    storeGame(store, t.game)
     expect(t.game.pauses.flatMap((p) => p.reasons)).toHaveLength(2)
     expect(loadGame(store)).toEqual({ status: 'ok', game: t.game })
+    expect(onServer(t.game)).toEqual(t.game)
   })
 
   it('drops a reason range that it cannot read, and keeps the game', () => {
@@ -60,7 +62,7 @@ describe('saved games and pause reasons', () => {
     ['4', asVersion4],
     ['5', asVersion5],
   ])(
-    'loads a version %s game with no rule checks and moves it to the version 6 keys',
+    'loads a version %s game with no rule checks, and forgets it after the upload',
     (version, shape) => {
       const store = memoryStore()
       const t = olderTable()
@@ -77,9 +79,10 @@ describe('saved games and pause reasons', () => {
       ])
       expect(game).toEqual(t.game)
       expect(gameOf(loadLastGame(store))).toEqual(t.game)
-      saveGame(store, game)
-      archiveGame(store)
-      expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v6'])
+      expect(onServer(game)).toEqual(game)
+      forgetGame(store)
+      forgetLastGame(store)
+      expect(store.data.size).toBe(0)
     },
   )
 
@@ -101,9 +104,7 @@ describe('saved games and pause reasons', () => {
     const game = gameOf(loadGame(store))
     expect(game).toEqual(withNullCards(t.game))
     expect(game.pauses.flatMap((p) => p.reasons)).toHaveLength(1)
-    saveGame(store, game)
-    expect([...store.data.keys()]).toEqual(['ti4tempo.game.v6'])
-    expect(loadGame(store)).toEqual({ status: 'ok', game })
+    expect(onServer(game)).toEqual(game)
   })
 
   it('loads a version 5 game that a preview of pause reasons saved', () => {
@@ -124,7 +125,6 @@ describe('saved games and pause reasons', () => {
     const game = gameOf(loadGame(store))
     expect(game).toEqual(withNullCards(t.game))
     expect(game.pauses.flatMap((p) => p.reasons)).toHaveLength(1)
-    saveGame(store, game)
-    expect(loadGame(store)).toEqual({ status: 'ok', game })
+    expect(onServer(game)).toEqual(game)
   })
 })

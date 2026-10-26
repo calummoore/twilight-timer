@@ -1,6 +1,5 @@
-/* App-only styles: the button reset, the full-window stage, fields, and the
-   load notice. mockup/controls.css holds the controls that the mockup draws
-   too. */
+/* App-only styles: the button reset, the full-window stage, and fields.
+   mockup/controls.css holds the controls that the mockup draws too. */
 
 button {
   font: inherit;
@@ -32,10 +31,6 @@ select {
   user-select: text;
   -webkit-user-select: text;
 }
-.ibtn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
 
 /* The app fills the window's safe area, so the status bar and the home
    indicator do not cover it. The stage is a size container, and the container
@@ -64,9 +59,6 @@ select {
 .big {
   text-align: center;
 }
-.sec:disabled {
-  opacity: 0.45;
-}
 .fld {
   width: 100%;
   outline: none;
@@ -84,20 +76,4 @@ select.fld {
 /* The phone seat rows set their own padding. Keep the room for the arrow. */
 .seat select.fld {
   padding-right: 26px;
-}
-
-.notice {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: #241408;
-  border: 1px solid #5b3a14;
-  border-radius: 11px;
-  padding: 12px 15px;
-  margin-bottom: 14px;
-  font-size: 13px;
-  color: #f0c489;
-}
-.notice .ibtn {
-  margin-left: auto;
 }

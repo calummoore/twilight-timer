@@ -1,9 +1,11 @@
 # TI4 Tempo
 
-A shared-table time tracker for Twilight Imperium 4th Edition. It runs on one
-iPad or phone in the middle of the table. It is a chess clock for the action
-phase, with enough of the round structure to know whose turn it is. The
-repository is `twilight-timer`.
+A shared-table time tracker for Twilight Imperium 4th Edition. The game lives
+on the server, and every device at the table joins it with a six-character
+code: the iPad in the middle of the table, a laptop at the side, and the
+phones of the players. It is a chess clock for the action phase, with enough
+of the round structure to know whose turn it is. The repository is
+`twilight-timer`.
 
 Each push to `main` deploys the app to the Cloudflare Worker `twilight-timer`
 in the futex account. The app opens at https://ti4.nexus; see
@@ -29,8 +31,14 @@ in the futex account. The app opens at https://ti4.nexus; see
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.
-- The game saves in the browser after every tap, and the screen stays awake.
-- The same screens on a phone, an iPad, and a computer, arranged for the space.
+- Each game lives on the server under a join code, with a link and a QR code.
+  Every device shows every tap at once, and a reload returns to the game.
+- The device that creates a game is its first admin. A device that joins is
+  a viewer until an admin device gives it admin.
+- Home lists the recent games of the device, and continues a game that an
+  older build saved on the device.
+- The screen stays awake, and the same screens show on a phone, an iPad, and
+  a computer, arranged for the space.
 
 ## Docs
 
@@ -108,8 +116,9 @@ its certificate.
 - `"workers_dev": true` keeps https://twilight-timer.futex.workers.dev on.
   When a route is set, Wrangler turns that URL off unless the setting is
   true.
-- The browser keeps saved games for each origin. A game saved at the
-  workers.dev URL does not show at `ti4.nexus`.
+- A game is on the server, so its code opens it at either address. The
+  browser keeps its recent games for each origin, so the list at the
+  workers.dev URL differs from the list at `ti4.nexus`.
 
 ### Pull request previews
 
@@ -136,9 +145,9 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   upload step, which holds `CLOUDFLARE_API_TOKEN`. Cal accepted this risk on
   2026-10-23. The `cleanup` job installs from the default branch, so it runs
   no pull request code.
-- A preview has its own origin, so it keeps its own saved games. It also gets
-  its own Durable Objects, from the `previews` block of `wrangler.jsonc`, so
-  a preview never sees a production game.
+- A preview has its own origin, so it keeps its own recent games. It also
+  gets its own Durable Objects, from the `previews` block of
+  `wrangler.jsonc`, so a preview never sees a production game.
 - Previews stay on workers.dev. `preview_urls` controls them, apart from
   `workers_dev` and the Custom Domain.
 - Workers Previews need Preview URLs on the Worker. `"preview_urls": true` in
@@ -166,8 +175,13 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   - `stats.ts`: round and game stats.
   - `pauses.ts`: the open pause, and the time and the count of rule checks,
     which count as game time.
-  - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
-    The parser also reads games saved by older builds.
+  - `storage.ts` and `parse.ts`: the settings in `localStorage`, and the
+    games that builds before the server saved there. The parser reads games
+    of every older version.
+  - `device-store.ts`: the token of the browser, and its open and recent
+    games.
+  - `connection.ts`: the offset to the server clock, and the waits between
+    the tries after a lost connection.
   - `code.ts`: the join codes.
   - `devices.ts`: the devices of a game, the seat takeover, and the
     last-admin rule.
@@ -183,7 +197,15 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   - `game-room.ts`: the Durable Object of one game. It applies each command
     with the model and its own clock, saves the room, and sends the state to
     every socket. Its sockets use the WebSocket Hibernation API.
-- `src/ui/GameScreen.tsx` connects the model to the screens.
+- `src/App.tsx` holds the routes: Home, the setup, and the game of one code,
+  which a join link `/join/<code>` opens.
+- `src/ui/useGameClient.ts` owns the socket of a game: hello, the state, the
+  server clock, pings, and the reconnect. `src/ui/api.ts` creates a game and
+  looks a code up.
+- `src/ui/RoomScreen.tsx` shows one game: the opening line, the lobby, or the
+  running game with Players & devices over it.
+- `src/ui/GameScreen.tsx` connects the model to the screens. Every control
+  asks `src/ui/rights.ts`, which calls the rights of the model.
 - `src/ui/screens/` has one component per screen.
 - `src/ui/Stage.tsx` is the app root: it fills the window's safe area and is a
   CSS size container.

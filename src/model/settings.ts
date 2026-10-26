@@ -50,6 +50,17 @@ export const DEFAULT_SETTINGS: Settings = {
   expansions: DEFAULT_EXPANSIONS,
 }
 
+/** The limits at the end of a log: the limits in force from now on. */
+export function limitsNow(log: readonly LimitsChange[]): LimitSettings {
+  const last = log.at(-1)
+  return last
+    ? { enforceLimits: last.enforce, limits: last.limits }
+    : {
+        enforceLimits: DEFAULT_SETTINGS.enforceLimits,
+        limits: DEFAULT_SETTINGS.limits,
+      }
+}
+
 /** The limit for a timer at wall-clock time `at`, or null for no limit. */
 export function limitAt(
   log: readonly LimitsChange[],

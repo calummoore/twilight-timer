@@ -1,18 +1,24 @@
 import { AGENDAS_PER_ROUND } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
+import { WaitLabel } from '../controls'
 import { clock, timerText } from '../format'
+import { whose, type Rights } from '../rights'
 
 type AgendaView = Extract<PhaseView, { phase: 'agenda' }>
 
 export function AgendaScreen(props: {
   game: GameView
   view: AgendaView
+  rights: Rights
   onOpenVoting: () => void
   onVoteCast: () => void
   onResolve: () => void
 }) {
-  const { game, view } = props
+  const { game, view, rights } = props
+  const vote = { kind: 'voteCast' } as const
+  const open = { kind: 'votingOpened' } as const
+  const resolve = { kind: 'agendaResolved' } as const
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const timer = game.timer
   const voting = view.voters.find((v) => v.state === 'now')
@@ -125,14 +131,26 @@ export function AgendaScreen(props: {
               <div className={`t num ${voteClock.over ? 'clock-over' : ''}`}>
                 {voteClock.text}
               </div>
-              <button className="big small" onClick={props.onVoteCast}>
+              <button
+                className="big small"
+                disabled={!rights.may(vote)}
+                onClick={props.onVoteCast}
+              >
+                <WaitLabel
+                  waitsFor={rights.waits(vote, whose(voter.name, 'vote'))}
+                />
                 VOTE CAST — NEXT PLAYER
               </button>
             </div>
           ) : (
             <div className="voter-now">
               {view.stage === 'discussion' ? (
-                <button className="big small" onClick={props.onOpenVoting}>
+                <button
+                  className="big small"
+                  disabled={!rights.may(open)}
+                  onClick={props.onOpenVoting}
+                >
+                  <WaitLabel waitsFor={rights.waits(open, null)} />
                   OPEN VOTING
                 </button>
               ) : (
@@ -141,7 +159,12 @@ export function AgendaScreen(props: {
             </div>
           )}
         </div>
-        <button className="big md ag-resolve" onClick={props.onResolve}>
+        <button
+          className="big md ag-resolve"
+          disabled={!rights.may(resolve)}
+          onClick={props.onResolve}
+        >
+          <WaitLabel waitsFor={rights.waits(resolve, null)} />
           {last ? 'RESOLVE → END ROUND' : `RESOLVE → AGENDA ${view.agenda + 1}`}
         </button>
       </div>

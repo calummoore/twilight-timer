@@ -1,14 +1,18 @@
 import { playersOfRound, roundStats } from '../../model/stats'
 import type { GameView } from '../../model/view'
 import { pc } from '../colour'
+import { WaitLabel } from '../controls'
 import { clock, percent, plural, words } from '../format'
+import type { Rights } from '../rights'
 
 export function RoundSummaryScreen(props: {
   game: GameView
+  rights: Rights
   onNextRound: () => void
   onEndGame: () => void
 }) {
-  const { game } = props
+  const { game, rights } = props
+  const next = { kind: 'phaseStepped' } as const
   const ids = playersOfRound(game.players, game.departures, game.round)
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const stats = roundStats(game.entries, game.round, ids)
@@ -118,10 +122,19 @@ export function RoundSummaryScreen(props: {
         </div>
       </div>
       <div className="foot">
-        <button className="ibtn" onClick={props.onEndGame}>
+        <button
+          className="ibtn"
+          disabled={!rights.may({ kind: 'gameEnded' })}
+          onClick={props.onEndGame}
+        >
           End game
         </button>
-        <button className="big" onClick={props.onNextRound}>
+        <button
+          className="big"
+          disabled={!rights.may(next)}
+          onClick={props.onNextRound}
+        >
+          <WaitLabel waitsFor={rights.waits(next, null)} />
           START ROUND {game.round + 1} — STRATEGY PHASE
         </button>
       </div>

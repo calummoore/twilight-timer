@@ -52,9 +52,11 @@ skill at that moment instead of guessing the rule.
   who may tap what, live in `src/model/`, where the tests reach them.
 - `src/styles/mockup/` is ported from `docs/mockups/index.html`, and
   Prettier skips it. Keep its class names in step with the mockup.
-- Saved games use versioned `localStorage` keys. Change the version when
-  the stored shape changes. Keep reading the keys and the shapes of older
-  versions, so that a saved game from an older build still loads.
+- `localStorage` keeps the data of the device under versioned keys: the
+  token, the open and the recent games, and the settings. Change the version
+  when a stored shape changes, and keep reading the older shapes. The
+  saved-game keys of the builds before the server stay readable, so that a
+  device can continue such a game on the server.
 - The Durable Object stores each game as a room with its own `version`.
   Change the room version when the stored room shape changes, and keep
   reading the older rooms. The game inside the room keeps the saved-game
@@ -91,8 +93,8 @@ skill at that moment instead of guessing the rule.
   or rule check. Plain pauses and undone ranges are not game time.
 - Undo: every clock returns to its value at the undone action. The game
   clock also keeps the rule checks in between.
-- Stored games: a saved game from an older build still loads, or the app
-  shows its notice and starts fresh.
+- Stored games: a stored room, and a game that an older build saved on a
+  device, still load. A saved game that cannot be read shows its notice.
 
 ## Status
 

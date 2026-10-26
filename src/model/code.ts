@@ -26,3 +26,14 @@ export function parseCode(text: string): string | null {
   if (code.length !== CODE_LENGTH) return null
   return [...code].every((c) => CODE_CHARS.includes(c)) ? code : null
 }
+
+/** The path of the join link of a game. */
+export function joinPath(code: string): string {
+  return `/join/${code}`
+}
+
+/** The code of a join link path, in capitals, or null for another path. */
+export function codeOfPath(pathname: string): string | null {
+  const match = /^\/join\/([^/]+)\/?$/.exec(pathname)
+  return match?.[1] ? parseCode(match[1]) : null
+}

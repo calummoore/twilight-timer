@@ -1,5 +1,7 @@
 import type { Ref } from 'react'
-import type { Phase } from '../model/types'
+import type { DeviceView } from '../model/protocol'
+import type { Phase, Player } from '../model/types'
+import { pc } from './colour'
 import { clock } from './format'
 
 /**
@@ -27,8 +29,14 @@ export interface TopBarProps {
   phase: Phase
   speakerName: string
   gameMs: number
+  /** This device, and the player of its seat, for the device chip. */
+  device: DeviceView | undefined
+  seat: Player | undefined
+  /** Undo and Pause need an admin device with a connection. */
   canUndo: boolean
+  canPause: boolean
   onSpeaker: () => void
+  onPlayers: () => void
   onUndo: () => void
   onPause: () => void
   onSettings: () => void
@@ -58,9 +66,16 @@ export function TopBar({ ref, ...props }: TopBarProps) {
           )
         })}
       </div>
-      <button className="ibtn spkb" onClick={props.onSpeaker}>
-        ★ Speaker: {props.speakerName}
-      </button>
+      <div className="chips">
+        <button className="ibtn spkb" onClick={props.onSpeaker}>
+          ★<span className="word"> Speaker:</span> {props.speakerName}
+        </button>
+        <DeviceChip
+          device={props.device}
+          seat={props.seat}
+          onClick={props.onPlayers}
+        />
+      </div>
       <div className="spacer" />
       <div className="gt">
         Game <b className="num">{clock(props.gameMs)}</b>
@@ -73,7 +88,12 @@ export function TopBar({ ref, ...props }: TopBarProps) {
         >
           ↺ Undo
         </button>
-        <button className="ibtn" onClick={props.onPause} aria-label="Pause">
+        <button
+          className="ibtn"
+          onClick={props.onPause}
+          disabled={!props.canPause}
+          aria-label="Pause"
+        >
           ⏸<span className="word"> Pause</span>
         </button>
         <button
@@ -87,5 +107,38 @@ export function TopBar({ ref, ...props }: TopBarProps) {
         </button>
       </div>
     </div>
+  )
+}
+
+/** The seat of this device, Table, or Viewer. It opens Players & devices. */
+function DeviceChip(props: {
+  device: DeviceView | undefined
+  seat: Player | undefined
+  onClick: () => void
+}) {
+  const { device, seat } = props
+  if (seat) {
+    return (
+      <button
+        className="ibtn youb"
+        style={pc(seat.colour)}
+        onClick={props.onClick}
+      >
+        <i />
+        <span className="word">You: </span>
+        {seat.name}
+      </button>
+    )
+  }
+  return device?.admin ? (
+    <button className="ibtn youb table" onClick={props.onClick}>
+      <i />
+      Table<span className="word"> device</span>
+    </button>
+  ) : (
+    <button className="ibtn youb" onClick={props.onClick}>
+      <i />
+      Viewer
+    </button>
   )
 }

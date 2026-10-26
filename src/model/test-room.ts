@@ -1,10 +1,17 @@
 import { derive } from './derive'
 import type { Command } from './protocol'
-import { applyCommand, newRoom, type Rejection, type Room } from './room'
+import {
+  applyCommand,
+  newRoom,
+  parseRoom,
+  roomOfGame,
+  type Rejection,
+  type Room,
+} from './room'
 import { DEFAULT_LIMITS } from './settings'
 import type { Setup } from './setup'
 import { PICKS, PLAYERS, SEC, T0 } from './test-table'
-import type { ActionInput } from './types'
+import type { ActionInput, Game } from './types'
 
 /** Test support: a game on the server, with a fake server clock. */
 
@@ -55,6 +62,15 @@ export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
 }
 
 export type Server = ReturnType<typeof server>
+
+/**
+ * The game after a device continued it on the server, and the server stored
+ * and read it again.
+ */
+export function onServer(game: Game): Game | undefined {
+  const stored = JSON.stringify(roomOfGame(CODE, game, HOST))
+  return parseRoom(JSON.parse(stored))?.game ?? undefined
+}
 
 /**
  * Jaz's phone holds Jaz's seat and Kira's phone holds Kira's, both without

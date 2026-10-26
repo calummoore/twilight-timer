@@ -1,49 +1,59 @@
 import { useState } from 'react'
-import { act, pause, resume, setPauseReason, undo } from '../model/commands'
 import { derive } from '../model/derive'
-import type { Settings } from '../model/settings'
+import type { Command, DeviceView } from '../model/protocol'
+import { limitsNow, type Settings } from '../model/settings'
 import type { ActionInput, Game } from '../model/types'
-import { Dialog } from './controls'
+import { NetBar } from './controls'
+import { GameOverlays, type Overlay } from './GameOverlays'
 import { useAlarm, useClock, useHeight, useWakeLock } from './hooks'
+import { rightsOf } from './rights'
 import { ActionScreen } from './screens/ActionScreen'
 import { AgendaScreen } from './screens/AgendaScreen'
-import { PauseOverlay } from './screens/PauseOverlay'
-import { ReactionOverlay } from './screens/ReactionOverlay'
 import { RoundSummaryScreen } from './screens/RoundSummaryScreen'
-import { SeatingScreen } from './screens/SeatingScreen'
-import { SettingsScreen } from './screens/SettingsScreen'
 import { StatsScreen } from './screens/StatsScreen'
 import { StatusScreen } from './screens/StatusScreen'
 import { StrategyScreen } from './screens/StrategyScreen'
 import { TopBar } from './TopBar'
 
-type Overlay = 'settings' | 'seating' | 'endGame' | null
-
+/**
+ * The running game on one device. The game comes from the server, and each
+ * tap goes to the server as a command. The clocks run on the server clock.
+ */
 export function GameScreen(props: {
   game: Game
+  /** The server clock minus the device clock, in ms. */
+  offset: number
   settings: Settings
-  onGame: (update: (game: Game, now: number) => Game) => void
   onSettings: (settings: Settings) => void
+  send: (command: Command) => void
+  connected: boolean
+  /** This device, or undefined before it joins. */
+  device: DeviceView | undefined
+  onPlayers: () => void
   onNewGame: () => void
 }) {
-  const [now, refresh] = useClock(250)
+  const [deviceNow] = useClock(250)
   const [overlay, setOverlay] = useState<Overlay>(null)
   const [barHeight, barRef] = useHeight<HTMLDivElement>()
-  const g = derive(props.game, now)
+  const g = derive(props.game, deviceNow + props.offset)
+  const rights = rightsOf(props.device, g, props.connected)
   const { alarming, silence } = useAlarm(g.timer, props.settings)
   useWakeLock(props.settings.keepAwake && g.view.phase !== 'ended')
 
-  const update = (fn: (game: Game, at: number) => Game) => {
-    props.onGame(fn)
-    refresh()
-  }
-  const dispatch = (input: ActionInput) =>
-    update((game, at) => act(game, input, at))
-  const onUndo = () => update(undo)
+  const { send } = props
+  const dispatch = (input: ActionInput) => send({ type: 'act', input })
+  const onUndo = () => send({ type: 'undo' })
   const speakerName = g.players.find((p) => p.id === g.speakerId)?.name ?? ''
 
   if (g.view.phase === 'ended') {
-    return <StatsScreen game={g} onUndo={onUndo} onNewGame={props.onNewGame} />
+    return (
+      <StatsScreen
+        game={g}
+        canReopen={rights.admin && g.canUndo}
+        onUndo={onUndo}
+        onNewGame={props.onNewGame}
+      />
+    )
   }
 
   const screen = (() => {
@@ -54,6 +64,7 @@ export function GameScreen(props: {
           <StrategyScreen
             game={g}
             view={v}
+            rights={rights}
             onPick={(playerId, card) =>
               dispatch({ kind: 'cardPicked', playerId, card })
             }
@@ -69,6 +80,7 @@ export function GameScreen(props: {
           <ActionScreen
             game={g}
             view={v}
+            rights={rights}
             showCumulative={props.settings.showCumulative}
             alarming={alarming}
             onSilence={silence}
@@ -84,6 +96,7 @@ export function GameScreen(props: {
           <StatusScreen
             game={g}
             view={v}
+            rights={rights}
             onToggleStep={(step) =>
               dispatch({ kind: 'statusStepToggled', step })
             }
@@ -98,6 +111,7 @@ export function GameScreen(props: {
           <AgendaScreen
             game={g}
             view={v}
+            rights={rights}
             onOpenVoting={() => dispatch({ kind: 'votingOpened' })}
             onVoteCast={() => dispatch({ kind: 'voteCast' })}
             onResolve={() => dispatch({ kind: 'agendaResolved' })}
@@ -107,6 +121,7 @@ export function GameScreen(props: {
         return (
           <RoundSummaryScreen
             game={g}
+            rights={rights}
             onNextRound={() => dispatch({ kind: 'phaseStepped' })}
             onEndGame={() => setOverlay('endGame')}
           />
@@ -114,11 +129,9 @@ export function GameScreen(props: {
     }
   })()
 
-  const reaction = g.view.phase === 'action' ? g.view.reaction : null
-
   return (
     <div
-      className="lay"
+      className={`lay ${props.connected ? '' : 'offline'}`}
       style={barHeight === null ? undefined : { '--top-h': `${barHeight}px` }}
     >
       <TopBar
@@ -127,73 +140,28 @@ export function GameScreen(props: {
         phase={g.view.phase}
         speakerName={speakerName}
         gameMs={g.gameMs}
-        canUndo={g.canUndo}
+        device={props.device}
+        seat={g.players.find((p) => p.id === props.device?.seat)}
+        canUndo={rights.admin && g.canUndo}
+        canPause={rights.admin}
         onSpeaker={() => setOverlay('seating')}
+        onPlayers={props.onPlayers}
         onUndo={onUndo}
-        onPause={() => update(pause)}
+        onPause={() => send({ type: 'pause' })}
         onSettings={() => setOverlay('settings')}
       />
+      {!props.connected && <NetBar />}
       {screen}
-      {reaction && (
-        <ReactionOverlay
-          game={g}
-          reaction={reaction}
-          onDone={(playerId) => dispatch({ kind: 'reactionDone', playerId })}
-          onExtend={(ms) => dispatch({ kind: 'reactionExtended', ms })}
-          onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
-          onClose={() => dispatch({ kind: 'reactionClosed' })}
-        />
-      )}
-      {overlay === 'seating' && (
-        <SeatingScreen
-          round={g.round}
-          players={g.players}
-          seated={g.seated}
-          departures={g.departures}
-          speakerId={g.speakerId}
-          pickOrder={g.pickOrder}
-          voteOrder={g.voteOrder}
-          canUndo={g.canUndo}
-          onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
-          onRemove={(playerId) => dispatch({ kind: 'playerRemoved', playerId })}
-          onUndo={onUndo}
-          onClose={() => setOverlay(null)}
-        />
-      )}
-      {overlay === 'settings' && (
-        <SettingsScreen
-          settings={props.settings}
-          onChange={props.onSettings}
-          onClose={() => setOverlay(null)}
-          onEndGame={() => setOverlay('endGame')}
-        />
-      )}
-      {overlay === 'endGame' && (
-        <Dialog
-          title="End the game?"
-          confirm={{
-            label: 'End game',
-            danger: true,
-            onConfirm: () => {
-              setOverlay(null)
-              dispatch({ kind: 'gameEnded' })
-            },
-          }}
-          onCancel={() => setOverlay(null)}
-        >
-          Every clock stops and the post-game stats open. You can reopen the
-          game from there.
-        </Dialog>
-      )}
-      {g.pause && (
-        <PauseOverlay
-          pause={g.pause}
-          onReason={(reason) =>
-            update((game, at) => setPauseReason(game, reason, at))
-          }
-          onResume={() => update(resume)}
-        />
-      )}
+      <GameOverlays
+        game={g}
+        overlay={overlay}
+        onOverlay={setOverlay}
+        rights={rights}
+        send={send}
+        settings={props.settings}
+        onSettings={props.onSettings}
+        limits={limitsNow(props.game.limitsLog)}
+      />
     </div>
   )
 }

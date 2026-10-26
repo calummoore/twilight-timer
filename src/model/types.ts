@@ -117,8 +117,15 @@ export interface Game {
   limitsLog: LimitsChange[]
 }
 
-export type Phase =
-  'strategy' | 'action' | 'status' | 'agenda' | 'summary' | 'ended'
+export const PHASES = [
+  'strategy',
+  'action',
+  'status',
+  'agenda',
+  'summary',
+  'ended',
+] as const
+export type Phase = (typeof PHASES)[number]
 
 export type EntryKind =
   'pick' | 'turn' | 'reaction' | 'status' | 'discussion' | 'vote' | 'table'

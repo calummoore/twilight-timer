@@ -7,10 +7,12 @@ export function Toggle({
   on,
   onChange,
   label,
+  disabled = false,
 }: {
   on: boolean
   onChange: (on: boolean) => void
   label: string
+  disabled?: boolean
 }) {
   return (
     <button
@@ -18,6 +20,7 @@ export function Toggle({
       role="switch"
       aria-checked={on}
       aria-label={label}
+      disabled={disabled}
       onClick={() => onChange(!on)}
     />
   )
@@ -32,24 +35,52 @@ export function DurationStepper({
   ms,
   onChange,
   label,
+  disabled = false,
 }: {
   ms: number
   onChange: (ms: number) => void
   label: string
+  disabled?: boolean
 }) {
   const set = (next: number) =>
     onChange(Math.min(MAX_MS, Math.max(MIN_MS, next)))
   return (
     <div className="stepper">
-      <button aria-label={`Shorter ${label}`} onClick={() => set(ms - STEP_MS)}>
+      <button
+        aria-label={`Shorter ${label}`}
+        disabled={disabled}
+        onClick={() => set(ms - STEP_MS)}
+      >
         −
       </button>
       <b className="num">{clock(ms)}</b>
-      <button aria-label={`Longer ${label}`} onClick={() => set(ms + STEP_MS)}>
+      <button
+        aria-label={`Longer ${label}`}
+        disabled={disabled}
+        onClick={() => set(ms + STEP_MS)}
+      >
         +
       </button>
     </div>
   )
+}
+
+/** The bar under the top bar while the device has no connection. */
+export function NetBar() {
+  return (
+    <div className="netbar" role="status">
+      <i />
+      Reconnecting · your taps wait for the connection
+    </div>
+  )
+}
+
+/**
+ * The small line on a disabled main button: the player that the game waits
+ * for, or the table for a table tap. Nothing while the device may tap.
+ */
+export function WaitLabel({ waitsFor }: { waitsFor: string | null }) {
+  return waitsFor === null ? null : <span className="k">{waitsFor}</span>
 }
 
 export interface DialogConfirm {

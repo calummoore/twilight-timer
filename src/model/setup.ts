@@ -1,7 +1,7 @@
 import { isFields, listOf } from './parse-fields'
 import { parseLimits, parsePlayer } from './parse-parts'
 import { MAX_PLAYERS, MIN_PLAYERS } from './rules'
-import { DEFAULT_SETTINGS, type LimitSettings } from './settings'
+import { limitsNow, type LimitSettings } from './settings'
 import type { Game, Player } from './types'
 
 /**
@@ -16,12 +16,10 @@ export interface Setup extends LimitSettings {
 
 /** The setup of a game that already runs, such as an older saved game. */
 export function setupOfGame(game: Game): Setup {
-  const last = game.limitsLog.at(-1)
   return {
     players: game.players,
     speakerId: game.firstSpeakerId,
-    enforceLimits: last?.enforce ?? DEFAULT_SETTINGS.enforceLimits,
-    limits: last?.limits ?? DEFAULT_SETTINGS.limits,
+    ...limitsNow(game.limitsLog),
   }
 }
 

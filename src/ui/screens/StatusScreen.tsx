@@ -1,19 +1,22 @@
 import { STATUS_STEPS } from '../../model/rules'
 import { roundStats } from '../../model/stats'
 import type { GameView, PhaseView } from '../../model/view'
-import { Toggle } from '../controls'
+import { Toggle, WaitLabel } from '../controls'
 import { clock } from '../format'
+import type { Rights } from '../rights'
 
 type StatusView = Extract<PhaseView, { phase: 'status' }>
 
 export function StatusScreen(props: {
   game: GameView
   view: StatusView
+  rights: Rights
   onToggleStep: (step: number) => void
   onCustodians: (removed: boolean) => void
   onNext: () => void
 }) {
-  const { game, view } = props
+  const { game, view, rights } = props
+  const next = { kind: 'phaseStepped' } as const
   const timer = game.timer?.kind === 'status' ? game.timer : null
   const over =
     timer !== null && timer.limitMs !== null && timer.elapsedMs > timer.limitMs
@@ -35,6 +38,7 @@ export function StatusScreen(props: {
               <button
                 key={step.label}
                 className={`step ${view.steps[i] ? 'on' : ''}`}
+                disabled={!rights.may({ kind: 'statusStepToggled', step: i })}
                 onClick={() => props.onToggleStep(i)}
               >
                 <div className="bx">✓</div>
@@ -90,10 +94,21 @@ export function StatusScreen(props: {
           <Toggle
             label="Custodians token removed"
             on={game.custodiansRemoved}
+            disabled={
+              !rights.may({
+                kind: 'custodiansSet',
+                removed: !game.custodiansRemoved,
+              })
+            }
             onChange={props.onCustodians}
           />
         </div>
-        <button className="big lg" onClick={props.onNext}>
+        <button
+          className="big lg"
+          disabled={!rights.may(next)}
+          onClick={props.onNext}
+        >
+          <WaitLabel waitsFor={rights.waits(next, null)} />
           {game.custodiansRemoved ? 'BEGIN AGENDA PHASE' : 'END ROUND'}
         </button>
       </div>
