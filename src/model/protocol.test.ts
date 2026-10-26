@@ -1,23 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildOf,
   parseClientMessage,
   parseCreateRequest,
   parseServerMessage,
   type Command,
 } from './protocol'
 import { DEFAULT_LIMITS } from './settings'
-import { HOST, SETUP } from './test-room'
-import { asVersion1 } from './test-shapes'
+import { BUILD, HOST, SETUP } from './test-room'
 import { PLAYERS, table } from './test-table'
 
 const wire = (value: unknown): unknown => JSON.parse(JSON.stringify(value))
 
 describe('messages from a device', () => {
-  it('reads hello and every command', () => {
-    expect(parseClientMessage({ type: 'hello', token: HOST })).toEqual({
-      type: 'hello',
-      token: HOST,
-    })
+  it('reads hello with the build of the page, and every command', () => {
+    const hello = { type: 'hello', token: HOST, build: BUILD }
+    expect(parseClientMessage(wire(hello))).toEqual(hello)
     const commands: Command[] = [
       { type: 'claim', seat: 'jaz' },
       { type: 'claim', seat: null },
@@ -41,8 +39,12 @@ describe('messages from a device', () => {
 
   it('rejects a message it cannot read', () => {
     const broken = [
-      { type: 'hello', token: 'short' },
-      { type: 'hello' },
+      { type: 'hello', token: 'short', build: BUILD },
+      { type: 'hello', build: BUILD },
+      // A page from before builds had ids.
+      { type: 'hello', token: HOST },
+      { type: 'hello', token: HOST, build: '' },
+      { type: 'hello', token: HOST, build: 7 },
       { type: 'command', rev: -1, command: { type: 'undo' } },
       { type: 'command', rev: 1.5, command: { type: 'undo' } },
       { type: 'command', command: { type: 'undo' } },
@@ -72,12 +74,43 @@ describe('messages from a device', () => {
 })
 
 describe('messages from the server', () => {
-  it('reads the missing message and rejects a broken state', () => {
-    expect(parseServerMessage({ type: 'missing' })).toEqual({
-      type: 'missing',
-    })
-    expect(parseServerMessage({ type: 'state', serverTime: 1 })).toBeNull()
-    expect(parseServerMessage({ type: 'pong' })).toBeNull()
+  it('reads each notice with the build of the server', () => {
+    for (const type of ['missing', 'unreadable', 'outdated']) {
+      const notice = { build: BUILD, type }
+      expect(parseServerMessage(wire(notice))).toEqual(notice)
+    }
+  })
+
+  it('rejects a broken message, and one without a build', () => {
+    const broken = [
+      { build: BUILD, type: 'state', serverTime: 1 },
+      { build: BUILD, type: 'pong' },
+      // A server from before builds had ids.
+      { type: 'missing' },
+      { build: 7, type: 'missing' },
+      'pong',
+      null,
+    ]
+    for (const raw of broken) expect(parseServerMessage(raw)).toBeNull()
+  })
+})
+
+describe('the build on the wire', () => {
+  it('reads the build first, whatever the rest of the message holds', () => {
+    expect(buildOf({ build: BUILD })).toBe(BUILD)
+    expect(buildOf({ build: BUILD, type: 'state', room: 'new shape' })).toBe(
+      BUILD,
+    )
+    expect(buildOf({ build: BUILD, type: 'hello' })).toBe(BUILD)
+  })
+
+  it('reads no build from a message without one', () => {
+    for (const raw of [{ type: 'missing' }, { build: '' }, { build: 7 }]) {
+      expect(buildOf(raw)).toBeNull()
+    }
+    for (const raw of ['pong', null, undefined, [BUILD]]) {
+      expect(buildOf(raw)).toBeNull()
+    }
   })
 })
 
@@ -89,24 +122,19 @@ describe('the request that creates a game', () => {
     })
   })
 
-  it('reads a game that an older build saved, in the newest shape', () => {
-    const t = table()
-    t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
-    const request = { token: HOST, game: asVersion1(t.game) }
-    const parsed = parseCreateRequest(wire(request))
-    expect(parsed && 'game' in parsed && parsed.game.version).toBe(6)
-  })
-
   it('rejects a setup that cannot start a game', () => {
     const two = { ...SETUP, players: PLAYERS.slice(0, 2), speakerId: 'jaz' }
     const twin = PLAYERS.map((p) => ({ ...p, id: 'jaz' }))
+    const empty = PLAYERS.map((p, i) => (i ? p : { ...p, factionId: null }))
     const broken = [
       { token: HOST, setup: two },
       { token: HOST, setup: { ...SETUP, players: twin } },
+      { token: HOST, setup: { ...SETUP, players: empty } },
       { token: HOST, setup: { ...SETUP, speakerId: 'zed' } },
       { token: HOST, setup: { ...SETUP, enforceLimits: 'yes' } },
       { token: 'short', setup: SETUP },
       { token: HOST, game: { version: 6 } },
+      { token: HOST, game: table().game },
       { token: HOST },
     ]
     for (const raw of broken) expect(parseCreateRequest(wire(raw))).toBeNull()

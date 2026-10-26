@@ -411,7 +411,8 @@ Run the checks, push, and review the branch.
         its device applies while it is still valid.
       - Review 1, 3. An older page freezes on a newer game. Severity Medium,
         effort Small. Recommended: A, reload the page once when a state
-        cannot be read.
+        cannot be read. Decided 2026-10-26: C, a build id on the wire, in
+        [Version handling](version-handling.md).
       - Review 1, 4. A lost last admin blocks the game. Severity Medium,
         effort Large. Recommended: B, a seated device may take admin while
         no admin device is connected.

@@ -9,6 +9,7 @@ import {
   playStrategyOn,
   seatedServer,
   server,
+  tableServer,
 } from './test-room'
 import { MIN, SEC, T0 } from './test-table'
 
@@ -16,15 +17,15 @@ import { MIN, SEC, T0 } from './test-table'
 
 describe('the room', () => {
   it('waits in the lobby with no clock until an admin starts the game', () => {
-    const s = server()
-    expect(s.room).toMatchObject({ revision: 0, game: null })
+    const s = tableServer()
+    expect(s.room).toMatchObject({ revision: 1, game: null })
     expect(s.room.members).toEqual([
       { id: 'd1', token: HOST, seat: null, admin: true },
     ])
     s.wait(5 * MIN)
     expect(s.send(HOST, { type: 'start' })).toBeNull()
     expect(s.room.game?.startedAt).toBe(T0 + 5 * MIN)
-    expect(s.room.revision).toBe(1)
+    expect(s.room.revision).toBe(2)
     s.wait(10 * SEC)
     expect(s.view()?.timer).toMatchObject({
       kind: 'pick',
@@ -34,7 +35,7 @@ describe('the room', () => {
   })
 
   it('starts the game only once, and only on an admin device', () => {
-    const s = server()
+    const s = tableServer()
     s.send(JAZ, { type: 'claim', seat: 'jaz' })
     expect(s.send(JAZ, { type: 'start' })).toBe('forbidden')
     expect(s.room.game).toBeNull()
@@ -96,7 +97,7 @@ describe('the room', () => {
   })
 
   it('refuses game commands in the lobby', () => {
-    const s = server()
+    const s = tableServer()
     expect(s.act(HOST, { kind: 'phaseStepped' })).toBe('invalid')
     expect(s.send(HOST, { type: 'pause' })).toBe('invalid')
     expect(s.send(HOST, { type: 'undo' })).toBe('invalid')
@@ -134,7 +135,7 @@ describe('the room', () => {
   })
 
   it('changes the limits of the lobby, and of the game from now on', () => {
-    const s = server()
+    const s = tableServer()
     const limits = { ...DEFAULT_LIMITS, turn: { on: true, ms: MIN } }
     const command = { type: 'limits', enforceLimits: true, limits } as const
     expect(s.send(HOST, command)).toBeNull()
@@ -153,7 +154,7 @@ describe('the room', () => {
 
 describe('the devices of a room', () => {
   it('joins a device as a viewer, which an admin makes an admin', () => {
-    const s = server()
+    const s = tableServer()
     expect(s.send(LAPTOP, { type: 'claim', seat: null })).toBeNull()
     expect(s.room.members[1]).toEqual({
       id: 'd2',
@@ -172,7 +173,7 @@ describe('the devices of a room', () => {
   })
 
   it('never takes admin from the last admin', () => {
-    const s = server()
+    const s = tableServer()
     expect(s.send(HOST, { type: 'admin', deviceId: 'd1', admin: false })).toBe(
       'invalid',
     )
@@ -209,5 +210,41 @@ describe('the devices of a room', () => {
     expect(s.send(JAZ, { type: 'claim', seat: 'zed' })).toBe('invalid')
     expect(s.send(JAZ, { type: 'claim', seat: 'jaz' })).toBe('invalid')
     expect(s.send(HOST, { type: 'claim', seat: null })).toBe('invalid')
+  })
+})
+
+describe('admin recovery in a room', () => {
+  const take = { type: 'admin', deviceId: 'd2', admin: true } as const
+
+  it('lets a seated device take admin while every admin device is away', () => {
+    const s = seatedServer()
+    expect(s.send(JAZ, take)).toBe('forbidden')
+    s.leave(HOST)
+    expect(s.send(JAZ, take)).toBeNull()
+    expect(s.room.members[1]).toMatchObject({ seat: 'jaz', admin: true })
+    expect(s.send(JAZ, { type: 'pause' })).toBeNull()
+  })
+
+  it('keeps admin for the device that created the game until it joins', () => {
+    // Jaz's phone opens the link before the host takes a place.
+    const s = server()
+    s.send(JAZ, { type: 'claim', seat: 'jaz' })
+    const jaz = { type: 'admin', deviceId: 'd1', admin: true } as const
+    expect(s.send(JAZ, jaz)).toBe('forbidden')
+    // The host's device is gone before it joined: Jaz may take admin.
+    s.leave(HOST)
+    expect(s.send(JAZ, jaz)).toBeNull()
+  })
+
+  it('refuses admin to a viewer, and for another device', () => {
+    const s = seatedServer()
+    s.send(LAPTOP, { type: 'claim', seat: null })
+    s.leave(HOST)
+    expect(s.send(LAPTOP, { type: 'admin', deviceId: 'd4', admin: true })).toBe(
+      'forbidden',
+    )
+    expect(s.send(JAZ, { type: 'admin', deviceId: 'd3', admin: true })).toBe(
+      'forbidden',
+    )
   })
 })

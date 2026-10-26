@@ -28,11 +28,11 @@ export type Command =
   | { type: 'limits'; enforceLimits: boolean; limits: Limits }
 
 /**
- * From a device. Hello names the browser, and each command names the
- * revision that the device saw.
+ * From a device. Hello names the browser and the build of the page, and each
+ * command names the revision that the device saw.
  */
 export type ClientMessage =
-  | { type: 'hello'; token: string }
+  | { type: 'hello'; token: string; build: string }
   | { type: 'command'; rev: number; command: Command }
 
 /** A device of the game, and whether it is connected now. */
@@ -48,29 +48,63 @@ export interface RoomState {
   /** The game from Start game on, or null in the lobby. */
   game: Game | null
   devices: DeviceView[]
+  /**
+   * No admin device has a connection now, so a seated device may take
+   * admin. The device that created the game counts as an admin device until
+   * it joins.
+   */
+  adminsAway: boolean
 }
 
-/** From the server: the state, or that no game has the code. */
-export type ServerMessage =
+/**
+ * The messages from the server that end the connection: no game has the
+ * code, the server cannot read the game under the code, or the page runs
+ * another build than the server.
+ */
+export const NOTICES = ['missing', 'unreadable', 'outdated'] as const
+export type Notice = (typeof NOTICES)[number]
+
+/** From the server: the state, or a notice. Each names the server's build. */
+export type ServerMessage = { build: string } & (
   | {
       type: 'state'
       /** The server clock when it sent the state, in ms. */
       serverTime: number
       /** The id of the receiving device, or null before it joins. */
       you: string | null
+      /**
+       * The receiving device created the game and has not joined it yet, so
+       * it joins with admin.
+       */
+      creator: boolean
       room: RoomState
     }
-  | { type: 'missing' }
+  | { type: Notice }
+)
 
-/** The body of the request that creates a game, from a setup or a saved game. */
-export type CreateRequest =
-  { token: string; setup: Setup } | { token: string; game: Game }
+/** The body of the request that creates a game from a setup. */
+export interface CreateRequest {
+  token: string
+  setup: Setup
+}
+
+/**
+ * Reads the build that a message names, before the rest of the message. The
+ * `build` field keeps its shape in every build, so that a page or a server
+ * of another build still reads it. Returns null when it has none.
+ */
+export function buildOf(raw: unknown): string | null {
+  if (!isFields(raw) || typeof raw.build !== 'string') return null
+  return raw.build === '' ? null : raw.build
+}
 
 export function parseClientMessage(raw: unknown): ClientMessage | null {
   if (!isFields(raw)) return null
   if (raw.type === 'hello') {
     const token = parseToken(raw.token)
-    return token === null ? null : { type: 'hello', token }
+    const build = buildOf(raw)
+    if (token === null || build === null) return null
+    return { type: 'hello', token, build }
   }
   if (raw.type !== 'command' || !isRevision(raw.rev)) return null
   const command = parseCommand(raw.command)
@@ -116,13 +150,17 @@ function parseCommand(raw: unknown): Command | null {
 }
 
 export function parseServerMessage(raw: unknown): ServerMessage | null {
-  if (!isFields(raw)) return null
-  if (raw.type === 'missing') return { type: 'missing' }
+  const build = buildOf(raw)
+  if (!isFields(raw) || build === null) return null
+  const notice = NOTICES.find((n) => n === raw.type)
+  if (notice) return { build, type: notice }
   const { serverTime, you } = raw
   if (raw.type !== 'state' || !isNumber(serverTime)) return null
   if (you !== null && typeof you !== 'string') return null
+  // A state without the flag reads as a device that did not create the game.
+  const creator = raw.creator === true
   const room = parseRoomState(raw.room)
-  return room && { type: 'state', serverTime, you, room }
+  return room && { build, type: 'state', serverTime, you, creator, room }
 }
 
 function parseRoomState(raw: unknown): RoomState | null {
@@ -133,7 +171,9 @@ function parseRoomState(raw: unknown): RoomState | null {
   const devices = listOf(raw.devices, parseDeviceView)
   if (!code || !isRevision(raw.revision) || !setup || !devices) return null
   if (game === null && raw.game !== null) return null
-  return { code, revision: raw.revision, setup, game, devices }
+  // A state without the flag reads as one with an admin device connected.
+  const adminsAway = raw.adminsAway === true
+  return { code, revision: raw.revision, setup, game, devices, adminsAway }
 }
 
 function parseDeviceView(raw: unknown): DeviceView | null {
@@ -147,13 +187,8 @@ function parseDeviceView(raw: unknown): DeviceView | null {
 export function parseCreateRequest(raw: unknown): CreateRequest | null {
   if (!isFields(raw)) return null
   const token = parseToken(raw.token)
-  if (!token) return null
-  if (raw.game !== undefined) {
-    const game = parseGame(raw.game)
-    return game && { token, game }
-  }
   const setup = parseSetup(raw.setup)
-  return setup && { token, setup }
+  return token !== null && setup ? { token, setup } : null
 }
 
 /** A revision is a count of changes, so it is a whole number from 0. */

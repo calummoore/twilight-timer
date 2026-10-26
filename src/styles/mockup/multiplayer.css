@@ -17,12 +17,9 @@
 .recent .d{font-size:12.5px; color:var(--dim)}
 /* home: a line under the code field when the code does not open a game */
 .home-err{font-size:12.5px; color:var(--warn); line-height:1.5; margin-top:10px}
-/* home: a game that an older build saved on this device has no code yet */
-.recent.saved{grid-template-columns:1fr auto}
-/* a saved game that cannot be read */
+/* players & devices: the notice while every admin device is away */
 .notice{display:flex; align-items:center; gap:14px; background:#241408; border:1px solid #5b3a14; border-radius:11px;
   padding:12px 15px; margin-bottom:14px; font-size:13px; color:#f0c489}
-.notice .ibtn{margin-left:auto}
 /* opening a game: one card in the middle while the device connects, or when no game has the code */
 .open-wait{display:grid; place-items:center}
 .open-card{width:min(460px,100%); text-align:center}
@@ -46,7 +43,12 @@
 .qr u{background:#000; border-radius:1px}
 .joincode{font-size:52px; font-weight:800; letter-spacing:.14em; margin-top:6px}
 .joinlink{font-size:15px; color:var(--dim); margin-top:12px; overflow-wrap:anywhere}
-.joinlink b{color:var(--txt); font-weight:600}
+.joinlink a{color:var(--accent); font-weight:600; text-decoration:underline; text-underline-offset:3px;
+  text-decoration-color:color-mix(in srgb,var(--accent) 45%, transparent)}
+.joinlink a:hover{text-decoration-color:currentColor}
+/* Copy link sits under the link, and turns green for a moment after it copies */
+.ibtn.copy{display:inline-flex; margin-top:14px}
+.ibtn.copy.done{color:var(--ok); border-color:#1d4a2e; background:#0d2418}
 .dev-row{display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center; padding:12px 15px;
   border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16}
 .dev-row i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
