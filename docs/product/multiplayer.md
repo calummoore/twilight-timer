@@ -48,8 +48,9 @@ Rejected: deleting old games, because a game is small, and a code must not
 be reused.
 
 A device that holds a game saved by an older build offers to continue that
-game on the server. The game then gets a code, and the device joins it as a
-table device. A saved game that cannot be read shows a notice, as before.
+game on the server. The game then gets a code, and the device joins it at
+once as a table device with admin, without the claim screen. A saved game
+that cannot be read shows a notice, as before.
 
 ## Codes
 
@@ -100,13 +101,13 @@ device takes a seat, or joins as a table device. A device that joins gets
 no admin, so a new table device is a viewer until an admin device gives it
 admin. The device that creates the game is the only exception.
 
-The device that creates a game also joins it on the claim screen, which
-Create game opens. It takes a seat or joins as a table device, and it gets
-admin either way, as the first admin of the game. Until it joins, it sees the
-claim screen, also after a reload. It can change its seat later and stays an
-admin. Rejected: the device that creates the game as a table device from the
-start, because a host can create the game on a phone, take their seat, and
-add the device in the middle of the table later.
+The device that creates a game with Create game also joins it on the claim
+screen, which Create game opens. It takes a seat or joins as a table device,
+and it gets admin either way, as the first admin of the game. Until it joins,
+it sees the claim screen, also after a reload. It can change its seat later
+and stays an admin. Rejected: the device that creates the game as a table
+device from the start, because a host can create the game on a phone, take
+their seat, and add the device in the middle of the table later.
 
 One device holds a seat at a time. When a device takes a seat that another
 device holds, the holder loses the seat and becomes a table device, with its
