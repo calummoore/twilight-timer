@@ -220,9 +220,9 @@ versions.
   - `room.ts` and `setup.ts`: one game on the server and its reducer.
     `room-storage.ts` reads its stored shape, with the upgrade chain of the
     room, into no room, a room, or a room that cannot be read.
-  - `fixtures/`: one stored shape of each version from game version 6 and
-    room version 1 on, as its build wrote it. `fixtures.test.ts` loads each
-    one and checks its clocks.
+  - `fixtures/`: the stored shapes of game version 6 and room versions 1
+    and 2, as their builds wrote them. Each version bump adds a fixture of
+    the old shape. `fixtures.test.ts` loads each one and checks its clocks.
 - `worker/` holds the Worker.
   - `index.ts`: the routes. `POST /api/games` creates a game from a setup,
     `GET /api/games/<code>` looks a code up, and

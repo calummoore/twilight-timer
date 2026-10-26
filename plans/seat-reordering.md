@@ -68,9 +68,10 @@ Other branches that touch this change, read on 2026-10-26:
   bump. This branch keeps that fixture in place of its own capture.
 - [PR #29](https://github.com/calummoore/twilight-timer/pull/29), the
   retirement of the games saved before the server, merged on 2026-10-26,
-  and this branch merged it. The parser has no upgrade chain now. It reads
-  version 6 and 7, because a version 6 game has the shape of version 7, so
-  the game `78JVZ7` and every other stored game still load.
+  and this branch merged it. PR #29 retired the upgrade steps of game
+  versions 1 to 5. This branch gives the upgrade chain of the game parser
+  one step, from version 6 to 7, so the game `78JVZ7` and every other
+  stored game still load.
 
 Contract owners:
 
@@ -283,6 +284,9 @@ Build re-order mode and the setup handle as the mockup shows them.
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest. Review 1 is in
       `.context/seat-reordering/review-1.md`. It fixed findings 2 and 3.
+      Review 3, after the merges of PR #28, #29, and #30, is in
+      `.context/seat-reordering/review-3.md`. It fixed findings 3 and 4,
+      and its findings 1 and 2 are review 1, 4 and review 2, 1 below.
   - Review 1, 1. Deploy leaves older game pages stale. Resolved on
     2026-10-26: PR #30 merged first, so the deploy reloads every open page.
   - Review 1, 4. Spec and code disagree on ending the mode. Severity Low,
@@ -293,7 +297,13 @@ Build re-order mode and the setup handle as the mockup shows them.
     finding 4, and add the reviewer's option A. Review 2 is in
     `.context/seat-reordering/review-2.md`.
   - Outside the scope: `src/ui/useGameClient.ts`, a page drops a state
-    message that it cannot read and shows no notice. Separate branch.
+    message that it cannot read and shows no notice. Resolved on
+    2026-10-26 by PR #30: a page reads the build of each message first,
+    and a page of another build reloads.
+  - Outside the scope: `plans/admin-recovery.md`,
+    `plans/retire-pre-server-games.md`, `plans/version-handling.md`, and
+    `plans/multiplayer.md` still say that their pull requests are open,
+    but PRs #28, #29, #30, and #21 merged. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. Copy the merge justifications in
       `.context/seat-reordering/merge-1.md` and `merge-2.md` into its
