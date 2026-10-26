@@ -3,7 +3,7 @@
 Status: Active. On branch `calummoore/protocol-version-handling`, no pull
 request yet. The plan closes when its PR merges.
 
-TI4 Tempo keeps each game in a room on the server, in one Cloudflare
+TI4 Nexus keeps each game in a room on the server, in one Cloudflare
 Durable Object per join code. After each change, the server sends every
 device the whole room in a state message, and each page runs the game
 model itself: it derives the clocks from the game log and decides which
@@ -13,7 +13,8 @@ keeps its old code until it reloads. Review 1 finding 3 of
 message that it cannot read, so a deploy during a game freezes every open
 device until someone reloads it. Stored data has the opposite direction: a
 newer build reads the games that older builds stored. The game has an
-upgrade chain with six versions. The room has a version but no chain yet.
+upgrade chain with six versions. The room has two versions, which one
+parser reads, but no chain yet.
 
 This change gives the wire one invariant, the same build on the page and
 on the server, and gives a stored room three states: none, ok, and
@@ -21,8 +22,9 @@ unreadable. A page of another build reloads once. A room that the server
 holds but cannot read stays stored and says so on every device. The change
 also sets the rules for future version bumps: one upgrade chain per stored
 shape, and one fixture per version. It does not change the shape of the
-game, of the room, or of the keys in `localStorage`, and it adds no
-upgrade step, because nothing needs one yet.
+game, of the room, or of the keys in `localStorage`. It turns the reading
+of room version 1 into the first step of a room chain, and adds no new
+version.
 
 Decisions, 2026-10-26, Cal:
 
@@ -64,6 +66,12 @@ Decisions, 2026-10-26, Cal:
 Assumption: the first fixtures are the current shapes, game version 6 and
 room version 1, captured in this change from a game that the test table
 plays. The next bump then has its fixture of the old shape ready.
+
+Update, 2026-10-26, after the merge of main: PR #27 moved the room to
+version 2, so the current shapes are game version 6 and room version 2.
+The fixtures are `game-v6.json` and `room-v2.json` from the current build,
+and `room-v1.json` from `d467cbd`, the last build that wrote room version
+1. The real room of version 1 tests the first step of the room chain.
 
 Contract owners:
 
@@ -147,13 +155,16 @@ Tags: mockup
 Two states of the Opening screen in `docs/mockups/index.html`, in the
 style of the state for a code that no game has.
 
-- [ ] Outdated, after a failed reload: the heading "A new version is
+- [x] Outdated, after a failed reload: the heading "A new version is
       live", the line "Reload the page.", and a RELOAD button.
-- [ ] Unreadable: the heading "This game needs a newer version of the
+- [x] Unreadable: the heading "This game needs a newer version of the
       app", a line that says that the game is kept on the server and
       opens again after the update, and a HOME button.
-- [ ] Add both to the catalogue with their notes, and check that the
+- [x] Add both to the catalogue with their notes, and check that the
       ported styles in `src/styles/mockup/` need no new class.
+- Evidence: `.context/version-handling/mockups/shoot.log`: the four
+  Opening states in three frames, no script error, and no sideways
+  overflow.
 
 ## Milestone 3: The build on the wire and the stored room
 
@@ -167,14 +178,17 @@ room. The two notices come in milestone 4.
 - [ ] Protocol: the build in hello and in every server message, the
       parser of the build field, and the messages unreadable and
       outdated. Tests in `src/model/protocol.test.ts`.
+- [ ] Room: give the room its upgrade chain, with the step from version 1
+      to 2 that the parser now does inline. Keep the behaviour.
 - [ ] Room: read a stored value into none, ok, or unreadable, and the
       build in the state message. Tests in
       `src/model/room-storage.test.ts`.
 - [ ] Connection: the reload guard on a key-value store. Tests in
       `src/model/connection.test.ts`.
-- [ ] Fixtures: `src/model/fixtures/game-v6.json` and `room-v1.json` from
-      a game that the test table plays, and `src/model/fixtures.test.ts`,
-      which loads each one and checks a clock.
+- [ ] Fixtures: `src/model/fixtures/game-v6.json` and `room-v2.json` from
+      a game that the test table plays on this build, `room-v1.json` from
+      a game that the test table plays on `d467cbd`, and
+      `src/model/fixtures.test.ts`, which loads each one and checks a clock.
 - [ ] Worker: the three states in the object, create refuses a room that
       is not none, the build in the attachment, the outdated message and
       close for a hello or a command of another build and in the
@@ -207,7 +221,8 @@ Tags: ui
 ## Milestone 5: Verification, commit, review, and pull request
 
 - [ ] Run the targeted tests and the complete gate named in `CLAUDE.md`.
-- [ ] Commit with Conventional Commits and push the branch.
+- [ ] Commit with Conventional Commits and push the branch. The merge of
+      main and its one conflict: `.context/version-handling/merge-justification.md`.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
