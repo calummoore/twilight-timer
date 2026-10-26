@@ -84,9 +84,9 @@ wait for an answer.
 
 | Screen              | Purpose                                                                 |
 | ------------------- | ----------------------------------------------------------------------- |
-| **Setup**           | Player count, names, colours, factions, expansions, random faction deal, seating order, speaker token |
+| **Setup**           | Player count, names, colours, factions, expansions, random faction deal, seating order by ⠿ drag or ▲ ▼, speaker token |
 | **Settings**        | Time limits, alarm, display options                                      |
-| **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive; hold a seat or tap Re-order seats, then drag or tap to swap two seats; remove a player who leaves |
+| **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive; hold a seat or tap Re-order seats, then drag or tap to move a seat; remove a player who leaves |
 | **Strategy Phase**  | Card selection in speaker order; sets initiative                         |
 | **Action Phase**    | **The hero screen.** Active clock, initiative rail, End Turn             |
 | ↳ *rail rows*       | Show each player's strategy cards; blue = still to play, grey ✓ = used   |

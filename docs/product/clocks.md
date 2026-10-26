@@ -118,7 +118,7 @@ A game saved by a build without reasons has no rule checks.
 Game state is a fold over an **append-only log of actions**. The log records
 every game tap: card picks, turns ended, passes, strategy cards played,
 reaction marks and window changes, phase steps, status steps, the Custodians
-switch, votes, agenda resolutions, speaker moves, seat swaps, Naalu token
+switch, votes, agenda resolutions, speaker moves, seat moves, Naalu token
 moves, player removals, and the game end. So undo can take back any tap. Pauses with their
 rule checks, and time-limit changes, are kept beside the log, not in it.
 

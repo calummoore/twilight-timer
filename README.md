@@ -15,8 +15,8 @@ in the futex account. The app opens at https://ti4.nexus; see
 ## Key features
 
 - Setup for 3 to 8 players: name, colour, faction from the official list, seat,
-  and the speaker. The table chooses its expansions, and one tap deals random
-  factions to the empty seats.
+  and the speaker. A row moves by its ⠿ handle or with ▲ and ▼. The table
+  chooses its expansions, and one tap deals random factions to the empty seats.
 - Strategy picks in speaker order, with trade goods on unpicked cards. With 3
   or 4 players, each player picks two cards, and the lower card sets their
   place in the turn order.
@@ -28,9 +28,10 @@ in the futex account. The app opens at https://ti4.nexus; see
 - The status checklist, and clocks for agenda discussion and each vote.
 - The table can remove a player who leaves mid-game. Their recorded time
   stays in the stats.
-- An admin device can swap two seats when the ring does not match the table:
-  a long press on a seat, or Re-order seats, starts re-order mode, and a drag
-  or two taps swap the seats. Undo takes a swap back.
+- An admin device can move seats when the ring does not match the table: a
+  long press on a seat, or Re-order seats, starts re-order mode. A drag or two
+  taps move a seat, and the seats between shift into the gap. Undo takes a
+  move back.
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.

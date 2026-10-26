@@ -204,13 +204,13 @@ State the swap rules as requirements before the code changes.
 - [x] `docs/product.md`: remove "No seat re-ordering after setup" from the
       MVP exceptions. Update the Speaker & Seating row of the screens
       table.
-- [ ] `docs/product.md`: the Setup row of the screens table.
+- [x] `docs/product.md`: the Setup row of the screens table.
 - [x] `docs/product/rounds.md`, "Seating and the speaker": replace the
       paragraph on understated re-ordering with the rules of the decisions
       and the Model section. Add the rejected alternatives of decisions 1
       to 3, and the rejected rewrite of the starting ring.
-- [ ] The same section: the setup handle, beside ▲ and ▼.
-- [ ] Decision 2B: a drop moves a seat, and the seats between shift into
+- [x] The same section: the setup handle, beside ▲ and ▼.
+- [x] Decision 2B: a drop moves a seat, and the seats between shift into
       the gap. Update `rounds.md`, the Speaker & Seating row of
       `product.md`, the logged taps of `clocks.md`, the rights table of
       `multiplayer.md`, and the README features.
