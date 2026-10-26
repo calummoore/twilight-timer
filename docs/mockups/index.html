@@ -452,6 +452,22 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 /* the empty seat of a player who left the game */
 .seatnode.out{opacity:.38; cursor:default}
 .seatnode.out .nm{text-decoration:line-through; text-decoration-color:var(--faint)}
+/* Re-order mode: every seat of a player in the game shakes, as on the iOS home screen. The shake turns the rotate
+   property, so the transform that places the seat stays. The held seat lifts, stops shaking, and follows the finger. The
+   seat under it slides into the gap. A device set to reduced motion shows a still dashed outline in place of the shake. */
+.ringwrap .seatnode{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+  transition:left .2s ease, top .2s ease, translate .2s ease}
+.ringwrap.reorder .seatnode:not(.out){touch-action:none; animation:shake .26s ease-in-out infinite alternate}
+.ringwrap.reorder .seatnode:nth-child(even){animation-direction:alternate-reverse}
+.ringwrap.reorder .seatnode.held{z-index:2; scale:1.08; animation:none; transition:none; border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 12px 30px rgba(0,0,0,.55)}
+@keyframes shake{from{rotate:-1.5deg} to{rotate:1.5deg}}
+@media (prefers-reduced-motion: reduce){
+  .ringwrap .seatnode{transition:none}
+  .ringwrap.reorder .seatnode:not(.out){animation:none; outline:1px dashed var(--accent); outline-offset:3px}
+}
+.ibtn.reorder{justify-content:center; padding:13px}
+.ibtn.reorder.on{color:var(--accent); border-color:#2b6b66; background:#0b1c1f}
 .ordlist{display:flex; flex-direction:column; gap:5px}
 .ordrow{display:grid; grid-template-columns:24px 1fr auto; gap:11px; align-items:center; padding:7px 12px;
   border:1px solid var(--line); border-radius:9px; background:#0a0f16; font-size:14px}
@@ -1294,11 +1310,16 @@ const PICK_ORDER = rot(SEATS, SPK);        // speaker picks first, then clockwis
 const VOTE_ORDER = rot(SEATS, SPK+1);      // starts left of speaker; speaker votes last
 
 // The seats sit on an ellipse inside a 500 × 410 box, given in percent so that the ring scales with the screen.
+const seatAt = i => { const a=(-90 + i*360/SEATS.length)*Math.PI/180;
+  return [(250+190*Math.cos(a))/500*100, (205+150*Math.sin(a))/410*100]; };
 // out: the player who left the game, or null. Their seat stays in the ring, empty.
-const ringNodes = out => SEATS.map((id,i)=>{
-  const a=(-90 + i*360/SEATS.length)*Math.PI/180;
-  const x=(250+190*Math.cos(a))/500*100, y=(205+150*Math.sin(a))/410*100;
-  return `<div class="seatnode ${i===SPK?'isspk':''} ${id===out?'out':''}" style="${col(id)};left:${x}%;top:${y}%">
+// drag: in re-order mode, the seat that a finger holds, the seat under the finger, and how far the finger is from the
+// centre of that seat, in percent. The seat under the finger slides into the place that the held seat left.
+const ringNodes = (out, drag=null) => SEATS.map((id,i)=>{
+  const held = drag?.held===id, over = drag?.over===id;
+  const [x,y] = held ? seatAt(SEATS.indexOf(drag.over)).map((v,k)=>v+drag.off[k])
+              : over ? seatAt(SEATS.indexOf(drag.held)) : seatAt(i);
+  return `<div class="seatnode ${i===SPK?'isspk':''} ${id===out?'out':''} ${held?'held':''}" style="${col(id)};left:${x}%;top:${y}%">
     ${i===SPK?'<span class="tok">★</span>':''}
     <i></i><div class="nm">${P[id].name}</div><div class="sn2">${id===out?'Left · round 3':`Seat ${i+1}`}</div></div>`;
 }).join('');
@@ -1310,17 +1331,18 @@ const ordList = ids => ids.map((id,i)=>{
     ${spk?'<span class="tag2">★ Speaker</span>':'<span></span>'}</div>`;
 }).join('');
 
-const seatingScreen = (out=null) => `<div class="space"></div><div class="lay">
+// drag: re-order mode, with the seat that a finger holds, as ringNodes takes it, or null.
+const seatingScreen = (out=null, drag=null) => `<div class="space"></div><div class="lay">
   <div class="top stack"><div class="round"><b>Speaker &amp; seating</b> · Round 3</div>
     <div class="spacer"></div><button class="ibtn">Remove a player</button><button class="ibtn">↺ Undo</button><button class="ibtn">✕ Close</button></div>
   <div class="content split" style="--side:400px;gap:20px">
     <div class="pnl" style="display:flex;flex-direction:column">
-      <div class="pnl-h">The table <span class="pnl-note">tap a seat to move the speaker token</span></div>
+      <div class="pnl-h">The table <span class="pnl-note">${drag?'drag a seat onto another to swap them':'tap a seat to move the speaker · hold to re-order'}</span></div>
       <div style="padding:18px 0 8px">
-        <div class="ringwrap">
+        <div class="ringwrap ${drag?'reorder':''}">
           <div class="cc"><div class="l">Speaker</div><div class="v">★ Jaz</div>
             <div class="s">Picks first in the strategy phase. <br>Votes last, and breaks ties.</div></div>
-          ${ringNodes(out)}
+          ${ringNodes(out, drag)}
         </div>
       </div>
       <div style="padding:0 20px 18px;margin-top:auto">
@@ -1335,23 +1357,38 @@ const seatingScreen = (out=null) => `<div class="space"></div><div class="lay">
       <div class="pnl"><div class="pnl-h">Agenda voting order</div>
         <div class="ord-body"><div class="ordlist">${ordList(VOTE_ORDER.filter(id=>id!==out))}</div>
           <div class="order-help">Starts left of the speaker. The speaker votes last.</div></div></div>
-      <button class="ibtn later" style="justify-content:center;padding:13px">⠿ Re-order seats${LATER}</button>
-      <div class="order-help later" style="text-align:center">Seating is set once at game start. Re-order only to fix a
-        mistake — it changes both orders above.</div>
+      ${drag?'<button class="ibtn reorder on">✓ Done</button>':'<button class="ibtn reorder">⠿ Re-order seats</button>'}
+      <div class="order-help" style="text-align:center">${drag?'A tap on two seats swaps them too. Undo takes a swap back.'
+        :'Swap two seats when the ring does not match the table.'}</div>
     </div>
   </div></div>`;
 
 S.seating = {t:'Speaker & Seating', note:
- `Seating is a <b>fixed ring</b> set at game start; the speaker is just a <b>pointer into it</b>. Both derived
+ `Seating is a <b>ring</b> set at setup; the speaker is just a <b>pointer into it</b>. Both derived
   orders fall out automatically, so moving the token is the only thing anyone ever needs to do — and the token
   does move, via Politics (3) and certain agendas. Note the two orders differ: strategy picks start <b>with</b>
   the speaker, while agenda voting starts to their <b>left and leaves the speaker until last</b>, since they
-  break ties. Re-ordering seats, marked <b>Later</b>, is deliberately understated — it's a correction for a setup
-  mistake, not something a round should ever need. <b>Remove a player</b> in the top bar is for a player who
-  is eliminated or goes home.`,
+  break ties. When the ring does not match the table, an admin device swaps two seats: a <b>long press</b> on a
+  seat, or <b>Re-order seats</b>, starts re-order mode. A plain tap on a seat still moves the speaker token.
+  <b>Remove a player</b> in the top bar is for a player who is eliminated or goes home.`,
  mnote:
- `The ring scales down and keeps its shape, because it is a map of the real table. The two orders sit side by side under it on a phone.`,
+ `The ring scales down and keeps its shape, because it is a map of the real table. The two orders sit side by side under it on a phone, and Re-order seats spans both.`,
  h:seatingScreen()};
+
+S.reorder = {t:'Speaker & Seating — Re-order Seats', note:
+ `Kira and Tom sat down in each other's chairs. A <b>long press</b> of about half a second on Kira's seat starts
+  re-order mode, as on the iOS home screen: every seat of a player in the game shakes, and Kira's seat lifts and
+  follows the finger at once. A finger that moves before the half second scrolls the screen as usual, and a
+  release before it is a plain tap that moves the speaker token. Here the finger holds Kira over Tom, so Tom's
+  seat <b>slides into the gap</b> that Kira left. The drop swaps the two players on every device, and both
+  orders follow. Each drop is one tap in the log: <b>Undo</b> takes it back, and the clock that runs keeps
+  running. A tap on one seat and then on another swaps them too, and a second tap on the same seat lets it go,
+  so the mode also works from a keyboard after <b>Re-order seats</b>. <b>Done</b>, a tap on the empty ring area,
+  or Close ends the mode. The empty seat of a player who left does not shake and takes no drop. A device set to
+  reduce motion shows a still dashed outline round each seat in place of the shake.`,
+ mnote:
+ `The same mode in the scaled ring. On a phone, Done sits under the two orders, so a tap on the empty ring area is the quick way out. A held seat stops the screen from scrolling until the finger lifts.`,
+ h:seatingScreen(null, {held:'kira', over:'tom', off:[-3,-4]})};
 
 // chosen: the player picked in the dialog. A speaker passes the token to their left.
 const removeDialog = chosen => {
@@ -2203,7 +2240,7 @@ S.players = {t:'Players & Devices', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','homeSaved','homeCode','opening','openingMissing','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
+  ['Every device · iPad and phone', ['home','homeSaved','homeCode','opening','openingMissing','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','seating','reorder','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.

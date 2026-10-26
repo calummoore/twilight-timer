@@ -202,18 +202,20 @@ Tags: mockup
 
 Show re-order mode and the setup handle before the screens change.
 
-- [ ] Speaker & Seating: remove the Later tag from `Re-order seats`. Add
+- [x] Speaker & Seating: remove the Later tag from `Re-order seats`. Add
       the hold hint to the ring note. Rewrite the help line under the
       button in a positive frame.
-- [ ] Add the screen "Speaker & Seating — Re-order seats": the seats shake,
+- [x] Add the screen "Speaker & Seating — Re-order seats": the seats shake,
       one seat is held over another, that seat slides to the gap, and Done
       shows.
-- [ ] Put the long press, the tap alternative, and reduced motion in the
+- [x] Put the long press, the tap alternative, and reduced motion in the
       note below the screen.
 - [ ] Setup: a ⠿ handle on each row, beside ▲ and ▼, in the iPad, upright
-      iPad, and phone frames. Waits for Cal's answer on the readings.
-- [ ] Render the changed screens in headless Chrome. Save the screenshots
-      under `.context/seat-reordering/mockup/`.
+      iPad, and phone frames. Render it in headless Chrome, as the next
+      TODO says. Waits for Cal's answer on the readings.
+- [x] Render the changed screens in headless Chrome. Save the screenshots
+      under `.context/seat-reordering/mockup/`. The Speaker & Seating
+      screens, also with reduced motion, are there.
 
 ## Milestone 3: Game model
 
