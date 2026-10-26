@@ -10,12 +10,12 @@ screens.
 ## The game on the server
 
 A game lives on the server from the moment the host creates it. Create
-game, at the end of setup, puts the seats on the server and opens the
-Players & devices screen as a lobby. The device that creates the game is a
-table device from the start. There is no game on a device alone. Rejected:
-a game that lives on one device with no server, next to the shared game,
-because two kinds of game double every command, every screen state, and
-every test.
+game, at the end of setup, puts the seats on the server and opens the claim
+screen, where the device that creates the game joins it, see
+[Joining](#joining). Then the device shows the Players & devices screen as a
+lobby. There is no game on a device alone. Rejected: a game that lives on
+one device with no server, next to the shared game, because two kinds of
+game double every command, every screen state, and every test.
 
 No clock runs before Start game. Start game, on an admin device, begins the
 strategy phase. A device that joins before Start sees the lobby and waits.
@@ -48,8 +48,9 @@ Rejected: deleting old games, because a game is small, and a code must not
 be reused.
 
 A device that holds a game saved by an older build offers to continue that
-game on the server. The game then gets a code, and the device joins it as a
-table device. A saved game that cannot be read shows a notice, as before.
+game on the server. The game then gets a code, and the device joins it at
+once as a table device with admin, without the claim screen. A saved game
+that cannot be read shows a notice, as before.
 
 ## Codes
 
@@ -93,19 +94,26 @@ A device in a game is a table device or a seated device:
   also be an admin.
 
 An admin device may do every tap in the game, and may change the rights of
-other devices. At least one admin device always exists in a game. A device
-that is neither has not joined the game, and only sees the claim screen.
+other devices. Once the device that creates a game has joined it, at least
+one admin device always exists in the game. A device that is neither has not
+joined the game, and only sees the claim screen.
 
 ### Joining
 
 A device joins a game with the join code, by typing it on the home screen or
 by opening the link. The claim screen then lists the seats of the game: each
 player's name, colour, faction, and whether a device holds the seat. The
-device takes a seat, or joins as a table device. A new table device is a
-viewer until an admin device gives it admin.
+device takes a seat, or joins as a table device. A device that joins gets
+no admin, so a new table device is a viewer until an admin device gives it
+admin. The device that creates the game is the only exception.
 
-The device that creates a game is a table device with admin from the start.
-It can take a seat later and stays an admin.
+The device that creates a game with Create game also joins it on the claim
+screen, which Create game opens. It takes a seat or joins as a table device,
+and it gets admin either way, as the first admin of the game. Until it joins,
+it sees the claim screen, also after a reload. It can change its seat later
+and stays an admin. Rejected: the device that creates the game as a table
+device from the start, because a host can create the game on a phone, take
+their seat, and add the device in the middle of the table later.
 
 One device holds a seat at a time. When a device takes a seat that another
 device holds, the holder loses the seat and becomes a table device, with its
@@ -180,13 +188,16 @@ device. The Settings screen shows the two groups apart.
 - **Home**: start a new game, join a game by code, and reopen a recent game
   of this device.
 - **Setup**: unchanged, on one device. Create game puts the seats on the
-  server and opens Players & devices as the lobby. Rejected: a code during
-  setup with a waiting screen for early joiners, because it saves a few
-  seconds at most, and it can be added later. Rejected: a lobby where each
-  player fills their own seat, because the setup then becomes a shared
-  document with its own rules for every field, and the claim screen is
-  needed anyway for a device that joins mid-game.
-- **Claim seat**: the seats of the game, and Join as table device.
+  server and opens the claim screen. After the claim, Players & devices
+  opens as the lobby. Rejected: a code during setup with a waiting screen
+  for early joiners, because it saves a few seconds at most, and it can be
+  added later. Rejected: a lobby where each player fills their own seat,
+  because the setup then becomes a shared document with its own rules for
+  every field, and the claim screen is needed anyway for a device that
+  joins mid-game.
+- **Claim seat**: the seats of the game, and Join as table device. On a
+  device that is an admin, or that gets admin when it joins, the screen
+  says that the device acts for every player, in a seat or at the table.
 - **Players & devices**: the join code, the link with Copy link, the QR code,
   and one row per seat with the device that holds it, its admin switch, and
   its connection state, then the table devices.

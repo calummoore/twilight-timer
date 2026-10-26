@@ -73,11 +73,21 @@ export function onServer(game: Game): Game | undefined {
 }
 
 /**
+ * The host created the game on the iPad in the middle of the table, and
+ * joined it as the table device, so the iPad is the first admin.
+ */
+export function tableServer(): Server {
+  const s = server()
+  s.send(HOST, { type: 'claim', seat: null })
+  return s
+}
+
+/**
  * Jaz's phone holds Jaz's seat and Kira's phone holds Kira's, both without
  * admin, and the host starts the game.
  */
 export function seatedServer(): Server {
-  const s = server()
+  const s = tableServer()
   s.send(JAZ, { type: 'claim', seat: 'jaz' })
   s.send(KIRA, { type: 'claim', seat: 'kira' })
   s.send(HOST, { type: 'start' })

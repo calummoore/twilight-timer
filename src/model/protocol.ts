@@ -58,6 +58,11 @@ export type ServerMessage =
       serverTime: number
       /** The id of the receiving device, or null before it joins. */
       you: string | null
+      /**
+       * The receiving device created the game and has not joined it yet, so
+       * it joins with admin.
+       */
+      creator: boolean
       room: RoomState
     }
   | { type: 'missing' }
@@ -121,8 +126,10 @@ export function parseServerMessage(raw: unknown): ServerMessage | null {
   const { serverTime, you } = raw
   if (raw.type !== 'state' || !isNumber(serverTime)) return null
   if (you !== null && typeof you !== 'string') return null
+  // A state without the flag reads as a device that did not create the game.
+  const creator = raw.creator === true
   const room = parseRoomState(raw.room)
-  return room && { type: 'state', serverTime, you, room }
+  return room && { type: 'state', serverTime, you, creator, room }
 }
 
 function parseRoomState(raw: unknown): RoomState | null {
