@@ -21,6 +21,7 @@ export function PlayersScreen(props: {
   /** This device is an admin with a connection. */
   admin: boolean
   onAdmin: (deviceId: string, admin: boolean) => void
+  onChangeSeat: () => void
   onLeave: () => void
   onStart?: () => void
   onSettings?: () => void
@@ -37,6 +38,9 @@ export function PlayersScreen(props: {
           {lobby ? 'Lobby' : `Round ${props.round}`}
         </div>
         <div className="spacer" />
+        <button className="ibtn" onClick={props.onChangeSeat}>
+          Change seat
+        </button>
         <button className="ibtn" onClick={props.onLeave}>
           Leave game
         </button>

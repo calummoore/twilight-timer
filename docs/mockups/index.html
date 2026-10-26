@@ -1425,7 +1425,7 @@ S.strategy = {t:'Strategy Phase — Card Selection', note:
  `Cards go four across on an upright iPad and two across on a phone. On a phone, the picker wraps: the pick clock stays next to the name, and the help and the speaker button go under it. The token button ends the strip.`,
  h:strategyScreen()};
 
-S.strategySeated = {t:'Strategy Phase — Seated Device', later:true, note:
+S.strategySeated = {t:'Strategy Phase — Seated Device', note:
  `The strategy phase on <b>Jaz's phone</b>, which holds Jaz's seat and no admin. Sam picks now, so the free cards say <b>Sam's pick</b> and do nothing on this phone. On Jaz's pick they turn on, and a tap takes the card for Jaz. Moving the speaker or the Naalu token belongs to admin devices, so those buttons are off. When every card is picked, Begin action phase reads <b>Waiting for the table</b>, because the next phase is a table tap.`,
  mnote:
  `The same picks on a phone, which is where a seated device usually is.`,
@@ -1509,7 +1509,7 @@ S.actionFour = {t:'Action Phase — Four Players', note:
  `The same four-player turn in the narrow layout. The two card buttons and Pass share the row under End Turn, and each rail row shows both cards. On a small phone, Pass takes its own row when the three buttons do not fit.`,
  h:actionScreen(false, false, true)};
 
-S.actionSeated = {t:'Action Phase — Seated Device, Waiting', later:true, note:
+S.actionSeated = {t:'Action Phase — Seated Device, Waiting', note:
  `The same screen on <b>Jaz's phone</b>. Jaz's phone holds Jaz's seat and no admin, so it acts for Jaz only, when the game waits for Jaz. It is Kira's turn, so End Turn, the strategic action, and Pass are <b>disabled, not hidden</b>: every device shows the same screen, and the disabled End Turn names the player that the game waits for. Undo and Pause need admin, so they are off too. The chip in the top bar says whose device this is and opens Players &amp; devices. On Jaz's turn the three controls come on, and the screen is the one before. A table device, or a seated device with admin, sees every control on at all times.`,
  mnote:
  `The same screen on a phone, which is where a seated device usually is. The chip in the top bar shows the colour and the name of the seat, next to the speaker chip.`,
@@ -1598,7 +1598,7 @@ const RW_SEATED = [
   {id:'wren',  done:false, passed:true},
   {id:'sam',   done:false},
 ];
-S.reactionSeated = {t:'Reaction Window — Seated Device', later:true, note:
+S.reactionSeated = {t:'Reaction Window — Seated Device', note:
  `The same window on <b>Jaz's phone</b>, which holds Jaz's seat and no admin. Jaz marks done on Jaz's own tile and on nobody else's, so the other Mark Done buttons are disabled. Kira played the card, so <b>Mark all done</b>, <b>＋ Add 1:00</b>, and the new speaker choice of a Politics window belong to Kira's device and to the admin devices. Each device reaches across the table less: five people tapping their own phones is the friction that the seat removes.`,
  mnote:
  `On a phone, the sheet gives each reacting player a row, and only Jaz's row has its Mark Done on.`,
@@ -1713,7 +1713,7 @@ S.status = {t:'Status Phase', note:
  `The table clock moves to the top. The steps follow, then the round so far, the Custodians switch, and the button.`,
  h:statusScreen()};
 
-S.statusSeated = {t:'Status Phase — Seated Device', later:true, note:
+S.statusSeated = {t:'Status Phase — Seated Device', note:
  `The status phase on <b>Jaz's phone</b>. The steps, the Custodians switch, and the button are table taps, so a seated device without admin follows the checklist and taps none of them. The button reads <b>Waiting for the table</b>, as the lobby does.`,
  mnote:
  `The same checklist on a phone, with the switch and the button off.`,
@@ -1786,7 +1786,7 @@ S.agenda = {t:'Agenda Phase', note:
  `The clocks move to the top: the discussion time first, then the current voter with Vote Cast. The voting order follows, then Resolve.`,
  h:agendaScreen()};
 
-S.agendaSeated = {t:'Agenda Phase — Seated Device', later:true, note:
+S.agendaSeated = {t:'Agenda Phase — Seated Device', note:
  `Voting on <b>Jaz's phone</b>. Sam votes now, so <b>Vote cast</b> names Sam and is off on this phone. On Jaz's vote it comes on, and Jaz taps it when Jaz has voted. Open voting and Resolve are table taps, so they read <b>Waiting for the table</b>. The running tally, which is not built yet, is left out of this state.`,
  mnote:
  `The same vote on a phone: the voter's clock and the button at the top, then the order.`,
@@ -1846,7 +1846,7 @@ S.round = {t:'Round Summary', note:
  `The four numbers go two across on a phone. The buttons wrap under the bars, and Start Round is full width.`,
  h:roundScreen()};
 
-S.roundSeated = {t:'Round Summary — Seated Device', later:true, note:
+S.roundSeated = {t:'Round Summary — Seated Device', note:
  `The round summary on <b>Jaz's phone</b>. The stats read the same on every device. Start round and End game are table taps, so a seated device without admin sees them off, and Start round reads <b>Waiting for the table</b>.`,
  mnote:
  `The same summary on a phone, with the button at the end.`,
@@ -2099,7 +2099,7 @@ const seatRow = (id, you) => { const h = holder(id);
   return `<div class="seat-pick ${you?'you':''}" style="${col(id)}"><i></i>
     <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f} · Seat ${P[id].seat}</div></div>
     <div class="tk ${h&&!you?'held':''}">${you?'✓ You':h?(h.on?'Held · connected':'Held · away'):'Free'}</div></div>`; };
-S.claim = {t:'Claim Seat', later:true, note:
+S.claim = {t:'Claim Seat', note:
  `The device has the code and sees the game. It <b>takes a seat</b> with one tap, or joins as a <b>table device</b>, which watches the game until an admin gives it admin. Every seat shows whether a device holds it. A held seat can still be taken: the holder loses it, so a player whose phone dies takes the seat again on another phone in seconds. The holder becomes a table device and keeps its admin, so a holder without admin becomes a viewer. A device that opened the link or scanned the QR code lands here at once. Before Start game, a device that took a seat waits in the lobby. After it, the device lands in the running game. The screen opens again from Players &amp; devices, when a device changes its seat.`,
  mnote:
  `One column: the seats, then Join as table device.`,
@@ -2143,7 +2143,7 @@ const deviceRows = (members, me) => `
 const MEMBERS_LOBBY = MEMBERS.filter(m=>m.seat!=='tom');
 const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space"></div><div class="lay">
   <div class="top stack"><div class="round"><b>Players &amp; devices</b> · ${lobby?'Lobby':'Round 3'}</div><div class="spacer"></div>
-    <button class="ibtn later">Change seat${LATER}</button><button class="ibtn">Leave game</button>${lobby
+    <button class="ibtn">Change seat</button><button class="ibtn">Leave game</button>${lobby
       ? '<button class="ibtn">⚙<span class="word"> Settings</span></button>'
       : '<button class="ibtn">✕ Close</button>'}</div>
   <div class="content join-grid">
@@ -2166,7 +2166,7 @@ S.lobby = {t:'Players & Devices — Lobby', note:
  `One column: the QR code and the code, then the seats, then Start game at the end.`,
  h:playersScreen(true, TABLE, MEMBERS_LOBBY)};
 
-S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', later:true, note:
+S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', note:
  `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It has no admin switches, so it sees who is an admin as text. When the host starts, the phone goes to the strategy phase on its own.`,
  mnote:
  `On a phone, the waiting line sits at the end of the column.`,

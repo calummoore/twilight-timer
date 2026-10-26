@@ -35,3 +35,12 @@
   opacity: 0.4;
   cursor: default;
 }
+
+/* The claim screen draws each seat as a button. */
+.seat-pick {
+  width: 100%;
+  text-align: left;
+}
+.seat-pick:disabled {
+  cursor: default;
+}

@@ -375,18 +375,20 @@ Tags: ui
 
 Seats, rights, and the disabled controls.
 
-- [ ] The claim screen, and seat changes on the Players & devices screen.
-- [ ] Gate every control with the permission module, and name the player
+- [x] The claim screen, and seat changes on the Players & devices screen.
+- [x] Gate every control with the permission module, and name the player
       that a disabled main control waits for: the strategy, action,
       reaction, status, agenda, summary, seating, settings, and stats
       screens, and the top bar.
-- [ ] Admin switches for seated and table devices on the Players & devices
+- [x] Admin switches for seated and table devices on the Players & devices
       screen, never taking admin from the last admin. The viewer state.
-- [ ] Remove the Later marks of the claim screen and the seated screens in
+- [x] Remove the Later marks of the claim screen and the seated screens in
       the mockup.
-- [ ] Smoke test on the dev server: three windows, one table and two seats.
+- [x] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
-      admin toggles work. Evidence: `.context/multiplayer/app/`.
+      admin toggles work. Evidence: `.context/multiplayer/app/smoke-m10.log`:
+      25 checks passed, with the claim screen, the seat takeover, and Change
+      seat.
 
 ## Milestone 11: Verification, commit, and review
 
