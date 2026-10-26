@@ -112,6 +112,17 @@ describe('the stored game', () => {
     expect(parseGame(wire(owner))).toBeNull()
   })
 
+  it('rejects a player without a faction', () => {
+    const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
+    // JSON leaves out a field without a value, so the faction is missing.
+    for (const factionId of [null, undefined]) {
+      const players = game.players.map((p, i) =>
+        i === 5 ? { ...p, factionId } : p,
+      )
+      expect(parseGame(wire({ ...game, players }))).toBeNull()
+    }
+  })
+
   it('rejects a game without a valid window rule', () => {
     const t = table()
     playStrategy(t)

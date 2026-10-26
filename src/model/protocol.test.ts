@@ -91,9 +91,11 @@ describe('the request that creates a game', () => {
   it('rejects a setup that cannot start a game', () => {
     const two = { ...SETUP, players: PLAYERS.slice(0, 2), speakerId: 'jaz' }
     const twin = PLAYERS.map((p) => ({ ...p, id: 'jaz' }))
+    const empty = PLAYERS.map((p, i) => (i ? p : { ...p, factionId: null }))
     const broken = [
       { token: HOST, setup: two },
       { token: HOST, setup: { ...SETUP, players: twin } },
+      { token: HOST, setup: { ...SETUP, players: empty } },
       { token: HOST, setup: { ...SETUP, speakerId: 'zed' } },
       { token: HOST, setup: { ...SETUP, enforceLimits: 'yes' } },
       { token: 'short', setup: SETUP },

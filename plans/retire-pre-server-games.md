@@ -124,17 +124,23 @@ the end.
 Small, across the model type and the screens that read it, so that the
 build compiles at the end.
 
-- [ ] `src/model/types.ts` and `src/model/parse-parts.ts`: the faction id
+- [x] `src/model/types.ts` and `src/model/parse-parts.ts`: the faction id
       of a player is never null. `src/model/factions.ts`: the faction name
       takes an id.
-- [ ] The setup rows get their own type with an empty seat, in
+- [x] The setup rows get their own type with an empty seat, in
       `src/ui/screens/SetupScreen.tsx` and `src/ui/screens/SetupSeat.tsx`,
       and the other screens drop their null fallbacks.
-- [ ] Tests of the parser: a player without a faction is rejected.
+- [x] Tests of the parser: a player without a faction is rejected.
+- [x] Test of the create request: a setup with a seat without a faction is
+      rejected.
+- [x] Smoke test on the dev server: Create game stays off until every seat
+      has a faction, and the server rejects a seat without one. Evidence:
+      `.context/retire-pre-server-games/smoke.md`.
 
 ## Milestone 5: Verification, commit, review, and pull request
 
-- [ ] Run the targeted tests and the complete gate named in `CLAUDE.md`.
+- [x] Run the targeted tests and the complete gate named in `CLAUDE.md`.
+      Evidence: `.context/retire-pre-server-games/check-m4.log`.
 - [ ] Commit with Conventional Commits and push the branch. Record the
       approval of the removal and each plan edit in the pull request
       description.

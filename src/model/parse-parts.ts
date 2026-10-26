@@ -21,7 +21,7 @@ export function parsePlayer(raw: unknown): Player | null {
   const { id, name, colour, factionId } = raw
   const c: Colour | undefined = COLOURS.find((x) => x === colour)
   if (typeof id !== 'string' || typeof name !== 'string' || !c) return null
-  if (factionId !== null && !isFactionId(factionId)) return null
+  if (!isFactionId(factionId)) return null
   return { id, name, colour: c, factionId }
 }
 

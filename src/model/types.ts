@@ -5,11 +5,8 @@ export interface Player {
   id: string
   name: string
   colour: Colour
-  /**
-   * The faction from the official list. Only a game from an older build
-   * holds null, because those builds allowed a missing or unlisted faction.
-   */
-  factionId: FactionId | null
+  /** The faction from the official list. Every player has one. */
+  factionId: FactionId
 }
 
 export const TIMER_KEYS = [
