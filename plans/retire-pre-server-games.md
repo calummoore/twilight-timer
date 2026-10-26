@@ -1,7 +1,7 @@
 # Retire the games saved before the server
 
-Status: Active. On branch `calummoore/retire-pre-server-games`, no pull
-request yet. The plan closes when its PR merges. It can run in parallel
+Status: Active. [PR #29](https://github.com/calummoore/twilight-timer/pull/29)
+is open. The plan closes when its PR merges. It can run in parallel
 with [Version handling](version-handling.md): the two change different
 code, and the second to merge resolves small conflicts in `CLAUDE.md`, the
 Key code of `README.md`, `src/model/protocol.ts`, `src/model/test-room.ts`,
@@ -141,10 +141,10 @@ build compiles at the end.
 
 - [x] Run the targeted tests and the complete gate named in `CLAUDE.md`.
       Evidence: `.context/retire-pre-server-games/check-m4.log`.
-- [ ] Commit with Conventional Commits and push the branch. Record the
+- [x] Commit with Conventional Commits and push the branch. Record the
       approval of the removal and each plan edit in the pull request
       description.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest.
@@ -152,6 +152,9 @@ build compiles at the end.
     lost its style, because Milestone 2 removed `.notice` after the merge
     of PR #28 reused it. Option A put the style back. Report:
     `.context/retire-pre-server-games/review-1.md`.
+  - Review 2 checked fix commit b4831ec: finding 1 is resolved, and it
+    found no new finding. Report:
+    `.context/retire-pre-server-games/review-2.md`.
   - `worker/game-room.ts`: `create()` treats a stored room that
     `parseRoom` cannot read as free, so a new game with the same code
     overwrites it. Separate branch.
@@ -160,7 +163,7 @@ build compiles at the end.
     `plans/random-factions.md`, `plans/strategic-action-ends-turn.md`,
     `plans/three-and-four-player-games.md`: each status says Active with an
     open pull request, but each pull request has merged. Separate branch.
-- [ ] Open the pull request when every other milestone TODO is ticked.
+- [x] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 
 ## Post-merge follow-up (non-blocking)
