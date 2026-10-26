@@ -195,7 +195,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 
 /* setup */
 .setup-grid{display:grid; grid-template-columns:1fr 330px; gap:18px; height:100%; min-height:0}
-.seat{display:grid; grid-template-columns:26px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
+.seat{display:grid; grid-template-columns:18px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
   padding:11px; border:1px solid var(--line); border-radius:11px; margin-bottom:9px; background:#0a0f16}
 .seat.sp{border-color:#4d4322; background:#14110a}
 .seat .sn{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); text-align:center}
@@ -605,17 +605,14 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .setup-help b{color:var(--dim)}
 .setup-help + .setup-help{margin-top:12px}
 /* The faction column grows to fit the longest faction name before the name column takes the rest. */
-.seat{grid-template-columns:18px 26px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 44px}
+.seat{grid-template-columns:18px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 44px}
 /* The seat rows share the columns of the seat list, so the faction column has one width in every row, also when one seat
    keeps a faction that the other lists leave out. Under subgrid, the padding and the border of a row take 12 px from its
    first and last columns, so those columns are 12 px wider. A browser without subgrid keeps the columns of each row. */
-.seat-list{display:grid; grid-template-columns:30px 26px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 56px;
+.seat-list{display:grid; grid-template-columns:30px 34px minmax(103px,216px) minmax(120px,1fr) minmax(96px,max-content) 56px;
   column-gap:11px; align-content:start}
 .seat-list .seat{grid-column:1 / -1; grid-template-columns:subgrid}
 .seat .swatches{flex-wrap:wrap}
-.seat-move{display:flex; flex-direction:column; gap:2px}
-.seat-move b{color:var(--faint); font-size:11px; font-weight:400; line-height:1; padding:3px 0; border-radius:5px; text-align:center}
-.seat-move b.off{opacity:.25}
 /* A row moves by its handle: the held row lifts and follows the finger, and the rows between slide by one into the gap.
    The rows slide only while a drag runs, so a drop puts them in place at once. */
 .seat-list.dragging .seat{transition:translate .2s ease}
@@ -920,10 +917,9 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .count b{padding:10px 0}
   /* a phone: each seat row is a card with its own grid, so the list has one column */
   .seat-list{grid-template-columns:minmax(0,1fr)}
-  .seat-list .seat{grid-template-columns:18px 24px 1fr 1fr 34px; grid-template-areas:"grip mv sw sw spk" "grip sn name fac fac"; gap:9px 7px;
+  .seat-list .seat{grid-template-columns:18px 24px 1fr 1fr 34px; grid-template-areas:"grip sn sw sw spk" "grip sn name fac fac"; gap:9px 7px;
     padding:10px 10px 10px 8px}
   .seat .drag{grid-area:grip}
-  .seat .seat-move{grid-area:mv}
   .seat .sn{grid-area:sn}
   .seat .swatches{grid-area:sw; gap:5px; flex-wrap:nowrap}
   .seat .sw{width:26px; height:26px; border-radius:7px}
@@ -1200,7 +1196,6 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false, drag=nu
         return `
         <div class="seat ${d.speaker?'sp':''} ${drag?.held===id?'held':''}" style="${col(id)};${rowShift(id, drag)}">
           <div class="drag" aria-hidden="true"><i></i></div>
-          <div class="seat-move"><b class="${d.seat===1?'off':''}">▲</b><b class="${d.seat===6?'off':''}">▼</b></div>
           <div class="sn">Seat<br>${d.seat}</div>
           <div class="swatches">${COLOURS.map(c=>
             `<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}</div>
@@ -1237,19 +1232,18 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false, drag=nu
   </div></div></div>`; };
 
 S.setup = {t:'Setup — New Game', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. A row moves by its <b>⠿ handle</b>, or one place at a time with ▲ and ▼. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. Only at 3 or 4 players, a second line under the summary says that each player picks <b>two</b> strategy cards, and that the lower card sets their place in the turn order. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game. <b>Create game</b> then puts the seats on the server and opens the claim screen, where this device takes a seat or joins as the table device, as the first admin. Then the lobby opens, where the phones join before the host starts the game. Elsewhere, dashed and dimmed controls marked <b>Later</b> are designed but not in the app yet.`,
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. A row moves by its <b>⠿ handle</b>. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. Only at 3 or 4 players, a second line under the summary says that each player picks <b>two</b> strategy cards, and that the lower card sets their place in the turn order. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game. <b>Create game</b> then puts the seats on the server and opens the claim screen, where this device takes a seat or joins as the table device, as the first admin. Then the lobby opens, where the phones join before the host starts the game. Elsewhere, dashed and dimmed controls marked <b>Later</b> are designed but not in the app yet.`,
  mnote:
- `On a narrow screen, the Game panel moves under the seats, and the screen scrolls. On a phone, each seat row becomes a card: the handle down the left edge, then the arrows and the seat number, the swatches and the speaker ★ on top, and the name and faction fields under them. Every control of the iPad row is still there.`,
+ `On a narrow screen, the Game panel moves under the seats, and the screen scrolls. On a phone, each seat row becomes a card: the handle and the seat number down the left edge, the swatches and the speaker ★ on top, and the name and faction fields under them. Every control of the iPad row is still there.`,
  h:setupScreen()};
 
 S.setupMove = {t:'Setup — Move a Row', note:
  `Each row has a <b>⠿ handle</b> on its left. A drag starts at once on the handle, so the name field still takes text and
   the swatches still take a tap. Here Wren sits at the other end of the table from where Wren's row says, so the
   finger drags Wren's row up over Tom's. The rows from Tom to Sam <b>slide down by one</b> into the gap, and the drop
-  puts Wren in seat 3. The speaker ★ stays with its player. <b>▲</b> and <b>▼</b> still move a row one place, also from a
-  keyboard, and they reach a row that is out of view on a small screen.`,
+  puts Wren in seat 3. The speaker ★ stays with its player.`,
  mnote:
- `On a phone, the handle runs down the left edge of each seat card. A drag on the handle does not scroll the list, and a swipe on the rest of the card does.`,
+ `On a phone, the handle runs down the left edge of each seat card. A drag on the handle does not scroll the list, and a swipe on the rest of the card does. A row further away than the screen shows moves in two drags, with a scroll between.`,
  h:setupScreen([], ALL_SETS, true, false, {held:'wren', over:'tom', dy:14})};
 
 S.setupFailed = {t:'Setup — Create Failed', note:

@@ -407,9 +407,9 @@ The setup rows move by the handle only.
 
 Tags: mockup
 
-- [ ] Remove ▲ and ▼ from the setup rows in every frame, and their styles.
+- [x] Remove ▲ and ▼ from the setup rows in every frame, and their styles.
       Update the notes of the setup screens.
-- [ ] Render the setup screens in headless Chrome. Save the screenshots
+- [x] Render the setup screens in headless Chrome. Save the screenshots
       under `.context/seat-reordering/mockup/arrows/`.
 
 ## Milestone 10: Screens without the setup arrows
