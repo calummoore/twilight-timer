@@ -8,6 +8,7 @@ import {
   SETUP,
   playStrategyOn,
   seatedServer,
+  server,
   tableServer,
 } from './test-room'
 import { MIN, SEC, T0 } from './test-table'
@@ -209,5 +210,41 @@ describe('the devices of a room', () => {
     expect(s.send(JAZ, { type: 'claim', seat: 'zed' })).toBe('invalid')
     expect(s.send(JAZ, { type: 'claim', seat: 'jaz' })).toBe('invalid')
     expect(s.send(HOST, { type: 'claim', seat: null })).toBe('invalid')
+  })
+})
+
+describe('admin recovery in a room', () => {
+  const take = { type: 'admin', deviceId: 'd2', admin: true } as const
+
+  it('lets a seated device take admin while every admin device is away', () => {
+    const s = seatedServer()
+    expect(s.send(JAZ, take)).toBe('forbidden')
+    s.leave(HOST)
+    expect(s.send(JAZ, take)).toBeNull()
+    expect(s.room.members[1]).toMatchObject({ seat: 'jaz', admin: true })
+    expect(s.send(JAZ, { type: 'pause' })).toBeNull()
+  })
+
+  it('keeps admin for the device that created the game until it joins', () => {
+    // Jaz's phone opens the link before the host takes a place.
+    const s = server()
+    s.send(JAZ, { type: 'claim', seat: 'jaz' })
+    const jaz = { type: 'admin', deviceId: 'd1', admin: true } as const
+    expect(s.send(JAZ, jaz)).toBe('forbidden')
+    // The host's device is gone before it joined: Jaz may take admin.
+    s.leave(HOST)
+    expect(s.send(JAZ, jaz)).toBeNull()
+  })
+
+  it('refuses admin to a viewer, and for another device', () => {
+    const s = seatedServer()
+    s.send(LAPTOP, { type: 'claim', seat: null })
+    s.leave(HOST)
+    expect(s.send(LAPTOP, { type: 'admin', deviceId: 'd4', admin: true })).toBe(
+      'forbidden',
+    )
+    expect(s.send(JAZ, { type: 'admin', deviceId: 'd3', admin: true })).toBe(
+      'forbidden',
+    )
   })
 })

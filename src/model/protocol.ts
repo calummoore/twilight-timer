@@ -48,6 +48,12 @@ export interface RoomState {
   /** The game from Start game on, or null in the lobby. */
   game: Game | null
   devices: DeviceView[]
+  /**
+   * No admin device has a connection now, so a seated device may take
+   * admin. The device that created the game counts as an admin device until
+   * it joins.
+   */
+  adminsAway: boolean
 }
 
 /** From the server: the state, or that no game has the code. */
@@ -140,7 +146,9 @@ function parseRoomState(raw: unknown): RoomState | null {
   const devices = listOf(raw.devices, parseDeviceView)
   if (!code || !isRevision(raw.revision) || !setup || !devices) return null
   if (game === null && raw.game !== null) return null
-  return { code, revision: raw.revision, setup, game, devices }
+  // A state without the flag reads as one with an admin device connected.
+  const adminsAway = raw.adminsAway === true
+  return { code, revision: raw.revision, setup, game, devices, adminsAway }
 }
 
 function parseDeviceView(raw: unknown): DeviceView | null {
