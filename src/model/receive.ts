@@ -10,9 +10,11 @@ import type { Setup } from './setup'
 /**
  * What the server does with a message from a device, and with a request
  * that creates a game. The page and the server must run the same build,
- * because the page runs the model too. So the server answers a page of
- * another build with the outdated message and closes the connection, and
- * none of its commands applies.
+ * because the page runs the model too. So on the socket of a game, the
+ * server answers a page of another build with the outdated message and
+ * closes the connection, and none of its commands applies. A request that
+ * creates a game is different: the server creates every game whose setup
+ * it can read, also for a page of another build.
  */
 
 /** What the server knows of a connection, from its hello. */
