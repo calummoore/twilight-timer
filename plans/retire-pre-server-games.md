@@ -1,10 +1,12 @@
 # Retire the games saved before the server
 
 Status: Active. On branch `calummoore/retire-pre-server-games`, no pull
-request yet. The plan closes when its PR merges. It starts after
-[Version handling](version-handling.md) merges, because both change the
-parser, the repository rules, and the README. Cal confirmed the scope
-below on 2026-10-26, which is the approval that the removal of
+request yet. The plan closes when its PR merges. It can run in parallel
+with [Version handling](version-handling.md): the two change different
+code, and the second to merge resolves small conflicts in `CLAUDE.md`, the
+Key code of `README.md`, `src/model/protocol.ts`, `src/model/test-room.ts`,
+and `docs/mockups/index.html`, with the `git-merge` skill. Cal confirmed
+the scope below on 2026-10-26, which is the approval that the removal of
 functionality on `origin/main` needs.
 
 Builds from 2026-10-23 to 2026-10-26 saved the game in `localStorage`,
