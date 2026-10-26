@@ -429,11 +429,13 @@ Tags: ui
 - [x] Run the complete gate named in `AGENTS.md`.
 - [x] Commit with Conventional Commits, record the approved removal, and
       push the branch.
-- [ ] Review the diff of the removal with the `implementation-review`
+- [x] Review the diff of the removal with the `implementation-review`
       skill. Apply the review-fix rule. Review 7 is in
       `.context/seat-reordering/review-7.md`. It fixed finding 1: the setup
       rows keep a stable id as their key, so a focused name field stays
-      with its player after a touch drag.
+      with its player after a touch drag. Review 8, the re-review of that
+      fix, fixed its finding 1: a drag ends in its own render before the
+      drop moves the rows, so a moved row with the focus does not slide.
   - Review 7, 2. Plan edit changes a ticked TODO. Severity Low, effort
     Small. Recommended: A, restore `merge-4.md` in the ticked TODO, and
     name `merge-5.md` in the TODO below.

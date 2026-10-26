@@ -8,6 +8,7 @@ import {
   type PointerEvent,
   type RefCallback,
 } from 'react'
+import { flushSync } from 'react-dom'
 
 /** A move further than this, in px, is a drag or a scroll, not a tap. */
 const SLOP_PX = 8
@@ -164,7 +165,9 @@ export function useDragReorder(options: DragReorderOptions): DragReorder {
     const up = (ev: globalThis.PointerEvent) => {
       if (ev.pointerId !== pointerId) return
       const dropped = current
-      end()
+      // The drag styles leave the page before the screen moves its items, so
+      // a moved item that holds the focus does not slide into its place.
+      flushSync(end)
       if (!dropped) return
       swallow.current = true
       if (dropped.overId !== null) latest.current.onDrop(id, dropped.overId)
