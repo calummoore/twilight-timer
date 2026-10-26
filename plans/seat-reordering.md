@@ -82,6 +82,9 @@ Other branches that touch this change, read on 2026-10-26:
   reloads every open game page. PR #30 also committed the version 6
   fixture, `src/model/fixtures/game-v6.json`, from the build before this
   bump. This branch keeps that fixture in place of its own capture.
+- PR #31, an address for each screen, and PR #32, a build check on Create
+  game, merged on 2026-10-26, and this branch merged them. They change no
+  rule of this change.
 - [PR #29](https://github.com/calummoore/twilight-timer/pull/29), the
   retirement of the games saved before the server, merged on 2026-10-26,
   and this branch merged it. PR #29 retired the upgrade steps of game
@@ -372,7 +375,7 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
     but PRs #28, #29, #30, and #21 merged. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. Copy the merge justifications in
-      `.context/seat-reordering/merge-1.md` and `merge-2.md` into its
+      `.context/seat-reordering/merge-1.md` to `merge-4.md` into its
       description. The description asks Cal to test the preview on an iPad
       and a phone before the merge: the long press, no text selection or
       menu, no scroll during a drag, a plain tap on a seat, and reduced
