@@ -1,7 +1,7 @@
 # Seat re-ordering by drag and drop
 
-Status: Active. On branch `conductor/seat-re-ordering-drag-and-drop`, no
-pull request yet. The plan closes when its PR merges. Cal and an agent
+Status: Active. [PR #34](https://github.com/calummoore/twilight-timer/pull/34)
+is open. The plan closes when its PR merges. Cal and an agent
 wrote the draft of this plan in the `skills` workspace during the design
 discussion of 2026-10-26, on `origin/main` at `ed4b3ad`. Main had not
 moved when this branch started.
@@ -382,7 +382,7 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
   - Outside the scope: `src/ui/screens/SetupSeatList.tsx`, as the setup
     rows of `origin/main`: the rows are keyed by their index, so after ▲
     or ▼ the keyboard focus stays at the old index. Separate branch.
-- [ ] Open the pull request when every other milestone TODO is ticked. Put
+- [x] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. Copy the merge justifications in
       `.context/seat-reordering/merge-1.md` to `merge-4.md` into its
       description. The description asks Cal to test the preview on an iPad
