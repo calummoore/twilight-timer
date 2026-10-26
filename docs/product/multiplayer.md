@@ -64,9 +64,10 @@ goes straight to the claim screen of that game. Rejected: no QR code, because
 a six-character code is quick to type, but a scan is quicker and cannot be
 misread across a table.
 
-The join code is the only code. A device becomes an admin only when an
-admin device gives it admin, see [Admin rights](#admin-rights). The device
-that creates the game is the first admin. Rejected: an
+The join code is the only code. A device becomes an admin when an admin
+device gives it admin, or when it holds a seat and takes admin while every
+admin device is away, see [Admin rights](#admin-rights). The device that
+creates the game is the first admin. Rejected: an
 admin code shown on admin devices, because it is readable wherever the
 join code is, on the device in the middle of the table. Rejected: a
 request for admin that an admin approves, because it adds a pending state
