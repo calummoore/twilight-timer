@@ -20,6 +20,9 @@ export interface Settings {
   expansions: Expansions
 }
 
+/** The time limits of a game: the master switch and each limit. */
+export type LimitSettings = Pick<Settings, 'enforceLimits' | 'limits'>
+
 /** Every expansion starts on, so a table that never chooses sees them all. */
 export const DEFAULT_EXPANSIONS: Expansions = {
   pok: true,

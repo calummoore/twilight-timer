@@ -275,24 +275,25 @@ switch as a seated device.
 Add the Worker, the object, and the pure model modules. The app still runs
 from `localStorage` at the end of this milestone.
 
-- [ ] Add to `src/model/`, each with tests: the join code, the devices with
+- [x] Add to `src/model/`, each with tests: the join code, the devices with
       the last-admin rule and the seat takeover, the permission rules of the
       spec table, the message parser, and the room reducer that applies a
       message to a room.
-- [ ] Add `worker/`: the routes and the game object with the WebSocket
+- [x] Add `worker/`: the routes and the game object with the WebSocket
       Hibernation API and SQLite storage.
-- [ ] Configure `wrangler.jsonc`: the Worker entry, the object binding and
+- [x] Configure `wrangler.jsonc`: the Worker entry, the object binding and
       its migration, the routes that the Worker serves first, and the
       previews block with the object binding.
-- [ ] Add `@cloudflare/vite-plugin`, a tsconfig for `worker/`, and the
+- [x] Add `@cloudflare/vite-plugin`, a tsconfig for `worker/`, and the
       generated runtime types. Keep the Vitest config apart from the plugin.
-- [ ] Point the deploy script and the CI preview and deploy steps at the
+- [x] Point the deploy script and the CI preview and deploy steps at the
       built configuration.
-- [ ] Update `README.md` and `AGENTS.md`: the deploy, the dev server, the
+- [x] Update `README.md` and `AGENTS.md`: the deploy, the dev server, the
       key code, and the storage rule, which now covers the room version and
       the game versions inside it.
-- [ ] Smoke test: start the dev server, create a game with the API, and
-      open its socket. Evidence: `.context/multiplayer/server/`.
+- [x] Smoke test: start the dev server, create a game with the API, and
+      open its socket. Evidence: `.context/multiplayer/server/smoke.log`:
+      16 checks passed.
 
 ## Milestone 8: Shared table
 

@@ -50,12 +50,26 @@ npm run dev     # opens on http://localhost:5173
 npm run check   # lint, format check, unit tests, and build
 ```
 
+`npm run dev` also runs the Worker and its Durable Objects in the Workers
+runtime, through `@cloudflare/vite-plugin`. The games of the dev server stay
+in `.wrangler/state/`. After a change to `wrangler.jsonc`, run
+`npm run types` to write `worker-configuration.d.ts` again, and commit it.
+
 ## Deploy
 
 The GitHub Actions workflow `.github/workflows/ci.yml` runs `npm run check` on
 every pull request and on every push to `main`. On a push to `main`, it then
-runs `wrangler deploy`, which uploads `dist/` as static assets.
-`wrangler.jsonc` configures the Worker.
+runs `npm run deploy`. The deploy uploads the Worker, its Durable Object
+migrations, and the static assets in one step.
+
+`wrangler.jsonc` configures the Worker: the entry `worker/index.ts`, the
+Durable Object binding `GAMES` with its migrations, and the assets. The
+Worker answers `/api/` first, and every other path is a static asset. The
+build writes the Worker to `dist/twilight_timer/` and the client to
+`dist/client/`, with the configuration that the deploy reads,
+`dist/twilight_timer/wrangler.json`. Each game is one Durable Object with the
+SQLite storage backend, which the Workers Free plan allows. A new Durable
+Object class, or a renamed one, needs a new entry under `migrations`.
 
 One-time setup:
 
@@ -101,9 +115,9 @@ its certificate.
 
 The same workflow gives each pull request a preview. Its `preview` job builds
 the pull request head commit of each run. A rerun builds the same commit
-again. Then the job runs `wrangler preview --name pr-<number>`. This makes or
-updates a Workers Preview of the build under the same Worker. Production does
-not change.
+again. Then the job runs `wrangler preview --name pr-<number>`, with the
+configuration that the build wrote. This makes or updates a Workers Preview of
+the build under the same Worker. Production does not change.
 
 The preview opens at `https://pr-<number>-twilight-timer.futex.workers.dev`.
 A bot comment on the pull request gives this link and a link to the exact
@@ -122,7 +136,9 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   upload step, which holds `CLOUDFLARE_API_TOKEN`. Cal accepted this risk on
   2026-10-23. The `cleanup` job installs from the default branch, so it runs
   no pull request code.
-- A preview has its own origin, so it keeps its own saved games.
+- A preview has its own origin, so it keeps its own saved games. It also gets
+  its own Durable Objects, from the `previews` block of `wrangler.jsonc`, so
+  a preview never sees a production game.
 - Previews stay on workers.dev. `preview_urls` controls them, apart from
   `workers_dev` and the Custom Domain.
 - Workers Previews need Preview URLs on the Worker. `"preview_urls": true` in
@@ -152,6 +168,21 @@ is deleted. If the pull request opens again, the next run makes a new preview.
     which count as game time.
   - `storage.ts` and `parse.ts`: `localStorage`, with a parser for saved data.
     The parser also reads games saved by older builds.
+  - `code.ts`: the join codes.
+  - `devices.ts`: the devices of a game, the seat takeover, and the
+    last-admin rule.
+  - `rights.ts`: who may tap what. The server and the screens call it.
+  - `protocol.ts`: the messages between a device and the server, with their
+    parsers.
+  - `room.ts` and `setup.ts`: one game on the server, its reducer, and its
+    stored shape.
+- `worker/` holds the Worker.
+  - `index.ts`: the routes. `POST /api/games` creates a game,
+    `GET /api/games/<code>` looks a code up, and
+    `GET /api/games/<code>/socket` opens the socket of a game.
+  - `game-room.ts`: the Durable Object of one game. It applies each command
+    with the model and its own clock, saves the room, and sends the state to
+    every socket. Its sockets use the WebSocket Hibernation API.
 - `src/ui/GameScreen.tsx` connects the model to the screens.
 - `src/ui/screens/` has one component per screen.
 - `src/ui/Stage.tsx` is the app root: it fills the window's safe area and is a

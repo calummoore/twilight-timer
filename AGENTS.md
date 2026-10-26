@@ -1,9 +1,10 @@
 # A guide for agents
 
-TI4 Tempo is a static React and TypeScript web app, built with Vite and
-deployed as Cloudflare Workers static assets. The game model is under
-`src/model/`, the screens are under `src/ui/`, and the product spec and the
-mockup are under `docs/`.
+TI4 Tempo is a React and TypeScript web app, built with Vite and deployed as
+a Cloudflare Worker with static assets. Each game lives in a Durable Object
+of the Worker. The game model is under `src/model/`, the screens are under
+`src/ui/`, the Worker is under `worker/`, and the product spec and the mockup
+are under `docs/`.
 
 This file holds the rules that are specific to this repository. The
 always-on rules and the detailed procedures live in the shared skills from
@@ -37,18 +38,27 @@ skill at that moment instead of guessing the rule.
 - Early check (format and lint): `npm run lint && npm run format:check`
 - Complete gate: `npm run check`. It stops at the first failed step.
 - Format: `npm run format`
+- Worker types: `npm run types`, after each change to `wrangler.jsonc`.
+  Commit the new `worker-configuration.d.ts`.
 
 ## Repository rules
 
 - Tests are Vitest unit tests of `src/model/` only. Do not add browser,
   screen, or end-to-end tests. Cal decided this on 2026-10-23.
 - Code in `src/model/` never reads the clock. Callers pass the time in, so
-  tests use fixed times.
+  tests use fixed times. The Durable Object passes its own clock, so every
+  tap gets the time at which it reaches the server.
+- `worker/` stays thin. Rules that the server and the screens share, such as
+  who may tap what, live in `src/model/`, where the tests reach them.
 - `src/styles/mockup/` is ported from `docs/mockups/index.html`, and
   Prettier skips it. Keep its class names in step with the mockup.
 - Saved games use versioned `localStorage` keys. Change the version when
   the stored shape changes. Keep reading the keys and the shapes of older
   versions, so that a saved game from an older build still loads.
+- The Durable Object stores each game as a room with its own `version`.
+  Change the room version when the stored room shape changes, and keep
+  reading the older rooms. The game inside the room keeps the saved-game
+  versions, so the room reads a game of every older version.
 - When a merge from main brings the saved-game version that your branch
   also took, move your branch to the next free version. Keep loading the
   games that your branch saved under the old number.

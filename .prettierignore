@@ -6,3 +6,4 @@ plans
 package-lock.json
 *.md
 src/styles/mockup
+worker-configuration.d.ts

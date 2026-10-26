@@ -1,6 +1,6 @@
 import { NAALU } from './factions'
 import { foldGame } from './fold'
-import type { Settings } from './settings'
+import type { LimitSettings } from './settings'
 import type {
   ActionInput,
   Game,
@@ -14,7 +14,7 @@ import type {
 export function startGame(
   players: Player[],
   speakerId: string,
-  settings: Settings,
+  settings: LimitSettings,
   now: number,
 ): Game {
   return {

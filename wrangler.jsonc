@@ -1,6 +1,9 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "twilight-timer",
+  // The Worker answers the game API and the socket of each game. The Vite
+  // build bundles it and writes the configuration that deploys it.
+  "main": "./worker/index.ts",
   "compatibility_date": "2026-10-01",
   // Production opens at https://ti4.nexus. Each deploy attaches this Custom
   // Domain, and Cloudflare makes its DNS record and its certificate. While
@@ -13,11 +16,24 @@
   // Workers Previews need this setting for those URLs. Each deploy keeps it,
   // so previews stay on.
   "preview_urls": true,
-  // `wrangler preview` needs this block. The app has no bindings or
-  // variables, so the block is empty. Previews use the assets setting below.
-  "previews": {},
+  // One Durable Object per join code holds the game. Objects with the SQLite
+  // storage backend run on the Workers Free plan.
+  "durable_objects": {
+    "bindings": [{ "name": "GAMES", "class_name": "GameRoom" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GameRoom"] }],
+  // `wrangler preview` needs this block. A preview does not take the
+  // bindings of production, so the block names the object binding again.
+  // Each preview gets its own objects, so it never sees a production game.
+  "previews": {
+    "durable_objects": {
+      "bindings": [{ "name": "GAMES", "class_name": "GameRoom" }],
+    },
+  },
   "assets": {
-    "directory": "./dist",
     "not_found_handling": "single-page-application",
+    // The Worker answers /api/ first. Every other path is a static asset,
+    // and a path with no asset, such as a join link, opens the app.
+    "run_worker_first": ["/api/*"],
   },
 }

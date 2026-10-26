@@ -1,25 +1,27 @@
-import { EXPANSIONS, FACTIONS, isFactionId, type FactionId } from './factions'
-import { COLOURS, type Colour } from './rules'
+import { EXPANSIONS, FACTIONS, type FactionId } from './factions'
+import {
+  bool,
+  isFields,
+  isNumber,
+  listOf,
+  mapList,
+  type Fields,
+} from './parse-fields'
+import {
+  parseAction,
+  parseInterval,
+  parseLimits,
+  parseLimitsChange,
+  parsePause,
+  parsePlayer,
+} from './parse-parts'
 import {
   ALARM_SOUNDS,
   DEFAULT_SETTINGS,
   type Expansions,
   type Settings,
 } from './settings'
-import {
-  PAUSE_REASONS,
-  TIMER_KEYS,
-  type Action,
-  type Game,
-  type Interval,
-  type Limits,
-  type LimitsChange,
-  type Pause,
-  type Player,
-  type ReasonRange,
-} from './types'
-
-type Fields = Record<string, unknown>
+import type { Game } from './types'
 
 /**
  * Narrows stored data to a game, or returns null when it is not valid. A game
@@ -154,15 +156,6 @@ function missingCard(raw: unknown): unknown {
   return cardless(raw)
 }
 
-function parsePlayer(raw: unknown): Player | null {
-  if (!isFields(raw)) return null
-  const { id, name, colour, factionId } = raw
-  const c: Colour | undefined = COLOURS.find((x) => x === colour)
-  if (typeof id !== 'string' || typeof name !== 'string' || !c) return null
-  if (factionId !== null && !isFactionId(factionId)) return null
-  return { id, name, colour: c, factionId }
-}
-
 /** A typed faction name or id from the list, in any letter case, or null. */
 function factionFromText(text: string): FactionId | null {
   const key = text.trim().toLowerCase()
@@ -170,128 +163,4 @@ function factionFromText(text: string): FactionId | null {
     (f) => f.id === key || f.name.toLowerCase() === key,
   )
   return match?.id ?? null
-}
-
-function parseAction(raw: unknown): Action | null {
-  if (!isFields(raw) || !isNumber(raw.at)) return null
-  const { at, playerId, card, ms, step, removed } = raw
-  const id = typeof playerId === 'string' ? playerId : null
-  switch (raw.kind) {
-    case 'cardPicked':
-      return id && isNumber(card)
-        ? { kind: raw.kind, at, playerId: id, card }
-        : null
-    case 'reactionDone':
-    case 'speakerMoved':
-    case 'naaluTokenMoved':
-    case 'playerRemoved':
-      return id ? { kind: raw.kind, at, playerId: id } : null
-    case 'reactionExtended':
-      return isNumber(ms) ? { kind: raw.kind, at, ms } : null
-    case 'statusStepToggled':
-      return isNumber(step) ? { kind: raw.kind, at, step } : null
-    case 'custodiansSet':
-      return typeof removed === 'boolean'
-        ? { kind: raw.kind, at, removed }
-        : null
-    case 'strategyCardPlayed':
-      // An upgraded game from an older build has a null card.
-      return isNumber(card) || card === null
-        ? { kind: raw.kind, at, card }
-        : null
-    case 'phaseStepped':
-    case 'turnEnded':
-    case 'passed':
-    case 'reactionClosed':
-    case 'votingOpened':
-    case 'voteCast':
-    case 'agendaResolved':
-    case 'gameEnded':
-      return { kind: raw.kind, at }
-    default:
-      return null
-  }
-}
-
-function parseInterval(raw: unknown): Interval | null {
-  if (!isFields(raw) || !isNumber(raw.from)) return null
-  if (raw.to !== null && !isNumber(raw.to)) return null
-  return { from: raw.from, to: raw.to }
-}
-
-/**
- * A pause and its reason ranges. A pause from before version 6 has no
- * ranges, except in a game that a preview of pause reasons saved as version
- * 4 or 5. A range that cannot be read is dropped, so its time counts as a
- * plain pause and the game still loads.
- */
-function parsePause(raw: unknown): Pause | null {
-  const range = parseInterval(raw)
-  if (!range || !isFields(raw)) return null
-  const reasons = Array.isArray(raw.reasons)
-    ? raw.reasons.flatMap((r: unknown) => parseReasonRange(r) ?? [])
-    : []
-  return { ...range, reasons }
-}
-
-function parseReasonRange(raw: unknown): ReasonRange | null {
-  const range = parseInterval(raw)
-  const reason = isFields(raw)
-    ? PAUSE_REASONS.find((r) => r === raw.reason)
-    : undefined
-  return range && reason ? { reason, ...range } : null
-}
-
-function parseLimitsChange(raw: unknown): LimitsChange | null {
-  if (!isFields(raw) || !isNumber(raw.at)) return null
-  const limits = parseLimits(raw.limits)
-  if (typeof raw.enforce !== 'boolean' || !limits) return null
-  return { at: raw.at, enforce: raw.enforce, limits }
-}
-
-function parseLimits(raw: unknown): Limits | null {
-  if (!isFields(raw)) return null
-  const out: Partial<Limits> = {}
-  for (const key of TIMER_KEYS) {
-    const limit = raw[key]
-    if (!isFields(limit) || typeof limit.on !== 'boolean') return null
-    if (!isNumber(limit.ms) || limit.ms <= 0) return null
-    out[key] = { on: limit.on, ms: limit.ms }
-  }
-  return isComplete(out) ? out : null
-}
-
-function isComplete(limits: Partial<Limits>): limits is Limits {
-  return TIMER_KEYS.every((key) => limits[key] !== undefined)
-}
-
-/** Maps each item of a list, and keeps anything else for the parser. */
-function mapList(raw: unknown, map: (item: unknown) => unknown): unknown {
-  return Array.isArray(raw) ? raw.map(map) : raw
-}
-
-function listOf<T>(
-  raw: unknown,
-  parse: (item: unknown) => T | null,
-): T[] | null {
-  if (!Array.isArray(raw)) return null
-  const out: T[] = []
-  for (const item of raw) {
-    const parsed = parse(item)
-    if (parsed === null) return null
-    out.push(parsed)
-  }
-  return out
-}
-
-function isFields(raw: unknown): raw is Fields {
-  return typeof raw === 'object' && raw !== null && !Array.isArray(raw)
-}
-
-function isNumber(raw: unknown): raw is number {
-  return typeof raw === 'number' && Number.isFinite(raw)
-}
-
-function bool(raw: unknown, fallback: boolean): boolean {
-  return typeof raw === 'boolean' ? raw : fallback
 }
