@@ -37,9 +37,10 @@ in the futex account. The app opens at https://ti4.nexus; see
   game waits for them: their pick, their turn, their tile in a reaction
   window, and their vote. A control that the device may not use is off, and
   names the player that the game waits for.
-- An admin device taps for every player. The device that creates a game is
-  its first admin, and gives admin to other devices with a switch. A table
-  device without admin is a viewer.
+- An admin device taps for every player. The device that creates a game
+  takes a seat or the table on the claim screen, and is its first admin
+  either way. It gives admin to other devices with a switch. A table device
+  without admin is a viewer.
 - Home lists the recent games of the device, and continues a game that an
   older build saved on the device.
 - The screen stays awake, and the same screens show on a phone, an iPad, and

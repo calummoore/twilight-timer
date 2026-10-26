@@ -98,7 +98,7 @@ export function PlayersScreen(props: {
             <>
               <div className="lobby-help">
                 Start when everyone has a seat, or start now. A phone can still
-                join later, and the table device acts for a seat without one.
+                join later, and an admin device acts for a seat without one.
               </div>
               <button
                 className="big"

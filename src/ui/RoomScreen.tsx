@@ -29,7 +29,7 @@ export function RoomScreen(props: {
   onLeave: () => void
   onNewGame: () => void
 }) {
-  const { status, room, you, offset, send } = useGameClient(
+  const { status, room, you, creator, offset, send } = useGameClient(
     props.code,
     props.token,
   )
@@ -56,13 +56,15 @@ export function RoomScreen(props: {
     )
   }
 
-  // Takes a seat, or makes this device a table device with null.
+  // Takes a seat, or makes this device a table device with null. The device
+  // that created the game joins with admin.
   const claim = (back: Overlay) => (
     <ClaimScreen
       code={room.code}
       players={room.setup.players}
       devices={room.devices}
       device={device}
+      admin={device ? device.admin : creator}
       connected={connected}
       onSeat={(seat) => {
         send({ type: 'claim', seat })

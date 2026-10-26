@@ -80,8 +80,8 @@ export function HomeScreen(props: {
             <div className="pnl-h">Join a game</div>
             <div className="pad">
               <div className="home-help">
-                Enter the code from the table device, or scan the QR code on its
-                Players &amp; devices screen.
+                Enter the code from a device in the game, or scan the QR code on
+                its Players &amp; devices screen.
               </div>
               <input
                 className={`fld code ${code ? '' : 'empty'}`}

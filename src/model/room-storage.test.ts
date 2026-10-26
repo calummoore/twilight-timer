@@ -27,6 +27,18 @@ describe('the stored room', () => {
     expect(parseRoom(wire(s.room))).toEqual(s.room)
   })
 
+  it('reads a room of version 1, whose creator joined at once', () => {
+    const v1 = {
+      version: 1,
+      code: CODE,
+      revision: 3,
+      setup: SETUP,
+      game: null,
+      members: [{ id: 'd1', token: HOST, seat: null, admin: true }],
+    }
+    expect(parseRoom(wire(v1))).toEqual({ ...v1, version: 2, creator: null })
+  })
+
   it('reads a room whose game an older build saved', () => {
     const t = table()
     t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
@@ -38,19 +50,21 @@ describe('the stored room', () => {
   it('rejects a broken room', () => {
     const room = newRoom(CODE, SETUP, HOST)
     const broken = [
-      { ...room, version: 2 },
+      { ...room, version: 3 },
       { ...room, code: '7qk2hn' },
       { ...room, revision: -1 },
       { ...room, revision: 1.5 },
       { ...room, game: { version: 6 } },
       { ...room, members: [{ id: 'd1', seat: null, admin: true }] },
       { ...room, setup: { ...SETUP, speakerId: 'zed' } },
+      { ...room, creator: 'short' },
+      { ...room, creator: undefined },
       null,
     ]
     for (const raw of broken) expect(parseRoom(wire(raw))).toBeNull()
   })
 
-  it('makes a room of a saved game, with its setup and its limits', () => {
+  it('makes a room of a saved game, which its device joins at once as the table', () => {
     const t = table()
     const limits = { ...DEFAULT_LIMITS, turn: { on: true, ms: MIN } }
     t.setLimits(true, limits)
@@ -65,6 +79,7 @@ describe('the stored room', () => {
     expect(room.members).toEqual([
       { id: 'd1', token: HOST, seat: null, admin: true },
     ])
+    expect(room.creator).toBeNull()
   })
 })
 
@@ -116,5 +131,13 @@ describe('the state that devices get', () => {
     expect(parseServerMessage(wire(message))).toEqual(message)
     const lobby = stateMessage(newRoom(CODE, SETUP, HOST), new Set(), HOST, T0)
     expect(parseServerMessage(wire(lobby))).toEqual(lobby)
+  })
+
+  it('reads a state with no creator flag as a device that did not create the game', () => {
+    const room = roomState(seatedServer().room, new Set())
+    const older = { type: 'state', serverTime: T0, you: 'd2', room }
+    expect(parseServerMessage(wire(older))).toMatchObject({ creator: false })
+    const odd = { ...older, creator: 'yes' }
+    expect(parseServerMessage(wire(odd))).toMatchObject({ creator: false })
   })
 })
