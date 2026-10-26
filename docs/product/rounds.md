@@ -75,9 +75,10 @@ tiles. The speaker token stays with its player. The empty seat of a player who
 left keeps its place: it does not shift, and it takes no drop. No move applies
 after the game ends.
 
-At setup, a row moves by its ⠿ handle, or one place at a time with ▲ and ▼. A
-drop of a row on another row moves it there, and the rows between shift by one.
-The speaker ★ stays with its player.
+At setup, a row moves by its ⠿ handle. A drop of a row on another row moves it
+there, and the rows between shift by one. The speaker ★ stays with its player.
+Rejected: ▲ and ▼ beside the handle, because the drag does the same with less on
+each row.
 
 Rejected: drag that is always on, only the button, only the long press, and a
 seat list with handles. The long press feels natural on the iPad and keeps a

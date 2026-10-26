@@ -64,6 +64,11 @@ Decisions:
   2B says for the ring. Cal did not change the other two readings, so the
   agent builds them as the draft states: the speaker star stays with its
   player, the handle drags at once, and ▲ and ▼ stay.
+- 2026-10-26, Cal, after a try of the setup handle: the setup rows lose ▲
+  and ▼. "We can remove the arrows now we have the drag." This is the
+  approval that the removal of the arrows on `main` needs. Alternative: keep
+  ▲ and ▼ beside the handle. Reason: the drag does the same with less on
+  each row. A keyboard can no longer move a row.
 - The agent's reading of decision 2B on a ring, which Cal has not seen: the
   seats shift along the shorter way round the table, or clockwise when both
   ways are as long. A move along the seat numbers would shift every other
@@ -193,7 +198,7 @@ Contract owners:
 ### Setup screen
 
 - Each row gets a ⠿ handle with `touch-action: none`, and the drag starts
-  at once. ▲ and ▼ stay.
+  at once. ▲ and ▼ go, by Cal's choice after a try of the handle.
 - A drop on another row moves the held row there, and the rows between
   shift by one. They slide while the finger is over a row.
 - The speaker star stays with its player.
@@ -389,6 +394,42 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
       and a phone before the merge: the long press, no text selection or
       menu, no scroll during a drag, a plain tap on a seat, and reduced
       motion.
+
+## Milestone 8: Documentation without the setup arrows
+
+The setup rows move by the handle only.
+
+- [x] `docs/product/rounds.md`: a row moves by its handle, with the rejected
+      arrows. `docs/product.md`: the Setup row of the screens table.
+- [x] `README.md`: the setup feature line.
+
+## Milestone 9: Mockup without the setup arrows
+
+Tags: mockup
+
+- [ ] Remove ▲ and ▼ from the setup rows in every frame, and their styles.
+      Update the notes of the setup screens.
+- [ ] Render the setup screens in headless Chrome. Save the screenshots
+      under `.context/seat-reordering/mockup/arrows/`.
+
+## Milestone 10: Screens without the setup arrows
+
+Tags: ui
+
+- [ ] `SetupSeat.tsx` and `SetupSeatList.tsx`: remove ▲ and ▼. Port the
+      grid without their column from the mockup, and remove their styles.
+- [ ] Scratch smoke test: drag setup rows up and down, the speaker star,
+      the name field, and no arrows. Save the evidence under
+      `.context/seat-reordering/smoke/`.
+
+## Milestone 11: Verification and review of the arrow removal
+
+- [ ] Run the complete gate named in `AGENTS.md`.
+- [ ] Commit with Conventional Commits, record the approved removal, and
+      push the branch.
+- [ ] Review the diff of the removal with the `implementation-review`
+      skill. Apply the review-fix rule.
+- [ ] Update the description of PR #34.
 
 ## Post-merge follow-up (non-blocking)
 

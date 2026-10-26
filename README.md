@@ -15,8 +15,8 @@ in the futex account. The app opens at https://ti4.nexus; see
 ## Key features
 
 - Setup for 3 to 8 players: name, colour, faction from the official list, seat,
-  and the speaker. A row moves by its ⠿ handle or with ▲ and ▼. The table
-  chooses its expansions, and one tap deals random factions to the empty seats.
+  and the speaker. A row moves by its ⠿ handle. The table chooses its
+  expansions, and one tap deals random factions to the empty seats.
 - Strategy picks in speaker order, with trade goods on unpicked cards. With 3
   or 4 players, each player picks two cards, and the lower card sets their
   place in the turn order.
