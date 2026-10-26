@@ -45,25 +45,13 @@ skill at that moment instead of guessing the rule.
 
 - Tests are Vitest unit tests of `src/model/` only. Do not add browser,
   screen, or end-to-end tests. Cal decided this on 2026-10-23.
-- Code in `src/model/` never reads the clock. Callers pass the time in, so
-  tests use fixed times. The Durable Object passes its own clock, so every
-  tap gets the time at which it reaches the server.
+- Code in `src/model/` never reads the clock or the build id. Callers pass
+  them in, so tests use fixed values. The Durable Object passes its own
+  clock, so every tap gets the time at which it reaches the server.
 - `worker/` stays thin. Rules that the server and the screens share, such as
   who may tap what, live in `src/model/`, where the tests reach them.
 - `src/styles/mockup/` is ported from `docs/mockups/index.html`, and
   Prettier skips it. Keep its class names in step with the mockup.
-- `localStorage` keeps the data of the device under versioned keys: the
-  token, the open and the recent games, and the settings. Change the version
-  when a stored shape changes, and keep reading the older shapes. The
-  saved-game keys of the builds before the server stay readable, so that a
-  device can continue such a game on the server.
-- The Durable Object stores each game as a room with its own `version`.
-  Change the room version when the stored room shape changes, and keep
-  reading the older rooms. The game inside the room keeps the saved-game
-  versions, so the room reads a game of every older version.
-- When a merge from main brings the saved-game version that your branch
-  also took, move your branch to the next free version. Keep loading the
-  games that your branch saved under the old number.
 - When a game rule changes, search `src/ui/` and the mockup for text that
   states the old rule.
 - A push to `main` deploys to Cloudflare. CI needs the repository variable
@@ -76,6 +64,36 @@ skill at that moment instead of guessing the rule.
   `https://pr-<number>-twilight-timer.futex.workers.dev`. A bot comment on
   the pull request gives the link. CI deletes the preview when the pull
   request closes.
+
+## Stored shapes and versions
+
+The Durable Object stores each game as a room, and `localStorage` keeps the
+data of the device. A newer build reads what older builds stored. The page
+and the server send each other only the shapes of one build.
+
+- Every stored shape carries its own version and has its own upgrade
+  chain. A container upgrades itself, then hands the nested shape to the
+  nested parser: the room parser upgrades the room, and the game parser
+  upgrades the game inside it.
+- Change the version when a stored shape changes, and add the upgrade step
+  from the old shape. `localStorage` keeps each shape under a versioned key:
+  the token, the open and the recent games, and the settings.
+- Upgrades run at read time, one room at a time. Nothing lists the rooms.
+- Save writes the newest shape only.
+- A stored value that the parser rejects is unreadable, not missing.
+  Nothing overwrites it.
+- The wire has no upgrade. The page and the server run the same build, and
+  a page of another build reloads.
+- The field that carries the build never changes shape.
+- Each version bump commits one fixture of the old shape under
+  `src/model/fixtures/`, captured from the build before the bump, and a
+  test that loads it. Capture the fixture before you change the shape.
+- Old upgrade steps stay until a decision retires them. The saved-game keys
+  of the builds before the server stay readable, so that a device can
+  continue such a game on the server.
+- When a merge from main brings the saved-game version that your branch
+  also took, move your branch to the next free version. Keep loading the
+  games that your branch saved under the old number.
 
 ## Product
 
@@ -94,7 +112,10 @@ skill at that moment instead of guessing the rule.
 - Undo: every clock returns to its value at the undone action. The game
   clock also keeps the rule checks in between.
 - Stored games: a stored room, and a game that an older build saved on a
-  device, still load. A saved game that cannot be read shows its notice.
+  device, still load. A saved game that cannot be read shows its notice. A
+  room that the server cannot read stays stored, and shows its notice.
+- Builds: a page of another build reloads once, and the server applies no
+  command from it.
 
 ## Status
 

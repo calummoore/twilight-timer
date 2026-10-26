@@ -75,6 +75,13 @@ every pull request and on every push to `main`. On a push to `main`, it then
 runs `npm run deploy`. The deploy uploads the Worker, its Durable Object
 migrations, and the static assets in one step.
 
+Each build gets a build id: the first seven characters of `GITHUB_SHA` in
+CI, else a timestamp of the build. The page and the Worker of one build
+carry the same id. After a deploy, an open page of the old build reloads
+once and returns to its game, as
+[New versions](docs/product/multiplayer.md#new-versions) says. A local build
+gets a new id each time, and `npm run dev` keeps one id while it runs.
+
 `wrangler.jsonc` configures the Worker: the entry `worker/index.ts`, the
 Durable Object binding `GAMES` with its migrations, and the assets. The
 Worker answers `/api/` first, and every other path is a static asset. The
@@ -164,6 +171,11 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   to #15 stay online for this reason.
 
 ## Key code
+
+Every stored shape has its own version and its own upgrade chain, which
+runs when the shape is read. The page and the server send each other only
+the shapes of one build. `AGENTS.md` gives the rules under Stored shapes and
+versions.
 
 - `src/model/` holds the game as a pure fold over an append-only action log.
   - `types.ts`: the actions, the stored game, and the timed entries.

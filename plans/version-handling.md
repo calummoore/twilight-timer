@@ -128,16 +128,16 @@ Stored shapes. These rules go into the repository rules:
 
 State the requirements and the decisions before the mockup and the code.
 
-- [ ] Add a section to `docs/product/multiplayer.md`: one build on the
+- [x] Add a section to `docs/product/multiplayer.md`: one build on the
       page and on the server, the reload, the lost tap of an idle page,
       the notice after a failed reload, the three states of a stored
       game, and the notice of an unreadable game, each with its rejected
       alternatives.
-- [ ] Add the two requirements to the Multiplayer list in
+- [x] Add the two requirements to the Multiplayer list in
       `docs/product.md`.
-- [ ] Add the stored-shape rules to the repository rules in `CLAUDE.md`,
+- [x] Add the stored-shape rules to the repository rules in `CLAUDE.md`,
       and keep the storage rules that are there in step with them.
-- [ ] Update `README.md`: the build id in the deploy section, and the
+- [x] Update `README.md`: the build id in the deploy section, and the
       storage rules under Key code.
 
 ## Milestone 2: Mockup
