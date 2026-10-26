@@ -23,7 +23,7 @@ import { parseGame } from './parse'
 import { isFields, listOf, type Fields } from './parse-fields'
 import type { Command, RoomState, ServerMessage } from './protocol'
 import { mayCommand } from './rights'
-import { parseSetup, setupOfGame, type Setup } from './setup'
+import { parseSetup, type Setup } from './setup'
 import type { Game } from './types'
 
 /**
@@ -71,16 +71,6 @@ export function newRoom(code: string, setup: Setup, token: string): Room {
     members: [],
     creator: token,
   }
-}
-
-/**
- * A game that a device saved before games lived on the server. The device
- * joins it at once, as a table device with admin.
- */
-export function roomOfGame(code: string, game: Game, token: string): Room {
-  const room = newRoom(code, setupOfGame(game), token)
-  const members = takeSeat([], token, null, true)
-  return { ...room, game, members, creator: null }
 }
 
 /**
@@ -198,9 +188,8 @@ export function stateMessage(
 }
 
 /**
- * Reads a stored room of version 1 or 2. The game inside keeps its own
- * version, so a room reads a game of an older version too. Returns null when
- * it is not valid.
+ * Reads a stored room of version 1 or 2. The game inside has its own version,
+ * which the game parser reads. Returns null when the room is not valid.
  */
 export function parseRoom(raw: unknown): Room | null {
   if (!isFields(raw) || (raw.version !== 1 && raw.version !== 2)) return null

@@ -88,31 +88,36 @@ One milestone across the model, the Worker, and the Home screen, because
 the Home route imports the storage functions and the build must compile at
 the end.
 
-- [ ] `src/model/parse.ts`: remove the upgrade chain and its helpers. The
+- [x] `src/model/parse.ts`: remove the upgrade chain and its helpers. The
       parser reads version 6 only. `src/model/parse-parts.ts`: a pause
       needs its reasons list.
-- [ ] `src/model/storage.ts`: remove the two slots, their six keys each,
+- [x] `src/model/storage.ts`: remove the two slots, their six keys each,
       load, and forget. The settings stay.
-- [ ] Remove the create request with a game, the room of a game, and the
+- [x] Remove the create request with a game, the room of a game, and the
       setup of a game, from `src/model/protocol.ts`, `src/model/room.ts`,
       and `src/model/setup.ts`, and the game branch of create in
       `worker/index.ts`.
-- [ ] `src/ui/HomeRoute.tsx` and `src/ui/screens/HomeScreen.tsx`: remove
+- [x] `src/ui/HomeRoute.tsx` and `src/ui/screens/HomeScreen.tsx`: remove
       the saved games, Continue, Dismiss, and their notice.
       `src/ui/api.ts`: create takes a setup only.
-- [ ] Tests: remove `src/model/storage-versions.test.ts`, the saved-game
+- [x] Tests: remove `src/model/storage-versions.test.ts`, the saved-game
       tests of `src/model/storage.test.ts`, the two preview tests of
       `src/model/storage-pauses.test.ts`, and the helpers that only they
       used in `test-shapes.ts`, `test-store.ts`, and `test-room.ts`. Move
       the tests that reach live behaviour through the removed helpers to
       the parser and the room, with the same assertions. Keep the old
       table and the null-card helpers with their tests.
-- [ ] Run the deletion audit of the `git-commit` skill, and save the
+- [x] Remove the dead code that the removal leaves: `mapList`,
+      `lastActivity` with its test, `removeItem` of the key-value store,
+      the export of `dateLabel`, and the store and token of the Home route.
+- [x] Run the deletion audit of the `git-commit` skill, and save the
       searches that show each removed item unused under
-      `.context/retire-pre-server-games/`.
-- [ ] Smoke test on the dev server: Home shows no saved game, a new game
+      `.context/retire-pre-server-games/`. Evidence:
+      `.context/retire-pre-server-games/deletion-audit.md`.
+- [x] Smoke test on the dev server: Home shows no saved game, a new game
       is created from the setup, and a game that a test puts on the server
-      with the old window rule and null cards shows its clocks.
+      with the old window rule and null cards shows its clocks. Evidence:
+      `.context/retire-pre-server-games/smoke.md`.
 
 ## Milestone 4: A faction for every player
 

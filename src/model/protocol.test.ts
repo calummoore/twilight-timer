@@ -7,7 +7,6 @@ import {
 } from './protocol'
 import { DEFAULT_LIMITS } from './settings'
 import { HOST, SETUP } from './test-room'
-import { asVersion1 } from './test-shapes'
 import { PLAYERS, table } from './test-table'
 
 const wire = (value: unknown): unknown => JSON.parse(JSON.stringify(value))
@@ -89,14 +88,6 @@ describe('the request that creates a game', () => {
     })
   })
 
-  it('reads a game that an older build saved, in the newest shape', () => {
-    const t = table()
-    t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
-    const request = { token: HOST, game: asVersion1(t.game) }
-    const parsed = parseCreateRequest(wire(request))
-    expect(parsed && 'game' in parsed && parsed.game.version).toBe(6)
-  })
-
   it('rejects a setup that cannot start a game', () => {
     const two = { ...SETUP, players: PLAYERS.slice(0, 2), speakerId: 'jaz' }
     const twin = PLAYERS.map((p) => ({ ...p, id: 'jaz' }))
@@ -107,6 +98,7 @@ describe('the request that creates a game', () => {
       { token: HOST, setup: { ...SETUP, enforceLimits: 'yes' } },
       { token: 'short', setup: SETUP },
       { token: HOST, game: { version: 6 } },
+      { token: HOST, game: table().game },
       { token: HOST },
     ]
     for (const raw of broken) expect(parseCreateRequest(wire(raw))).toBeNull()
