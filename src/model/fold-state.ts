@@ -46,7 +46,7 @@ export interface FoldState {
   game: Game
   /**
    * Every player, also those who left, in clockwise order. It starts as the
-   * seat order of the game, and seat swaps change it.
+   * seat order of the game, and seat moves change it.
    */
   ring: string[]
   /** The players still in the game, in ring order. */

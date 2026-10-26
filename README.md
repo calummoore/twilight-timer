@@ -195,9 +195,9 @@ versions.
     of one seat, and the random deal for the empty seats.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
     `fold-orders.ts` finds who acts next, `fold-removal.ts` takes out a
-    player who leaves, and `fold-seats.ts` swaps two seats on the ring.
+    player who leaves, and `fold-seats.ts` moves a seat on the ring.
   - `ring.ts`: the players of a running game in ring order, as the seat
-    swaps left it, for the screens outside the game.
+    moves left it, for the screens outside the game.
   - `derive.ts` and `view.ts`: what each screen shows at a given time.
   - `commands.ts`: start, act, undo, pause, the pause reason, resume, and
     limit changes.

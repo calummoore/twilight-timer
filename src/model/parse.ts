@@ -60,7 +60,7 @@ export function parseGame(raw: unknown): Game | null {
 function upgrade(raw: Fields): Fields {
   switch (raw.version) {
     case 6:
-      // Builds before seat swaps have the shape of version 7.
+      // Builds before seat moves have the shape of version 7.
       return upgrade({ ...raw, version: 7 })
     default:
       return raw

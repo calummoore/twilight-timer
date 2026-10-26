@@ -118,7 +118,7 @@ export type PhaseView =
 export interface GameView {
   round: number
   /**
-   * Every player of the game, in ring order, also those who left. Seat swaps
+   * Every player of the game, in ring order, also those who left. Seat moves
    * change the order.
    */
   players: Player[]

@@ -308,16 +308,16 @@ Build re-order mode and the setup handle as the mockup shows them.
 Decision 2B: the logged tap moves a seat, and the seats between shift into
 the gap.
 
-- [ ] `orders.ts`: the helper that moves a player in the ring, along the
+- [x] `orders.ts`: the helper that moves a player in the ring, along the
       shorter way round, with the empty seats in place.
-- [ ] Replace `seatsSwapped` with `seatMoved` in `types.ts`, the fold, the
+- [x] Replace `seatsSwapped` with `seatMoved` in `types.ts`, the fold, the
       parser, and the rights tests.
-- [ ] Unit tests:
-  - [ ] A move to a neighbour, a move two seats away, a move the other way
+- [x] Unit tests:
+  - [x] A move to a neighbour, a move two seats away, a move the other way
         round, and the clockwise way for two equal ways.
-  - [ ] The empty seat of a player who left keeps its place, and the move
+  - [x] The empty seat of a player who left keeps its place, and the move
         skips it.
-  - [ ] Every earlier case of the swap: the orders, the clocks, undo, the
+  - [x] Every earlier case of the swap: the orders, the clocks, undo, the
         rights, the parser, and the server.
 
 ## Milestone 6: Seat moves and the setup handle on the screens

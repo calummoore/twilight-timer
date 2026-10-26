@@ -72,8 +72,8 @@ export type Action =
   | { kind: 'voteCast'; at: number }
   | { kind: 'agendaResolved'; at: number }
   | { kind: 'speakerMoved'; at: number; playerId: string }
-  /** Two players swap their seats on the ring. */
-  | { kind: 'seatsSwapped'; at: number; playerId: string; otherId: string }
+  /** A player moves into the seat of `toId`, and the seats between shift. */
+  | { kind: 'seatMoved'; at: number; playerId: string; toId: string }
   | { kind: 'naaluTokenMoved'; at: number; playerId: string }
   | { kind: 'playerRemoved'; at: number; playerId: string }
   | { kind: 'gameEnded'; at: number }
@@ -92,7 +92,7 @@ export type ActionInput = Action extends infer A
 export interface Game {
   version: 7
   startedAt: number
-  /** Seat order at the start, clockwise. Seat swaps change it later. */
+  /** Seat order at the start, clockwise. Seat moves change it later. */
   players: Player[]
   firstSpeakerId: string
   /**

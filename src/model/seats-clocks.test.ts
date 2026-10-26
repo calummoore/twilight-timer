@@ -14,13 +14,13 @@ function voters(t: Table): [string, string][] {
 const total = (entries: Entry[]) =>
   entries.reduce((sum, e) => sum + e.durationMs, 0)
 
-describe('the clocks of a seat swap', () => {
+describe('the clocks of a seat move', () => {
   it('moves the pick clock to a new picker, and charges each moment once', () => {
     const t = table()
     t.wait(10 * SEC)
     t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 }) // Kira picks next
     t.wait(5 * SEC)
-    t.act({ kind: 'seatsSwapped', playerId: 'kira', otherId: 'tom' })
+    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'tom' })
     t.wait(7 * SEC)
     const view = t.view()
     expect(view.view).toMatchObject({ pickerId: 'tom' })
@@ -36,7 +36,7 @@ describe('the clocks of a seat swap', () => {
   it('keeps the pick clock running when the picker stays', () => {
     const t = table()
     t.wait(10 * SEC)
-    t.act({ kind: 'seatsSwapped', playerId: 'priya', otherId: 'wren' })
+    t.act({ kind: 'seatMoved', playerId: 'priya', toId: 'wren' })
     t.wait(5 * SEC)
     expect(t.view().entries).toMatchObject([
       { kind: 'pick', playerId: 'jaz', durationMs: 15 * SEC, running: true },
@@ -53,20 +53,21 @@ describe('the clocks of a seat swap', () => {
     t.wait(5 * SEC)
     t.act({ kind: 'voteCast' }) // Tom votes now
     t.wait(3 * SEC)
-    t.act({ kind: 'seatsSwapped', playerId: 'tom', otherId: 'wren' })
+    // Tom moves to Wren's seat, so Priya, Sam, and Wren shift back by one.
+    t.act({ kind: 'seatMoved', playerId: 'tom', toId: 'wren' })
     t.wait(4 * SEC)
     expect(voters(t)).toEqual([
       ['kira', 'done'],
-      ['wren', 'now'],
-      ['priya', 'waiting'],
+      ['priya', 'now'],
       ['sam', 'waiting'],
+      ['wren', 'waiting'],
       ['tom', 'waiting'],
       ['jaz', 'waiting'],
     ])
     expect(t.view().entries.filter((e) => e.kind === 'vote')).toMatchObject([
       { playerId: 'kira', durationMs: 5 * SEC, running: false },
       { playerId: 'tom', durationMs: 3 * SEC, running: false },
-      { playerId: 'wren', durationMs: 4 * SEC, running: true },
+      { playerId: 'priya', durationMs: 4 * SEC, running: true },
     ])
   })
 
@@ -74,7 +75,7 @@ describe('the clocks of a seat swap', () => {
     const t = table()
     playStrategy(t)
     t.wait(10 * SEC)
-    t.act({ kind: 'seatsSwapped', playerId: 'tom', otherId: 'kira' })
+    t.act({ kind: 'seatMoved', playerId: 'tom', toId: 'kira' })
     t.wait(5 * SEC)
     expect(t.view().timer).toMatchObject({
       kind: 'turn',
@@ -83,12 +84,12 @@ describe('the clocks of a seat swap', () => {
     })
   })
 
-  it('returns the ring and every clock to their values at the swap on undo', () => {
+  it('returns the ring and every clock to their values at the move on undo', () => {
     const t = table()
     t.wait(10 * SEC)
     t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
     t.wait(5 * SEC)
-    t.act({ kind: 'seatsSwapped', playerId: 'kira', otherId: 'tom' })
+    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'tom' })
     t.wait(4 * SEC)
     t.undo()
     t.wait(6 * SEC)

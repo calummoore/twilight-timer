@@ -5,7 +5,7 @@ import {
   turnOrder,
 } from './fold-orders'
 import { removePlayer } from './fold-removal'
-import { swapSeats } from './fold-seats'
+import { moveSeat } from './fold-seats'
 import {
   close,
   closeReaction,
@@ -55,8 +55,8 @@ function step(s: FoldState, a: Action, ms: number): boolean {
   switch (a.kind) {
     case 'speakerMoved':
       return moveSpeaker(s, a.playerId, ms, a.at)
-    case 'seatsSwapped':
-      return swapSeats(s, a.playerId, a.otherId, ms, a.at)
+    case 'seatMoved':
+      return moveSeat(s, a.playerId, a.toId, ms, a.at)
     case 'naaluTokenMoved':
       return moveNaaluToken(s, a.playerId)
     case 'playerRemoved':

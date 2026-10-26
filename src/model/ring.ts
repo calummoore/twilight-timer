@@ -1,7 +1,7 @@
 import { foldGame } from './fold'
 import type { Game, Player } from './types'
 
-/** The table ring: every player in clockwise order, as the seat swaps left it. */
+/** The table ring: every player in clockwise order, as the seat moves left it. */
 
 /** The players of a game in the order of `ring`, a list of their ids. */
 export function playersOf(game: Game, ring: readonly string[]): Player[] {

@@ -22,6 +22,39 @@ export function leftOf(
   return at < 0 ? undefined : seats[(at + 1) % seats.length]
 }
 
+/**
+ * The ring after `id` moves into the seat of `toId`. The seated players
+ * between them shift one seat toward the seat that `id` left, along the
+ * shorter way round the table, or clockwise when both ways are as long. The
+ * seats of the players who left keep their places. The ring stays as it is
+ * when either player is not seated.
+ */
+export function moveInRing(
+  ring: readonly string[],
+  seated: readonly string[],
+  id: string,
+  toId: string,
+): string[] {
+  const slots = ring.flatMap((p, i) => (seated.includes(p) ? [i] : []))
+  const order = slots.map((i) => ring[i])
+  const n = order.length
+  const from = order.indexOf(id)
+  const to = order.indexOf(toId)
+  if (from < 0 || to < 0) return [...ring]
+  const ahead = (to - from + n) % n
+  const step = ahead <= n - ahead ? 1 : -1
+  const moved = [...order]
+  for (let k = from; k !== to; k = (k + step + n) % n) {
+    moved[k] = order[(k + step + n) % n]
+  }
+  moved[to] = id
+  const out = [...ring]
+  slots.forEach((slot, k) => {
+    out[slot] = moved[k]
+  })
+  return out
+}
+
 /** Agenda votes: left of the speaker first, clockwise, speaker last. */
 export function voteOrder(
   seats: readonly string[],

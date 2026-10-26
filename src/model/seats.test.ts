@@ -8,47 +8,56 @@ import { PLAYERS, playStrategy, table } from './test-table'
 
 const ids = (players: readonly { id: string }[]) => players.map((p) => p.id)
 
-describe('a seat swap', () => {
+describe('a seat move', () => {
   it('changes the ring, the pick order, and the voting order', () => {
     const t = table()
-    expect(
-      t.act({ kind: 'seatsSwapped', playerId: 'kira', otherId: 'sam' }),
-    ).toBe(true)
+    // Kira moves two seats on, so Tom and Priya shift back into the gap.
+    expect(t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'priya' })).toBe(
+      true,
+    )
     const view = t.view()
-    const ring = ['jaz', 'sam', 'tom', 'priya', 'kira', 'wren']
+    const ring = ['jaz', 'tom', 'priya', 'kira', 'sam', 'wren']
     expect(ids(view.players)).toEqual(ring)
     expect(view.seated).toEqual(ring)
     expect(view.pickOrder).toEqual(ring)
     expect(view.voteOrder).toEqual([
-      'sam',
       'tom',
       'priya',
       'kira',
+      'sam',
       'wren',
       'jaz',
     ])
     expect(ids(ringOf(t.game))).toEqual(ring)
   })
 
-  it('swaps the same two seats back with a second swap', () => {
+  it('moves a seat back with a second move the other way round', () => {
     const t = table()
-    t.act({ kind: 'seatsSwapped', playerId: 'kira', otherId: 'sam' })
-    t.act({ kind: 'seatsSwapped', playerId: 'sam', otherId: 'kira' })
+    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'priya' })
+    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'tom' })
     expect(ids(t.view().players)).toEqual(ids(PLAYERS))
   })
 
   it('keeps the speaker token with its player', () => {
     const t = table()
-    t.act({ kind: 'seatsSwapped', playerId: 'jaz', otherId: 'priya' })
+    t.act({ kind: 'seatMoved', playerId: 'jaz', toId: 'priya' })
     const view = t.view()
     expect(view.speakerId).toBe('jaz')
+    expect(ids(view.players)).toEqual([
+      'kira',
+      'tom',
+      'priya',
+      'jaz',
+      'sam',
+      'wren',
+    ])
     expect(view.pickOrder).toEqual([
       'jaz',
       'sam',
       'wren',
-      'priya',
       'kira',
       'tom',
+      'priya',
     ])
   })
 
@@ -56,13 +65,13 @@ describe('a seat swap', () => {
     const t = table()
     t.act({ kind: 'playerRemoved', playerId: 'tom' })
     const rejected = [
-      { playerId: 'tom', otherId: 'kira' },
-      { playerId: 'kira', otherId: 'tom' },
-      { playerId: 'kira', otherId: 'zed' },
-      { playerId: 'kira', otherId: 'kira' },
+      { playerId: 'tom', toId: 'kira' },
+      { playerId: 'kira', toId: 'tom' },
+      { playerId: 'kira', toId: 'zed' },
+      { playerId: 'kira', toId: 'kira' },
     ]
-    for (const swap of rejected) {
-      expect(t.act({ kind: 'seatsSwapped', ...swap })).toBe(false)
+    for (const move of rejected) {
+      expect(t.act({ kind: 'seatMoved', ...move })).toBe(false)
     }
     expect(t.game.actions).toHaveLength(1)
   })
@@ -70,41 +79,42 @@ describe('a seat swap', () => {
   it('does nothing after the game ends', () => {
     const t = table()
     t.act({ kind: 'gameEnded' })
-    const swap = { playerId: 'kira', otherId: 'sam' }
-    expect(t.act({ kind: 'seatsSwapped', ...swap })).toBe(false)
+    const move = { playerId: 'kira', toId: 'sam' }
+    expect(t.act({ kind: 'seatMoved', ...move })).toBe(false)
   })
 
   it('keeps the empty seat of a player who left in its place', () => {
     const t = table()
     t.act({ kind: 'playerRemoved', playerId: 'tom' })
-    t.act({ kind: 'seatsSwapped', playerId: 'kira', otherId: 'priya' })
+    // Priya and Sam shift back past Tom's empty seat, which stays.
+    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'sam' })
     const view = t.view()
     expect(ids(view.players)).toEqual([
       'jaz',
       'priya',
       'tom',
-      'kira',
       'sam',
+      'kira',
       'wren',
     ])
-    expect(view.seated).toEqual(['jaz', 'priya', 'kira', 'sam', 'wren'])
+    expect(view.seated).toEqual(['jaz', 'priya', 'sam', 'kira', 'wren'])
     expect(view.departures).toEqual([{ playerId: 'tom', round: 1 }])
   })
 
   it('passes the token of a speaker who leaves to their new left neighbour', () => {
     const t = table()
     // Jaz moves to seat 4, so Sam sits on Jaz's left.
-    t.act({ kind: 'seatsSwapped', playerId: 'jaz', otherId: 'priya' })
+    t.act({ kind: 'seatMoved', playerId: 'jaz', toId: 'priya' })
     t.act({ kind: 'playerRemoved', playerId: 'jaz' })
     const view = t.view()
     expect(view.speakerId).toBe('sam')
-    expect(view.pickOrder).toEqual(['sam', 'wren', 'priya', 'kira', 'tom'])
+    expect(view.pickOrder).toEqual(['sam', 'wren', 'kira', 'tom', 'priya'])
   })
 
   it('keeps the initiative order of the action phase', () => {
     const t = table()
     playStrategy(t)
-    t.act({ kind: 'seatsSwapped', playerId: 'tom', otherId: 'wren' })
+    t.act({ kind: 'seatMoved', playerId: 'tom', toId: 'wren' })
     const view = t.view().view
     expect(view.phase === 'action' && view.rail.map((r) => r.playerId)).toEqual(
       ['tom', 'wren', 'jaz', 'sam', 'kira', 'priya'],
@@ -118,7 +128,8 @@ describe('a seat swap', () => {
     t.act({ kind: 'turnEnded' }) // Tom
     t.act({ kind: 'turnEnded' }) // Wren
     t.act({ kind: 'strategyCardPlayed', card: 3 }) // Jaz plays Politics
-    t.act({ kind: 'seatsSwapped', playerId: 'kira', otherId: 'wren' })
+    // Kira moves the shorter way round, past Jaz, to Wren's seat.
+    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'wren' })
     const view = t.view().view
     const r = view.phase === 'action' ? view.reaction : null
     expect(r?.tiles.map((tile) => tile.playerId)).toEqual([
@@ -139,20 +150,16 @@ describe('a seat swap', () => {
   })
 })
 
-describe('a seat swap on the server', () => {
+describe('a seat move on the server', () => {
   it('applies for an admin device only, and keeps the setup', () => {
     const s = seatedServer()
-    const swap = {
-      kind: 'seatsSwapped',
-      playerId: 'jaz',
-      otherId: 'kira',
-    } as const
-    expect(s.act(JAZ, swap)).toBe('forbidden')
-    expect(s.act(HOST, swap)).toBeNull()
+    const move = { kind: 'seatMoved', playerId: 'jaz', toId: 'kira' } as const
+    expect(s.act(JAZ, move)).toBe('forbidden')
+    expect(s.act(HOST, move)).toBeNull()
     const ring = ['kira', 'jaz', 'tom', 'priya', 'sam', 'wren']
-    expect(s.view()?.players.map((p) => p.id)).toEqual(ring)
+    expect(ids(s.view()?.players ?? [])).toEqual(ring)
     expect(s.room.setup.players).toEqual(PLAYERS)
-    // The stored room keeps the swap.
+    // The stored room keeps the move.
     const stored = parseRoom(JSON.parse(JSON.stringify(s.room)))
     expect(stored).toEqual(s.room)
     expect(stored?.game && ids(ringOf(stored.game))).toEqual(ring)
