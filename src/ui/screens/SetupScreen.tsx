@@ -37,7 +37,7 @@ export function SetupScreen(props: {
   const { expansions } = props.settings
   const [count, setCount] = useState(DEFAULT_PLAYERS)
   const [rows, setRows] = useState<SeatRow[]>(() =>
-    COLOURS.map((colour) => ({ name: '', colour, factionId: null })),
+    COLOURS.map((colour, id) => ({ id, name: '', colour, factionId: null })),
   )
   const [speaker, setSpeaker] = useState(0)
   const seats = rows.slice(0, count)
@@ -95,7 +95,9 @@ export function SetupScreen(props: {
   // A row moves to another seat, and the rows between shift by one. The
   // speaker star stays with its player.
   const moveRow = (from: number, to: number) => {
-    if (from === to || to < 0 || to >= count) return
+    if (from === to || Math.min(from, to) < 0 || Math.max(from, to) >= count) {
+      return
+    }
     setRows((all) => moveItem(all, from, to))
     setSpeaker((at) => movedIndex(at, from, to))
   }

@@ -37,7 +37,7 @@ export function SetupSeatList(props: {
     >
       {props.seats.map((row, i) => (
         <SetupSeat
-          key={i}
+          key={row.id}
           index={i}
           row={row}
           speaker={i === props.speaker}

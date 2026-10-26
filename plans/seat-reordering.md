@@ -386,7 +386,8 @@ Show the shift into the gap on the ring, and drag setup rows by a handle.
     merged. Separate branch.
   - Outside the scope: `src/ui/screens/SetupSeatList.tsx`, as the setup
     rows of `origin/main`: the rows are keyed by their index, so after ▲
-    or ▼ the keyboard focus stays at the old index. Separate branch.
+    or ▼ the keyboard focus stays at the old index. Resolved on
+    2026-10-26 by review 7, finding 1: the rows have stable ids.
 - [x] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. Copy the merge justifications in
       `.context/seat-reordering/merge-1.md` to `merge-5.md` into its
@@ -429,7 +430,13 @@ Tags: ui
 - [x] Commit with Conventional Commits, record the approved removal, and
       push the branch.
 - [ ] Review the diff of the removal with the `implementation-review`
-      skill. Apply the review-fix rule.
+      skill. Apply the review-fix rule. Review 7 is in
+      `.context/seat-reordering/review-7.md`. It fixed finding 1: the setup
+      rows keep a stable id as their key, so a focused name field stays
+      with its player after a touch drag.
+  - Review 7, 2. Plan edit changes a ticked TODO. Severity Low, effort
+    Small. Recommended: A, restore `merge-4.md` in the ticked TODO, and
+    name `merge-5.md` in the TODO below.
 - [ ] Update the description of PR #34.
 
 ## Post-merge follow-up (non-blocking)

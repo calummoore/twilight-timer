@@ -10,6 +10,8 @@ import { pc } from '../colour'
  * it has no faction yet, and the game cannot begin until it has one.
  */
 export interface SeatRow {
+  /** Stays with the row through every move, so React keeps its fields. */
+  id: number
   name: string
   colour: Colour
   /** The faction of the seat, or null for an empty seat. */
