@@ -1,7 +1,7 @@
 # Multiplayer
 
-Status: Active. The work is on branch `calummoore/multiplayer-system-design`, with no
-pull request yet. The plan closes when its pull request merges.
+Status: Active. [PR #21](https://github.com/calummoore/twilight-timer/pull/21)
+is open. The plan closes when its pull request merges.
 
 TI4 Tempo runs a Twilight Imperium game on one device. The game is an
 append-only log of taps in `localStorage`, and every screen folds that log.
@@ -422,6 +422,7 @@ Run the checks, push, and review the branch.
       - Follow-up: add an unused-export check such as knip to
         `npm run check`. Effort Large. Covers review 1 finding 8. Previous
         examples: finding 9 of the MVP review in `plans/ti4-tempo-mvp.md`.
+- [x] Open the pull request, and put its link in the status paragraph.
 
 ## Post-merge follow-up (non-blocking)
 
