@@ -14,7 +14,8 @@ pauses do not change. The spec page
 decisions in force.
 
 The change does not cover remote play, a lobby where each player fills their
-own seat, a spectator mode, or push notifications.
+own seat, or push notifications. A table device without admin is a viewer,
+which is the spectator mode, by admin decision 3 below.
 
 Decisions, all on 2026-10-26 by Cal, from the discussion of that day:
 
