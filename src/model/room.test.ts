@@ -8,7 +8,7 @@ import {
   SETUP,
   playStrategyOn,
   seatedServer,
-  server,
+  tableServer,
 } from './test-room'
 import { MIN, SEC, T0 } from './test-table'
 
@@ -16,15 +16,15 @@ import { MIN, SEC, T0 } from './test-table'
 
 describe('the room', () => {
   it('waits in the lobby with no clock until an admin starts the game', () => {
-    const s = server()
-    expect(s.room).toMatchObject({ revision: 0, game: null })
+    const s = tableServer()
+    expect(s.room).toMatchObject({ revision: 1, game: null })
     expect(s.room.members).toEqual([
       { id: 'd1', token: HOST, seat: null, admin: true },
     ])
     s.wait(5 * MIN)
     expect(s.send(HOST, { type: 'start' })).toBeNull()
     expect(s.room.game?.startedAt).toBe(T0 + 5 * MIN)
-    expect(s.room.revision).toBe(1)
+    expect(s.room.revision).toBe(2)
     s.wait(10 * SEC)
     expect(s.view()?.timer).toMatchObject({
       kind: 'pick',
@@ -34,7 +34,7 @@ describe('the room', () => {
   })
 
   it('starts the game only once, and only on an admin device', () => {
-    const s = server()
+    const s = tableServer()
     s.send(JAZ, { type: 'claim', seat: 'jaz' })
     expect(s.send(JAZ, { type: 'start' })).toBe('forbidden')
     expect(s.room.game).toBeNull()
@@ -96,7 +96,7 @@ describe('the room', () => {
   })
 
   it('refuses game commands in the lobby', () => {
-    const s = server()
+    const s = tableServer()
     expect(s.act(HOST, { kind: 'phaseStepped' })).toBe('invalid')
     expect(s.send(HOST, { type: 'pause' })).toBe('invalid')
     expect(s.send(HOST, { type: 'undo' })).toBe('invalid')
@@ -134,7 +134,7 @@ describe('the room', () => {
   })
 
   it('changes the limits of the lobby, and of the game from now on', () => {
-    const s = server()
+    const s = tableServer()
     const limits = { ...DEFAULT_LIMITS, turn: { on: true, ms: MIN } }
     const command = { type: 'limits', enforceLimits: true, limits } as const
     expect(s.send(HOST, command)).toBeNull()
@@ -153,7 +153,7 @@ describe('the room', () => {
 
 describe('the devices of a room', () => {
   it('joins a device as a viewer, which an admin makes an admin', () => {
-    const s = server()
+    const s = tableServer()
     expect(s.send(LAPTOP, { type: 'claim', seat: null })).toBeNull()
     expect(s.room.members[1]).toEqual({
       id: 'd2',
@@ -172,7 +172,7 @@ describe('the devices of a room', () => {
   })
 
   it('never takes admin from the last admin', () => {
-    const s = server()
+    const s = tableServer()
     expect(s.send(HOST, { type: 'admin', deviceId: 'd1', admin: false })).toBe(
       'invalid',
     )

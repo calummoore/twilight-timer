@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   adminsAway,
-  founder,
   isLastAdmin,
   parseMember,
   publicDevice,
@@ -14,19 +13,24 @@ const HOST = 'host-token-0000000001'
 const JAZ = 'jaz-token-00000000002'
 const KIRA = 'kira-token-0000000003'
 
-/** The host's iPad, then Jaz's phone in Jaz's seat. */
+/** The host's iPad, which created the game, then Jaz's phone in Jaz's seat. */
 function twoDevices(): Member[] {
-  return takeSeat([founder(HOST)], JAZ, 'jaz')
+  return takeSeat(takeSeat([], HOST, null, true), JAZ, 'jaz')
 }
 
 describe('devices', () => {
-  it('makes the device that creates the game a table device with admin', () => {
-    expect(founder(HOST)).toEqual({
-      id: 'd1',
-      token: HOST,
-      seat: null,
-      admin: true,
-    })
+  it('lets the device that created the game join with admin, in a seat or at the table', () => {
+    expect(takeSeat([], HOST, 'kira', true)).toEqual([
+      { id: 'd1', token: HOST, seat: 'kira', admin: true },
+    ])
+    expect(takeSeat([], HOST, null, true)).toEqual([
+      { id: 'd1', token: HOST, seat: null, admin: true },
+    ])
+  })
+
+  it('keeps the admin of a device that has joined when it changes its seat', () => {
+    const moved = takeSeat(twoDevices(), JAZ, 'kira', true)
+    expect(moved[1]).toMatchObject({ id: 'd2', seat: 'kira', admin: false })
   })
 
   it('lets a new device join a seat or the table without admin', () => {

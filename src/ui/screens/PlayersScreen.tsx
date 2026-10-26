@@ -1,11 +1,10 @@
-import { QRCodeSVG } from 'qrcode.react'
 import { useEffect } from 'react'
-import { joinPath } from '../../model/code'
 import { REFRESH_MS } from '../../model/connection'
 import type { DeviceView } from '../../model/protocol'
 import type { Player } from '../../model/types'
 import { NetBar } from '../controls'
 import { DeviceRows } from './DeviceRows'
+import { JoinCode } from './JoinCode'
 
 /**
  * The join code, its link and QR code, and the seats and devices of the
@@ -36,7 +35,6 @@ export function PlayersScreen(props: {
   onClose?: () => void
 }) {
   const lobby = props.round === null
-  const link = `${location.host}${joinPath(props.code)}`
   // The server sends no state when a device goes quiet, so this screen asks
   // for the connections of now while it is open.
   const { onRefresh } = props
@@ -77,29 +75,7 @@ export function PlayersScreen(props: {
       </div>
       {!props.connected && <NetBar />}
       <div className="content join-grid">
-        <div style={{ textAlign: 'center' }}>
-          <div className="qr" style={{ margin: '0 auto' }}>
-            <QRCodeSVG
-              value={`${location.origin}${joinPath(props.code)}`}
-              title={`Join link of game ${props.code}`}
-            />
-          </div>
-          <div
-            style={{
-              fontSize: 10.5,
-              letterSpacing: '.18em',
-              textTransform: 'uppercase',
-              color: 'var(--faint)',
-              marginTop: 22,
-            }}
-          >
-            Join code
-          </div>
-          <div className="joincode num">{props.code}</div>
-          <div className="joinlink">
-            Scan the code, or open <b>{link}</b>
-          </div>
-        </div>
+        <JoinCode code={props.code} />
         <div>
           {props.adminsAway && props.connected && (
             <div className="notice" role="status">
@@ -122,7 +98,7 @@ export function PlayersScreen(props: {
             <>
               <div className="lobby-help">
                 Start when everyone has a seat, or start now. A phone can still
-                join later, and the table device acts for a seat without one.
+                join later, and an admin device acts for a seat without one.
               </div>
               <button
                 className="big"

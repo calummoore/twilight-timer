@@ -38,6 +38,8 @@ export interface GameClient {
   room: RoomState | null
   /** The id of this device in the game, or null before it joins. */
   you: string | null
+  /** This device created the game and joins it with admin. */
+  creator: boolean
   /** The server clock minus the device clock, in ms. */
   offset: number
   /**
@@ -62,6 +64,7 @@ export function useGameClient(code: string, token: string): GameClient {
   const [state, setState] = useState<{
     room: RoomState
     you: string | null
+    creator: boolean
   } | null>(null)
   const [offset, setOffset] = useState(0)
   const socket = useRef<WebSocket | null>(null)
@@ -129,7 +132,8 @@ export function useGameClient(code: string, token: string): GameClient {
         }
         sample = nextOffset(sample, message.serverTime, Date.now())
         setOffset(sample)
-        setState({ room: message.room, you: message.you })
+        const { room, you, creator } = message
+        setState({ room, you, creator })
         setStatus('open')
       })
       ws.addEventListener('close', drop)
@@ -182,6 +186,7 @@ export function useGameClient(code: string, token: string): GameClient {
     status,
     room: state?.room ?? null,
     you: state?.you ?? null,
+    creator: state?.creator ?? false,
     offset,
     refresh,
     send,

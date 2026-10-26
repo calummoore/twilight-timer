@@ -1,4 +1,4 @@
-# TI4 Tempo
+# TI4 Nexus
 
 A shared-table time tracker for **Twilight Imperium (4th Edition)**.
 
@@ -12,7 +12,7 @@ player's phone, and answers the question every TI4 group eventually asks:
 
 Twilight Imperium is long. Nobody disputes that. What groups actually disagree
 about is **who** made it long — and without data, that argument is unwinnable and
-mildly poisonous. TI4 Tempo replaces the argument with a record.
+mildly poisonous. TI4 Nexus replaces the argument with a record.
 
 The app is a **chess clock for the action phase**, wrapped in enough of TI4's
 round structure to know whose turn it is and when it's legal to pass.
@@ -95,7 +95,7 @@ wait for an answer.
 | **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count, rule-check time |
 | **Home**            | New game, join a game by code, recent games of this device               |
 | **Claim seat**      | Which player this device is, or join as a table device                   |
-| **Players & devices** | Join code, link, QR code, one row per seat with its device and its admin switch; the lobby before Start game |
+| **Players & devices** | Join code, a link to open or copy, QR code, one row per seat with its device and its admin switch; the lobby before Start game |
 
 ---
 

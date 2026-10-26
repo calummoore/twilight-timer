@@ -1,4 +1,4 @@
-# TI4 Tempo
+# TI4 Nexus
 
 A shared-table time tracker for Twilight Imperium 4th Edition. The game lives
 on the server, and every device at the table joins it with a six-character
@@ -31,18 +31,21 @@ in the futex account. The app opens at https://ti4.nexus; see
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.
-- Each game lives on the server under a join code, with a link and a QR code.
+- Each game lives on the server under a join code, with a QR code and a link
+  to open or copy.
   Every device shows every tap at once, and a reload returns to the game.
 - A phone takes the seat of its player, and taps for that player when the
   game waits for them: their pick, their turn, their tile in a reaction
   window, and their vote. A control that the device may not use is off, and
   names the player that the game waits for.
-- An admin device taps for every player. The device that creates a game is
-  its first admin, and gives admin to other devices with a switch. A table
-  device without admin is a viewer. While every admin device is away, a
-  seated device can take admin, so the table can finish the game.
+- An admin device taps for every player. After Create game, the device
+  takes a seat or the table on the claim screen, and is the first admin
+  either way. It gives admin to other devices with a switch. A table device
+  without admin is a viewer. While every admin device is away, a seated
+  device can take admin, so the table can finish the game.
 - Home lists the recent games of the device, and continues a game that an
-  older build saved on the device.
+  older build saved on the device. The device then joins that game as the
+  table device, with admin.
 - The screen stays awake, and the same screens show on a phone, an iPad, and
   a computer, arranged for the space.
 
@@ -188,7 +191,7 @@ is deleted. If the pull request opens again, the next run makes a new preview.
     games.
   - `connection.ts`: the offset to the server clock, and the waits between
     the tries after a lost connection.
-  - `code.ts`: the join codes.
+  - `code.ts`: the join codes and their links.
   - `devices.ts`: the devices of a game, the seat takeover, and the
     last-admin rule.
   - `rights.ts`: who may tap what. The server and the screens call it.

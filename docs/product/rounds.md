@@ -1,6 +1,6 @@
 # Rounds and turn order
 
-Part of the [TI4 Tempo product spec](../product.md).
+Part of the [TI4 Nexus product spec](../product.md).
 
 ## Round structure
 

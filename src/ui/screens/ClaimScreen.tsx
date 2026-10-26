@@ -7,7 +7,8 @@ import { NetBar } from '../controls'
 /**
  * Which player this device is: one tap takes a seat, also one that another
  * device holds, or joins as a table device, which is a viewer until an admin
- * device gives it admin. It also changes the seat of a device in the game.
+ * device gives it admin. The device that created the game joins here too,
+ * with admin. It also changes the seat of a device in the game.
  */
 export function ClaimScreen(props: {
   code: string
@@ -15,6 +16,11 @@ export function ClaimScreen(props: {
   devices: DeviceView[]
   /** This device, when it has joined the game. */
   device: DeviceView | undefined
+  /**
+   * This device is an admin, or gets admin when it joins, as the device that
+   * created the game does. So it acts for every player, also in a seat.
+   */
+  admin: boolean
   connected: boolean
   onSeat: (seat: string | null) => void
   onCancel: () => void
@@ -41,8 +47,17 @@ export function ClaimScreen(props: {
               Which player are you?
             </div>
             <div className="h1s" style={{ marginBottom: 18 }}>
-              Take your seat. This device then acts for that player, when it is
-              their turn.
+              {props.admin ? (
+                <>
+                  Take your seat. This device is an admin, so it also acts for
+                  every player.
+                </>
+              ) : (
+                <>
+                  Take your seat. This device then acts for that player, when it
+                  is their turn.
+                </>
+              )}
             </div>
             {props.players.map((p, i) => {
               const held = holder(p.id)
@@ -79,9 +94,19 @@ export function ClaimScreen(props: {
             <div className="pnl-h">Join as table device</div>
             <div className="pad">
               <div className="home-help">
-                A table device has no seat. It joins as a viewer, and an admin
-                can give it admin on Players &amp; devices, so that it acts for
-                every player like the iPad in the middle of the table.
+                {props.admin ? (
+                  <>
+                    A table device has no seat. It acts for every player, like
+                    the iPad in the middle of the table.
+                  </>
+                ) : (
+                  <>
+                    A table device has no seat. It joins as a viewer, and an
+                    admin can give it admin on Players &amp; devices, so that it
+                    acts for every player like the iPad in the middle of the
+                    table.
+                  </>
+                )}
               </div>
               <button
                 className="big lg"
