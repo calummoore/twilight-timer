@@ -6,6 +6,7 @@ import {
   type RefCallback,
 } from 'react'
 import type { Settings } from '../model/settings'
+import type { Game } from '../model/types'
 import type { TimerView } from '../model/view'
 import { playAlarm } from './alarm'
 
@@ -28,12 +29,29 @@ export function useClock(intervalMs: number): [number, () => void] {
 export function useConfirm<T>(
   revision: number,
 ): [T | null, (value: T | null) => void] {
-  const [open, setOpen] = useState<{ revision: number; value: T } | null>(null)
+  return useKeyed<T>(revision)
+}
+
+/**
+ * A tap that a screen draws before the server answers it. It shows until the
+ * next state of the game arrives, also when the server refuses the tap or a
+ * lost connection drops it. `received` is the game of the latest state
+ * message, and each message gives a new object.
+ */
+export function usePending<T>(
+  received: Game,
+): [T | null, (value: T | null) => void] {
+  return useKeyed<T>(received)
+}
+
+/** A value that shows while its key stays the same. A new key drops it. */
+function useKeyed<T>(key: unknown): [T | null, (value: T | null) => void] {
+  const [held, setHeld] = useState<{ key: unknown; value: T } | null>(null)
   const set = useCallback(
-    (value: T | null) => setOpen(value === null ? null : { revision, value }),
-    [revision],
+    (value: T | null) => setHeld(value === null ? null : { key, value }),
+    [key],
   )
-  return [open?.revision === revision ? open.value : null, set]
+  return [held !== null && held.key === key ? held.value : null, set]
 }
 
 /** Keeps the screen on. The browser drops the lock when the tab hides. */

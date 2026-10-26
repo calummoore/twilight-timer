@@ -10,6 +10,7 @@ import {
 } from './fold-state'
 import { pickOrder, voteOrder } from './orders'
 import { gameTimeMs, openPause, reasonTotals } from './pauses'
+import { playersOf } from './ring'
 import { POLITICS, STRATEGY_CARDS, cardsEach } from './rules'
 import { entryClock, mergeIntervals } from './time'
 import type { Entry, Game } from './types'
@@ -34,7 +35,7 @@ export function derive(game: Game, now: number): GameView {
   const reasons = reasonTotals(game.pauses, now)
   return {
     round: s.round,
-    players: game.players,
+    players: playersOf(game, s.ring),
     seated: [...s.seats],
     departures: [...s.departures],
     cardsEach: cardsEach(game.players.length),

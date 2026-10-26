@@ -18,7 +18,7 @@ Mecatol Rex; before that the round goes Strategy → Action → Status.
 
 ## Seating and the speaker
 
-Seating is a **ring**, set once at game start to match where people are actually
+Seating is a **ring**, set at setup to match where people are actually
 sitting. The **speaker is a pointer into that ring** — nothing more.
 
 Two orders derive from it, and they are not the same:
@@ -45,9 +45,52 @@ their left (see [Players who leave](#players-who-leave)). Rejected: passing the
 token automatically each round, because the TI4 rules move it only through
 Politics, a few other cards, and a speaker who leaves the game.
 
-Re-ordering the seats themselves is possible but deliberately understated. It is
-a correction for a setup mistake — people do not swap chairs mid-game — so it
-lives behind a secondary control rather than in the main flow.
+### Seat moves
+
+A seat move fixes a ring that does not match the table, for example after a
+player sat down in another chair. An admin device moves seats on the Speaker &
+Seating screen, in re-order mode.
+
+- A long press of about half a second on a seat starts re-order mode, as on the
+  iOS home screen. **Re-order seats** starts it too.
+- In the mode, every seat of a player in the game shakes. The held seat follows
+  the finger at once.
+- A drop of a seat on another seat moves the player into that seat. The players
+  between shift one seat toward the seat that the held player left, along the
+  shorter way round the table, or clockwise when both ways are as long. While
+  the finger is over a seat, those seats slide to their new places.
+- A tap on one seat and then on another also moves the first player into the
+  second seat. A second tap on the same seat lets it go. This also works from a
+  keyboard.
+- **Done**, a tap outside the seats, or Close ends the mode. Outside the mode, a
+  tap on a seat moves the speaker token.
+
+Each move is one tap in the log. It applies at once on every device, and undo
+takes back one move. A move changes the ring from the tap on. The pick order and
+the voting order derive again, and the initiative order does not change. When a
+move changes the player who picks or votes now, the clock of that player stops,
+and the clock of the new player starts. Earlier picks and votes stay as they
+were. Re-order mode stops no clock. A reaction window that is open keeps its
+tiles. The speaker token stays with its player. The empty seat of a player who
+left keeps its place: it does not shift, and it takes no drop. No move applies
+after the game ends.
+
+At setup, a row moves by its ⠿ handle. A drop of a row on another row moves it
+there, and the rows between shift by one. The speaker ★ stays with its player.
+Rejected: ▲ and ▼ beside the handle, because the drag does the same with less on
+each row.
+
+Rejected: drag that is always on, only the button, only the long press, and a
+seat list with handles. The long press feels natural on the iPad and keeps a
+plain tap for the speaker token, and the button keeps the mode easy to find,
+also from a keyboard. Rejected: a swap of the two players, because the players
+between should shift into the gap, as icons do on the iOS home screen. Rejected:
+a shift along the seat numbers, because a move between the last seat and seat 1,
+which are neighbours, would then shift every other seat. Rejected: a draft of
+the new ring that a Save applies as one tap, because every other change is one
+tap that applies at once. Rejected: a move that changes the ring from the start
+of the game, because the earlier picks and votes would then not follow the order
+of their time.
 
 ## Factions
 

@@ -24,6 +24,10 @@ describe('messages from a device', () => {
       { type: 'act', input: { kind: 'cardPicked', playerId: 'jaz', card: 3 } },
       { type: 'act', input: { kind: 'turnEnded' } },
       { type: 'act', input: { kind: 'strategyCardPlayed', card: 5 } },
+      {
+        type: 'act',
+        input: { kind: 'seatMoved', playerId: 'kira', toId: 'sam' },
+      },
       { type: 'undo' },
       { type: 'pause' },
       { type: 'resume' },
@@ -55,6 +59,14 @@ describe('messages from a device', () => {
         type: 'command',
         rev: 1,
         command: { type: 'act', input: { kind: 'cardPicked', card: 3 } },
+      },
+      {
+        type: 'command',
+        rev: 1,
+        command: {
+          type: 'act',
+          input: { kind: 'seatMoved', playerId: 'kira', toId: 4 },
+        },
       },
       {
         type: 'command',

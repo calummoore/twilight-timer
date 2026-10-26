@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import type { RecentGame } from '../model/device-store'
 import { NOTICES, type Command } from '../model/protocol'
+import { ringOf } from '../model/ring'
 import { mayCommand } from '../model/rights'
 import {
   routePath,
@@ -85,6 +86,9 @@ export function RoomScreen(props: {
       />
     )
   }
+  // The seats in clockwise order: the setup in the lobby, then the ring of the
+  // game, which seat moves change.
+  const seatOrder = room.game ? ringOf(room.game) : room.setup.players
 
   const panel = route.screen === 'game' ? route.panel : null
   // Change seat opens over Players & devices, which is the lobby before the
@@ -95,7 +99,7 @@ export function RoomScreen(props: {
   const claim = (
     <ClaimScreen
       code={room.code}
-      players={room.setup.players}
+      players={seatOrder}
       devices={room.devices}
       device={device}
       admin={device ? device.admin : creator}
@@ -124,7 +128,7 @@ export function RoomScreen(props: {
     <PlayersScreen
       code={room.code}
       round={round}
-      players={room.setup.players}
+      players={seatOrder}
       devices={room.devices}
       you={you}
       connected={connected}

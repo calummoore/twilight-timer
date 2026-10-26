@@ -84,8 +84,9 @@ describe('the stored game', () => {
   it('rejects an unknown version, an unknown action, or a broken pause', () => {
     const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
     const broken = [
-      { ...game, version: 7 },
+      { ...game, version: 8 },
       { ...game, version: '6' },
+      { ...game, version: '7' },
       { ...game, actions: [{ kind: 'teleported', at: T0 }] },
       { ...game, pauses: [{ from: T0, to: 'later', reasons: [] }] },
       'game',
@@ -94,11 +95,13 @@ describe('the stored game', () => {
     for (const raw of broken) expect(parseGame(wire(raw))).toBeNull()
   })
 
-  it('reads version 6 only, so a game of version 1 to 5 is rejected', () => {
+  it('reads versions 6 and 7 only, so a game of version 1 to 5 is rejected', () => {
     const t = table()
     playStrategy(t)
     t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
     expect(read(t.game)).toEqual(t.game)
+    // A build before seat moves stored version 6, which has the same shape.
+    expect(read({ ...t.game, version: 6 })).toEqual(t.game)
     for (const version of [1, 2, 3, 4, 5]) {
       expect(parseGame(wire({ ...t.game, version }))).toBeNull()
     }
@@ -144,7 +147,7 @@ describe('a stored game with the values of an older build', () => {
     t.wait(20 * SEC)
     t.act({ kind: 'turnEnded' })
     const game = read(withNullCards(t.game))
-    expect(game).toMatchObject({ version: 6, windowEndsTurn: false })
+    expect(game).toMatchObject({ version: 7, windowEndsTurn: false })
     // The old build resumed Tom's turn after the window, so Tom ended it.
     const view = derive(game, T0 + 2 * MIN)
     expect(view.entries.filter((e) => e.kind === 'turn')).toMatchObject([

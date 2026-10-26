@@ -64,7 +64,7 @@ export interface ReactionView {
 export interface SpeakerChoice {
   /** The speaker when the window opened. */
   fromId: string
-  /** Every other player, in seat order. */
+  /** Every other player, in ring order. */
   options: string[]
   /** The new speaker, or null until a player takes the token. */
   chosenId: string | null
@@ -117,9 +117,12 @@ export type PhaseView =
 
 export interface GameView {
   round: number
-  /** Every player of the game, in seat order, also those who left. */
+  /**
+   * Every player of the game, in ring order, also those who left. Seat moves
+   * change the order.
+   */
   players: Player[]
-  /** The players still in the game, in seat order. */
+  /** The players still in the game, in ring order. */
   seated: string[]
   /** The players who left the game, oldest first. */
   departures: Departure[]

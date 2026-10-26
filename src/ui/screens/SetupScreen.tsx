@@ -10,8 +10,10 @@ import {
 } from '../../model/rules'
 import type { Expansions, Settings } from '../../model/settings'
 import type { Player } from '../../model/types'
+import { moveItem, movedIndex } from '../listMove'
 import { SetupGamePanel, type CreateFailure } from './SetupGamePanel'
-import { SetupSeat, type SeatRow } from './SetupSeat'
+import type { SeatRow } from './SetupSeat'
+import { SetupSeatList } from './SetupSeatList'
 
 const COUNTS = Array.from(
   { length: MAX_PLAYERS - MIN_PLAYERS + 1 },
@@ -35,7 +37,7 @@ export function SetupScreen(props: {
   const { expansions } = props.settings
   const [count, setCount] = useState(DEFAULT_PLAYERS)
   const [rows, setRows] = useState<SeatRow[]>(() =>
-    COLOURS.map((colour) => ({ name: '', colour, factionId: null })),
+    COLOURS.map((colour, id) => ({ id, name: '', colour, factionId: null })),
   )
   const [speaker, setSpeaker] = useState(0)
   const seats = rows.slice(0, count)
@@ -90,18 +92,14 @@ export function SetupScreen(props: {
   const changeExpansions = (next: Expansions) =>
     props.onSettingsChange({ ...props.settings, expansions: next })
 
-  const move = (i: number, by: number) => {
-    const j = i + by
-    setRows((all) => {
-      const next = [...all]
-      const [a, b] = [next[i], next[j]]
-      if (!a || !b) return all
-      next[i] = b
-      next[j] = a
-      return next
-    })
-    if (speaker === i) setSpeaker(j)
-    else if (speaker === j) setSpeaker(i)
+  // A row moves to another seat, and the rows between shift by one. The
+  // speaker star stays with its player.
+  const moveRow = (from: number, to: number) => {
+    if (from === to || Math.min(from, to) < 0 || Math.max(from, to) >= count) {
+      return
+    }
+    setRows((all) => moveItem(all, from, to))
+    setSpeaker((at) => movedIndex(at, from, to))
   }
 
   // Create game is off while a seat is empty, so every seat has a faction.
@@ -154,23 +152,16 @@ export function SetupScreen(props: {
                 ))}
               </div>
             </div>
-            <div className="seat-list scroll grow">
-              {seats.map((row, i) => (
-                <SetupSeat
-                  key={i}
-                  index={i}
-                  row={row}
-                  last={i === count - 1}
-                  speaker={i === speaker}
-                  expansions={expansions}
-                  onMove={(by) => move(i, by)}
-                  onColour={(colour) => pickColour(i, colour)}
-                  onName={(name) => update(i, { name })}
-                  onFaction={(factionId) => pickFaction(i, factionId)}
-                  onSpeaker={() => setSpeaker(i)}
-                />
-              ))}
-            </div>
+            <SetupSeatList
+              seats={seats}
+              speaker={speaker}
+              expansions={expansions}
+              onMoveRow={moveRow}
+              onColour={pickColour}
+              onName={(i, name) => update(i, { name })}
+              onFaction={pickFaction}
+              onSpeaker={setSpeaker}
+            />
           </div>
           <SetupGamePanel
             count={count}

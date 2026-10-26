@@ -1,3 +1,4 @@
+import type { PointerEvent } from 'react'
 import { factionChoices } from '../../model/deal'
 import { factionName, isFactionId, type FactionId } from '../../model/factions'
 import { COLOURS, type Colour } from '../../model/rules'
@@ -9,6 +10,8 @@ import { pc } from '../colour'
  * it has no faction yet, and the game cannot begin until it has one.
  */
 export interface SeatRow {
+  /** Stays with the row through every move, so React keeps its fields. */
+  id: number
   name: string
   colour: Colour
   /** The faction of the seat, or null for an empty seat. */
@@ -16,17 +19,21 @@ export interface SeatRow {
 }
 
 /**
- * One seat row: the move buttons, the colour swatches, the name, the faction,
+ * One seat row: the drag handle, the colour swatches, the name, the faction,
  * and the speaker button. The faction list offers the factions in play, and
  * the faction that the seat holds.
  */
 export function SetupSeat(props: {
   index: number
   row: SeatRow
-  last: boolean
   speaker: boolean
   expansions: Expansions
-  onMove: (by: number) => void
+  /** The row follows a drag on its handle. */
+  held: boolean
+  /** How far the row moves down during a drag, in px, or null. */
+  shiftY: number | null
+  /** A press on the handle, which can start a drag. */
+  onGrip: (e: PointerEvent<HTMLElement>) => void
   onColour: (colour: Colour) => void
   onName: (name: string) => void
   onFaction: (factionId: FactionId | null) => void
@@ -34,23 +41,17 @@ export function SetupSeat(props: {
 }) {
   const { index, row } = props
   return (
-    <div className={`seat ${props.speaker ? 'sp' : ''}`} style={pc(row.colour)}>
-      <div className="seat-move">
-        <button
-          aria-label="Move up"
-          disabled={index === 0}
-          onClick={() => props.onMove(-1)}
-        >
-          ▲
-        </button>
-        <button
-          aria-label="Move down"
-          disabled={props.last}
-          onClick={() => props.onMove(1)}
-        >
-          ▼
-        </button>
-      </div>
+    <div
+      className={`seat ${props.speaker ? 'sp' : ''} ${props.held ? 'held' : ''}`}
+      data-drag-id={index}
+      style={{
+        ...pc(row.colour),
+        translate: props.shiftY === null ? undefined : `0 ${props.shiftY}px`,
+      }}
+    >
+      <span className="drag" aria-hidden="true" onPointerDown={props.onGrip}>
+        <i />
+      </span>
       <div className="sn">
         Seat
         <br />

@@ -166,6 +166,7 @@ export function GameScreen(props: {
       {screen}
       <GameOverlays
         game={g}
+        received={props.game}
         overlay={overlay}
         onOverlay={(next) => (next ? onPanel(next) : props.onClosePanel())}
         ending={ending !== null}

@@ -1,7 +1,7 @@
 /* Ported from docs/mockups/index.html, with buttons in place of tags. Prettier skips this folder, so it stays easy to compare with the mockup. */
 /* setup */
 .setup-grid{display:grid; grid-template-columns:1fr 330px; gap:18px; height:100%; min-height:0}
-.seat{display:grid; grid-template-columns:26px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
+.seat{display:grid; grid-template-columns:18px 34px 132px 1fr 150px 44px; gap:11px; align-items:center;
   padding:11px; border:1px solid var(--line); border-radius:11px; margin-bottom:9px; background:#0a0f16}
 .seat.sp{border-color:#4d4322; background:#14110a}
 .seat .sn{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); text-align:center}
