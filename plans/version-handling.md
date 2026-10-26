@@ -285,7 +285,12 @@ Tags: ui
           that reads the build of the answer first.
         - 2. The outdated reload opens Home without a word. Severity Low,
           effort Small. Recommended: A, say so in the spec and the mockup
-          note.
+          note. Update after the merge of PR #31: the setup screen has the
+          address `/new` now, which was option B, so the reload returns to
+          an empty setup instead of Home. The spec and the mockup note
+          already say that the host enters the seats again. What stays open
+          is option C: a line after the reload that says that a new version
+          loaded, with a mockup state, effort Medium.
         - `src/ui/api.ts` and `src/ui/screens/SetupGamePanel.tsx`: the type
           comments say that `offline` means no answer, but it also covers
           the invalid and busy answers. Separate branch.
