@@ -1146,7 +1146,8 @@ const S = {};
 // limits: the time limits are on. The panel summary scrolls when it is full.
 const EXPANSIONS = [['pok','Prophecy of Kings'], ['te',"Thunder's Edge"], ['keleres','Council Keleres']];
 const ALL_SETS = EXPANSIONS.map(([k])=>k);
-// failed: Create game did not reach the server.
+// failed: Create game did not reach the server ('offline'), or the server runs a newer version that a reload did
+// not bring ('outdated').
 const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">✕ Back</button><button class="ibtn">⚙<span class="word"> Settings</span></button></div>
@@ -1190,8 +1191,9 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false) => { co
           ${EXPANSIONS.map(([k,n])=>`<button class="exp ${sets.includes(k)?'on':''}">${n}</button>`).join('')}
         </div></div>
         ${missing?'<div class="setup-need">Pick a faction for every seat to create the game.</div><button class="deal">Random factions for empty seats</button>':''}
-        ${failed?'<div class="setup-need">The game could not be created. Check the connection and try again.</div>':''}
-        <button class="big lg" style="width:100%" ${missing?'disabled':''}>CREATE GAME</button>
+        ${failed==='offline'?'<div class="setup-need">The game could not be created. Check the connection and try again.</div>':''}
+        ${failed==='outdated'?'<div class="setup-need">A new version is live. Reload the page.</div>':''}
+        <button class="big lg" style="width:100%" ${missing?'disabled':''}>${failed==='outdated'?'RELOAD':'CREATE GAME'}</button>
       </div>
     </div>
   </div></div></div>`; };
@@ -1206,7 +1208,13 @@ S.setupFailed = {t:'Setup — Create Failed', note:
  `Create game puts the seats on the server, so it needs a connection. While the request runs, the button reads CREATING and waits. When the server cannot be reached, the line above the button says so, and the seats stay as they are, so one more tap tries again. <b>Back</b> goes to Home and drops the seats.`,
  mnote:
  `The line sits above CREATE GAME, at the end of the Game panel.`,
- h:setupScreen([], ALL_SETS, true, true)};
+ h:setupScreen([], ALL_SETS, true, 'offline')};
+
+S.setupOutdated = {t:'Setup — New Version', note:
+ `Create game sends the version of this page with the seats. The server creates every game whose seats it can read, also from a page of an older version, which then reloads when it opens the game. When the server cannot read the seats of a page of another version, it creates nothing, and the page reloads once by itself, so the host enters the seats again. The host sees this state only when that reload did not bring the new version, for example from an old cache. <b>Reload</b> reloads the page.`,
+ mnote:
+ `The line sits above RELOAD, at the end of the Game panel.`,
+ h:setupScreen([], ALL_SETS, true, 'outdated')};
 
 S.setupMissing = {t:'Setup — Faction Missing', note:
  `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>CREATE GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
@@ -2219,7 +2227,7 @@ S.players = {t:'Players & Devices', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
+  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMissing','setupDeal','setupFailed','setupOutdated','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.
