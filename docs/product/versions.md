@@ -32,6 +32,17 @@ not bring the version of the server, the device stops and shows "A new
 version is live", with a Reload button. So a device never reloads in a
 loop.
 
+Create game names the version of the device. The server creates every game
+whose seats it can read, also from a device of another version. That device
+reloads when it opens the game. When the server cannot read the seats from
+a device of another version, it creates nothing, and the device reloads
+once by itself. The host then enters the seats again. When that reload does
+not bring the version of the server, the setup shows "A new version is
+live", with a Reload button. Rejected: a refusal of every Create game from
+another version, because the host would enter the seats again after each
+update. Rejected: no version on Create game, because a device of an older
+version would fail to create a game until a manual reload.
+
 A code has no game, a game that the server can read, or a game that the
 server holds but cannot read, for example after a faulty update. The server
 keeps a game that it cannot read as it is, and never puts another game

@@ -1,7 +1,9 @@
 # Version handling
 
-Status: Active. [PR #30](https://github.com/calummoore/twilight-timer/pull/30)
-is open. The plan closes when its PR merges.
+Status: Completed. [PR #30](https://github.com/calummoore/twilight-timer/pull/30)
+merged on 2026-10-26. Review 1 findings 1 and 3 are decided, and branch
+`calummoore/untitled-v3` implements them. The post-merge follow-up and the
+three plan lines outside the scope stay open.
 
 TI4 Nexus keeps each game in a room on the server, in one Cloudflare
 Durable Object per join code. After each change, the server sends every
@@ -260,10 +262,20 @@ Tags: ui
       Review 2 of the fix: `.context/version-handling/review-2.md`, no
       findings. Open:
       - 1. Create game skips the build check. Severity Medium, effort
-        Large. Recommended: C, the build in the create request, and the
-        Worker still creates a game that it can read.
+        Large. Decided 2026-10-26, Cal: C. The create request names the
+        build of the page, and the Worker creates every game whose setup it
+        can read. It refuses only a setup that it cannot read from a page
+        of another build, and that page reloads once. Alternatives: A, a
+        build check on the socket only, and B, a refusal of every request
+        of another build. Reason, from the recommendation: the only failure
+        becomes a reload, and every setup that the server can read stays.
+        Branch `calummoore/untitled-v3` implements it.
       - 3. The no-overwrite rule overstates the device store. Severity
-        Low, effort Small. Recommended: A, narrow the rule to stored games.
+        Low, effort Small. Decided 2026-10-26, Cal: A, the rule covers
+        stored games only. Alternative: B, a device store that never writes
+        over a value that it cannot read. Reason, from the recommendation:
+        a device needs a working token more than a value that it cannot
+        read. Branch `calummoore/untitled-v3` implements it.
       - `plans/admin-recovery.md`: the status says that PR #28 is open,
         but it merged. Separate branch.
       - `plans/multiplayer.md`: the open item "Review 1, 4" does not record
