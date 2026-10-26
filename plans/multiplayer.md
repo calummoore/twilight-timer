@@ -1,6 +1,6 @@
 # Multiplayer
 
-Status: Active. The work is on branch `calummoore/bootstrap-v23`, with no
+Status: Active. The work is on branch `calummoore/multiplayer-system-design`, with no
 pull request yet. The plan closes when its pull request merges.
 
 TI4 Tempo runs a Twilight Imperium game on one device. The game is an
