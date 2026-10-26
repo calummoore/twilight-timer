@@ -2059,16 +2059,25 @@ S.homeCode = {t:'Home — Unknown Code', note:
  h:homeScreen({typed:'7QK2HM', err:'No game has the code 7QK2HM. Check the code on a device in the game.'})};
 
 /* ── 13b. Opening a game ── */
-// A device that joined with a code or a link waits for the game. A link with a code that no game has says so.
-const openingScreen = (missing=false) => `<div class="space"></div><div class="lay">
-  <div class="top"><div class="round"><b>Join game</b> · <span class="num">${missing?'7QK2HM':CODE}</span></div><div class="spacer"></div>
+// A device that joined with a code or a link waits for the game. A link with a code that no game has says so. So do
+// a page that a reload did not bring to the version of the server, and a game that the server holds but cannot read.
+const OPENING = {
+  missing:    {code:'7QK2HM', h:'No game has this code',
+               s:'Check the code on a device in the game, and join again from Home.', b:'HOME'},
+  outdated:   {h:'A new version is live', s:'Reload the page.', b:'RELOAD'},
+  unreadable: {h:'This game needs a newer version of the app',
+               s:'The game stays on the server. Open it again after the next update.', b:'HOME'},
+};
+const openingScreen = (state) => { const o = OPENING[state];
+  return `<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>Join game</b> · <span class="num">${o?.code ?? CODE}</span></div><div class="spacer"></div>
     <button class="ibtn">✕ Cancel</button></div>
-  <div class="content open-wait"><div class="open-card">${missing
-    ? `<div class="h1" style="font-size:25px">No game has this code</div>
-      <div class="h1s">Check the code on a device in the game, and join again from Home.</div>
-      <button class="big lg" style="width:100%">HOME</button>`
+  <div class="content open-wait"><div class="open-card">${o
+    ? `<div class="h1" style="font-size:25px">${o.h}</div>
+      <div class="h1s">${o.s}</div>
+      <button class="big lg" style="width:100%">${o.b}</button>`
     : `<div class="lobby-wait"><i></i>Opening the game</div>`}
-  </div></div></div>`;
+  </div></div></div>`; };
 
 S.opening = {t:'Opening a Game', note:
  `The screen between Join game, or a link, and the game. The device connects to the game on the server, and the claim screen, the lobby, or the running game replaces this line as soon as the game arrives. A device that cannot reach the server stays here and tries again on its own. <b>Cancel</b> goes back to Home.`,
@@ -2080,7 +2089,19 @@ S.openingMissing = {t:'Opening a Game — No Such Code', note:
  `A link or a QR code with a code that no game has. The device says so and offers <b>Home</b>, where the code can be typed again. Home asks the server before it opens a typed code, so this screen comes only from a link.`,
  mnote:
  `The card fills the width of the phone.`,
- h:openingScreen(true)};
+ h:openingScreen('missing')};
+
+S.openingOutdated = {t:'Opening a Game — New Version', note:
+ `The server runs a newer version of the app than this page. A page of another version reloads by itself once, with no question first, and returns to the same game, so the players see this screen only when that reload did not bring the new version, for example from an old cache. The page then stops here instead of reloading again. <b>Reload</b> reloads the page. A device that has the game open shows this screen in place of the game.`,
+ mnote:
+ `The card fills the width of the phone.`,
+ h:openingScreen('outdated')};
+
+S.openingUnreadable = {t:'Opening a Game — Needs a Newer Version', note:
+ `The server holds the game, but this version of the app cannot read it, for example after a faulty update. The server keeps the game as it is and never puts another game under its code, so the record stays safe. Every device in the game shows this screen, also a device that has the game open, and the game stays in Recent games. <b>Home</b> goes back to Home. When a version that can read the game is live, the game opens again from Recent games or with its code.`,
+ mnote:
+ `The card fills the width of the phone.`,
+ h:openingScreen('unreadable')};
 
 /* ── 14. Claim seat ── */
 // A device that joined with the code or the link. Jaz's phone takes Jaz's seat. A seat that another device holds
@@ -2198,7 +2219,7 @@ S.players = {t:'Players & Devices', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
+  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.

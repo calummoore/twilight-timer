@@ -1,4 +1,3 @@
-import { parseCode } from './code'
 import {
   act,
   pause,
@@ -12,23 +11,20 @@ import { derive } from './derive'
 import {
   adminsAway,
   memberOf,
-  parseMember,
-  parseToken,
   publicDevice,
   setAdmin,
   takeSeat,
   type Member,
 } from './devices'
-import { parseGame } from './parse'
-import { isFields, listOf, type Fields } from './parse-fields'
 import type { Command, RoomState, ServerMessage } from './protocol'
 import { mayCommand } from './rights'
-import { parseSetup, type Setup } from './setup'
+import type { Setup } from './setup'
 import type { Game } from './types'
 
 /**
  * One game on the server, under its join code: the setup, the game from
- * Start game on, and the devices. The server stores it as one value.
+ * Start game on, and the devices. The server stores it as one value, which
+ * `room-storage.ts` reads.
  */
 export interface Room {
   version: 2
@@ -173,44 +169,17 @@ export function roomState(
   return { code, revision, setup, game, devices, adminsAway: away }
 }
 
-/** The state message for the device of `token`. */
+/** The state message for the device of `token`, from a server of `build`. */
 export function stateMessage(
   room: Room,
   connected: ReadonlySet<string>,
   token: string | null,
   serverTime: number,
+  build: string,
 ): ServerMessage {
   const you =
     token === null ? null : (memberOf(room.members, token)?.id ?? null)
   const creator = token !== null && token === room.creator
   const state = roomState(room, connected)
-  return { type: 'state', serverTime, you, creator, room: state }
-}
-
-/**
- * Reads a stored room of version 1 or 2. The game inside has its own version,
- * which the game parser reads. Returns null when the room is not valid.
- */
-export function parseRoom(raw: unknown): Room | null {
-  if (!isFields(raw) || (raw.version !== 1 && raw.version !== 2)) return null
-  const code = typeof raw.code === 'string' ? parseCode(raw.code) : null
-  const setup = parseSetup(raw.setup)
-  const game = raw.game === null ? null : parseGame(raw.game)
-  const members = listOf(raw.members, parseMember)
-  const creator = parseCreator(raw)
-  const { revision } = raw
-  if (!code || code !== raw.code || !setup || !members) return null
-  if (creator === undefined) return null
-  if (!Number.isSafeInteger(revision) || typeof revision !== 'number') {
-    return null
-  }
-  if (revision < 0 || (game === null && raw.game !== null)) return null
-  return { version: 2, code, revision, setup, game, members, creator }
-}
-
-/** The creator of a stored room, or undefined when it is not valid. */
-function parseCreator(raw: Fields): string | null | undefined {
-  // The creator of a room of version 1 joined when it created the room.
-  if (raw.version === 1 || raw.creator === null) return null
-  return parseToken(raw.creator) ?? undefined
+  return { build, type: 'state', serverTime, you, creator, room: state }
 }

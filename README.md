@@ -34,6 +34,7 @@ in the futex account. The app opens at https://ti4.nexus; see
 - Each game lives on the server under a join code, with a QR code and a link
   to open or copy.
   Every device shows every tap at once, and a reload returns to the game.
+  After an update of the app, every open device reloads into its game.
 - Each screen has its own address, such as `/new` or `/game/<code>/players`,
   so Back, a reload, and a link open the same screen. See
   [Addresses](docs/product/addresses.md).
@@ -79,6 +80,13 @@ The GitHub Actions workflow `.github/workflows/ci.yml` runs `npm run check` on
 every pull request and on every push to `main`. On a push to `main`, it then
 runs `npm run deploy`. The deploy uploads the Worker, its Durable Object
 migrations, and the static assets in one step.
+
+Each build gets a build id: the first seven characters of `GITHUB_SHA` in
+CI, else a timestamp of the build. The page and the Worker of one build
+carry the same id. After a deploy, an open page of the old build reloads
+once and returns to its game, as
+[New versions](docs/product/versions.md) says. A local build
+gets a new id each time, and `npm run dev` keeps one id while it runs.
 
 `wrangler.jsonc` configures the Worker: the entry `worker/index.ts`, the
 Durable Object binding `GAMES` with its migrations, and the assets. The
@@ -170,6 +178,11 @@ is deleted. If the pull request opens again, the next run makes a new preview.
 
 ## Key code
 
+Every stored shape has its own version and its own upgrade chain, which
+runs when the shape is read. The page and the server send each other only
+the shapes of one build. `AGENTS.md` gives the rules under Stored shapes and
+versions.
+
 - `src/model/` holds the game as a pure fold over an append-only action log.
   - `types.ts`: the actions, the stored game, and the timed entries.
   - `factions.ts`: the official factions and the ids that saved games store,
@@ -193,29 +206,41 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   - `routes.ts`: the address of each screen, the join link, the game that a
     new visit to Home opens, and the screen that a game address shows to a
     device that joined or not.
-  - `connection.ts`: the offset to the server clock, and the waits between
-    the tries after a lost connection.
+  - `connection.ts`: the offset to the server clock, the waits between the
+    tries after a lost connection, and the reload guard of a page of another
+    build.
   - `code.ts`: the join codes.
   - `devices.ts`: the devices of a game, the seat takeover, and the
     last-admin rule.
   - `rights.ts`: who may tap what. The server and the screens call it.
   - `protocol.ts`: the messages between a device and the server, with their
-    parsers.
-  - `room.ts` and `setup.ts`: one game on the server, its reducer, and its
-    stored shape.
+    parsers. Every message from the server, and the hello of a page, names
+    its build first.
+  - `receive.ts`: what the server does with each message of a device: a
+    hello or a command of another build gets the outdated message.
+  - `room.ts` and `setup.ts`: one game on the server and its reducer.
+    `room-storage.ts` reads its stored shape, with the upgrade chain of the
+    room, into no room, a room, or a room that cannot be read.
+  - `fixtures/`: one stored shape of each version from game version 6 and
+    room version 1 on, as its build wrote it. `fixtures.test.ts` loads each
+    one and checks its clocks.
 - `worker/` holds the Worker.
   - `index.ts`: the routes. `POST /api/games` creates a game from a setup,
     `GET /api/games/<code>` looks a code up, and
     `GET /api/games/<code>/socket` opens the socket of a game.
   - `game-room.ts`: the Durable Object of one game. It applies each command
     with the model and its own clock, saves the room, and sends the state to
-    every socket. Its sockets use the WebSocket Hibernation API.
+    every socket. Its sockets use the WebSocket Hibernation API. It never
+    stores a new room over one that it cannot read.
 - `src/App.tsx` shows the screen of the address: Home, the setup, or the
   game of one code. `src/ui/useRoute.ts` keeps the address, the screen, and
   the history of the browser in step.
-- `src/ui/useGameClient.ts` owns the socket of a game: hello, the state, the
-  server clock, pings, and the reconnect. `src/ui/api.ts` creates a game and
-  looks a code up.
+- `src/build.ts` holds the build id, which `vite.config.ts` puts into the
+  page and the Worker.
+- `src/ui/useGameClient.ts` holds the game of one code for the screens.
+  `src/ui/gameSocket.ts` owns its socket: hello, the state, the server
+  clock, pings, the reconnect, and the reload of a page of another build.
+  `src/ui/api.ts` creates a game and looks a code up.
 - `src/ui/RoomScreen.tsx` shows one game: the opening line, the lobby, or the
   running game with Players & devices over it.
 - `src/ui/GameScreen.tsx` connects the model to the screens. Every control

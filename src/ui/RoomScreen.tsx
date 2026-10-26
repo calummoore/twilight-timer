@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import type { RecentGame } from '../model/device-store'
-import type { Command } from '../model/protocol'
+import { NOTICES, type Command } from '../model/protocol'
 import { mayCommand } from '../model/rights'
 import {
   routePath,
@@ -72,11 +72,18 @@ export function RoomScreen(props: {
     onSeen({ code, ...summary, seenAt: Date.now() })
   }, [code, joined, summary, onSeen])
 
-  if (status === 'missing') {
-    return <OpeningScreen code={code} missing onHome={props.onHome} />
-  }
-  if (!room || !summary) {
-    return <OpeningScreen code={code} missing={false} onHome={props.onHome} />
+  // A notice of the server ends the connection. The game stays in the recent
+  // games of the device.
+  const notice = NOTICES.find((n) => n === status) ?? null
+  if (notice || !room || !summary) {
+    return (
+      <OpeningScreen
+        code={code}
+        notice={notice}
+        onHome={props.onHome}
+        onReload={() => location.reload()}
+      />
+    )
   }
 
   const panel = route.screen === 'game' ? route.panel : null
