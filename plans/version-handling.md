@@ -1,7 +1,7 @@
 # Version handling
 
-Status: Active. On branch `calummoore/protocol-version-handling`, no pull
-request yet. The plan closes when its PR merges.
+Status: Active. [PR #30](https://github.com/calummoore/twilight-timer/pull/30)
+is open. The plan closes when its PR merges.
 
 TI4 Nexus keeps each game in a room on the server, in one Cloudflare
 Durable Object per join code. After each change, the server sends every
@@ -273,7 +273,7 @@ Tags: ui
       `docs/product/versions.md`, because `docs/product/multiplayer.md`
       passed 250 lines. Update its links. The merge and its conflicts:
       `.context/version-handling/merge-justification.md`, merge 2.
-- [ ] Open the pull request when every other milestone TODO is ticked.
+- [x] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 
 ## Post-merge follow-up (non-blocking)
