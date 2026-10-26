@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { startGame } from './commands'
 import { derive } from './derive'
 import { DEFAULT_SETTINGS } from './settings'
-import { archiveGame, loadGame, loadLastGame, saveGame } from './storage'
-import { gameOf, memoryStore } from './test-store'
+import { forgetGame, forgetLastGame, loadGame, loadLastGame } from './storage'
+import { onServer } from './test-room'
+import { gameOf, memoryStore, storeGame } from './test-store'
 import {
   asVersion1,
   asVersion2,
@@ -60,7 +61,7 @@ describe('saved games of older versions', () => {
     ])
   })
 
-  it('loads a version 2 game as it was saved and moves it to the version 6 keys', () => {
+  it('loads a version 2 game as it was saved, and forgets it after the upload', () => {
     const store = memoryStore()
     const t = table(DEFAULT_SETTINGS, 'jaz', NAALU_PLAYERS)
     playStrategy(t)
@@ -73,9 +74,9 @@ describe('saved games of older versions', () => {
     const saved = { ...t.game, windowEndsTurn: false }
     expect(gameOf(loadGame(store))).toEqual(saved)
     expect(gameOf(loadLastGame(store))).toEqual(saved)
-    saveGame(store, saved)
-    archiveGame(store)
-    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v6'])
+    forgetGame(store)
+    forgetLastGame(store)
+    expect(store.data.size).toBe(0)
   })
 
   it.each([
@@ -136,20 +137,23 @@ describe('saved games of older versions', () => {
     ['3', asVersion3],
     ['4', asVersion4],
     ['5', asVersion5],
-  ])('moves a version %s game to the version 6 keys', (version, shape) => {
-    const store = memoryStore()
-    const old = JSON.stringify(shape(olderTable().game))
-    store.data.set(`ti4tempo.game.v${version}`, old)
-    store.data.set(`ti4tempo.lastGame.v${version}`, old)
-    const game = gameOf(loadGame(store))
-    expect(gameOf(loadLastGame(store))).toEqual(game)
-    saveGame(store, game)
-    expect(store.data.has(`ti4tempo.game.v${version}`)).toBe(false)
-    expect(gameOf(loadGame(store))).toEqual(game)
-    archiveGame(store)
-    expect([...store.data.keys()]).toEqual(['ti4tempo.lastGame.v6'])
-    expect(gameOf(loadLastGame(store))).toEqual(game)
-  })
+  ])(
+    'continues a version %s game on the server, and forgets it',
+    (version, shape) => {
+      const store = memoryStore()
+      const old = JSON.stringify(shape(olderTable().game))
+      store.data.set(`ti4tempo.game.v${version}`, old)
+      store.data.set(`ti4tempo.lastGame.v${version}`, old)
+      const game = gameOf(loadGame(store))
+      expect(gameOf(loadLastGame(store))).toEqual(game)
+      expect(onServer(game)).toEqual(game)
+      forgetGame(store)
+      expect(store.data.has(`ti4tempo.game.v${version}`)).toBe(false)
+      expect(gameOf(loadLastGame(store))).toEqual(game)
+      forgetLastGame(store)
+      expect(store.data.size).toBe(0)
+    },
+  )
 
   it('rejects a version 4 to 6 game without a valid window rule', () => {
     const store = memoryStore()
@@ -183,8 +187,7 @@ describe('saved games of older versions', () => {
     store.data.set('ti4tempo.game.v4', JSON.stringify(early))
     const game = gameOf(loadGame(store))
     expect(game).toEqual({ ...t.game, windowEndsTurn: false })
-    saveGame(store, game)
-    expect(loadGame(store)).toEqual({ status: 'ok', game })
+    expect(onServer(game)).toEqual(game)
   })
 
   it('loads a version 4 game, which logged no card for a strategic action', () => {
@@ -192,7 +195,7 @@ describe('saved games of older versions', () => {
     const t = table()
     playStrategy(t)
     t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
-    saveGame(store, t.game)
+    storeGame(store, t.game)
     expect(gameOf(loadGame(store))).toEqual(t.game)
     // A version 6 strategic action needs a card field. Only an upgraded game
     // from an older build holds a null card.
@@ -210,7 +213,7 @@ describe('saved games of older versions', () => {
     })
   })
 
-  it('loads an older game again after the app saves it', () => {
+  it('keeps an older game the same after the server stores it', () => {
     const t = table()
     playStrategy(t)
     t.act({ kind: 'strategyCardPlayed', card: 1 }) // Tom plays Leadership
@@ -225,8 +228,7 @@ describe('saved games of older versions', () => {
       const store = memoryStore()
       store.data.set(`ti4tempo.game.${key}`, JSON.stringify(old))
       const game = gameOf(loadGame(store))
-      saveGame(store, game)
-      expect(loadGame(store)).toEqual({ status: 'ok', game })
+      expect(onServer(game)).toEqual(game)
     }
   })
 })

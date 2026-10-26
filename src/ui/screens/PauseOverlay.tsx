@@ -10,6 +10,8 @@ const CHOICES: (PauseReason | null)[] = [null, ...PAUSE_REASONS]
 /** The pause card over the whole stage: the pause clock, the reason, and Resume. */
 export function PauseOverlay(props: {
   pause: PauseView
+  /** The reason and Resume belong to admin devices. */
+  canChange: boolean
   onReason: (reason: PauseReason | null) => void
   onResume: () => void
 }) {
@@ -31,6 +33,7 @@ export function PauseOverlay(props: {
                 key={reason ?? 'plain'}
                 className={on ? 'on' : undefined}
                 aria-pressed={on}
+                disabled={!props.canChange}
                 onClick={() => props.onReason(reason)}
               >
                 {reasonLabel(reason)}
@@ -46,7 +49,11 @@ export function PauseOverlay(props: {
             </>
           )}
         </div>
-        <button className="big small" onClick={props.onResume}>
+        <button
+          className="big small"
+          disabled={!props.canChange}
+          onClick={props.onResume}
+        >
           RESUME
         </button>
       </div>

@@ -16,6 +16,8 @@ const COLUMNS = {
 
 export function StatsScreen(props: {
   game: GameView
+  /** Reopening takes back the end of the game, so it needs an admin. */
+  canReopen: boolean
   onUndo: () => void
   onNewGame: () => void
 }) {
@@ -70,7 +72,11 @@ export function StatsScreen(props: {
           <b>Game complete</b> · {plural(stats.rounds, 'round')}
         </div>
         <div className="spacer" />
-        <button className="ibtn" onClick={props.onUndo}>
+        <button
+          className="ibtn"
+          disabled={!props.canReopen}
+          onClick={props.onUndo}
+        >
           ↺ Reopen game
         </button>
         <button className="ibtn" onClick={props.onNewGame}>

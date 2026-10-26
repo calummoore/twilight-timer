@@ -4,18 +4,20 @@ import type { Player } from '../../model/types'
 import type { GameView, ReactionView, SpeakerChoice } from '../../model/view'
 import { pc } from '../colour'
 import { clock, timerText } from '../format'
+import type { Rights } from '../rights'
 
 const EXTEND_MS = 60_000
 
 export function ReactionOverlay(props: {
   game: GameView
   reaction: ReactionView
+  rights: Rights
   onDone: (playerId: string) => void
   onExtend: (ms: number) => void
   onSpeaker: (playerId: string) => void
   onClose: () => void
 }) {
-  const { game, reaction: r } = props
+  const { game, reaction: r, rights } = props
   const byId = new Map(game.players.map((p) => [p.id, p]))
   const by = byId.get(r.byId)
   const seated = game.seated.includes(r.byId)
@@ -72,6 +74,7 @@ export function ReactionOverlay(props: {
           <SpeakerRow
             choice={r.speakerChoice}
             byId={byId}
+            may={(playerId) => rights.may({ kind: 'speakerMoved', playerId })}
             onSpeaker={props.onSpeaker}
           />
         )}
@@ -103,6 +106,12 @@ export function ReactionOverlay(props: {
                 ) : (
                   <button
                     className="tapme"
+                    disabled={
+                      !rights.may({
+                        kind: 'reactionDone',
+                        playerId: tile.playerId,
+                      })
+                    }
                     onClick={() => props.onDone(tile.playerId)}
                   >
                     MARK DONE
@@ -134,11 +143,21 @@ export function ReactionOverlay(props: {
           </div>
           <div className="spacer" />
           {r.limitMs !== null && (
-            <button className="ibtn" onClick={() => props.onExtend(EXTEND_MS)}>
+            <button
+              className="ibtn"
+              disabled={
+                !rights.may({ kind: 'reactionExtended', ms: EXTEND_MS })
+              }
+              onClick={() => props.onExtend(EXTEND_MS)}
+            >
               ＋ Add 1:00
             </button>
           )}
-          <button className="big small" onClick={props.onClose}>
+          <button
+            className="big small"
+            disabled={!rights.may({ kind: 'reactionClosed' })}
+            onClick={props.onClose}
+          >
             MARK ALL DONE
           </button>
         </div>
@@ -159,6 +178,8 @@ function clockLabel(limitMs: number | null, over: boolean): string {
 function SpeakerRow(props: {
   choice: SpeakerChoice
   byId: Map<string, Player>
+  /** Whether this device may hand the token to the player. */
+  may: (playerId: string) => boolean
   onSpeaker: (playerId: string) => void
 }) {
   const { choice, byId } = props
@@ -185,7 +206,7 @@ function SpeakerRow(props: {
               className={`spkopt ${on ? 'on' : ''}`}
               style={pc(p?.colour)}
               aria-pressed={on}
-              disabled={on}
+              disabled={on || !props.may(id)}
               onClick={() => props.onSpeaker(id)}
             >
               <i />

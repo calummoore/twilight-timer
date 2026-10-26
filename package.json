@@ -13,13 +13,16 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "check": "npm run lint && npm run format:check && npm run test && npm run build",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy --config dist/twilight_timer/wrangler.json",
+    "types": "wrangler types"
   },
   "dependencies": {
+    "qrcode.react": "^4.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.65.0",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",

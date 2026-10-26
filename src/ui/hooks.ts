@@ -20,6 +20,22 @@ export function useClock(intervalMs: number): [number, () => void] {
   return [now, refresh]
 }
 
+/**
+ * A confirm that belongs to the state of the game on which it opened. It
+ * shows while the game keeps that revision. A tap on any device closes it for
+ * good, because revisions only grow, and the server would drop its tap.
+ */
+export function useConfirm<T>(
+  revision: number,
+): [T | null, (value: T | null) => void] {
+  const [open, setOpen] = useState<{ revision: number; value: T } | null>(null)
+  const set = useCallback(
+    (value: T | null) => setOpen(value === null ? null : { revision, value }),
+    [revision],
+  )
+  return [open?.revision === revision ? open.value : null, set]
+}
+
 /** Keeps the screen on. The browser drops the lock when the tab hides. */
 export function useWakeLock(enabled: boolean): void {
   useEffect(() => {

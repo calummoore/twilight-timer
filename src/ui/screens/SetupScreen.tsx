@@ -20,14 +20,15 @@ const COUNTS = Array.from(
 
 export function SetupScreen(props: {
   settings: Settings
-  notice: string | null
-  canLoadLast: boolean
-  onDismissNotice: () => void
-  onLoadLast: () => void
+  /** Create game waits for the server. */
+  creating: boolean
+  /** The last Create game did not reach the server. */
+  failed: boolean
+  onBack: () => void
   onSettings: () => void
   /** Saves changed settings, for example the expansions in play. */
   onSettingsChange: (settings: Settings) => void
-  onBegin: (players: Player[], speakerId: string) => void
+  onCreate: (players: Player[], speakerId: string) => void
 }) {
   const { expansions } = props.settings
   const [count, setCount] = useState(DEFAULT_PLAYERS)
@@ -101,14 +102,14 @@ export function SetupScreen(props: {
     else if (speaker === j) setSpeaker(i)
   }
 
-  const begin = () => {
+  const create = () => {
     const players = seats.map((row, i) => ({
       id: `p${i + 1}`,
       name: nameOf(i),
       colour: row.colour,
       factionId: row.factionId,
     }))
-    props.onBegin(players, `p${speaker + 1}`)
+    props.onCreate(players, `p${speaker + 1}`)
   }
 
   return (
@@ -118,11 +119,9 @@ export function SetupScreen(props: {
           <b>New Game</b>
         </div>
         <div className="spacer" />
-        {props.canLoadLast && (
-          <button className="ibtn" onClick={props.onLoadLast}>
-            Load last game
-          </button>
-        )}
+        <button className="ibtn" onClick={props.onBack}>
+          ✕ Back
+        </button>
         <button
           className="ibtn"
           onClick={props.onSettings}
@@ -134,14 +133,6 @@ export function SetupScreen(props: {
       <div className="content">
         <div className="setup-grid">
           <div className="col">
-            {props.notice && (
-              <div className="notice">
-                {props.notice}
-                <button className="ibtn" onClick={props.onDismissNotice}>
-                  Dismiss
-                </button>
-              </div>
-            )}
             <div>
               <div className="setup-label">
                 Players · in seat order, clockwise around the table
@@ -185,9 +176,11 @@ export function SetupScreen(props: {
             naaluName={naalu < 0 ? null : nameOf(naalu)}
             factionsMissing={factionsMissing}
             settings={props.settings}
+            creating={props.creating}
+            failed={props.failed}
             onExpansions={changeExpansions}
             onDeal={deal}
-            onBegin={begin}
+            onCreate={create}
           />
         </div>
       </div>

@@ -47,3 +47,33 @@ export function timerText(
     ? { text: `+${clock(elapsedMs - limitMs)}`, over }
     : { text: countdown(limitMs - elapsedMs), over }
 }
+
+const DAY_MS = 86_400_000
+
+/**
+ * When a device last saw a game: "Today", "Yesterday", the weekday within a
+ * week, else the date. In the time zone of the device.
+ */
+export function dayLabel(at: number, now: number): string {
+  const day = (t: number) => {
+    const d = new Date(t)
+    return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY_MS
+  }
+  const ago = day(now) - day(at)
+  if (ago <= 0) return 'Today'
+  if (ago === 1) return 'Yesterday'
+  if (ago < 7) {
+    return new Date(at).toLocaleDateString('en-GB', { weekday: 'long' })
+  }
+  const sameYear = new Date(at).getFullYear() === new Date(now).getFullYear()
+  return dateLabel(at, !sameYear)
+}
+
+/** "12 October", or "12 October 2025" with the year. */
+export function dateLabel(at: number, year = false): string {
+  return new Date(at).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    ...(year ? { year: 'numeric' } : {}),
+  })
+}

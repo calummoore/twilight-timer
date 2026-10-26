@@ -1,6 +1,7 @@
 import {
   ALARM_SOUNDS,
   type AlarmSound,
+  type LimitSettings,
   type Settings,
 } from '../../model/settings'
 import type { TimerKey } from '../../model/types'
@@ -43,20 +44,33 @@ const SOUND_NAMES: Record<AlarmSound, string> = {
   beep: 'Beep',
 }
 
+/**
+ * The settings in two groups. The time limits belong to the game, so every
+ * device follows them and only an admin device changes them. The alarm and
+ * the display belong to this device.
+ */
 export function SettingsScreen(props: {
+  /** The settings of this device. */
   settings: Settings
   onChange: (settings: Settings) => void
+  /** The time limits of the game, or of the next game before it exists. */
+  limits: LimitSettings
+  /** Changes the time limits. Absent when this device may not. */
+  onLimits?: (limits: LimitSettings) => void
+  /** Before a game: the limits are the ones that the next game starts with. */
+  beforeGame?: boolean
+  /** In a game: End game, which needs an admin device. */
+  endGame?: { allowed: boolean; onEnd: () => void }
   onClose: () => void
-  onEndGame?: () => void
 }) {
-  const { settings, onChange } = props
+  const { settings, onChange, limits, onLimits } = props
   const set = (patch: Partial<Settings>) => onChange({ ...settings, ...patch })
+  const locked = !onLimits
+  const setLimits = (patch: Partial<LimitSettings>) =>
+    onLimits?.({ ...limits, ...patch })
   const setTimer = (key: TimerKey, patch: { on?: boolean; ms?: number }) =>
-    set({
-      limits: {
-        ...settings.limits,
-        [key]: { ...settings.limits[key], ...patch },
-      },
+    setLimits({
+      limits: { ...limits.limits, [key]: { ...limits.limits[key], ...patch } },
     })
 
   return (
@@ -66,8 +80,12 @@ export function SettingsScreen(props: {
           <b>Settings</b>
         </div>
         <div className="spacer" />
-        {props.onEndGame && (
-          <button className="ibtn warnish" onClick={props.onEndGame}>
+        {props.endGame && (
+          <button
+            className="ibtn warnish"
+            disabled={!props.endGame.allowed}
+            onClick={props.endGame.onEnd}
+          >
             End game
           </button>
         )}
@@ -76,6 +94,11 @@ export function SettingsScreen(props: {
         </button>
       </div>
       <div className="content">
+        <div className="setup-label">
+          {props.beforeGame
+            ? 'New game · the limits it starts with'
+            : 'Game · every device follows these'}
+        </div>
         <div className="master">
           <div style={{ flex: 1 }}>
             <div className="lb">Enforce time limits</div>
@@ -85,14 +108,15 @@ export function SettingsScreen(props: {
           </div>
           <Toggle
             label="Enforce time limits"
-            on={settings.enforceLimits}
-            onChange={(enforceLimits) => set({ enforceLimits })}
+            on={limits.enforceLimits}
+            disabled={locked}
+            onChange={(enforceLimits) => setLimits({ enforceLimits })}
           />
         </div>
         <div className="pnl">
           <div className="pnl-h">Timers</div>
           {TIMERS.map(({ key, label, about }) => {
-            const limit = settings.limits[key]
+            const limit = limits.limits[key]
             return (
               <div key={key} className={`set-row ${limit.on ? '' : 'off'}`}>
                 <div className="txt">
@@ -103,26 +127,31 @@ export function SettingsScreen(props: {
                   <DurationStepper
                     label={label}
                     ms={limit.ms}
+                    disabled={locked}
                     onChange={(ms) => setTimer(key, { ms })}
                   />
                 </div>
                 <Toggle
                   label={label}
                   on={limit.on}
+                  disabled={locked}
                   onChange={(on) => setTimer(key, { on })}
                 />
               </div>
             )
           })}
         </div>
-        <div className="pnl" style={{ marginTop: 16 }}>
-          <div className="pnl-h">When time is up</div>
+        <div className="setup-label" style={{ marginTop: 26 }}>
+          This device
+        </div>
+        <div className="pnl">
+          <div className="pnl-h">Alarm</div>
           <div className="set-row">
             <div className="txt">
               <div className="lb">Alarm sound</div>
               <div className="ds">
-                The clock turns red and counts overtime. Nothing ends on its
-                own.
+                Sounds on this device when a limit passes. The clock turns red
+                and counts overtime. Nothing ends on its own.
               </div>
             </div>
             <div className="ctl" style={{ display: 'flex', gap: 8 }}>

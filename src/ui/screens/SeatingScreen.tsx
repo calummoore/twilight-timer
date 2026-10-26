@@ -26,6 +26,9 @@ export function SeatingScreen(props: {
   pickOrder: string[]
   voteOrder: string[]
   canUndo: boolean
+  /** Whether this device may hand the speaker token to the player. */
+  maySpeaker: (playerId: string) => boolean
+  canRemove: boolean
   onSpeaker: (playerId: string) => void
   onRemove: (playerId: string) => void
   onUndo: () => void
@@ -66,7 +69,7 @@ export function SeatingScreen(props: {
         <div className="spacer" />
         <button
           className="ibtn"
-          disabled={props.seated.length < 2}
+          disabled={props.seated.length < 2 || !props.canRemove}
           onClick={() => setRemoving(true)}
         >
           Remove a player
@@ -116,7 +119,7 @@ export function SeatingScreen(props: {
                       left: `${((CX + RX * Math.cos(angle)) / W) * 100}%`,
                       top: `${((CY + RY * Math.sin(angle)) / H) * 100}%`,
                     }}
-                    disabled={left !== undefined}
+                    disabled={left !== undefined || !props.maySpeaker(p.id)}
                     onClick={() => props.onSpeaker(p.id)}
                   >
                     {isSpeaker && <span className="tok">★</span>}

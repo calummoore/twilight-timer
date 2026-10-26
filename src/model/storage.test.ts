@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { startGame } from './commands'
 import { DEFAULT_SETTINGS } from './settings'
 import {
-  archiveGame,
+  forgetGame,
+  forgetLastGame,
   loadGame,
   loadLastGame,
   loadSettings,
-  saveGame,
   saveSettings,
 } from './storage'
-import { memoryStore } from './test-store'
+import { memoryStore, storeGame } from './test-store'
 import { NAALU_PLAYERS, PLAYERS, T0, table } from './test-table'
 
 /**
@@ -18,13 +18,13 @@ import { NAALU_PLAYERS, PLAYERS, T0, table } from './test-table'
  */
 
 describe('storage', () => {
-  it('saves and loads a game with its whole log', () => {
+  it('loads a saved game with its whole log', () => {
     const store = memoryStore()
     const t = table()
     t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
     t.act({ kind: 'playerRemoved', playerId: 'wren' })
     t.pause()
-    saveGame(store, t.game)
+    storeGame(store, t.game)
     expect(loadGame(store)).toEqual({ status: 'ok', game: t.game })
   })
 
@@ -54,13 +54,18 @@ describe('storage', () => {
     expect(loadGame(store)).toEqual({ status: 'invalid' })
   })
 
-  it('keeps the archived game as the last game', () => {
+  it('loads the last game, and forgets each saved game alone', () => {
     const store = memoryStore()
     const game = startGame(PLAYERS, 'jaz', DEFAULT_SETTINGS, T0)
-    saveGame(store, game)
-    archiveGame(store)
+    storeGame(store, game, 'ti4tempo.lastGame.v6')
     expect(loadGame(store)).toEqual({ status: 'none' })
     expect(loadLastGame(store)).toEqual({ status: 'ok', game })
+    storeGame(store, game)
+    forgetGame(store)
+    expect(loadGame(store)).toEqual({ status: 'none' })
+    expect(loadLastGame(store)).toEqual({ status: 'ok', game })
+    forgetLastGame(store)
+    expect(store.data.size).toBe(0)
   })
 
   it('rejects an unknown faction or token owner', () => {

@@ -1,18 +1,27 @@
-import { useState } from 'react'
 import { factionName } from '../../model/factions'
 import { cardName } from '../../model/rules'
 import type { GameView, PhaseView } from '../../model/view'
 import { pc } from '../colour'
-import { Dialog } from '../controls'
+import { Dialog, WaitLabel } from '../controls'
 import { clock } from '../format'
-import { isOver } from '../hooks'
+import { isOver, useConfirm } from '../hooks'
+import { whose, type Rights } from '../rights'
 import { InitiativeRail } from './InitiativeRail'
 
 type ActionView = Extract<PhaseView, { phase: 'action' }>
 
+/** A pass that waits for its confirm: the cards it warns about, and the tap. */
+interface PassAsk {
+  unplayed: string[]
+  onPass: () => void
+}
+
 export function ActionScreen(props: {
   game: GameView
   view: ActionView
+  /** The revision of the game, to which a confirm belongs. */
+  revision: number
+  rights: Rights
   showCumulative: boolean
   alarming: boolean
   onSilence: () => void
@@ -20,8 +29,10 @@ export function ActionScreen(props: {
   onPlayCard: (card: number) => void
   onPass: () => void
 }) {
-  const { game, view } = props
-  const [confirmPass, setConfirmPass] = useState(false)
+  const { game, view, rights } = props
+  // A tap on another device, such as the end of this turn, closes the
+  // confirm, so it cannot pass the next player.
+  const [confirm, setAsk] = useConfirm<PassAsk>(props.revision)
   const seat = game.players.findIndex((p) => p.id === view.activeId)
   const player = game.players[seat]
   const turn = game.timer?.kind === 'turn' ? game.timer : null
@@ -36,7 +47,9 @@ export function ActionScreen(props: {
   const unplayed = cards.filter((c) => !c.played).map((c) => cardName(c.card))
 
   const pass = () =>
-    unplayed.length === 0 ? props.onPass() : setConfirmPass(true)
+    unplayed.length === 0
+      ? props.onPass()
+      : setAsk({ unplayed, onPass: props.onPass })
 
   return (
     <div className="body">
@@ -96,15 +109,24 @@ export function ActionScreen(props: {
         <div className={`acts ${cards.length > 1 ? 'two' : ''}`}>
           <button
             className={`big ${over ? 'red' : ''}`}
+            disabled={!rights.may({ kind: 'turnEnded' })}
             onClick={props.onEndTurn}
           >
+            <WaitLabel
+              waitsFor={rights.waits(
+                { kind: 'turnEnded' },
+                whose(player?.name, 'turn'),
+              )}
+            />
             END TURN
           </button>
           {cards.map(({ card, played }) => (
             <button
               key={card}
               className="sec hl"
-              disabled={played}
+              disabled={
+                played || !rights.may({ kind: 'strategyCardPlayed', card })
+              }
               onClick={() => props.onPlayCard(card)}
             >
               <span className="k">Strategic action</span>
@@ -115,6 +137,7 @@ export function ActionScreen(props: {
           ))}
           <button
             className={`sec ${unplayed.length === 0 ? '' : 'muted'}`}
+            disabled={!rights.may({ kind: 'passed' })}
             onClick={pass}
           >
             <span className="k">
@@ -133,20 +156,20 @@ export function ActionScreen(props: {
         view={view}
         showCumulative={props.showCumulative}
       />
-      {confirmPass && (
+      {confirm && (
         <Dialog
-          title={`Pass before playing ${unplayed.join(' and ')}?`}
+          title={`Pass before playing ${confirm.unplayed.join(' and ')}?`}
           confirm={{
             label: 'Pass anyway',
             danger: true,
             onConfirm: () => {
-              setConfirmPass(false)
-              props.onPass()
+              setAsk(null)
+              confirm.onPass()
             },
           }}
-          onCancel={() => setConfirmPass(false)}
+          onCancel={() => setAsk(null)}
         >
-          {unplayed.length > 1
+          {confirm.unplayed.length > 1
             ? 'The rules say a player passes only after both strategic actions.'
             : 'The rules say a player passes only after their strategic action.'}{' '}
           Pass anyway if the table agrees.

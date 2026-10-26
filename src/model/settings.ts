@@ -20,6 +20,9 @@ export interface Settings {
   expansions: Expansions
 }
 
+/** The time limits of a game: the master switch and each limit. */
+export type LimitSettings = Pick<Settings, 'enforceLimits' | 'limits'>
+
 /** Every expansion starts on, so a table that never chooses sees them all. */
 export const DEFAULT_EXPANSIONS: Expansions = {
   pok: true,
@@ -45,6 +48,17 @@ export const DEFAULT_SETTINGS: Settings = {
   keepAwake: true,
   showCumulative: true,
   expansions: DEFAULT_EXPANSIONS,
+}
+
+/** The limits at the end of a log: the limits in force from now on. */
+export function limitsNow(log: readonly LimitsChange[]): LimitSettings {
+  const last = log.at(-1)
+  return last
+    ? { enforceLimits: last.enforce, limits: last.limits }
+    : {
+        enforceLimits: DEFAULT_SETTINGS.enforceLimits,
+        limits: DEFAULT_SETTINGS.limits,
+      }
 }
 
 /** The limit for a timer at wall-clock time `at`, or null for no limit. */

@@ -477,59 +477,84 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   box-shadow:0 16px 44px rgba(0,0,0,.6); font-size:13.5px}
 .undo-toast b{font-weight:650}
 
-/* join / qr */
+/* home: a new game, a join code, and the recent games of this device */
+.home-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.pad{padding:18px}
+.home-help{font-size:13px; color:var(--dim); line-height:1.6; margin-bottom:16px}
+.fld.code{font-size:26px; font-weight:800; letter-spacing:.3em; text-transform:uppercase; text-align:center; padding:14px; width:100%}
+.fld.code.empty{color:var(--faint); letter-spacing:.08em; font-weight:500; font-size:15px}
+.recent{display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center; padding:12px 15px;
+  border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16}
+.recent .code{font-size:17px; font-weight:800; letter-spacing:.12em}
+.recent .d{font-size:12.5px; color:var(--dim)}
+/* home: a line under the code field when the code does not open a game */
+.home-err{font-size:12.5px; color:var(--warn); line-height:1.5; margin-top:10px}
+/* home: a game that an older build saved on this device has no code yet */
+.recent.saved{grid-template-columns:1fr auto}
+/* a saved game that cannot be read */
+.notice{display:flex; align-items:center; gap:14px; background:#241408; border:1px solid #5b3a14; border-radius:11px;
+  padding:12px 15px; margin-bottom:14px; font-size:13px; color:#f0c489}
+.notice .ibtn{margin-left:auto}
+/* opening a game: one card in the middle while the device connects, or when no game has the code */
+.open-wait{display:grid; place-items:center}
+.open-card{width:min(460px,100%); text-align:center}
+.open-card .h1s{margin:8px 0 20px; line-height:1.5}
+
+/* claim seat: one row per seat, with the device that holds it */
+.claim-grid{display:grid; grid-template-columns:1fr 360px; gap:18px}
+.seat-pick{display:flex; align-items:center; gap:13px; padding:15px; border:1px solid var(--line2);
+  border-radius:13px; margin-bottom:10px; background:#0b111a; cursor:pointer}
+.seat-pick i{width:26px; height:26px; border-radius:8px; background:var(--pc); flex:none; font-style:normal}
+.seat-pick .nm{font-size:17px; font-weight:650}
+.seat-pick .fc{font-size:12px; color:var(--faint); margin-top:2px}
+.seat-pick .tk{margin-left:auto; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); text-align:right}
+.seat-pick .tk.held{color:var(--warn)}
+.seat-pick.you{border-color:var(--accent); background:#0a1a1c}
+.seat-pick.you .tk{color:var(--accent)}
+
+/* players & devices: the code, the link, the QR code, and the seats with their devices and requests */
 .qr{width:250px; height:250px; background:#fff; border-radius:14px; padding:14px; display:grid;
   grid-template-columns:repeat(25,1fr); grid-template-rows:repeat(25,1fr)}
 .qr u{background:#000; border-radius:1px}
 .joincode{font-size:52px; font-weight:800; letter-spacing:.14em; margin-top:6px}
-.dev-row{display:flex; align-items:center; gap:12px; padding:13px 15px; border:1px solid var(--line);
-  border-radius:11px; margin-bottom:8px; background:#0a0f16}
+.joinlink{font-size:15px; color:var(--dim); margin-top:12px; overflow-wrap:anywhere}
+.joinlink b{color:var(--txt); font-weight:600}
+.dev-row{display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center; padding:12px 15px;
+  border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16}
 .dev-row i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
 .dev-row .nm{font-size:15px; font-weight:650}
-.dev-row .st{margin-left:auto; font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase}
-.dev-row .st.ok{color:var(--ok)} .dev-row .st.no{color:var(--faint)}
+.dev-row .fc{font-size:11.5px; color:var(--faint); margin-top:2px}
+.dev-row .st{font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; text-align:right}
+.dev-row .st.ok{color:var(--ok)} .dev-row .st.no{color:var(--faint)} .dev-row .st.away{color:var(--warn)}
+.dev-row .adm{display:flex; align-items:center; justify-content:flex-end; gap:8px; min-width:96px;
+  font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+.dev-row.table{border-color:#2b4a58; background:#0c1620}
+.you-tag{font-size:9px; letter-spacing:.12em; text-transform:uppercase; padding:2px 7px; border-radius:20px; font-weight:700; white-space:nowrap;
+  background:var(--accent); color:#04211f; margin-left:8px; vertical-align:middle}
+/* the lobby: Start game on an admin device, and the waiting line on every other device */
+.lobby-help{flex:1; align-self:center; font-size:13px; color:var(--dim); line-height:1.5}
+.lobby-wait{flex:1; display:flex; align-items:center; justify-content:center; gap:10px; padding:18px;
+  border:1px dashed var(--line2); border-radius:13px; font-size:15px; color:var(--dim)}
+.lobby-wait i{width:9px; height:9px; border-radius:50%; background:var(--accent); font-style:normal; animation:blink 1.1s ease-in-out infinite}
 
-/* ─────────── phone ─────────── */
-.ph{position:absolute; inset:0; display:flex; flex-direction:column; padding:52px 20px 30px}
-.ph-top{display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--faint);
-  letter-spacing:.14em; text-transform:uppercase; flex:none; padding-bottom:14px}
-.ph h2{font-size:29px; font-weight:750; letter-spacing:-.02em}
-.ph .sub{font-size:14px; color:var(--dim); margin-top:8px; line-height:1.5}
-.ph-flood{position:absolute; inset:0; background:linear-gradient(170deg,color-mix(in srgb,var(--pc) 34%, #05070b) 0%, #05070b 62%)}
-.ph .card2{background:#0b111a; border:1px solid var(--line); border-radius:14px; padding:16px}
-.ph-clock{font-size:96px; font-weight:800; letter-spacing:-.05em; text-align:center; line-height:.92}
-.ph-clock.over{color:var(--danger)}
-.ph-btn{background:linear-gradient(180deg,#25d3c5,#12a89c); color:#032422; border:none; font-family:var(--f);
-  font-size:22px; font-weight:800; letter-spacing:.04em; padding:22px; border-radius:15px; width:100%;
-  box-shadow:0 7px 0 #0a5f58; cursor:pointer}
-.ph-btn.ghost{background:transparent; border:1px solid var(--line2); color:var(--txt); box-shadow:none; font-size:15px; padding:15px}
-.ph-btn.red{background:linear-gradient(180deg,#ff6b5e,#d63c30); color:#2a0704; box-shadow:0 7px 0 #7d211a}
-.ph-btn.big2{font-size:26px; padding:28px}
-.codebox{display:flex; gap:9px; justify-content:center; margin:26px 0}
-.codebox b{width:50px; height:64px; border:1px solid var(--line2); border-radius:11px; background:#0b111a;
-  display:grid; place-items:center; font-size:28px; font-weight:800}
-.codebox b.f{border-color:var(--accent); background:#0b1c1f}
-.seat-pick{display:flex; align-items:center; gap:13px; padding:15px; border:1px solid var(--line2);
-  border-radius:13px; margin-bottom:10px; background:#0b111a}
-.seat-pick i{width:26px; height:26px; border-radius:8px; background:var(--pc); flex:none; font-style:normal}
-.seat-pick .nm{font-size:17px; font-weight:650}
-.seat-pick .fc{font-size:12px; color:var(--faint); margin-top:2px}
-.seat-pick .tk{margin-left:auto; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
-.seat-pick.taken{opacity:.42}
-.seat-pick.you{border-color:var(--accent); background:#0a1a1c}
-.seat-pick.you .tk{color:var(--accent)}
-.mini-rail{display:flex; gap:6px; margin-top:14px}
-.mini-rail u{flex:1; height:5px; border-radius:3px; background:var(--pc); opacity:.3; display:block}
-.mini-rail u.on{opacity:1} .mini-rail u.p{opacity:.12}
-.ph-modal{position:absolute; inset:0; background:rgba(2,4,7,.86); backdrop-filter:blur(6px); display:flex;
-  align-items:flex-end; padding:20px}
-.ph-sheet{background:#121a24; border:1px solid var(--line2); border-radius:20px; padding:24px; width:100%}
-.ph-sheet h3{font-size:23px; font-weight:750}
-.ph-sheet p{font-size:14px; color:var(--dim); margin-top:10px; line-height:1.55}
-.warnbox{background:#241408; border:1px solid #5b3a14; border-radius:11px; padding:13px 15px; margin-top:16px;
-  font-size:13px; color:#f0c489; line-height:1.5}
-.ph-stat{display:flex; justify-content:space-between; align-items:baseline; padding:14px 0; border-bottom:1px solid var(--line)}
-.ph-stat span{font-size:14px; color:var(--dim)} .ph-stat b{font-size:22px; font-weight:750}
+/* the device chip in the top bar: the seat of this device, or Table */
+.top .chips{display:flex; gap:10px; flex-wrap:wrap}
+.ibtn.youb{color:var(--txt); border-color:color-mix(in srgb,var(--pc) 55%, var(--line2)); background:color-mix(in srgb,var(--pc) 12%, var(--panel2))}
+.ibtn.youb i{width:9px; height:9px; border-radius:50%; background:var(--pc); font-style:normal}
+.ibtn.youb.table{--pc:var(--accent)}
+
+/* a seated device: a disabled main control names the player that the game waits for */
+.big .k{display:block; font-size:11px; letter-spacing:.16em; text-transform:uppercase; opacity:.75; margin-bottom:4px; font-weight:800}
+.ibtn:disabled, .sec:disabled, .tile .tapme:disabled{opacity:.4; cursor:default}
+.sec.muted:disabled .k{color:var(--faint)}
+.tog:disabled, .tog.off{opacity:.4; cursor:default}
+
+/* the device has no connection: the bar under the top bar says so, and every control waits */
+.netbar{display:flex; align-items:center; justify-content:center; gap:10px; padding:9px 16px; flex:none; position:relative; z-index:5;
+  background:#1d160a; border-bottom:1px solid #4a3a1c; color:var(--warn); font-size:12.5px; font-weight:700; letter-spacing:.06em}
+.netbar i{width:9px; height:9px; border-radius:50%; background:var(--warn); font-style:normal; animation:blink 1.1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.offline .body, .offline .content, .offline .foot{opacity:.5; pointer-events:none}
 
 /* ─────────── app controls that the screens share, as the app draws them ─────────── */
 .overlay{position:fixed; inset:0; background:rgba(2,4,7,.87); backdrop-filter:blur(7px); display:grid; place-items:center; z-index:10;
@@ -620,7 +645,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   color:#a9b8c9; font-size:9px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; font-style:normal; line-height:1.3}
 
 /* ─────────── device frames ─────────── */
-/* Each table screen is drawn once. Its screen box plays the app's stage: it sits inside the device's safe area and is a
+/* Each screen is drawn once. Its screen box plays the app's stage: it sits inside the device's safe area and is a
    size container, and the queries below arrange the screen for it. Layout containment holds the fixed overlays inside
    it, as in the app. */
 .screen.table{container:app / size; contain:layout}
@@ -643,8 +668,10 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .top.game .round{grid-area:round}
   .top.game .phase-pill{grid-area:pill; justify-self:center}
   .top.game .gt{grid-area:gt}
-  .top.game .spkb{grid-area:spk; justify-self:start}
+  .top.game .chips{grid-area:spk; justify-self:start}
   .top.game .extra{grid-area:extra; justify-self:end}
+  .home-grid, .claim-grid{grid-template-columns:1fr}
+  .lay > .open-wait{flex:1 0 auto}
   .top.game .tools{grid-area:tools; gap:8px}
   .top.game .spacer{display:none}
   .content, .body, .scroll{overflow:visible; min-height:auto}
@@ -698,7 +725,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .top.game .round{font-size:11px}
   .top.game .ibtn{padding:9px 12px}
   .top.game .ibtn .word{display:none}
-  .top.game .spkb, .top.game .tools, .top.game .extra, .top.game .phase-pill{margin-top:10px}
+  .top.game .chips, .top.game .tools, .top.game .extra, .top.game .phase-pill{margin-top:10px}
+  .top.game .chips{gap:8px}
   .top.game .ph-now{display:inline}
   .top.game .gt{font-size:10.5px}
   .top.game .gt b{font-size:15px; margin-left:6px}
@@ -910,6 +938,14 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   /* join */
   .qr{width:206px; height:206px; padding:12px}
   .joincode{font-size:44px}
+  .joinlink{font-size:14px}
+  .dev-row{gap:9px; padding:11px 12px}
+  .dev-row .adm{min-width:0}
+  /* home: the code above the summary, and the button beside both */
+  .recent{grid-template-columns:1fr auto; gap:3px 12px}
+  .recent .code{grid-column:1}
+  .recent .ibtn{grid-row:1 / span 2; grid-column:2; align-self:center}
+  .foot .lobby-help{flex-basis:100%; text-align:center}
 
   /* dialogs open as a sheet at the bottom, and the pause overlay keeps Resume full width */
   .overlay.ask{place-items:end stretch}
@@ -1048,39 +1084,65 @@ const railRow = p => {
 /* solid gear with eight teeth and a round hole, in a 24x24 box */
 const GEAR = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M9.9 4L10.1 1.2L13.9 1.2L14.1 4L16.2 4.8L18.3 3L21 5.7L19.2 7.8L20 9.9L22.8 10.1L22.8 13.9L20 14.1L19.2 16.2L21 18.3L18.3 21L16.2 19.2L14.1 20L13.9 22.8L10.1 22.8L9.9 20L7.8 19.2L5.7 21L3 18.3L4.8 16.2L4 14.1L1.2 13.9L1.2 10.1L4 9.9L4.8 7.8L3 5.7L5.7 3L7.8 4.8ZM15.3 12a3.3 3.3 0 1 0 -6.6 0a3.3 3.3 0 1 0 6.6 0Z"/></svg>`;
 
+// The game on the server, and the devices in it. The iPad in the middle of the table is a table device, so it is an
+// admin. Kira's phone has a seat and admin, because Kira set the game up. Jaz's phone has a seat and no admin, so
+// it waits while Kira plays. Tom's phone holds a seat but is away. Priya's phone has a seat and no admin. A laptop
+// joined as a table device and is a viewer until an admin gives it admin.
+const CODE = '7QK2HN', LINK = 'ti4.nexus/join/7QK2HN';
+const TABLE  = {seat:null,  admin:true};
+const SEATED = {seat:'jaz', admin:false};
+const VIEWER = {seat:null,  admin:false};
+const MEMBERS = [
+  {seat:null,    admin:true,  on:true, me:true},
+  {seat:'kira',  admin:true,  on:true},
+  {seat:'jaz',   admin:false, on:true},
+  {seat:'tom',   admin:false, on:false},
+  {seat:'priya', admin:false, on:true},
+  {seat:null,    admin:false, on:true},
+];
+// The chip that opens Players & devices: the seat of this device, Table, or Viewer.
+const youChip = me => me.seat
+  ? `<button class="ibtn youb" style="${col(me.seat)}"><i></i><span class="word">You: </span>${P[me.seat].name}</button>`
+  : me.admin
+    ? `<button class="ibtn youb table"><i></i>Table<span class="word"> device</span></button>`
+    : `<button class="ibtn youb"><i></i>Viewer</button>`;
+
 const PHASES = [['str','Strategy'],['act','Action'],['sta','Status'],['age','Agenda']];
-const topBar = (phase, extra='') => {
+// `me` is the device that shows the screen. Undo and Pause need admin.
+const topBar = (phase, extra='', me=TABLE) => {
   const at = phase==='sum' ? PHASES.length : PHASES.findIndex(p=>p[0]===phase);
   const name = phase==='sum' ? 'Summary' : PHASES[at][1];
+  const adm = me.admin ? '' : ' disabled';
   return `
   <div class="top game">
     <div class="round">Round <b>3</b><span class="ph-now"> · <b>${name}</b></span></div>
     <div class="phase-pill">${PHASES.map(([,label],i)=>
       `<span class="${i===at?'on':i<at?'done':''}">${label}</span>`).join('')}</div>
-    <button class="ibtn spkb">★ Speaker: Jaz</button>
+    <div class="chips"><button class="ibtn spkb">★<span class="word"> Speaker:</span> Jaz</button>${youChip(me)}</div>
     <div class="spacer"></div>
     ${extra}
     <div class="gt">Game <b class="num" data-clock="up" data-t="9847">2:44:07</b></div>
-    <div class="tools"><button class="ibtn">↺ Undo</button><button class="ibtn">⏸<span class="word"> Pause</span></button>
+    <div class="tools"><button class="ibtn"${adm}>↺ Undo</button><button class="ibtn"${adm}>⏸<span class="word"> Pause</span></button>
       <button class="ibtn icon" aria-label="Settings">${GEAR}</button></div>
   </div>`;
 };
 
 /* ══════════════════ screens ══════════════════ */
-// Each table screen has one template. The iPad frame draws it at 1194 × 834; the narrow frames draw the same
+// Each screen has one template. The iPad frame draws it at 1194 × 834; the narrow frames draw the same
 // template, and the container queries in the styles arrange it. `note` explains the iPad layout, `mnote` the narrow one.
 const S = {};
 
 /* ── 1. Setup ── */
-// empty: the seats with no faction yet. While a seat has none, BEGIN GAME is off,
+// empty: the seats with no faction yet. While a seat has none, CREATE GAME is off,
 // and the random deal can fill the empty seats.
 // sets: the expansions that are on. The base game is always in play.
 // limits: the time limits are on. The panel summary scrolls when it is full.
 const EXPANSIONS = [['pok','Prophecy of Kings'], ['te',"Thunder's Edge"], ['keleres','Council Keleres']];
 const ALL_SETS = EXPANSIONS.map(([k])=>k);
-const setupScreen = (empty=[], sets=ALL_SETS, limits=true) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
+// failed: Create game did not reach the server.
+const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
-    <button class="ibtn">Load last game</button><button class="ibtn">⚙<span class="word"> Settings</span></button></div>
+    <button class="ibtn">✕ Back</button><button class="ibtn">⚙<span class="word"> Settings</span></button></div>
   <div class="content"><div class="setup-grid">
     <div class="col">
       <div>
@@ -1122,28 +1184,35 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true) => { const missing = 
         <div class="exps"><div class="lbl">Expansions</div><div class="exp-row">
           ${EXPANSIONS.map(([k,n])=>`<button class="exp ${sets.includes(k)?'on':''}">${n}</button>`).join('')}
         </div></div>
-        ${missing?'<div class="setup-need">Pick a faction for every seat to begin.</div><button class="deal">Random factions for empty seats</button>':''}
-        <button class="big lg" style="width:100%" ${missing?'disabled':''}>BEGIN GAME</button>
+        ${missing?'<div class="setup-need">Pick a faction for every seat to create the game.</div><button class="deal">Random factions for empty seats</button>':''}
+        ${failed?'<div class="setup-need">The game could not be created. Check the connection and try again.</div>':''}
+        <button class="big lg" style="width:100%" ${missing?'disabled':''}>CREATE GAME</button>
       </div>
     </div>
   </div></div></div>`; };
 
-S.setup = {t:'Setup — New Game', d:'ipad', note:
- `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game. Elsewhere, dashed and dimmed controls marked <b>Later</b> are designed but not in the app yet.`,
+S.setup = {t:'Setup — New Game', note:
+ `Seat order matters: it drives <b>speaker order</b> in the strategy phase and <b>clockwise voting order</b> in the agenda phase, both of which are independent of initiative order. Colour is the primary identifier everywhere else in the app, so it's picked as swatches rather than buried in a dropdown. The speaker token is set here. Later it moves only when someone moves it: from the speaker chip, or in the reaction window when Politics (3) is played. Each seat picks its faction from the official factions of the base game and the chosen expansions, and taking a faction another seat holds swaps the two, as colours do. Because the app knows each faction, it knows the Naalu player: the Game panel shows who holds the <b>Naalu "0" token</b>, which puts that player first in each action phase, unless Gift of Prescience moves it for one round. The <b>Expansions</b> chips say what the table plays with besides the base game. They start all on, and the iPad keeps the choice for the next game. <b>Create game</b> then puts the seats on the server and opens Players &amp; devices as the lobby, where the phones join before the host starts the game. Elsewhere, dashed and dimmed controls marked <b>Later</b> are designed but not in the app yet.`,
  mnote:
  `On a narrow screen, the Game panel moves under the seats, and the screen scrolls. On a phone, each seat row becomes a card: the arrows and the seat number on the left, the swatches and the speaker ★ on top, and the name and faction fields under them. Every control of the iPad row is still there.`,
  h:setupScreen()};
 
-S.setupMissing = {t:'Setup — Faction Missing', d:'ipad', note:
- `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>BEGIN GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
+S.setupFailed = {t:'Setup — Create Failed', note:
+ `Create game puts the seats on the server, so it needs a connection. While the request runs, the button reads CREATING and waits. When the server cannot be reached, the line above the button says so, and the seats stay as they are, so one more tap tries again. <b>Back</b> goes to Home and drops the seats.`,
  mnote:
- `The same check in the narrow layout. The message and the deal button sit above BEGIN GAME, at the end of the Game panel.`,
+ `The line sits above CREATE GAME, at the end of the Game panel.`,
+ h:setupScreen([], ALL_SETS, true, true)};
+
+S.setupMissing = {t:'Setup — Faction Missing', note:
+ `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>CREATE GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
+ mnote:
+ `The same check in the narrow layout. The message and the deal button sit above CREATE GAME, at the end of the Game panel.`,
  h:setupScreen(['wren'])};
 
-S.setupDeal = {t:'Setup — Random Factions', d:'ipad', note:
- `A new setup, before any seat has a faction. This table plays with the base game and Prophecy of Kings, so <b>Thunder's Edge</b> and <b>Council Keleres</b> are off. Every faction list then offers only the 24 factions of those two boxes, and so does the deal. The time limits show their default, off. <b>Random factions for empty seats</b> gives each empty seat a different faction, and BEGIN GAME turns on. The button shows only while a seat has no faction, so it never replaces a faction that a player picked. A seat keeps its faction when its expansion turns off.`,
+S.setupDeal = {t:'Setup — Random Factions', note:
+ `A new setup, before any seat has a faction. This table plays with the base game and Prophecy of Kings, so <b>Thunder's Edge</b> and <b>Council Keleres</b> are off. Every faction list then offers only the 24 factions of those two boxes, and so does the deal. The time limits show their default, off. <b>Random factions for empty seats</b> gives each empty seat a different faction, and CREATE GAME turns on. The button shows only while a seat has no faction, so it never replaces a faction that a player picked. A seat keeps its faction when its expansion turns off.`,
  mnote:
- `The same setup in the narrow layout. The deal button sits above BEGIN GAME. On a phone, the expansion chips wrap.`,
+ `The same setup in the narrow layout. The deal button sits above CREATE GAME. On a phone, the expansion chips wrap.`,
  h:setupScreen(Object.keys(P), ['pok'], false)};
 
 /* ── 2. Settings ── */
@@ -1161,14 +1230,25 @@ const TIMERS = [
   ['Strategy pick','Per player, choosing a card.','0:45',true],
 ];
 
-S.settings = {t:'Settings — Time Limits', d:'ipad', note:
- `Limits ship <b>off</b> — tracking is the product, enforcement is opt-in. Each timer is independently switchable so a group can, say, cap the agenda phase (the usual offender) while leaving turns unlimited. Expiry is always soft: red, alarm, and the clock keeps counting <b>upward into overtime</b>, which is logged separately and shows up in the post-game stats. The app never ends a turn on its own. <b>End game</b> shows when settings open during a game.`,
+S.settings = {t:'Settings — Game and This Device', note:
+ `Limits ship <b>off</b> — tracking is the product, enforcement is opt-in. Each timer is independently switchable so a group can, say, cap the agenda phase (the usual offender) while leaving turns unlimited. Expiry is always soft: red, alarm, and the clock keeps counting <b>upward into overtime</b>, which is logged separately and shows up in the post-game stats. The app never ends a turn on its own. <b>End game</b> shows when settings open during a game. The settings sit in two groups. The <b>Game</b> group belongs to the game: every device follows it, and only an admin device changes it, so a seated device without admin sees it dimmed, with End game. The <b>This device</b> group stays on the device: the alarm, the screen, and the rail.`,
  mnote:
  `The same rows in one column. On a phone, each row puts its switch next to its name, and its stepper or sound menu under the description.`,
- h:`<div class="space"></div><div class="lay">
+ h:settingsScreen()};
+
+S.settingsNew = {t:'Settings — Before a Game', note:
+ `Settings from Home or from the setup, before the game exists. The time limits are the ones that the next game starts with, and this device keeps them for its next setup. The game then keeps its own limits, which an admin device changes. There is no game to end yet.`,
+ mnote:
+ `The same rows in one column, as in a game.`,
+ h:settingsScreen(false)};
+
+// `game`: the settings open in a game, so the time limits are the game's own. Before a game, they are the limits that
+// the next game starts with.
+function settingsScreen(game=true){ return `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>Settings</b></div><div class="spacer"></div>
-    <button class="ibtn warnish">End game</button><button class="ibtn">✕ Close</button></div>
+    ${game?'<button class="ibtn warnish">End game</button>':''}<button class="ibtn">✕ Close</button></div>
   <div class="content">
+    <div class="setup-label">${game?'Game · every device follows these':'New game · the limits it starts with'}</div>
     <div class="master"><div style="flex:1"><div class="lb">Enforce time limits</div>
       <div class="ds">Off is pure tracking. Clocks still run and every turn is recorded.</div></div>
       ${tog(true)}</div>
@@ -1178,21 +1258,24 @@ S.settings = {t:'Settings — Time Limits', d:'ipad', note:
     </div>
     <div class="pnl" style="margin-top:16px">
       <div class="pnl-h">When time is up</div>
-      ${setRow('Alarm sound','The clock turns red and counts overtime. Nothing ends on its own.',
-        `<div style="display:flex;gap:8px"><div class="fld sel" style="flex:1">Klaxon ▾</div><button class="mini">Play</button></div>`,tog(true))}
       ${setRow(`Count overtime${LATER}`,'Clock flips to counting up. Overage is logged per turn and totalled per player.',
         '<div style="font-size:12px;color:var(--faint);text-align:center">Always on</div>',
         '<div class="tog on" style="opacity:.4"></div>','later')}
       ${setRow(`Auto-advance turn${LATER}`,'End the turn automatically when the limit is hit. Off by design — the app is not a referee.',
         '',tog(false),'later')}
     </div>
+    <div class="setup-label" style="margin-top:26px">This device</div>
+    <div class="pnl">
+      <div class="pnl-h">Alarm</div>
+      ${setRow('Alarm sound','Sounds on this device when a limit passes. The clock turns red and counts overtime. Nothing ends on its own.',
+        `<div style="display:flex;gap:8px"><div class="fld sel" style="flex:1">Klaxon ▾</div><button class="mini">Play</button></div>`,tog(true))}
+    </div>
     <div class="pnl" style="margin-top:16px">
       <div class="pnl-h">Display</div>
       ${setRow('Keep screen awake','Stops the screen sleeping mid-game.','',tog(true))}
       ${setRow('Show game time on the rail','Off shows only the current turn, which some groups find less competitive.','',tog(true))}
-      ${setRow(`Allow phone companions${LATER}`,'Players can join on their own device and end their own turns.','',tog(true),'later')}
     </div>
-  </div></div>`};
+  </div></div>`; }
 
 /* ── 3. Speaker & seating ── */
 // physical seating ring, clockwise. Speaker is a pointer into it.
@@ -1250,7 +1333,7 @@ const seatingScreen = (out=null) => `<div class="space"></div><div class="lay">
     </div>
   </div></div>`;
 
-S.seating = {t:'Speaker & Seating', d:'ipad', note:
+S.seating = {t:'Speaker & Seating', note:
  `Seating is a <b>fixed ring</b> set at game start; the speaker is just a <b>pointer into it</b>. Both derived
   orders fall out automatically, so moving the token is the only thing anyone ever needs to do — and the token
   does move, via Politics (3) and certain agendas. Note the two orders differ: strategy picks start <b>with</b>
@@ -1274,7 +1357,7 @@ const removeDialog = chosen => {
   </div></div>`;
 };
 
-S.remove = {t:'Speaker & Seating — Remove a Player', d:'ipad', note:
+S.remove = {t:'Speaker & Seating — Remove a Player', note:
  `The table removes a player who is <b>eliminated or goes home</b>. The dialog lists the players still in the
   game: one tap chooses, and a second tap confirms. The player leaves every order at once. A clock that runs for
   them stops and moves to the next player, and a card they picked in the strategy phase returns to the common
@@ -1283,7 +1366,7 @@ S.remove = {t:'Speaker & Seating — Remove a Player', d:'ipad', note:
  `On a phone, the dialog opens as a sheet at the bottom of the screen, with the players two to a line and the confirm button above Cancel.`,
  h:`${seatingScreen()}${removeDialog('tom')}`};
 
-S.removeSpeaker = {t:'Speaker & Seating — Remove the Speaker', d:'ipad', note:
+S.removeSpeaker = {t:'Speaker & Seating — Remove the Speaker', note:
  `When the speaker leaves, the token passes to the player on their <b>left</b>, the next player clockwise, as
   the TI4 rules say. The dialog names that player before the table confirms. The speaker chip can still move
   the token afterwards, for example for a house rule.`,
@@ -1291,7 +1374,7 @@ S.removeSpeaker = {t:'Speaker & Seating — Remove the Speaker', d:'ipad', note:
  `The same sheet as for any other player, with the line that names the new speaker above the buttons.`,
  h:`${seatingScreen()}${removeDialog('jaz')}`};
 
-S.seatingOut = {t:'Speaker & Seating — After a Player Leaves', d:'ipad', note:
+S.seatingOut = {t:'Speaker & Seating — After a Player Leaves', note:
  `Tom left in round 3. Tom's seat <b>stays in the ring, empty</b>, so the other seats keep their places and
   their numbers. A tap on the empty seat does nothing. Both orders and the initiative order skip Tom, and
   Tom's recorded time stays in the round and game stats.`,
@@ -1305,22 +1388,25 @@ const PICKS6 = {who:'sam', lbl:'5 of 6', cards:CARDS, order:ORDER.filter(p=>CARD
   waiting:['sam','wren'], token:true, left:2};
 const PICKS4 = {who:'kira', lbl:'6 of 8 · second card', cards:CARDS4, order:ORDER4,
   waiting:[], token:false, left:3};
-const strategyScreen = (g=PICKS6) => `<div class="space"></div><div class="lay">
-  ${topBar('str')}
+// `me` is the device. A seated device without admin picks only on its own pick, and the speaker and the token belong
+// to admin devices.
+const strategyScreen = (g=PICKS6, me=TABLE) => { const mine = me.admin || me.seat===g.who, adm = me.admin?'':' disabled';
+  return `<div class="space"></div><div class="lay">
+  ${topBar('str', '', me)}
   <div class="content" style="display:flex;flex-direction:column">
     <div class="picker" style="${col(g.who)}">
       <div class="who-box"><div class="lbl">Now picking · ${g.lbl}</div><div class="who"><i></i>${P[g.who].name}</div></div>
       <div class="picker-help">Order follows the speaker. Tap a card to assign it.</div>
-      <button class="ibtn spkb">★ Speaker: Jaz · change</button>
+      <button class="ibtn spkb"${adm}>★ Speaker: Jaz · change</button>
       <div class="t num" data-clock="down" data-t="27" data-limit="45">0:27</div>
     </div>
     <div class="cards grow">
       ${g.cards.map(c=>{
         const taken=!!c.o;
-        return `<div class="card ${taken?'taken':'next'}" style="${taken?col(c.o):''}">
+        return `<div class="card ${taken?'taken':mine?'next':''}" style="${taken?col(c.o):''}">
           ${!taken&&c.tg?'<div class="tg">+1 TG</div>':''}
           <div class="n num">${c.n}</div><div class="nm">${c.nm}</div>
-          ${taken?`<div class="own"><i></i>${P[c.o].name}</div>`:`<div class="free">Tap to assign to ${P[g.who].name}</div>`}
+          ${taken?`<div class="own"><i></i>${P[c.o].name}</div>`:`<div class="free">${mine?`Tap to assign to ${P[g.who].name}`:`${P[g.who].name}’s pick`}</div>`}
         </div>`}).join('')}
     </div>
     <div class="order-strip"><span class="lbl">Initiative order so far</span>
@@ -1328,18 +1414,24 @@ const strategyScreen = (g=PICKS6) => `<div class="space"></div><div class="lay">
         `<span class="oc" style="${col(p.id)}"><b>${p.init}</b><i></i>${P[p.id].name}</span>`).join('')}
       ${g.waiting.map(id=>
         `<span class="oc" style="--pc:var(--line2);color:var(--faint)"><b>?</b>${P[id].name}</span>`).join('')}
-      ${g.token?`<button class="ibtn tokb" style="${col('sam')}"><b>0</b>Naalu token: Sam · change</button>`:''}</div>
+      ${g.token?`<button class="ibtn tokb" style="${col('sam')}"${adm}><b>0</b>Naalu token: Sam · change</button>`:''}</div>
   </div>
   <div class="foot"><button class="big" disabled>BEGIN ACTION PHASE — ${g.left} PICKS REMAINING</button></div>
-  </div>`;
+  </div>`; };
 
-S.strategy = {t:'Strategy Phase — Card Selection', d:'ipad', note:
+S.strategy = {t:'Strategy Phase — Card Selection', note:
  `Picks happen in <b>speaker order</b>, one at a time, with an optional per-pick timer. As cards are claimed the app builds the initiative order along the bottom — no separate ordering step, because in TI4 the card number <b>is</b> the turn order. The one exception is the <b>Naalu "0" token</b>: its holder goes first whatever card they pick, and the strip shows them with 0 once they pick. The token button at the end of the strip only appears when a player has the Naalu faction. Unchosen cards accumulate a trade good each round, shown top-right on the card, so the strip doubles as a reminder at the table.`,
  mnote:
  `Cards go four across on an upright iPad and two across on a phone. On a phone, the picker wraps: the pick clock stays next to the name, and the help and the speaker button go under it. The token button ends the strip.`,
  h:strategyScreen()};
 
-S.token = {t:'Strategy Phase — Naalu 0 Token', d:'ipad', note:
+S.strategySeated = {t:'Strategy Phase — Seated Device', note:
+ `The strategy phase on <b>Jaz's phone</b>, which holds Jaz's seat and no admin. Sam picks now, so the free cards say <b>Sam's pick</b> and do nothing on this phone. On Jaz's pick they turn on, and a tap takes the card for Jaz. Moving the speaker or the Naalu token belongs to admin devices, so those buttons are off. When every card is picked, Begin action phase reads <b>Waiting for the table</b>, because the next phase is a table tap.`,
+ mnote:
+ `The same picks on a phone, which is where a seated device usually is.`,
+ h:strategyScreen(PICKS6, SEATED)};
+
+S.token = {t:'Strategy Phase — Naalu 0 Token', note:
  `The Naalu player holds the <b>"0" token</b> every round, so they need no tap. When another player plays <b>Gift of Prescience</b>, the table moves the token here before the action phase begins, and that player goes first instead. The move lasts one round: the token returns to the Naalu player when the next round starts. The move is logged like every other tap, so Undo takes it back.`,
  mnote:
  `On a phone, the dialog opens as a sheet at the bottom of the screen, with the players two to a line.`,
@@ -1351,7 +1443,7 @@ S.token = {t:'Strategy Phase — Naalu 0 Token', d:'ipad', note:
     <div class="btns"><button class="ibtn">Cancel</button></div>
   </div></div>`};
 
-S.strategyFour = {t:'Strategy Phase — Four Players', d:'ipad', note:
+S.strategyFour = {t:'Strategy Phase — Four Players', note:
  `With 3 or 4 players, each player picks <b>two</b> strategy cards. When every player has one card, the second round starts with the <b>speaker</b> again and goes clockwise, so Jaz took a second card first and Kira picks now. The label counts every pick and names the <b>second card</b>. The strip shows each player's <b>lower</b> card, because that card alone sets their place in the turn order. With four players every card is picked, so no card gains a trade good.`,
  mnote:
  `The same second round of picks in the narrow layout, with the cards four across on an upright iPad and two across on a phone.`,
@@ -1359,12 +1451,14 @@ S.strategyFour = {t:'Strategy Phase — Four Players', d:'ipad', note:
 
 /* ── 5. Action phase ── */
 // Pass only warns: its label counts the cards that are still to play.
-const passButton = unplayed => `<button class="sec ${unplayed?'muted':''}"><span class="k">${
+const passButton = (unplayed, dis='') => `<button class="sec ${unplayed?'muted':''}"${dis}><span class="k">${
   unplayed===0 ? 'Out for the round'
   : unplayed===1 ? 'Strategy card not played yet' : 'Strategy cards not played yet'}</span>Pass</button>`;
-// `held` stops the turn clock, as a reaction window does. `four` draws a four-player game.
-const actionScreen = (over, held=false, four=false) => `<div class="space"></div><div class="lay">
-  ${topBar('act')}
+// `held` stops the turn clock, as a reaction window does. `four` draws a four-player game. `me` is the device:
+// a seated device without admin can end only its own turn, so Jaz's phone shows Kira's controls disabled.
+const actionScreen = (over, held=false, four=false, me=TABLE) => { const mine = me.admin || me.seat==='kira', dis = mine?'':' disabled';
+  return `<div class="space"></div><div class="lay">
+  ${topBar('act', '', me)}
   <div class="body">
     <div class="hero ${over?'over':''}" style="${col('kira')}">
       ${over?`<div class="alarm"><span class="ico">🔔</span>
@@ -1381,12 +1475,12 @@ const actionScreen = (over, held=false, four=false) => `<div class="space"></div
       <div class="limitbar"><i id="lb${over?'2':'1'}" style="width:${over?100:59}%"></i></div>
       <div class="limitrow"><span>Turn limit 3:00</span><span data-rem="lb${over?'2':'1'}">${over?'Over by 0:12':'1:13 remaining'}</span></div>
       <div class="acts ${four?'two':''}">
-        <button class="big ${over?'red':''}">END TURN</button>
+        <button class="big ${over?'red':''}"${dis}>${mine?'':'<span class="k">Kira’s turn</span>'}END TURN</button>
         ${four
           ? `<button class="sec hl" style="opacity:.45" disabled><span class="k">Strategic action</span>Trade (5) played ✓</button>
-        <button class="sec hl"><span class="k">Strategic action</span>Play Warfare (6) ▸</button>`
-          : `<button class="sec hl"><span class="k">Strategic action</span>Play Trade (5) ▸</button>`}
-        ${passButton(1)}
+        <button class="sec hl"${dis}><span class="k">Strategic action</span>Play Warfare (6) ▸</button>`
+          : `<button class="sec hl"${dis}><span class="k">Strategic action</span>Play Trade (5) ▸</button>`}
+        ${passButton(1, dis)}
       </div>
     </div>
     <div class="rail">
@@ -1395,25 +1489,37 @@ const actionScreen = (over, held=false, four=false) => `<div class="space"></div
       <div class="rail-f"><span><span class="sccard" style="margin-right:5px">Card</span>still to play</span>
         <span><span class="sccard used" style="margin-right:5px">✓ Card</span>already played</span></div>
     </div>
-  </div></div>`;
+  </div></div>`; };
 
-S.action = {t:'Action Phase', d:'ipad', note:
- `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal: Kira's Pass button warns that Trade is not played yet, and passing early asks first. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
+S.action = {t:'Action Phase', note:
+ `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal: Kira's Pass button warns that Trade is not played yet, and passing early asks first. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state. The chip beside the speaker names this device's seat, Table, or Viewer, and opens Players &amp; devices.`,
  mnote:
  `The rail moves under the clock. End Turn, the strategic action, and Pass stay in the hero, under the clock, as on the iPad. The top bar takes two rows. On a phone, the rail rows become tiles in initiative order, so six players fit on one screen. Up to 740 px wide, and on a phone held sideways, the top bar is compact: the phase pill becomes a thin progress line with the phase name next to the round.`,
  h:actionScreen(false)};
 
-S.overtime = {t:'Action Phase — Limit Exceeded', d:'ipad', note:
+S.overtime = {t:'Action Phase — Limit Exceeded', note:
  `The same screen once the limit passes. Soft expiry: the clock goes red and <b>flips to counting overtime upward</b>, an alarm sounds so the table notices without watching, and the End Turn button turns red. Nothing has advanced and nothing is blocked — the overage is simply recorded and surfaces in the round and post-game stats.`,
  mnote:
  `The same screen after the turn limit, in the narrow layout. On a phone held sideways, the clock gets smaller, so that End Turn stays in reach.`,
  h:actionScreen(true)};
 
-S.actionFour = {t:'Action Phase — Four Players', d:'ipad', note:
+S.actionFour = {t:'Action Phase — Four Players', note:
  `In a four-player game each player holds <b>two</b> strategy cards and takes <b>one turn</b> in each cycle, at their lower card. Each rail row shows both cards: blue while still to play, grey with a ✓ once used. On a turn the player can play <b>either</b> card that is still blue, so the hero shows a play button for each card. A strategic action is the whole turn: closing its window ends the turn, so the second card waits for a <b>later turn</b>. Kira played Trade on an earlier turn and can play Warfare now. Pass stays a warning until both cards are played. Tom played both cards and has passed.`,
  mnote:
  `The same four-player turn in the narrow layout. The two card buttons and Pass share the row under End Turn, and each rail row shows both cards. On a small phone, Pass takes its own row when the three buttons do not fit.`,
  h:actionScreen(false, false, true)};
+
+S.actionSeated = {t:'Action Phase — Seated Device, Waiting', note:
+ `The same screen on <b>Jaz's phone</b>. Jaz's phone holds Jaz's seat and no admin, so it acts for Jaz only, when the game waits for Jaz. It is Kira's turn, so End Turn, the strategic action, and Pass are <b>disabled, not hidden</b>: every device shows the same screen, and the disabled End Turn names the player that the game waits for. Undo and Pause need admin, so they are off too. The chip in the top bar says whose device this is and opens Players &amp; devices. On Jaz's turn the three controls come on, and the screen is the one before. A table device, or a seated device with admin, sees every control on at all times.`,
+ mnote:
+ `The same screen on a phone, which is where a seated device usually is. The chip in the top bar shows the colour and the name of the seat, next to the speaker chip.`,
+ h:actionScreen(false, false, false, SEATED)};
+
+S.actionViewer = {t:'Action Phase — Viewer', note:
+ `The same screen on a <b>laptop that joined as a table device</b>. It has no seat and no admin yet, so it is a viewer: it sees every clock and the rail, and every control is disabled. The chip reads Viewer and opens Players &amp; devices, where the laptop can take a seat instead. When an admin turns the laptop's admin switch on, every control comes on, and the laptop acts for every player like the iPad.`,
+ mnote:
+ `The same screen on a phone that joined as a table device.`,
+ h:actionScreen(false, false, false, VIEWER)};
 
 /* ── 6. Reaction window ── */
 const RW = [
@@ -1443,12 +1549,15 @@ const rwClock = w => w.over
   : `<div class="t num" data-clock="down" data-t="${w.t}" data-limit="120" data-bar="rwb">${fmtL(w.t)}</div>
         <div class="l">Window remaining · 2:00</div>`;
 // everyone but the speaker when the window opened can take the token
-const speakerRow = (from, to) => `
+const speakerRow = (from, to, dis='') => `
     <div class="rw-spk">
       <div class="l"><b>★ New speaker</b><span>${P[to].name} is the new speaker.</span></div>
-      <div class="opts">${Object.keys(P).filter(id=>id!==from).map(id=>`<button class="spkopt ${id===to?'on':''}" style="${col(id)}"><i></i><span class="n">${P[id].name}</span>${id===to?'<span>★</span>':''}</button>`).join('')}</div>
+      <div class="opts">${Object.keys(P).filter(id=>id!==from).map(id=>`<button class="spkopt ${id===to?'on':''}" style="${col(id)}"${dis}><i></i><span class="n">${P[id].name}</span>${id===to?'<span>★</span>':''}</button>`).join('')}</div>
     </div>`;
-const reactionScreen = w => `${actionScreen(false, true)}<div class="scrim"></div>
+// `me` is the device. A seated device without admin marks only its own tile, and it closes or extends the window
+// only when its player played the card.
+const reactionScreen = (w, me=TABLE) => { const mine = id => me.admin || me.seat===id, dis = mine(w.by)?'':' disabled';
+  return `${actionScreen(false, true, false, me)}<div class="scrim"></div>
   <div class="rw">
     <div class="rw-h" style="${col(w.by)}">
       <div><div class="lbl">Strategic action · secondary abilities</div>
@@ -1456,45 +1565,59 @@ const reactionScreen = w => `${actionScreen(false, true)}<div class="scrim"></di
         <div class="by"><i></i>Played by ${P[w.by].name} · their turn took <b class="num" style="color:var(--dim);margin-left:4px">${w.turn}</b></div></div>
       <div class="rw-clock">${rwClock(w)}</div>
     </div>
-    <div class="rw-bar"><i id="rwb" style="width:${w.over?0:Math.round(w.t/120*100)}%"></i></div>${w.to?speakerRow(w.from, w.to):''}
+    <div class="rw-bar"><i id="rwb" style="width:${w.over?0:Math.round(w.t/120*100)}%"></i></div>${w.to?speakerRow(w.from, w.to, dis):''}
     <div class="tiles">
       ${w.tiles.map(r=>`<div class="tile ${r.done?'done':'wait'}" style="${col(r.id)}">
         ${r.passed?'<span class="pchip">Passed</span>':''}
         <div class="nm"><i></i>${P[r.id].name}</div><div class="fc">${P[r.id].f}</div>
         ${r.done
           ? `<div class="st">✓ Done</div><div class="took num">Took ${fmtL(r.took)}</div>`
-          : `<button class="tapme">MARK DONE</button>`}
+          : `<button class="tapme"${mine(r.id)?'':' disabled'}>MARK DONE</button>`}
       </div>`).join('')}
       <div class="tile tile-idle"><div>Active player <br>does not react</div></div>
     </div>
     <div class="rw-f">
       <div class="note"><b style="color:var(--dim)">${w.tiles.filter(r=>r.done).length} of ${w.tiles.length} done.</b> The window closes and ${P[w.by].name}'s turn ends when the last player marks done.</div>
       <div class="spacer"></div>
-      <button class="ibtn">＋ Add 1:00</button>
-      <button class="big small">MARK ALL DONE</button>
+      <button class="ibtn"${dis}>＋ Add 1:00</button>
+      <button class="big small"${dis}>MARK ALL DONE</button>
     </div>
-  </div>`;
+  </div>`; };
 
-S.reaction = {t:'Reaction Window (overlay)', d:'ipad', note:
+S.reaction = {t:'Reaction Window (overlay)', note:
  `The mechanic that makes a naive chess clock wrong for TI4. Playing a strategy card <b>stops the active player's clock</b> and opens a window for everyone else's secondary abilities — real table time that belongs to nobody, so it's charged to nobody. Each player taps their own tile when they're done, whether they resolved the secondary or declined it. The window closes when the last tile is marked. <b>Mark all done</b> closes it early: every player still waiting is marked done at that moment. Closing the window <b>ends Kira's turn</b>, because the strategic action was her action for the turn, and the next player's clock starts at once. Her turn keeps the 1:47 before she played the card. Note that <b>passed players still get a tile</b>: passing stops you taking turns, not resolving secondaries. A player who leaves the game during the window counts as done, and their tile shows <b>Left</b>. When the player who played the card leaves, their turn ends, and the next turn starts when the window closes. The top bar stays above the window, so the table can <b>pause</b> for a break, undo, or move the speaker during it.`,
  mnote:
  `The window opens under the top bar, so Pause, Undo, and Settings stay in reach. On a phone, it is a sheet, and each reacting player gets a row with a large Mark Done button.`,
  h:reactionScreen(WINDOWS.trade)};
 
-S.reactionOver = {t:'Reaction Window — Over Limit', d:'ipad', note:
+// The same window a little earlier, on Jaz's phone: Jaz has not marked done yet.
+const RW_SEATED = [
+  {id:'jaz',   done:false},
+  {id:'tom',   done:true,  took:31, passed:true},
+  {id:'priya', done:true,  took:48},
+  {id:'wren',  done:false, passed:true},
+  {id:'sam',   done:false},
+];
+S.reactionSeated = {t:'Reaction Window — Seated Device', note:
+ `The same window on <b>Jaz's phone</b>, which holds Jaz's seat and no admin. Jaz marks done on Jaz's own tile and on nobody else's, so the other Mark Done buttons are disabled. Kira played the card, so <b>Mark all done</b>, <b>＋ Add 1:00</b>, and the new speaker choice of a Politics window belong to Kira's device and to the admin devices. Each device reaches across the table less: five people tapping their own phones is the friction that the seat removes.`,
+ mnote:
+ `On a phone, the sheet gives each reacting player a row, and only Jaz's row has its Mark Done on.`,
+ h:reactionScreen({by:'kira', card:5, turn:'1:47', t:92, tiles:RW_SEATED}, SEATED)};
+
+S.reactionOver = {t:'Reaction Window — Over Limit', note:
  `The same window once its limit passes. As with every limit, expiry is soft: the window clock turns red and <b>counts overtime upward</b>, and an alarm sounds. The window stays open and nothing advances, so Sam and Wren can still mark done, and the overtime goes into the round and post-game stats. Only a tap closes the window and ends Kira's turn, so undo can always take the close back. <b>＋ Add 1:00</b> moves the limit.`,
  mnote:
  `The same overtime window in the narrow layout. On a phone, the red overtime clock sits above the tiles of the sheet.`,
  h:reactionScreen(WINDOWS.over)};
 
-S.politics = {t:'Reaction Window — Politics', d:'ipad', note:
+S.politics = {t:'Reaction Window — Politics', note:
  `Politics (3) is the one strategy card that moves the speaker token: its primary ability hands the token to any player who does not hold it, the Politics player included. So its window adds a <b>new speaker</b> row above the tiles, listing everyone except the speaker when the window opened. One tap moves the token, a tap on another player changes the choice, and <b>Undo</b> in the top bar reverts it. Before the first tap the row reads "Tap the player who takes the token from Jaz." The choice is optional: the window still closes, and Jaz's turn still ends, when the last player marks done. The speaker chip still works afterwards.`,
  mnote:
  `On a phone, the new speaker row puts its label above the players, and the players wrap three to a line.`,
  h:reactionScreen(WINDOWS.pol)};
 
 /* ── 7. Pass warning and pause ── */
-S.passWarn = {t:'Action Phase — Pass Warning', d:'ipad', note:
+S.passWarn = {t:'Action Phase — Pass Warning', note:
  `Passing before the strategy card is played breaks the rules, so the app asks first. It warns and does not block, because the table is the authority and sometimes a rule is bent on purpose. End Game asks for confirmation in the same dialog.`,
  mnote:
  `On a phone, the dialog opens as a sheet at the bottom of the screen, with the confirm button above Cancel.`,
@@ -1503,6 +1626,15 @@ S.passWarn = {t:'Action Phase — Pass Warning', d:'ipad', note:
     <p>The rules say a player passes only after their strategic action. Pass anyway if the table agrees.</p>
     <div class="btns"><button class="ibtn">Cancel</button><button class="big small red">Pass anyway</button></div>
   </div></div>`};
+
+// The device lost its connection. The bar under the top bar says so, and every control waits until it is back.
+S.reconnecting = {t:'Action Phase — Reconnecting', note:
+ `The game lives on the server, and this device has lost its connection to it. The bar under the top bar says so, and every control <b>waits</b>. A tap is not queued, because a tap that arrives late would be charged at the wrong time, and the table can tap on another device. The clocks keep running from the last state the device saw, so the screen still reads right, and the device reconnects on its own. Once it is back, the bar goes and the controls return.`,
+ mnote:
+ `The same bar under the compact top bar, and the screen under it dimmed.`,
+ h:actionScreen(false).replace('<div class="lay">','<div class="lay offline">')
+   .replace('<div class="body">','<div class="netbar"><i></i>Reconnecting · your taps wait for the connection</div><div class="body">')};
+
 
 // The table paused 4:12 ago. A pause stops every clock behind the card, so the action screen drops its live clocks.
 // A rule check is game time, so during one the game clock in the top bar keeps running.
@@ -1519,13 +1651,13 @@ const pauseScreen = rule => `${behindCard(rule)}
     <button class="big small">RESUME</button>
   </div></div>`;
 
-S.paused = {t:'Game Paused', d:'ipad', note:
+S.paused = {t:'Game Paused', note:
  `Pause stops every clock, so a break costs nobody any time. The card covers the whole table, top bar included, and its clock counts up from the tap. A new pause is always a plain <b>Pause</b>: food, a phone call, a stretch. Its time counts nowhere, not even in the game time. When the table stops to settle a rule, one tap on <b>Rule check</b> starts timing the discussion.`,
  mnote:
  `The same card. On a phone, the reason buttons and Resume take the full width.`,
  h:pauseScreen(false)};
 
-S.pausedRule = {t:'Game Paused — Rule Check', d:'ipad', note:
+S.pausedRule = {t:'Game Paused — Rule Check', note:
  `The table paused, and later tapped <b>Rule check</b> to settle a rule. The line under the choice counts this rule check from that tap: 1:23 of the 4:12 pause. The time before the tap stays a plain pause. A rules discussion is part of playing the game, so rule-check time counts as <b>game time</b>: the game clock runs again, but every player clock stays stopped, and nobody is charged. A tap on <b>Pause</b> ends the rule check and keeps the game paused, so the table can settle a rule and then take a break. Resume also ends it. One pause can hold several rule checks, and the post-game stats show their total time and their number.`,
  mnote:
  `The same rule check in the narrow layout. The game clock in the top bar runs behind the card.`,
@@ -1541,12 +1673,9 @@ const STEPS = [
   ['Ready cards','All exhausted cards',0],
   ['Repair units','All damaged units',0],
 ];
-S.status = {t:'Status Phase', d:'ipad', note:
- `A whole-table timer rather than a per-player one — the status phase is procedural and mostly simultaneous. The seven steps are a checklist because they're the ones groups reliably forget (usually "remove command tokens"), and ticking them gives the timer something honest to measure. Whether the round ends here or continues into the agenda phase depends on the Custodians token, which the table marks here once it is removed.`,
- mnote:
- `The table clock moves to the top. The steps follow, then the round so far, the Custodians switch, and the button.`,
- h:`<div class="space"></div><div class="lay">
-  ${topBar('sta')}
+// `me` is the device. The steps, the Custodians switch, and the next phase are table taps.
+const statusScreen = (me=TABLE) => `<div class="space"></div><div class="lay">
+  ${topBar('sta', '', me)}
   <div class="content split status" style="--side:420px">
     <div class="pnl" style="display:flex;flex-direction:column">
       <div class="pnl-h">Status phase steps <span class="pnl-note">3 of 7</span></div>
@@ -1572,11 +1701,23 @@ S.status = {t:'Status Phase', d:'ipad', note:
       <div class="pnl custodians">
         <div style="flex:1"><div class="lb">Custodians token removed</div>
           <div class="ds">The agenda phase runs every round once it is gone.</div></div>
-        ${tog(true)}
+        ${me.admin?tog(true):'<div class="tog on off"></div>'}
       </div>
-      <button class="big lg">BEGIN AGENDA PHASE</button>
+      <button class="big lg"${me.admin?'':' disabled'}>${me.admin?'':'<span class="k">Waiting for the table</span>'}BEGIN AGENDA PHASE</button>
     </div>
-  </div></div>`};
+  </div></div>`;
+
+S.status = {t:'Status Phase', note:
+ `A whole-table timer rather than a per-player one — the status phase is procedural and mostly simultaneous. The seven steps are a checklist because they're the ones groups reliably forget (usually "remove command tokens"), and ticking them gives the timer something honest to measure. Whether the round ends here or continues into the agenda phase depends on the Custodians token, which the table marks here once it is removed.`,
+ mnote:
+ `The table clock moves to the top. The steps follow, then the round so far, the Custodians switch, and the button.`,
+ h:statusScreen()};
+
+S.statusSeated = {t:'Status Phase — Seated Device', note:
+ `The status phase on <b>Jaz's phone</b>. The steps, the Custodians switch, and the button are table taps, so a seated device without admin follows the checklist and taps none of them. The button reads <b>Waiting for the table</b>, as the lobby does.`,
+ mnote:
+ `The same checklist on a phone, with the switch and the button off.`,
+ h:statusScreen(SEATED)};
 
 /* ── 9. Agenda phase ── */
 // clockwise starting left of the speaker; speaker (Jaz) votes last and breaks ties
@@ -1588,12 +1729,11 @@ const VOTES = [
   {id:'wren',  st:''},
   {id:'jaz',   st:'', spk:1},
 ];
-S.agenda = {t:'Agenda Phase', d:'ipad', note:
- `Two timers, because the agenda phase has two distinct failure modes. The <b>discussion timer</b> is table-wide and covers the open negotiation before voting; it stops when voting opens. Then voting runs with a <b>per-player timer</b>, which is where the phase usually haemorrhages time — one player agonising over an influence count while five people wait. Voting starts to the <b>speaker's left and ends with the speaker</b>, who breaks ties — so this order is derived from the seating ring, not from initiative, and it is not the same order as the strategy phase. The agenda text and the running tally are marked <b>Later</b>.`,
- mnote:
- `The clocks move to the top: the discussion time first, then the current voter with Vote Cast. The voting order follows, then Resolve.`,
- h:`<div class="space"></div><div class="lay">
-  ${topBar('age')}
+// `me` is the device. A seated device casts only its own vote. Open voting and Resolve are table taps. `tally` draws
+// the running tally, which is not built yet.
+const agendaScreen = (me=TABLE, tally=true) => { const mine = me.admin || me.seat==='sam', adm = me.admin?'':' disabled';
+  return `<div class="space"></div><div class="lay">
+  ${topBar('age', '', me)}
   <div class="content split agenda" style="--side:430px">
     <div class="col">
       <div class="agenda-card ag-card">
@@ -1625,20 +1765,32 @@ S.agenda = {t:'Agenda Phase', d:'ipad', note:
         <div class="voter-now" style="${col('sam')}">
           <div class="who"><i></i>Sam</div>
           <div class="t num" data-clock="down" data-t="38" data-limit="60">0:38</div>
-          <button class="big small">VOTE CAST — NEXT PLAYER</button>
+          <button class="big small"${mine?'':' disabled'}>${mine?'':'<span class="k">Sam’s vote</span>'}VOTE CAST — NEXT PLAYER</button>
         </div>
       </div>
-      <div class="pnl later ag-tally">
+      ${tally?`<div class="pnl later ag-tally">
         <div class="pnl-h">Running tally${LATER}</div>
         <div style="padding:16px 18px">
           <div class="kv"><span>For</span><b class="num" style="color:var(--ok);font-size:19px">27</b></div>
           <div class="kv"><span>Against</span><b class="num" style="color:#ff8b80;font-size:19px">8</b></div>
           <div class="kv" style="border:none"><span>Not yet cast</span><b class="num" style="color:var(--faint)">3 players</b></div>
         </div>
-      </div>
-      <button class="big md ag-resolve">RESOLVE → AGENDA 2</button>
+      </div>`:''}
+      <button class="big md ag-resolve"${adm}>${me.admin?'':'<span class="k">Waiting for the table</span>'}RESOLVE → AGENDA 2</button>
     </div>
-  </div></div>`};
+  </div></div>`; };
+
+S.agenda = {t:'Agenda Phase', note:
+ `Two timers, because the agenda phase has two distinct failure modes. The <b>discussion timer</b> is table-wide and covers the open negotiation before voting; it stops when voting opens. Then voting runs with a <b>per-player timer</b>, which is where the phase usually haemorrhages time — one player agonising over an influence count while five people wait. Voting starts to the <b>speaker's left and ends with the speaker</b>, who breaks ties — so this order is derived from the seating ring, not from initiative, and it is not the same order as the strategy phase. The agenda text and the running tally are marked <b>Later</b>.`,
+ mnote:
+ `The clocks move to the top: the discussion time first, then the current voter with Vote Cast. The voting order follows, then Resolve.`,
+ h:agendaScreen()};
+
+S.agendaSeated = {t:'Agenda Phase — Seated Device', note:
+ `Voting on <b>Jaz's phone</b>. Sam votes now, so <b>Vote cast</b> names Sam and is off on this phone. On Jaz's vote it comes on, and Jaz taps it when Jaz has voted. Open voting and Resolve are table taps, so they read <b>Waiting for the table</b>. The running tally, which is not built yet, is left out of this state.`,
+ mnote:
+ `The same vote on a phone: the voter's clock and the button at the top, then the order.`,
+ h:agendaScreen(SEATED, false)};
 
 /* ── 10. Round summary ── */
 // round 3 only — own-turn seconds sum to the 41:26 action phase
@@ -1651,12 +1803,10 @@ const RS = [
   {id:'sam',   ac:288, rw:110, ot:0},
 ];
 const MAXR = 700;
-S.round = {t:'Round Summary', d:'ipad', note:
- `Shown between rounds — a natural pause while the table resets. The stacked bar separates <b>own turn time</b> from <b>reaction window time</b>, because they mean different things: the first is your decision-making, the second is you holding everyone else up during someone else's strategy card. Overtime is hatched so it reads as distinct from ordinary time at a glance. Full stats and History are marked <b>Later</b>.`,
- mnote:
- `The four numbers go two across on a phone. The buttons wrap under the bars, and Start Round is full width.`,
- h:`<div class="space"></div><div class="lay">
-  ${topBar('sum',`<button class="ibtn extra later">📊 Full stats${LATER}</button>`)}
+// `me` is the device. Starting the next round and ending the game are table taps.
+const roundScreen = (me=TABLE) => { const adm = me.admin?'':' disabled';
+  return `<div class="space"></div><div class="lay">
+  ${topBar('sum',`<button class="ibtn extra later">📊 Full stats${LATER}</button>`, me)}
   <div class="content">
     <div class="h1">Round 3 complete</div>
     <div class="h1s">58 minutes 43 seconds · game total 2 hours 44 minutes</div>
@@ -1685,10 +1835,22 @@ S.round = {t:'Round Summary', d:'ipad', note:
     </div>
   </div>
   <div class="foot">
-    <button class="ibtn">End game</button>
+    <button class="ibtn"${adm}>End game</button>
     <button class="ibtn later">↺ History &amp; undo${LATER}</button>
-    <button class="big">START ROUND 4 — STRATEGY PHASE</button>
-  </div></div>`};
+    <button class="big"${adm}>${me.admin?'':'<span class="k">Waiting for the table</span>'}START ROUND 4 — STRATEGY PHASE</button>
+  </div></div>`; };
+
+S.round = {t:'Round Summary', note:
+ `Shown between rounds — a natural pause while the table resets. The stacked bar separates <b>own turn time</b> from <b>reaction window time</b>, because they mean different things: the first is your decision-making, the second is you holding everyone else up during someone else's strategy card. Overtime is hatched so it reads as distinct from ordinary time at a glance. Full stats and History are marked <b>Later</b>.`,
+ mnote:
+ `The four numbers go two across on a phone. The buttons wrap under the bars, and Start Round is full width.`,
+ h:roundScreen()};
+
+S.roundSeated = {t:'Round Summary — Seated Device', note:
+ `The round summary on <b>Jaz's phone</b>. The stats read the same on every device. Start round and End game are table taps, so a seated device without admin sees them off, and Start round reads <b>Waiting for the table</b>.`,
+ mnote:
+ `The same summary on a phone, with the button at the end.`,
+ h:roundScreen(SEATED)};
 
 /* ── 11. History & Undo ── */
 // append-only action log, newest first. Undo pops from the top.
@@ -1704,7 +1866,7 @@ const EV = [
   {ico:'⟳', t:'Action phase began',     d:'Round 3',                            ago:'52m ago'},
 ];
 
-S.history = {t:'History & Undo', d:'ipad', later:true, note:
+S.history = {t:'History & Undo', later:true, note:
  `Two operations, and deliberately no others. <b>Undo</b> pops the last action off the log — press it again to
   keep stepping back until the board matches the app, then carry on from there. It restores elapsed time as
   well as state, so a mis-tapped End Turn costs nobody their seconds. <b>Edit time</b> changes a duration and
@@ -1791,7 +1953,7 @@ const WHERE = [
   ['Between rounds',             480, 'var(--line2)'],
 ];
 const GAME = WHERE.reduce((s,x)=>s+x[1],0);
-S.stats = {t:'Post-game Stats', d:'ipad', note:
+S.stats = {t:'Post-game Stats', note:
  `The payoff — the screen the whole app exists to produce. Per-player totals, average turn, worst turn and overtime count, plus where the game actually went by phase. <b>Rule checks</b> get their own figure and their own row: the time the table spent settling rules, and how many times it stopped to do so. That time is part of the game time, though no player is charged for it. Plain pauses are not counted at all. The "longest turns" list is the one people crowd round: it names the specific moments, not just the aggregate. Export, marked <b>Later</b>, will let a group build a season's worth of data. A player who left the game keeps their time, and the table names the round in which they left.`,
  mnote:
  `One column. On a phone, each table row becomes a block: the player, then Turns, Avg turn, Worst turn, Over limit, and Share, each with its label.`,
@@ -1849,181 +2011,179 @@ S.stats = {t:'Post-game Stats', d:'ipad', note:
     </div>
   </div></div>`};
 
-/* ── 13. Join ── */
-S.join = {t:'Join — Phone Companions', d:'ipad', later:true, note:
- `The bridge to the add-on. Phones are always <b>optional</b> — the tabletop device stays fully functional on its own, and a player whose phone drops off simply uses it as before. That constraint is what keeps the companion an add-on rather than a dependency, and it's the reason this screen shows connection state so plainly.`,
+/* ── 13. Home ── */
+// The first screen of the app, where a device starts a new game or joins one. The recent games are the games that
+// this device was in, newest first, so that a reload or a new tab goes back to the table.
+const RECENT = [
+  [CODE,     '6 players · Round 3 · Action phase',    'Today'],
+  ['K8N3VT', '4 players · 8 rounds · Game complete', 'Sunday'],
+  ['DY7MP2', '6 players · 6 rounds · Game complete', '12 October'],
+];
+// Games that an older build saved on this device, before games lived on the server: one that loads, and one that
+// cannot be read. `typed` is the code in the field, and `err` the line under it when the code opens no game.
+const SAVED = ['6 players · Round 2 · Action phase', 'Saved on this device, 18 October'];
+const homeScreen = ({saved=false, typed='', err=''}={}) => `<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>TI4 Tempo</b></div><div class="spacer"></div>
+    <button class="ibtn">⚙<span class="word"> Settings</span></button></div>
+  <div class="content">
+    <div class="home-grid">
+      <div class="pnl"><div class="pnl-h">New game</div><div class="pad">
+        <div class="home-help">Set up the seats on this device. The game then gets a join code, and every player can join from their own phone.</div>
+        <button class="big lg" style="width:100%">NEW GAME</button></div></div>
+      <div class="pnl"><div class="pnl-h">Join a game</div><div class="pad">
+        <div class="home-help">Enter the code from the table device, or scan the QR code on its Players &amp; devices screen.</div>
+        <div class="fld code ${typed?'':'empty'}">${typed||'Join code'}</div>
+        ${err?`<div class="home-err">${err}</div>`:''}
+        <button class="big lg" style="width:100%;margin-top:12px">JOIN GAME</button></div></div>
+    </div>
+    ${saved?`<div class="pnl" style="margin-top:18px"><div class="pnl-h">Saved on this device</div><div class="pad" style="padding-bottom:10px">
+      <div class="home-help">This device saved a game before games had join codes. Continue it to give it a code, so that every player can join.</div>
+      <div class="recent saved"><div><div style="font-size:14.5px;font-weight:650">${SAVED[0]}</div><div class="d">${SAVED[1]}</div></div>
+        <button class="ibtn">Continue</button></div>
+      <div class="notice">The last game saved on this device could not be read.<button class="ibtn">Dismiss</button></div>
+    </div></div>`:''}
+    <div class="pnl" style="margin-top:18px"><div class="pnl-h">Recent games on this device</div><div class="pad" style="padding-bottom:10px">
+      ${RECENT.map(([c,d,w],i)=>`<div class="recent"><div class="code num">${c}</div>
+        <div><div style="font-size:14.5px;font-weight:650">${d}</div><div class="d">${w}</div></div>
+        <button class="ibtn">${i?'Open':'Rejoin'}</button></div>`).join('')}
+    </div></div>
+  </div></div>`;
+
+S.home = {t:'Home', note:
+ `The first screen. <b>New game</b> opens the setup, which stays on one device: the host fills the seats, and Create game puts the seats on the server and opens the lobby with the join code. <b>Join a game</b> takes the six-character code from the table device. A device that scanned the QR code or opened the link skips this screen and goes straight to the claim screen. <b>Recent games</b> lists the games this device was in, newest first, so a reload or a new tab returns to the table in one tap, and a finished game opens again for its stats. Leave game takes a game off the list. There is no account and nothing to install.`,
  mnote:
- `One column: the QR code and the join code first, then the connected players. When a phone is the table device, it shows the same screen for the other phones.`,
+ `One column: New game, then Join a game, then the recent games.`,
+ h:homeScreen()};
+
+S.homeSaved = {t:'Home — Saved on This Device', note:
+ `A device that an older build used can hold a game in its own storage, from before games lived on the server. Home lists it under <b>Saved on this device</b>, with its players, its round, and its phase. <b>Continue</b> puts it on the server: it gets a join code, this device joins it as a table device with admin, and the game opens where it stopped, with every clock as it was. A finished game opens at its stats. The device keeps a game that it continued in its recent games, and the saved copy goes. When the server cannot be reached, a line under the saved game says so, and the copy stays. A saved game that cannot be read shows a notice in its place, and Dismiss removes it.`,
+ mnote:
+ `The saved games sit between Join a game and the recent games.`,
+ h:homeScreen({saved:true})};
+
+S.homeCode = {t:'Home — Unknown Code', note:
+ `The device asked the server for the code before it opens the game. No game has <b>7QK2HM</b>, so the line under the field says so, and the device stays on Home to fix the code. Six characters that cannot be a code, such as one with the letter O, get the same line before the device asks. When the device cannot reach the server, the line asks for a check of the connection instead.`,
+ mnote:
+ `The line sits under the field, above Join game.`,
+ h:homeScreen({typed:'7QK2HM', err:'No game has the code 7QK2HM. Check the code on the table device.'})};
+
+/* ── 13b. Opening a game ── */
+// A device that joined with a code or a link waits for the game. A link with a code that no game has says so.
+const openingScreen = (missing=false) => `<div class="space"></div><div class="lay">
+  <div class="top"><div class="round"><b>Join game</b> · <span class="num">${missing?'7QK2HM':CODE}</span></div><div class="spacer"></div>
+    <button class="ibtn">✕ Cancel</button></div>
+  <div class="content open-wait"><div class="open-card">${missing
+    ? `<div class="h1" style="font-size:25px">No game has this code</div>
+      <div class="h1s">Check the code on the table device, and join again from Home.</div>
+      <button class="big lg" style="width:100%">HOME</button>`
+    : `<div class="lobby-wait"><i></i>Opening the game</div>`}
+  </div></div></div>`;
+
+S.opening = {t:'Opening a Game', note:
+ `The screen between Join game, or a link, and the game. The device connects to the game on the server, and the claim screen, the lobby, or the running game replaces this line as soon as the game arrives. A device that cannot reach the server stays here and tries again on its own. <b>Cancel</b> goes back to Home.`,
+ mnote:
+ `The same line in the middle of the phone.`,
+ h:openingScreen()};
+
+S.openingMissing = {t:'Opening a Game — No Such Code', note:
+ `A link or a QR code with a code that no game has. The device says so and offers <b>Home</b>, where the code can be typed again. Home asks the server before it opens a typed code, so this screen comes only from a link.`,
+ mnote:
+ `The card fills the width of the phone.`,
+ h:openingScreen(true)};
+
+/* ── 14. Claim seat ── */
+// A device that joined with the code or the link. Jaz's phone takes Jaz's seat. A seat that another device holds
+// can be taken back: the dead phone cannot answer, so the new one wins.
+const holder = (id, members=MEMBERS) => members.find(m=>m.seat===id);
+const seatRow = (id, you) => { const h = holder(id);
+  return `<div class="seat-pick ${you?'you':''}" style="${col(id)}"><i></i>
+    <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f} · Seat ${P[id].seat}</div></div>
+    <div class="tk ${h&&!you?'held':''}">${you?'✓ You':h?(h.on?'Held · connected':'Held · away'):'Free'}</div></div>`; };
+S.claim = {t:'Claim Seat', note:
+ `The device has the code and sees the game. It <b>takes a seat</b> with one tap, or joins as a <b>table device</b>, which watches the game until an admin gives it admin. Every seat shows whether a device holds it. A held seat can still be taken: the holder loses it, so a player whose phone dies takes the seat again on another phone in seconds. The holder becomes a table device and keeps its admin, so a holder without admin becomes a viewer. A device that opened the link or scanned the QR code lands here at once. Before Start game, a device that took a seat waits in the lobby. After it, the device lands in the running game. The screen opens again from Players &amp; devices, when a device changes its seat.`,
+ mnote:
+ `One column: the seats, then Join as table device.`,
  h:`<div class="space"></div><div class="lay">
-  <div class="top"><div class="round"><b>Join game</b></div><div class="spacer"></div><button class="ibtn">✕ Close</button></div>
+  <div class="top"><div class="round"><b>Join game</b> · <span class="num">${CODE}</span></div><div class="spacer"></div><button class="ibtn">✕ Cancel</button></div>
+  <div class="content"><div class="claim-grid">
+    <div>
+      <div class="h1" style="font-size:25px">Which player are you?</div>
+      <div class="h1s" style="margin-bottom:18px">Take your seat. This device then acts for that player, when it is their turn.</div>
+      ${SEATS.map(id=>seatRow(id, id==='jaz')).join('')}
+    </div>
+    <div class="pnl" style="align-self:start"><div class="pnl-h">Join as table device</div><div class="pad">
+      <div class="home-help">A table device has no seat. It joins as a viewer, and an admin can give it admin on Players &amp; devices, so that it acts for every player like the iPad in the middle of the table.</div>
+      <button class="big lg" style="width:100%">JOIN AS TABLE</button></div></div>
+  </div></div></div>`};
+
+/* ── 15. Players & devices ── */
+// The code, the link, and the QR code for new devices, and one row per seat with the device that holds it, then the
+// table devices. Every device sees the admin switch of every device, and only an admin device uses them; on the
+// others they are off. Before Start game the same screen is the lobby.
+const admCell = (m, me) => me.admin
+  ? `<div class="adm">Admin ${tog(m.admin)}</div>`
+  : `<div class="adm">Admin <div class="tog ${m.admin?'on':''} off"></div></div>`;
+const devRow = (m, me) => {
+  const seat = m.seat ? P[m.seat] : null;
+  const isMe = me.seat ? m.seat===me.seat : !m.seat && m.me;
+  const st = m.on ? '<div class="st ok">● Connected</div>' : '<div class="st away">Away</div>';
+  return `<div class="dev-row ${seat?'':'table'}" style="${seat?col(m.seat):'--pc:var(--accent)'}"><i></i>
+    <div><div class="nm">${seat?seat.name:'Table device'}${isMe?'<span class="you-tag">This device</span>':''}</div>
+      <div class="fc">${seat?seat.f:m.admin?'Acts for every player':'Watches the game'}</div></div>${st}${admCell(m, me)}</div>`;
+};
+const freeRow = id => `<div class="dev-row" style="${col(id)}"><i></i>
+    <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f}</div></div><div class="st no">No device</div><div class="adm"></div></div>`;
+const deviceRows = (members, me) => `
+      <div class="setup-label">Seats and devices · ${members.filter(m=>m.seat).length} of 6 seats have a device</div>
+      ${SEATS.map(id=>{ const h=holder(id, members); return h?devRow(h, me):freeRow(id); }).join('')}
+      <div class="setup-label" style="margin-top:18px">Table devices</div>
+      ${members.filter(m=>!m.seat).map(m=>devRow(m, me)).join('')}`;
+// Before the start: three phones took their seats.
+const MEMBERS_LOBBY = MEMBERS.filter(m=>m.seat!=='tom');
+const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space"></div><div class="lay">
+  <div class="top stack"><div class="round"><b>Players &amp; devices</b> · ${lobby?'Lobby':'Round 3'}</div><div class="spacer"></div>
+    <button class="ibtn">Change seat</button><button class="ibtn">Leave game</button>${lobby
+      ? '<button class="ibtn">⚙<span class="word"> Settings</span></button>'
+      : '<button class="ibtn">✕ Close</button>'}</div>
   <div class="content join-grid">
     <div style="text-align:center">
       <div class="qr" id="qr" style="margin:0 auto"></div>
-      <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:22px">Or enter the code at ti4tempo.app</div>
-      <div class="joincode num">7QK2</div>
+      <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:22px">Join code</div>
+      <div class="joincode num">${CODE}</div>
+      <div class="joinlink">Scan the code, or open <b>${LINK}</b></div>
     </div>
-    <div>
-      <div class="h1" style="font-size:25px">Play from your own phone</div>
-      <div class="h1s" style="line-height:1.65">End your own turn, mark yourself done in a reaction window, and see your running time — without reaching across the table.<br><br>
-        <b style="color:var(--dim)">Entirely optional.</b> The table device stays fully functional on its own, and anyone who doesn't join just uses it as normal.</div>
-      <div style="margin-top:26px">
-        <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:11px">Connected · 4 of 6</div>
-        ${Object.entries(P).map(([id,d],i)=>`<div class="dev-row" style="${col(id)}">
-          <i></i><div><div class="nm">${d.name}</div></div>
-          <div class="st ${i<4?'ok':'no'}">${i<4?'● Connected':'Table device'}</div></div>`).join('')}
-      </div>
-    </div>
-  </div></div>`};
-
-/* ══════════════════ phone screens ══════════════════ */
-S.pJoin = {t:'Phone — Join', d:'phone', note:
- `Deliberately the shortest possible path in: four characters, no account, no install. A player who arrives late or whose phone dies mid-game must be able to rejoin in seconds, or they'll just use the table device — which is fine, but the companion only earns its place if joining is faster than reaching.`,
- h:`<div class="space"></div><div class="ph">
-  <div class="ph-top"><span>TI4 Tempo</span><span>9:41</span></div>
-  <div style="margin-top:34px"><h2>Join the table</h2>
-    <div class="sub">Enter the four-character code shown on the table device, or scan its QR.</div></div>
-  <div class="codebox"><b>7</b><b>Q</b><b>K</b><b class="f">|</b></div>
-  <div class="card2" style="display:flex;align-items:center;gap:13px">
-    <div style="width:40px;height:40px;border-radius:10px;background:#16202c;display:grid;place-items:center;font-size:19px">⛶</div>
-    <div style="flex:1"><div style="font-size:15px;font-weight:650">Scan QR instead</div>
-      <div style="font-size:12px;color:var(--faint);margin-top:2px">Point at the table device</div></div></div>
-  <div style="margin-top:auto;display:grid;gap:11px">
-    <button class="ph-btn">JOIN</button>
-    <div style="font-size:12px;color:var(--faint);text-align:center;line-height:1.5">No account needed. The companion is optional —<br>you can always just use the table device.</div>
-  </div></div>`};
-
-S.pSeat = {t:'Phone — Claim Seat', d:'phone', note:
- `Players claim a seat rather than being assigned one, because the table has already sorted out who is which colour physically. Claimed seats grey out so two people can't fight over Blue. This is the only screen where the phone writes identity — everything after it is read-and-act.`,
- h:`<div class="space"></div><div class="ph">
-  <div class="ph-top"><span>Round 3 · Action</span><span>9:41</span></div>
-  <div style="margin-top:26px"><h2>Which one are you?</h2>
-    <div class="sub">Pick your seat. Greyed-out seats are already claimed on another phone.</div></div>
-  <div style="margin-top:24px;overflow:auto">
-    ${Object.entries(P).map(([id,d],i)=>`<div class="seat-pick ${id==='kira'?'you':(i<4&&id!=='kira'?'taken':'')}" style="${col(id)}">
-      <i></i><div><div class="nm">${d.name}</div><div class="fc">${d.f}</div></div>
-      <div class="tk">${id==='kira'?'✓ You':(i<4?'Claimed':'Free')}</div></div>`).join('')}
+    <div>${deviceRows(members, me)}</div>
   </div>
-  <div style="margin-top:auto"><button class="ph-btn">CONTINUE AS KIRA</button></div></div>`};
+  ${lobby?`<div class="foot">${me.admin
+    ? '<div class="lobby-help">Start when everyone has a seat, or start now. A phone can still join later, and the table device acts for a seat without one.</div><button class="big">START GAME</button>'
+    : '<div class="lobby-wait"><i></i>Waiting for the table to start</div>'}</div>`:''}
+  </div>`;
 
-S.pWait = {t:'Phone — Waiting', d:'phone', note:
- `The state a player is in for most of the game, so it's built for a two-second glance from across the table: whose turn, how long they've had, and how far away yours is. The <b>"3 turns away"</b> line is the one genuinely new thing a phone offers over the table device — a private heads-up to start thinking now.`,
- h:`<div class="space"></div><div class="ph">
-  <div class="ph-top"><span>Round 3 · Action phase</span><span>9:41</span></div>
-  <div class="card2" style="margin-top:20px;${col('jaz')};border-color:color-mix(in srgb,var(--pc) 45%, transparent);background:color-mix(in srgb,var(--pc) 10%, #0b111a)">
-    <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">Current turn</div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:9px">
-      <i style="width:14px;height:14px;border-radius:50%;background:var(--pc);font-style:normal"></i>
-      <div style="font-size:26px;font-weight:750">Jaz</div>
-      <div class="num" style="margin-left:auto;font-size:32px;font-weight:800" data-clock="up" data-t="88">1:28</div></div>
-    <div style="font-size:12px;color:var(--faint);margin-top:6px">Federation of Sol · initiative 3 · limit 3:00</div>
-  </div>
-  <div style="margin-top:22px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">You</div>
-  <div class="card2" style="margin-top:10px;${col('kira')}">
-    <div style="display:flex;align-items:center;gap:10px">
-      <i style="width:12px;height:12px;border-radius:50%;background:var(--pc);font-style:normal"></i>
-      <div style="font-size:20px;font-weight:700">Kira</div>
-      <div class="tk" style="margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--warn)">Not passed</div></div>
-    <div class="mini-rail">
-      <u class="p" style="--pc:var(--c-green)"></u><u class="p" style="--pc:var(--c-orange)"></u>
-      <u class="on" style="--pc:var(--c-blue)"></u><u style="--pc:var(--c-purple)"></u>
-      <u style="--pc:var(--c-red)"></u><u style="--pc:var(--c-yellow)"></u></div>
-    <div style="display:flex;justify-content:space-between;margin-top:16px">
-      <div><div style="font-size:11px;color:var(--faint)">Your total</div><div class="num" style="font-size:22px;font-weight:750">17:30</div></div>
-      <div><div style="font-size:11px;color:var(--faint)">Avg turn</div><div class="num" style="font-size:22px;font-weight:750">1:45</div></div>
-      <div><div style="font-size:11px;color:var(--faint)">Strategy card</div><div style="font-size:16px;font-weight:700;margin-top:4px">Trade (5)</div></div></div>
-  </div>
-  <div style="margin-top:24px;text-align:center;padding:20px;border:1px dashed var(--line2);border-radius:14px">
-    <div style="font-size:15px;color:var(--dim)">You're <b style="color:var(--txt)">2 turns away</b></div>
-    <div style="font-size:12.5px;color:var(--faint);margin-top:6px">Jaz, then Sam. Tom and Wren have passed.</div></div>
-  <div style="margin-top:auto;font-size:12px;color:var(--faint);text-align:center">Buttons unlock when it's your turn.</div>
-  </div>`};
+S.lobby = {t:'Players & Devices — Lobby', note:
+ `Create game put the six seats on the server and opened this screen on the host's iPad. <b>No clock runs yet.</b> The host reads the code out or holds up the QR code, and each row flips to <b>Connected</b> as a phone takes its seat: Kira, Jaz, and Priya are in, and three seats have no device yet. The <b>admin switch</b> on a row gives that device admin or takes it away; Kira's phone has it, because Kira is the host. A laptop joined as a table device and is a <b>viewer</b> until the host turns its switch on. <b>Leave game</b> takes the game off this device and goes to Home. <b>Start game</b> begins the strategy phase. The host can start before every seat has a phone, because the table device acts for a seat without one, and a phone can still join later. Settings opens the time limits before the start.`,
+ mnote:
+ `One column: the QR code and the code, then the seats, then Start game at the end.`,
+ h:playersScreen(true, TABLE, MEMBERS_LOBBY)};
 
-S.pTurn = {t:'Phone — Your Turn', d:'phone', note:
- `Colour-flooded so a player knows it's theirs before reading a word — and so five other people can see the glow across the table. The three actions mirror the table device exactly; anything done here updates the table device instantly and vice versa, so a player can start on their phone and finish with a tap on the table device. Pass is greyed until the strategy card is played.`,
- h:`<div class="ph-flood" style="${col('kira')}"></div><div class="ph">
-  <div class="ph-top"><span>Round 3 · Turn 4</span><span>9:41</span></div>
-  <div style="margin-top:22px;text-align:center">
-    <div style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)">Your turn</div>
-    <h2 style="font-size:38px;margin-top:8px">Kira</h2>
-    <div style="font-size:13px;color:var(--dim);margin-top:5px">Embers of Muaat · initiative 5</div></div>
-  <div class="ph-clock num" style="margin-top:32px" data-clock="up" data-t="107" data-limit="180" data-bar="pb1">1:47</div>
-  <div style="margin:20px 4px 0"><div class="limitbar"><i id="pb1" style="width:59%;background:var(--c-red)"></i></div>
-    <div class="limitrow"><span>Limit 3:00</span><span data-rem="pb1">1:13 left</span></div></div>
-  <div style="margin-top:auto;display:grid;gap:11px">
-    <button class="ph-btn big2">END TURN</button>
-    <button class="ph-btn ghost" style="text-align:left;padding:16px 18px">
-      <span style="display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">Strategic action</span>
-      Play Trade (5)</button>
-    <button class="ph-btn ghost" style="opacity:.4">PASS — strategy card unplayed</button>
-  </div></div>`};
+S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', note:
+ `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It sees the admin switch of every device, off for this phone, because only an admin device gives admin. When the host starts, the phone goes to the strategy phase on its own.`,
+ mnote:
+ `On a phone, the waiting line sits at the end of the column.`,
+ h:playersScreen(true, SEATED, MEMBERS_LOBBY)};
 
-S.pReaction = {t:'Phone — Reaction Window', d:'phone', note:
- `The clearest win for the companion. Five people reaching across a board the size of a coffee table to tap tiles is exactly the friction the phone removes — one enormous button, no aim required. Marking done means "I'm finished with this window", whether the secondary was resolved or declined, so there is no second decision to make.`,
- h:`<div class="space"></div><div class="ph">
-  <div class="ph-top"><span style="color:var(--accent)">Reaction window</span><span>9:41</span></div>
-  <div class="card2" style="margin-top:20px;${col('kira')};text-align:center;padding:22px">
-    <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)">Secondary ability</div>
-    <div style="font-size:29px;font-weight:750;margin-top:8px">Trade <span style="color:var(--faint)">(5)</span></div>
-    <div style="font-size:13px;color:var(--dim);margin-top:7px;display:flex;align-items:center;justify-content:center;gap:8px">
-      <i style="width:9px;height:9px;border-radius:50%;background:var(--pc);font-style:normal"></i>Played by Kira</div></div>
-  <div class="ph-clock num" style="margin-top:26px;color:var(--accent)" data-clock="down" data-t="92" data-limit="120" data-bar="pb2">1:32</div>
-  <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);text-align:center;margin-top:8px">Window remaining</div>
-  <div style="margin:18px 4px 0"><div class="limitbar"><i id="pb2" style="width:77%;background:var(--accent)"></i></div></div>
-  <div style="margin-top:24px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">Table status · 3 of 5 done</div>
-  <div style="display:flex;gap:8px;margin-top:11px">
-    ${['jaz','tom','priya','wren','sam'].map((id,i)=>`<div style="flex:1;text-align:center;${col(id)};
-      padding:11px 4px;border-radius:10px;border:1px solid ${i<3?'#2a5c3d':'var(--line2)'};background:${i<3?'#0a1c13':'#0b111a'}">
-      <i style="width:11px;height:11px;border-radius:50%;background:var(--pc);font-style:normal;display:block;margin:0 auto"></i>
-      <div style="font-size:11px;margin-top:7px;color:${i<3?'var(--ok)':'var(--faint)'}">${i<3?'✓':'…'}</div></div>`).join('')}
-  </div>
-  <div style="margin-top:auto;display:grid;gap:11px">
-    <button class="ph-btn big2">I'M DONE</button>
-    <div style="font-size:12px;color:var(--faint);text-align:center;line-height:1.5">Tap whether or not you used the secondary.<br>The window closes when everyone has.</div>
-  </div></div>`};
-
-S.pPass = {t:'Phone — Pass Confirmation', d:'phone', note:
- `The only confirmation dialog in the app. Passing is the single irreversible decision in a round — you're out until the next one — and it's the mistake with the highest cost, so it gets a guard rail that End Turn deliberately does not. Even so it's undoable from the table device, because a rules argument can retroactively change what should have happened.`,
- h:`<div class="space"></div>${S.pTurn.h.replace('<div class="space"></div>','')}
-  <div class="ph-modal"><div class="ph-sheet">
-    <h3>Pass for the rest of round 3?</h3>
-    <p>You won't take another turn this round. You'll be skipped in the initiative order until round 4 begins.</p>
-    <div class="warnbox"><b>You can still resolve secondary abilities.</b> Passing only stops you taking turns — you'll still get a tile in every reaction window.</div>
-    <div style="display:grid;gap:10px;margin-top:20px">
-      <button class="ph-btn red">YES, PASS</button>
-      <button class="ph-btn ghost">Cancel</button></div>
-  </div></div>`};
-
-S.pStats = {t:'Phone — Personal Stats', d:'phone', note:
- `Kept private to the player's own device on purpose. The table device shows everyone's numbers side by side, which is the social contract of the shared screen; the phone is where someone can quietly check whether they really are the slow one before anyone says it out loud.`,
- h:`<div class="space"></div><div class="ph">
-  <div class="ph-top"><span>Game complete</span><span>9:41</span></div>
-  <div style="margin-top:24px;${col('kira')}">
-    <div style="display:flex;align-items:center;gap:11px">
-      <i style="width:15px;height:15px;border-radius:50%;background:var(--pc);font-style:normal"></i>
-      <h2>Kira</h2></div>
-    <div class="sub">Embers of Muaat · 8 rounds · 30 turns</div></div>
-  <div class="card2" style="margin-top:22px;text-align:center;padding:24px">
-    <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">Your own-turn time</div>
-    <div class="num" style="font-size:56px;font-weight:800;letter-spacing:-.04em;margin-top:8px">46:00</div>
-    <div style="font-size:13px;color:var(--dim);margin-top:6px">18% of all turn time · 3rd of 6</div></div>
-  <div style="margin-top:20px">
-    <div class="ph-stat"><span>Average turn</span><b class="num">1:32</b></div>
-    <div class="ph-stat"><span>Longest turn</span><b class="num">7:35</b></div>
-    <div class="ph-stat"><span>Turns over limit</span><b class="num" style="color:var(--danger)">2</b></div>
-    <div class="ph-stat"><span>Total overtime</span><b class="num" style="color:var(--danger)">3:12</b></div>
-    <div class="ph-stat"><span>Reaction window time</span><b class="num">9:44</b></div>
-    <div class="ph-stat" style="border:none"><span>Fastest round</span><b class="num">Round 2</b></div></div>
-  <div style="margin-top:auto"><button class="ph-btn ghost">See the full table breakdown</button></div>
-  </div>`};
+S.players = {t:'Players & Devices', note:
+ `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. Every seat lists the device that holds it, connected or away, with the <b>admin switch</b> of that device. An admin gives admin to any other device or takes it away, but never from the last admin. A device that joins as a table device is a <b>viewer</b>: it watches the game, and the switch on its row gives it admin. The table devices come last. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
+ mnote:
+ `One column: the QR code and the code first, then the seats and the devices. On a phone this is where a player checks that their seat is theirs.`,
+ h:playersScreen(false)};
 
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Table device · iPad and phone', ['setup','setupMissing','setupDeal','settings','seating','remove','removeSpeaker','seatingOut','strategy','token','strategyFour','action','overtime','actionFour','paused','pausedRule','reaction','reactionOver','politics','passWarn','status','agenda','round','history','stats','join']],
-  ['Phone — companion (add-on)', ['pJoin','pSeat','pWait','pTurn','pReaction','pPass','pStats']],
+  ['Every device · iPad and phone', ['home','homeSaved','homeCode','opening','openingMissing','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','lobby','lobbyWait','claim','players','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
-// The frames: every table screen draws in each of them. Companion screens draw on the phone only.
+// The frames: every screen draws in each of them.
 const DEVICES = {
   ipad:   {W:1194, H:834,  tag:'iPad · 1194×834'},
   tablet: {W:834,  H:1194, tag:'iPad upright · 834×1194'},
@@ -2034,30 +2194,30 @@ const ORDERED = Object.keys(DEVICES);
 const nav = document.getElementById('navlist');
 nav.innerHTML = GROUPS.map(([g,ks])=>
   `<div class="nav-group">${g}</div>` +
-  ks.map(k=>`<div class="nav-item" data-k="${k}"><span class="idx num">${KEYS.indexOf(k)+1}</span>${S[k].t.replace(/^Phone — /,'')}</div>`).join('')
+  ks.map(k=>`<div class="nav-item" data-k="${k}"><span class="idx num">${KEYS.indexOf(k)+1}</span>${S[k].t}</div>`).join('')
 ).join('');
 
 const frame=document.getElementById('frame'), wrap=document.getElementById('wrap');
 const devs=document.getElementById('devs');
 let cur=null, dev='ipad';
 
-// A table screen has one template for every frame; the narrow frames show the narrow note.
-const layouts = s => s.d==='phone' ? {phone:s.note} : {ipad:s.note, tablet:s.mnote, phone:s.mnote};
+// Every screen has one template for every frame; the narrow frames show the narrow note.
+const layouts = s => ({ipad:s.note, tablet:s.mnote, phone:s.mnote});
 
 // `#action` opens a screen on the iPad, `#action/tablet` upright, and `#action/phone` on the phone.
 function show(k, want=dev){
   const s=S[k], ls=layouts(s), d=ls[want]!==undefined?want:Object.keys(ls)[0];
-  cur=k; if(s.d!=='phone') dev=d;
+  cur=k; dev=d;
   frame.className='frame '+d;
-  frame.innerHTML=`<div class="screen active ${s.d==='phone'?'':'table'}">${s.h}</div>`;
+  frame.innerHTML=`<div class="screen active table">${s.h}</div>`;
   document.getElementById('stitle').textContent=s.t;
   document.getElementById('stag').textContent=DEVICES[d].tag;
-  document.getElementById('slater').hidden=!(s.later||s.d==='phone');
+  document.getElementById('slater').hidden=!s.later;
   document.getElementById('snote').innerHTML=ls[d];
   devs.querySelectorAll('button').forEach(b=>{b.disabled=ls[b.dataset.d]===undefined; b.classList.toggle('on',b.dataset.d===d);});
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on',n.dataset.k===k));
-  try{ history.replaceState(null,'','#'+k+(d!=='ipad'&&s.d!=='phone'?'/'+d:'')); }catch(e){}
-  if(k==='join') drawQR();
+  try{ history.replaceState(null,'','#'+k+(d!=='ipad'?'/'+d:'')); }catch(e){}
+  if(frame.querySelector('#qr')) drawQR();
   fit();
   // Overlays open under the top bar, so they need its height, as the app measures it.
   const bar=frame.querySelector('.top.game');

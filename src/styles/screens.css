@@ -22,3 +22,25 @@
   font-weight: 400;
   color: var(--faint);
 }
+
+/* The QR code of the join link fills the white box that the mockup draws. */
+.qr > svg {
+  grid-area: 1 / 1 / -1 / -1;
+  width: 100%;
+  height: 100%;
+}
+
+/* A device without admin sees the time limits of the game, dimmed. */
+.stepper button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* The claim screen draws each seat as a button. */
+.seat-pick {
+  width: 100%;
+  text-align: left;
+}
+.seat-pick:disabled {
+  cursor: default;
+}

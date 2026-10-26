@@ -13,8 +13,10 @@
   .top.game .round{grid-area:round}
   .top.game .phase-pill{grid-area:pill; justify-self:center}
   .top.game .gt{grid-area:gt}
-  .top.game .spkb{grid-area:spk; justify-self:start}
+  .top.game .chips{grid-area:spk; justify-self:start}
   .top.game .extra{grid-area:extra; justify-self:end}
+  .home-grid, .claim-grid{grid-template-columns:1fr}
+  .lay > .open-wait{flex:1 0 auto}
   .top.game .tools{grid-area:tools; gap:8px}
   .top.game .spacer{display:none}
   .content, .body, .scroll{overflow:visible; min-height:auto}
@@ -68,7 +70,8 @@
   .top.game .round{font-size:11px}
   .top.game .ibtn{padding:9px 12px}
   .top.game .ibtn .word{display:none}
-  .top.game .spkb, .top.game .tools, .top.game .extra, .top.game .phase-pill{margin-top:10px}
+  .top.game .chips, .top.game .tools, .top.game .extra, .top.game .phase-pill{margin-top:10px}
+  .top.game .chips{gap:8px}
   .top.game .ph-now{display:inline}
   .top.game .gt{font-size:10.5px}
   .top.game .gt b{font-size:15px; margin-left:6px}
@@ -280,6 +283,14 @@
   /* join */
   .qr{width:206px; height:206px; padding:12px}
   .joincode{font-size:44px}
+  .joinlink{font-size:14px}
+  .dev-row{gap:9px; padding:11px 12px}
+  .dev-row .adm{min-width:0}
+  /* home: the code above the summary, and the button beside both */
+  .recent{grid-template-columns:1fr auto; gap:3px 12px}
+  .recent .code{grid-column:1}
+  .recent .ibtn{grid-row:1 / span 2; grid-column:2; align-self:center}
+  .foot .lobby-help{flex-basis:100%; text-align:center}
 
   /* dialogs open as a sheet at the bottom, and the pause overlay keeps Resume full width */
   .overlay.ask{place-items:end stretch}

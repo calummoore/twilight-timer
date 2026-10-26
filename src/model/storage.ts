@@ -10,8 +10,9 @@ export interface KeyValueStore {
 }
 
 /**
- * The keys of one saved game, newest version first. Load reads the first
- * key with data, so a game saved by an older build still loads.
+ * The keys of one game that a build before the server saved, newest version
+ * first. Load reads the first key with data, so a game of every older build
+ * still loads, and the device can continue it on the server.
  */
 type Slot = readonly [current: string, ...older: string[]]
 
@@ -47,15 +48,14 @@ export function loadLastGame(store: KeyValueStore): LoadedGame {
   return loadGame(store, LAST_GAME)
 }
 
-export function saveGame(store: KeyValueStore, game: Game): void {
-  write(store, GAME, JSON.stringify(game))
+/** Forgets the saved game, after the device continued it on the server. */
+export function forgetGame(store: KeyValueStore): void {
+  for (const key of GAME) store.removeItem(key)
 }
 
-/** Keeps the current game as the last game, then clears it. */
-export function archiveGame(store: KeyValueStore): void {
-  const text = read(store, GAME)
-  if (text !== null) write(store, LAST_GAME, text)
-  for (const key of GAME) store.removeItem(key)
+/** Forgets the last game, after the device continued it on the server. */
+export function forgetLastGame(store: KeyValueStore): void {
+  for (const key of LAST_GAME) store.removeItem(key)
 }
 
 export function loadSettings(store: KeyValueStore): Settings {
@@ -73,13 +73,6 @@ function read(store: KeyValueStore, slot: Slot): string | null {
     if (text !== null) return text
   }
   return null
-}
-
-/** Writes the current key and removes the older ones, so they cannot come back. */
-function write(store: KeyValueStore, slot: Slot, text: string): void {
-  const [current, ...older] = slot
-  store.setItem(current, text)
-  for (const key of older) store.removeItem(key)
 }
 
 function parseJson(text: string): unknown {

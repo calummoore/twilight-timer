@@ -5,7 +5,7 @@ import { clock } from '../format'
 
 /**
  * The Game panel of the setup screen: what the game starts with. Its summary
- * rows scroll when the panel is full, so the expansions, the deal, and BEGIN
+ * rows scroll when the panel is full, so the expansions, the deal, and CREATE
  * GAME stay in view.
  */
 export function SetupGamePanel(props: {
@@ -16,10 +16,14 @@ export function SetupGamePanel(props: {
   /** A seat has no faction yet, so the game cannot begin. */
   factionsMissing: boolean
   settings: Settings
+  /** Create game waits for the server. */
+  creating: boolean
+  /** The last Create game did not reach the server. */
+  failed: boolean
   onExpansions: (expansions: Expansions) => void
   /** Gives each seat with no faction a random faction in play. */
   onDeal: () => void
-  onBegin: () => void
+  onCreate: () => void
 }) {
   const { settings } = props
   const { expansions } = settings
@@ -106,20 +110,25 @@ export function SetupGamePanel(props: {
         {props.factionsMissing && (
           <>
             <div className="setup-need">
-              Pick a faction for every seat to begin.
+              Pick a faction for every seat to create the game.
             </div>
             <button className="deal" onClick={props.onDeal}>
               Random factions for empty seats
             </button>
           </>
         )}
+        {props.failed && !props.creating && (
+          <div className="setup-need">
+            The game could not be created. Check the connection and try again.
+          </div>
+        )}
         <button
           className="big lg"
           style={{ width: '100%' }}
-          disabled={props.factionsMissing}
-          onClick={props.onBegin}
+          disabled={props.factionsMissing || props.creating}
+          onClick={props.onCreate}
         >
-          BEGIN GAME
+          {props.creating ? 'CREATING…' : 'CREATE GAME'}
         </button>
       </div>
     </div>
