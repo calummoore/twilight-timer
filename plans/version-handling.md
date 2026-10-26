@@ -113,22 +113,24 @@ second mismatch, the page shows the notice instead and stops its socket.
 A matching build clears the guard. The statuses unreadable and outdated
 end the connection, like missing: the page does not reconnect from them.
 
-Transition. The first deploy of this change ends the sockets of the pages
-that are open, as every deploy does. Those pages connect again and send a
-hello without a build, which the object ignores. They show the
-reconnecting bar or the opening line until one manual reload. Every later
-deploy reloads every open page.
+Transition. The pages open during the first deploy of this change send a
+hello without a build, which the object ignores, and the object closes
+their old sockets at its next broadcast. Those pages show the reconnecting
+bar or the opening line until one manual reload. Every later deploy
+reloads every open page.
 
-Update, 2026-10-26, from the implementation: the Cloudflare docs say that a
-deploy restarts every Durable Object and ends every WebSocket, also a
-hibernated one. So an idle page connects again at once, gets the outdated
-message, and reloads. The lost tap of decision 5 needs a socket that
-outlives a deploy, which Cloudflare does not keep. Decision 5 stays as it
-is: the object still refuses a command of another build and closes the
-sockets of another build at its next broadcast. The New versions section of
-the spec says so. A deploy rolls out over some seconds, so a page that
-reloads can meet the other build for a moment. The guard then shows the
-notice, and RELOAD recovers.
+Update, 2026-10-26, from the implementation: the Cloudflare docs say that
+a deploy restarts every Durable Object and ends its WebSockets. A test on
+the preview of PR #30 showed more. During a new preview version, the socket
+of one device closed, and that device connected again, got the outdated
+message, and reloaded. The other device kept its socket, and the new code
+served it. That device got the outdated message at the next broadcast,
+which the reconnect of the first device caused, and reloaded too. So an
+idle table can keep its sockets across a deploy, and the lost tap of
+decision 5 can happen. Decision 5 stays as it is. Evidence:
+`.context/version-handling/smoke-preview.log`. A deploy also rolls out over
+some seconds, so a page that reloads can meet the other build for a
+moment. The guard then shows the notice, and RELOAD recovers.
 
 Stored shapes. These rules go into the repository rules:
 
@@ -273,6 +275,12 @@ Tags: ui
       `docs/product/versions.md`, because `docs/product/multiplayer.md`
       passed 250 lines. Update its links. The merge and its conflicts:
       `.context/version-handling/merge-justification.md`, merge 2.
+- [x] Smoke test on the preview of PR #30, across a new preview version:
+      the socket of one device closed, and that device reloaded. The other
+      device kept its socket, got the outdated message at the next
+      broadcast, and reloaded. Both returned to the game. This corrects the
+      spec paragraph that said that a deploy ends every socket. Evidence:
+      `.context/version-handling/smoke-preview.log`.
 - [x] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 
