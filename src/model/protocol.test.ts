@@ -127,11 +127,12 @@ describe('the build on the wire', () => {
 })
 
 describe('the request that creates a game', () => {
-  it('reads a setup', () => {
-    expect(parseCreateRequest(wire({ token: HOST, setup: SETUP }))).toEqual({
-      token: HOST,
-      setup: SETUP,
-    })
+  it('reads a setup, and leaves the build of the page apart', () => {
+    const request = { token: HOST, build: BUILD, setup: SETUP }
+    const seats = { token: HOST, setup: SETUP }
+    expect(parseCreateRequest(wire(request))).toEqual(seats)
+    // A page from before the request named its build.
+    expect(parseCreateRequest(wire(seats))).toEqual(seats)
   })
 
   it('rejects a setup that cannot start a game', () => {

@@ -1,10 +1,18 @@
 import { parseCode } from '../model/code'
-import type { CreateRequest } from '../model/protocol'
+import { isFields } from '../model/parse-fields'
+import { buildOf, type CreateRequest } from '../model/protocol'
 
 /** Calls to the game API of the Worker, on the origin of the app. */
 
-/** A new game and its code, or the reason that the game has none. */
-export type Created = { code: string } | { error: 'offline' }
+/**
+ * A new game and its code, or the reason that the game has none: no answer
+ * from the server, or a server of another build that cannot read the setup
+ * of this page. The server names its build, or none before builds had ids.
+ */
+export type Created =
+  | { code: string }
+  | { error: 'offline' }
+  | { error: 'outdated'; build: string | null }
 
 /** Creates a game from a setup. */
 export async function createGame(request: CreateRequest): Promise<Created> {
@@ -14,8 +22,13 @@ export async function createGame(request: CreateRequest): Promise<Created> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
     })
-    const code = response.ok ? codeOf(await response.json()) : null
-    return code ? { code } : { error: 'offline' }
+    const body: unknown = await response.json().catch(() => null)
+    const code = response.ok ? codeOf(body) : null
+    if (code) return { code }
+    if (isFields(body) && body.error === 'outdated') {
+      return { error: 'outdated', build: buildOf(body) }
+    }
+    return { error: 'offline' }
   } catch {
     return { error: 'offline' }
   }
