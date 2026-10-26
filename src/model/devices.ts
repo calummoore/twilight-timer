@@ -71,6 +71,16 @@ export function isLastAdmin(
   return device.admin && devices.filter((d) => d.admin).length === 1
 }
 
+/**
+ * Whether no admin device has a connection now. Then a seated device may
+ * switch its own admin on, so that the table can finish the game.
+ */
+export function adminsAway(
+  devices: readonly { admin: boolean; connected: boolean }[],
+): boolean {
+  return !devices.some((d) => d.admin && d.connected)
+}
+
 /** The device without its token, as the other devices see it. */
 export function publicDevice({ id, seat, admin }: Member): Device {
   return { id, seat, admin }

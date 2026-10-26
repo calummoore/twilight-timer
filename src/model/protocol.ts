@@ -48,6 +48,12 @@ export interface RoomState {
   /** The game from Start game on, or null in the lobby. */
   game: Game | null
   devices: DeviceView[]
+  /**
+   * No admin device has a connection now, so a seated device may take
+   * admin. The device that created the game counts as an admin device until
+   * it joins.
+   */
+  adminsAway: boolean
 }
 
 /** From the server: the state, or that no game has the code. */
@@ -67,9 +73,11 @@ export type ServerMessage =
     }
   | { type: 'missing' }
 
-/** The body of the request that creates a game, from a setup or a saved game. */
-export type CreateRequest =
-  { token: string; setup: Setup } | { token: string; game: Game }
+/** The body of the request that creates a game from a setup. */
+export interface CreateRequest {
+  token: string
+  setup: Setup
+}
 
 export function parseClientMessage(raw: unknown): ClientMessage | null {
   if (!isFields(raw)) return null
@@ -140,7 +148,9 @@ function parseRoomState(raw: unknown): RoomState | null {
   const devices = listOf(raw.devices, parseDeviceView)
   if (!code || !isRevision(raw.revision) || !setup || !devices) return null
   if (game === null && raw.game !== null) return null
-  return { code, revision: raw.revision, setup, game, devices }
+  // A state without the flag reads as one with an admin device connected.
+  const adminsAway = raw.adminsAway === true
+  return { code, revision: raw.revision, setup, game, devices, adminsAway }
 }
 
 function parseDeviceView(raw: unknown): DeviceView | null {
@@ -154,13 +164,8 @@ function parseDeviceView(raw: unknown): DeviceView | null {
 export function parseCreateRequest(raw: unknown): CreateRequest | null {
   if (!isFields(raw)) return null
   const token = parseToken(raw.token)
-  if (!token) return null
-  if (raw.game !== undefined) {
-    const game = parseGame(raw.game)
-    return game && { token, game }
-  }
   const setup = parseSetup(raw.setup)
-  return setup && { token, setup }
+  return token !== null && setup ? { token, setup } : null
 }
 
 /** A revision is a count of changes, so it is a whole number from 0. */

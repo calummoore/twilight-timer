@@ -14,14 +14,6 @@ export function bool(raw: unknown, fallback: boolean): boolean {
   return typeof raw === 'boolean' ? raw : fallback
 }
 
-/** Maps each item of a list, and keeps anything else for the parser. */
-export function mapList(
-  raw: unknown,
-  map: (item: unknown) => unknown,
-): unknown {
-  return Array.isArray(raw) ? raw.map(map) : raw
-}
-
 /** Parses each item of a list, or returns null when one item is not valid. */
 export function listOf<T>(
   raw: unknown,

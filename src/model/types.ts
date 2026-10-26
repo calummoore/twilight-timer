@@ -5,11 +5,8 @@ export interface Player {
   id: string
   name: string
   colour: Colour
-  /**
-   * The faction from the official list. Only a game from an older build
-   * holds null, because those builds allowed a missing or unlisted faction.
-   */
-  factionId: FactionId | null
+  /** The faction from the official list. Every player has one. */
+  factionId: FactionId
 }
 
 export const TIMER_KEYS = [
@@ -100,17 +97,15 @@ export interface Game {
   firstSpeakerId: string
   /**
    * The Naalu player, who gets the Naalu "0" token back each round while
-   * they are in the game, or null. A version 1 game, from a build before
-   * the Naalu token, has null, because its log follows card order.
+   * they are in the game, or null. A game from a build before the Naalu
+   * token has null, because its log follows card order.
    */
   naaluTokenOwnerId: string | null
   /**
    * True when a tap that closes a reaction window also ends the turn. The
    * window then stays open past its limit, so that only a tap ends a turn.
-   * A version 1 to 3 game, from an older build, has false: its window close
-   * resumed the turn, and its window closed itself at its limit. A version 3
-   * game that stores the field keeps it. So does a version 4 game from main,
-   * but a version 4 game without the field, from a preview, has false.
+   * A game from a build before this rule has false: its window close resumes
+   * the turn, and its window closes itself at its limit.
    */
   windowEndsTurn: boolean
   actions: Action[]

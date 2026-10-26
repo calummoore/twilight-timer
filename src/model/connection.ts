@@ -30,3 +30,18 @@ export const PONG_TIMEOUT_MS = 10_000
 export const PING_INTERVAL_MS = 20_000
 /** When the page shows again, a connection must answer a ping this fast. */
 export const WAKE_TIMEOUT_MS = 3_000
+
+/**
+ * A device counts as connected while its socket showed a sign of life this
+ * recently: a message, or a ping that the server answered. A hidden page may
+ * ping only once a minute, so the window is longer than that.
+ */
+export const LIVE_MS = 90_000
+
+/** Whether a socket whose last sign of life came at `lastSeen` is live. */
+export function isLive(lastSeen: number, now: number): boolean {
+  return now - lastSeen <= LIVE_MS
+}
+
+/** Players & devices asks for a fresh state this often while it is open. */
+export const REFRESH_MS = 15_000

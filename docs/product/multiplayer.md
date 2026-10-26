@@ -47,11 +47,6 @@ A game stays on the server, reachable by its code, without a time limit.
 Rejected: deleting old games, because a game is small, and a code must not
 be reused.
 
-A device that holds a game saved by an older build offers to continue that
-game on the server. The game then gets a code, and the device joins it at
-once as a table device with admin, without the claim screen. A saved game
-that cannot be read shows a notice, as before.
-
 ## Codes
 
 Each game has a join code: six characters, letters and digits, without the
@@ -71,9 +66,10 @@ clipboard, so that a player can send it in a chat. Rejected: opening the link
 in the same tab, because the page then loads again, and during a game it
 leaves Players & devices.
 
-The join code is the only code. A device becomes an admin only when an
-admin device gives it admin, see [Admin rights](#admin-rights). The device
-that creates the game is the first admin. Rejected: an
+The join code is the only code. A device becomes an admin when an admin
+device gives it admin, or when it holds a seat and takes admin while every
+admin device is away, see [Admin rights](#admin-rights). The device that
+creates the game is the first admin. Rejected: an
 admin code shown on admin devices, because it is readable wherever the
 join code is, on the device in the middle of the table. Rejected: a
 request for admin that an admin approves, because it adds a pending state
@@ -141,6 +137,17 @@ viewer and the switch are the same check as for a seated device. The
 Players & devices screen lists every device of the game with its seat or
 Table, its admin state, and whether it is connected.
 
+While no admin device has a connection, a seated device may give itself
+admin, with the switch on its own row. So a table whose only admin device is
+gone for good, for example after its browser data is lost, can finish the
+game. A viewer takes a seat first. The device that creates the game counts
+as an admin device until it joins, so a device that joins first cannot take
+admin from the host. The Players & devices screen says so on every device
+while every admin device is away. Rejected: a recovery link
+for the device that creates the game, because it is a second secret, close
+to the rejected admin code. Rejected: a tip in the lobby to give admin to a
+second device, because the stuck state stays possible.
+
 ## Who may tap what
 
 A seated device acts for its player only, and only when the game waits for
@@ -148,21 +155,21 @@ that player. The table below gives the rule for each tap. The server applies
 the same rules, so a tap outside the rights of a device does nothing,
 whatever the device shows.
 
-| Tap                                                                     | Seated device                   | Admin device                 |
-| ----------------------------------------------------------------------- | ------------------------------- | ---------------------------- |
-| Pick a strategy card                                                    | When it is the player's pick    | Any time                     |
-| End turn, play a strategy card, pass                                    | On the player's turn            | Any time                     |
-| Mark done in a reaction window                                          | The player's own tile           | Any tile                     |
-| Mark all done, extend the window, choose the Politics speaker           | When the player played the card | Any time                     |
-| Cast a vote                                                             | When it is the player's vote    | Any time                     |
-| Status steps, Custodians, next phase, open voting, resolve, next round  | No                              | Yes                          |
-| Move the speaker, move the Naalu token, remove a player, end the game   | No                              | Yes                          |
-| Swap two seats                                                          | No                              | Yes                          |
-| Pause, resume, rule check, time limits                                  | No                              | Yes                          |
-| Start game, from the lobby                                              | No                              | Yes                          |
-| Undo                                                                    | No                              | Yes                          |
-| Change own seat, become a table device                                  | Yes                             | Yes                          |
-| Give or take admin                                                      | No                              | Yes, not from the last admin |
+| Tap                                                                    | Seated device                                | Admin device                 |
+| ---------------------------------------------------------------------- | -------------------------------------------- | ---------------------------- |
+| Pick a strategy card                                                   | When it is the player's pick                 | Any time                     |
+| End turn, play a strategy card, pass                                   | On the player's turn                         | Any time                     |
+| Mark done in a reaction window                                         | The player's own tile                        | Any tile                     |
+| Mark all done, extend the window, choose the Politics speaker          | When the player played the card              | Any time                     |
+| Cast a vote                                                            | When it is the player's vote                 | Any time                     |
+| Status steps, Custodians, next phase, open voting, resolve, next round | No                                           | Yes                          |
+| Move the speaker, move the Naalu token, remove a player, end the game  | No                                           | Yes                          |
+| Swap two seats                                                         | No                                           | Yes                          |
+| Pause, resume, rule check, time limits                                 | No                                           | Yes                          |
+| Start game, from the lobby                                             | No                                           | Yes                          |
+| Undo                                                                   | No                                           | Yes                          |
+| Change own seat, become a table device                                 | Yes                                          | Yes                          |
+| Give or take admin                                                     | Give itself admin, while every admin is away | Yes, not from the last admin |
 
 A viewer may only take a seat.
 

@@ -4,10 +4,14 @@ import { COLOURS, type Colour } from '../../model/rules'
 import type { Expansions } from '../../model/settings'
 import { pc } from '../colour'
 
-/** One seat of the setup screen, before the game begins. */
+/**
+ * One seat of the setup screen, before the game begins. A seat can be empty:
+ * it has no faction yet, and the game cannot begin until it has one.
+ */
 export interface SeatRow {
   name: string
   colour: Colour
+  /** The faction of the seat, or null for an empty seat. */
   factionId: FactionId | null
 }
 

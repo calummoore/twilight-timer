@@ -44,10 +44,9 @@ in the futex account. The app opens at https://ti4.nexus; see
 - An admin device taps for every player. After Create game, the device
   takes a seat or the table on the claim screen, and is the first admin
   either way. It gives admin to other devices with a switch. A table device
-  without admin is a viewer.
-- Home lists the recent games of the device, and continues a game that an
-  older build saved on the device. The device then joins that game as the
-  table device, with admin.
+  without admin is a viewer. While every admin device is away, a seated
+  device can take admin, so the table can finish the game.
+- Home lists the recent games of the device.
 - The screen stays awake, and the same screens show on a phone, an iPad, and
   a computer, arranged for the space.
 
@@ -188,9 +187,9 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   - `stats.ts`: round and game stats.
   - `pauses.ts`: the open pause, and the time and the count of rule checks,
     which count as game time.
-  - `storage.ts` and `parse.ts`: the settings in `localStorage`, and the
-    games that builds before the server saved there. The parser reads games
-    of every older version.
+  - `storage.ts`: the settings in `localStorage`.
+  - `parse.ts` and `parse-parts.ts`: the parsers of the settings and of a
+    stored game. The parser reads a game of version 6 or 7.
   - `fixtures/`: one game for each version bump, as the build before the
     bump stored it. `fixtures.test.ts` loads each one.
   - `device-store.ts`: the token of the browser, and its open and recent
@@ -206,7 +205,7 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   - `room.ts` and `setup.ts`: one game on the server, its reducer, and its
     stored shape.
 - `worker/` holds the Worker.
-  - `index.ts`: the routes. `POST /api/games` creates a game,
+  - `index.ts`: the routes. `POST /api/games` creates a game from a setup,
     `GET /api/games/<code>` looks a code up, and
     `GET /api/games/<code>/socket` opens the socket of a game.
   - `game-room.ts`: the Durable Object of one game. It applies each command

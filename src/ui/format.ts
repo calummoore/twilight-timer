@@ -70,7 +70,7 @@ export function dayLabel(at: number, now: number): string {
 }
 
 /** "12 October", or "12 October 2025" with the year. */
-export function dateLabel(at: number, year = false): string {
+function dateLabel(at: number, year = false): string {
   return new Date(at).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',

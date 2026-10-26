@@ -3,8 +3,8 @@ import { derive } from './derive'
 import { foldGame } from './fold'
 import gameV6 from './fixtures/game-v6.json'
 import { parseGame } from './parse'
-import { parseRoom, roomOfGame } from './room'
-import { CODE, HOST } from './test-room'
+import { newRoom, parseRoom } from './room'
+import { CODE, HOST, SETUP } from './test-room'
 import { NAALU_PLAYERS, SEC, T0, playStrategy, table } from './test-table'
 import { DEFAULT_SETTINGS } from './settings'
 
@@ -54,7 +54,7 @@ describe('stored games of an older version', () => {
     const v6 = { ...t.game, version: 6 }
     expect(parseGame(wire(v6))).toEqual(t.game)
     // A stored room reads its version 6 game the same way.
-    const room = { ...roomOfGame(CODE, t.game, HOST), game: v6 }
+    const room = { ...newRoom(CODE, SETUP, HOST), game: v6 }
     expect(parseRoom(wire(room))?.game).toEqual(t.game)
   })
 })

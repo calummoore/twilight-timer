@@ -21,7 +21,7 @@ export function parsePlayer(raw: unknown): Player | null {
   const { id, name, colour, factionId } = raw
   const c: Colour | undefined = COLOURS.find((x) => x === colour)
   if (typeof id !== 'string' || typeof name !== 'string' || !c) return null
-  if (factionId !== null && !isFactionId(factionId)) return null
+  if (!isFactionId(factionId)) return null
   return { id, name, colour: c, factionId }
 }
 
@@ -57,7 +57,7 @@ export function parseActionInput(raw: unknown): ActionInput | null {
     case 'custodiansSet':
       return typeof removed === 'boolean' ? { kind: raw.kind, removed } : null
     case 'strategyCardPlayed':
-      // An upgraded game from an older build has a null card.
+      // A game from a build that gave each player one card has a null card.
       return isNumber(card) || card === null ? { kind: raw.kind, card } : null
     case 'phaseStepped':
     case 'turnEnded':
@@ -80,17 +80,14 @@ export function parseInterval(raw: unknown): Interval | null {
 }
 
 /**
- * A pause and its reason ranges. A pause from before version 6 has no
- * ranges, except in a game that a preview of pause reasons saved as version
- * 4 or 5. A range that cannot be read is dropped, so its time counts as a
- * plain pause and the game still loads.
+ * A pause and its list of reason ranges, which every pause has. A range that
+ * cannot be read is dropped, so its time counts as a plain pause and the game
+ * still loads.
  */
 export function parsePause(raw: unknown): Pause | null {
   const range = parseInterval(raw)
-  if (!range || !isFields(raw)) return null
-  const reasons = Array.isArray(raw.reasons)
-    ? raw.reasons.flatMap((r: unknown) => parseReasonRange(r) ?? [])
-    : []
+  if (!range || !isFields(raw) || !Array.isArray(raw.reasons)) return null
+  const reasons = raw.reasons.flatMap((r: unknown) => parseReasonRange(r) ?? [])
   return { ...range, reasons }
 }
 

@@ -102,13 +102,13 @@ export function SetupScreen(props: {
     else if (speaker === j) setSpeaker(i)
   }
 
+  // Create game is off while a seat is empty, so every seat has a faction.
   const create = () => {
-    const players = seats.map((row, i) => ({
-      id: `p${i + 1}`,
-      name: nameOf(i),
-      colour: row.colour,
-      factionId: row.factionId,
-    }))
+    const players: Player[] = []
+    for (const [i, { colour, factionId }] of seats.entries()) {
+      if (factionId === null) return
+      players.push({ id: `p${i + 1}`, name: nameOf(i), colour, factionId })
+    }
     props.onCreate(players, `p${speaker + 1}`)
   }
 
