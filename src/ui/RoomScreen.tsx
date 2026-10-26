@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import type { RecentGame } from '../model/device-store'
-import { adminsAway } from '../model/devices'
 import type { Command } from '../model/protocol'
 import { mayCommand } from '../model/rights'
 import type { LimitSettings, Settings } from '../model/settings'
@@ -84,8 +83,8 @@ export function RoomScreen(props: {
     props.onSettings({ ...props.settings, ...limits })
   }
   // While every admin device is away, a seated device may take admin. The
-  // switches ask the same rule as the server.
-  const away = adminsAway(room.devices)
+  // server says when they are, and the switches ask its rule.
+  const away = room.adminsAway
   const mayAdmin = (deviceId: string, on: boolean) =>
     connected && mayCommand(device, adminCommand(deviceId, on), null, away)
   const playersScreen = (round: number | null, onClose?: () => void) => (

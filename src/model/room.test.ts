@@ -8,6 +8,7 @@ import {
   SETUP,
   playStrategyOn,
   seatedServer,
+  server,
   tableServer,
 } from './test-room'
 import { MIN, SEC, T0 } from './test-table'
@@ -222,6 +223,17 @@ describe('admin recovery in a room', () => {
     expect(s.send(JAZ, take)).toBeNull()
     expect(s.room.members[1]).toMatchObject({ seat: 'jaz', admin: true })
     expect(s.send(JAZ, { type: 'pause' })).toBeNull()
+  })
+
+  it('keeps admin for the device that created the game until it joins', () => {
+    // Jaz's phone opens the link before the host takes a place.
+    const s = server()
+    s.send(JAZ, { type: 'claim', seat: 'jaz' })
+    const jaz = { type: 'admin', deviceId: 'd1', admin: true } as const
+    expect(s.send(JAZ, jaz)).toBe('forbidden')
+    // The host's device is gone before it joined: Jaz may take admin.
+    s.leave(HOST)
+    expect(s.send(JAZ, jaz)).toBeNull()
   })
 
   it('refuses admin to a viewer, and for another device', () => {

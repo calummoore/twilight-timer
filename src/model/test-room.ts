@@ -32,14 +32,15 @@ export const SETUP: Setup = {
 export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
   let now = T0
   let current = room
-  // The devices that have no connection. Every other device is connected.
+  // The devices that have no connection. Every other device is connected,
+  // also the device that created the game before it joins.
   const away = new Set<string>()
-  const connected = (sender: string) =>
-    new Set(
-      [...current.members.map((m) => m.token), sender].filter(
-        (t) => !away.has(t) || t === sender,
-      ),
-    )
+  const connected = (sender: string) => {
+    const tokens = current.members.map((m) => m.token)
+    if (current.creator !== null) tokens.push(current.creator)
+    tokens.push(sender)
+    return new Set(tokens.filter((t) => !away.has(t) || t === sender))
+  }
   return {
     get room() {
       return current

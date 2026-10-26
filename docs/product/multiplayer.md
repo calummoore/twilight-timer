@@ -145,8 +145,10 @@ Table, its admin state, and whether it is connected.
 While no admin device has a connection, a seated device may give itself
 admin, with the switch on its own row. So a table whose only admin device is
 gone for good, for example after its browser data is lost, can finish the
-game. A viewer takes a seat first. The Players & devices screen says so on
-every device while every admin device is away. Rejected: a recovery link
+game. A viewer takes a seat first. The device that creates the game counts
+as an admin device until it joins, so a device that joins first cannot take
+admin from the host. The Players & devices screen says so on every device
+while every admin device is away. Rejected: a recovery link
 for the device that creates the game, because it is a second secret, close
 to the rejected admin code. Rejected: a tip in the lobby to give admin to a
 second device, because the stuck state stays possible.

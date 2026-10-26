@@ -57,8 +57,8 @@ Contract owners:
 
 The rights module takes one more input: whether every admin device is away.
 The room reducer gets the tokens of the connected devices from the object,
-derives that input, and passes it to the rights module. The screens derive
-the same input from the devices of the state message. An admin command from
+derives that input, and passes it to the rights module. The state message
+carries the same input, and the screens use it. An admin command from
 a device without admin is allowed only when the input holds, the device
 holds a seat, the command names the device itself, and it turns admin on.
 The last-admin rule does not change, because taking admin only adds an
@@ -141,3 +141,15 @@ Tags: ui
         Separate branch.
 - [x] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
+
+## Milestone 6: The creator before it joins
+
+The merge of main brought the claim screen after Create game: a new game
+has no device until the device that creates it joins. Until then, no admin
+device exists, so a phone that joined first could take admin from the host.
+
+- [x] The device that creates the game counts as an admin device until it
+      joins. The server decides whether every admin device is away, and
+      sends it in the state, so the screens use the same answer. Test.
+- [x] Update `docs/product/multiplayer.md`.
+- [x] Run the complete gate, commit, and push.

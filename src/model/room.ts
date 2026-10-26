@@ -100,7 +100,7 @@ export function applyCommand(
   if (rev !== room.revision) return { rejected: 'stale' }
   const device = memberOf(room.members, token)
   const view = room.game && derive(room.game, now)
-  const away = adminsAway(roomState(room, connected).devices)
+  const { adminsAway: away } = roomState(room, connected)
   if (!mayCommand(device, command, view, away)) {
     return { rejected: 'forbidden' }
   }
@@ -165,7 +165,9 @@ function withGame(room: Room, game: Game | null): Room | null {
 
 /**
  * The room as every device sees it. `connected` holds the tokens of the
- * devices that have a connection now.
+ * devices that have a connection now. The device that created the game
+ * counts as an admin device until it joins, so a device that joins first
+ * cannot take admin from it.
  */
 export function roomState(
   room: Room,
@@ -176,7 +178,9 @@ export function roomState(
     ...publicDevice(member),
     connected: connected.has(member.token),
   }))
-  return { code, revision, setup, game, devices }
+  const creatorHere = room.creator !== null && connected.has(room.creator)
+  const away = !creatorHere && adminsAway(devices)
+  return { code, revision, setup, game, devices, adminsAway: away }
 }
 
 /** The state message for the device of `token`. */
