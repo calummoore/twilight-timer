@@ -290,6 +290,10 @@ Build re-order mode and the setup handle as the mockup shows them.
   - Review 1, 4. Spec and code disagree on ending the mode. Severity Low,
     effort Small. Recommended: B, a tap anywhere outside the seats and the
     buttons ends the mode, as decision 1 says.
+  - Review 2, 1. Plan misstates the open review findings. Severity Low,
+    effort Small. Recommended: B, keep the agent's recommendations, and add
+    the reviewer's option A and the second reload of option B. Review 2 is
+    in `.context/seat-reordering/review-2.md`.
   - Outside the scope: `src/ui/useGameClient.ts`, a page drops a state
     message that it cannot read and shows no notice. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked. Put
