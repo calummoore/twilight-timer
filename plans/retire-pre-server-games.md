@@ -3,9 +3,9 @@
 Status: Active. On branch `calummoore/retire-pre-server-games`, no pull
 request yet. The plan closes when its PR merges. It starts after
 [Version handling](version-handling.md) merges, because both change the
-parser, the repository rules, and the README. The scope below is proposed:
-Cal confirms it before milestone 3 starts, because the change deletes
-functionality that is on `origin/main`.
+parser, the repository rules, and the README. Cal confirmed the scope
+below on 2026-10-26, which is the approval that the removal of
+functionality on `origin/main` needs.
 
 Builds from 2026-10-23 to 2026-10-26 saved the game in `localStorage`,
 under one key per version, and the game shape went from version 1 to 6 in
@@ -30,20 +30,22 @@ and no fixture changes.
 Decisions:
 
 - 2026-10-26, Cal: decision 6 of the version-handling discussion, option
-  C. The device path goes, after Cal continued the one game that matters.
-  Alternatives: A, keep everything, B, retire only the two steps that pull
-  request previews wrote, and D, also retire the old-rule branches with a
-  version 7 that rejects an old value. Reason: nothing on the server needs
-  the device path, and D would break the clocks and the history of the
-  continued game, which keeps the old window rule and null cards.
+  E. The device path goes, after Cal continued the one game that matters,
+  and every player of a game needs a faction. Alternatives: A, keep
+  everything, B, retire only the two steps that pull request previews
+  wrote, C, the device path alone, and D, also the old-rule branches with
+  a version 7 that rejects an old value. Reason: nothing on the server
+  needs the device path, every stored game has a faction for each player,
+  and D would break the clocks and the history of the continued game,
+  which keeps the old window rule and null cards.
 - 2026-10-26: the null cards stay null, and the fold keeps its branch that
   plays the lowest unplayed card. Alternative: an upgrade step that fills
   each null card. Rejected: the fill needs the active player at each play,
   which only the fold knows, and a parse step must not run the fold.
-- 2026-10-26, proposed: a faction for every player. The player type loses
-  its null faction, the parser rejects a null, and the setup rows get
-  their own type for an empty seat. Reason: the continued game has listed
-  factions, so the empty name serves nothing.
+- 2026-10-26: with a faction for every player, the player type loses its
+  null faction, the parser rejects a null, and the setup rows get their
+  own type for an empty seat. The empty faction name served only games
+  from the first build, which allowed an unlisted faction.
 - 2026-10-26: this is the decision that rule 8 of the stored-shape rules
   asks for, which says that old upgrade steps stay until a decision
   retires them. A game of version 1 to 5 is unreadable from this change
