@@ -113,9 +113,31 @@ Tags: ui
 
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
 - [x] Commit with Conventional Commits and push the branch.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
-      re-review once, and report the rest.
+      re-review once, and report the rest. Review 1:
+      `.context/admin-recovery/review-1.md`, 5 findings. Fixed: 4. Review
+      2 of the fix: `.context/admin-recovery/review-2.md`, no findings.
+      Open:
+      - 1. The spec does not define a connected device. Severity Medium,
+        effort Small. Recommended: A, add the 90-second rule to the spec
+        once Cal approves it.
+      - 2. No check that pings keep a device connected. Severity Medium,
+        effort Small. Recommended: C, a smoke step and a unit-tested pure
+        function. The smoke step passed:
+        `.context/admin-recovery/smoke.log`.
+      - 3. A refresh after eviction reaches every device. Severity Low,
+        effort Small. Recommended: A, keep the last sent connection key on
+        each socket.
+      - 5. No test keeps the table taps closed while away. Severity Low,
+        effort Small. Recommended: A, run the admin-only commands with the
+        away state on.
+      - `src/ui/GameScreen.tsx`: the screen stays awake only in the running
+        game, so the host iPad can lock in the lobby, and the phones then
+        see the recovery notice. Separate branch.
+      - `docs/mockups/index.html:1087`: the comment above the device list
+        says that the iPad is an admin because it is a table device.
+        Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
