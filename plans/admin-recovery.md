@@ -1,7 +1,7 @@
 # Admin recovery
 
-Status: Active. On branch `calummoore/untitled-v2`, no pull request yet. The
-plan closes when its PR merges.
+Status: Active. [PR #28](https://github.com/calummoore/twilight-timer/pull/28)
+is open. The plan closes when its PR merges.
 
 Only an admin device gives admin, starts the game, steps a phase, undoes,
 or pauses. The device that creates a game is its only admin until it gives
@@ -139,5 +139,5 @@ Tags: ui
       - `docs/mockups/index.html:1087`: the comment above the device list
         says that the iPad is an admin because it is a table device.
         Separate branch.
-- [ ] Open the pull request when every other milestone TODO is ticked.
+- [x] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
