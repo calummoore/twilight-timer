@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { newRoom, stateMessage } from './room'
-import { CODE, HOST, JAZ, KIRA, LAPTOP, SETUP, server } from './test-room'
+import {
+  BUILD,
+  CODE,
+  HOST,
+  JAZ,
+  KIRA,
+  LAPTOP,
+  SETUP,
+  server,
+} from './test-room'
 import { T0 } from './test-table'
 
 /**
@@ -75,18 +84,18 @@ describe('the device that creates a game', () => {
   it('learns from its state that it joins with admin, until it joins', () => {
     const s = server()
     const none = new Set<string>()
-    expect(stateMessage(s.room, none, HOST, T0)).toMatchObject({
+    expect(stateMessage(s.room, none, HOST, T0, BUILD)).toMatchObject({
       you: null,
       creator: true,
     })
     for (const token of [JAZ, null]) {
-      expect(stateMessage(s.room, none, token, T0)).toMatchObject({
+      expect(stateMessage(s.room, none, token, T0, BUILD)).toMatchObject({
         you: null,
         creator: false,
       })
     }
     s.send(HOST, { type: 'claim', seat: null })
-    expect(stateMessage(s.room, none, HOST, T0)).toMatchObject({
+    expect(stateMessage(s.room, none, HOST, T0, BUILD)).toMatchObject({
       you: 'd1',
       creator: false,
     })

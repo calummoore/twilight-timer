@@ -1,12 +1,10 @@
 import { DurableObject } from 'cloudflare:workers'
+import { BUILD } from '../src/build'
 import { isLive } from '../src/model/connection'
-import { parseClientMessage } from '../src/model/protocol'
-import {
-  applyCommand,
-  parseRoom,
-  stateMessage,
-  type Room,
-} from '../src/model/room'
+import type { Notice, ServerMessage } from '../src/model/protocol'
+import { receive } from '../src/model/receive'
+import { applyCommand, stateMessage, type Room } from '../src/model/room'
+import { readRoom, type StoredRoom } from '../src/model/room-storage'
 
 /** The key of the room in the storage of the object. */
 const ROOM = 'room'
@@ -15,6 +13,11 @@ const ROOM = 'room'
 interface Attachment {
   /** The token of the browser, from its hello, or null before it. */
   token: string | null
+  /**
+   * The build of the page, from its hello, or null before it. A socket from
+   * a build before builds had ids has a token and no build.
+   */
+  build: string | null
   /** The time of the last message of the socket, in ms. */
   seenAt: number
 }
@@ -23,10 +26,12 @@ interface Attachment {
  * One game under one join code. The object is the only writer of the game:
  * it checks each command, applies it with its own clock, saves the room,
  * and sends the state to every socket. Sockets hibernate between messages.
+ * A page of another build gets the outdated message, and the object closes
+ * its socket.
  */
 export class GameRoom extends DurableObject<Env> {
-  /** The stored room, kept in memory while the object is awake. */
-  private room: Room | null = null
+  /** The stored room, read once while the object is awake. */
+  private stored: StoredRoom | null = null
   /** The connected tokens that the last state to every device named. */
   private sent: string | null = null
 
@@ -39,18 +44,25 @@ export class GameRoom extends DurableObject<Env> {
     )
   }
 
-  /** Stores a new room. Returns false when the code has a game already. */
+  /**
+   * Stores a new room. Returns false when the code has a game already, also
+   * one that this build cannot read, so that nothing overwrites it.
+   */
   async create(room: Room): Promise<boolean> {
-    if (await this.load()) return false
+    if ((await this.load()).status !== 'none') return false
     await this.save(room)
     return true
   }
 
+  /** Whether the code has a game, also one that this build cannot read. */
   async exists(): Promise<boolean> {
-    return (await this.load()) !== null
+    return (await this.load()).status !== 'none'
   }
 
-  /** Opens the socket of a device. A code with no game says so and closes. */
+  /**
+   * Opens the socket of a device. A code with no game, or with a game that
+   * this build cannot read, says so and closes.
+   */
   async fetch(request: Request): Promise<Response> {
     if (request.headers.get('Upgrade') !== 'websocket') {
       return new Response('Expected a WebSocket', { status: 426 })
@@ -59,37 +71,39 @@ export class GameRoom extends DurableObject<Env> {
     this.ctx.acceptWebSocket(socket)
     socket.serializeAttachment({
       token: null,
+      build: null,
       seenAt: Date.now(),
     } satisfies Attachment)
-    if (!(await this.load())) {
-      socket.send(JSON.stringify({ type: 'missing' }))
-      socket.close(1000, 'No game has this code')
-    }
+    const stored = await this.load()
+    if (stored.status !== 'ok') this.refuse(socket, stored)
     return new Response(null, { status: 101, webSocket: client })
   }
 
   async webSocketMessage(ws: WebSocket, data: string | ArrayBuffer) {
-    const room = await this.load()
-    if (!room) return
+    const stored = await this.load()
+    if (stored.status !== 'ok') return this.refuse(ws, stored)
+    const { room } = stored
     const now = Date.now()
-    const message =
-      typeof data === 'string' ? parseClientMessage(parseJson(data)) : null
-    const token = message?.type === 'hello' ? message.token : tokenOf(ws)
+    const raw = typeof data === 'string' ? parseJson(data) : null
+    const caller = attachmentOf(ws)
+    const received = receive(raw, BUILD, caller)
+    if (received.type === 'outdated') return this.notify(ws, 'outdated')
+    const { token, build } = received.type === 'hello' ? received : caller
     // Every message is a sign of life, as every answered ping is.
-    ws.serializeAttachment({ token, seenAt: now } satisfies Attachment)
-    if (message?.type === 'hello') {
+    ws.serializeAttachment({ token, build, seenAt: now } satisfies Attachment)
+    if (received.type === 'hello') {
       // The device gets the state. The others get it only when a connection
       // changed, so that a hello that asks for a fresh state costs little.
       if (key(this.connected()) === this.sent) this.send(ws, room)
       else this.broadcast(room)
       return
     }
-    if (!message || token === null) return
+    if (received.type !== 'command') return
     const out = applyCommand(
       room,
-      token,
-      message.rev,
-      message.command,
+      received.token,
+      received.rev,
+      received.command,
       now,
       this.connected(),
     )
@@ -112,18 +126,28 @@ export class GameRoom extends DurableObject<Env> {
 
   /** The other devices see that the device of a closed socket is away. */
   private async disconnect(closed: WebSocket) {
-    const room = await this.load()
-    if (room) this.broadcast(room, closed)
+    const stored = await this.load()
+    if (stored.status === 'ok') this.broadcast(stored.room, closed)
   }
 
-  private async load(): Promise<Room | null> {
-    this.room ??= parseRoom(await this.ctx.storage.get(ROOM))
-    return this.room
+  private async load(): Promise<StoredRoom> {
+    this.stored ??= readRoom(await this.ctx.storage.get(ROOM))
+    return this.stored
   }
 
   private async save(room: Room) {
     await this.ctx.storage.put(ROOM, room)
-    this.room = room
+    this.stored = { status: 'ok', room }
+  }
+
+  /** Tells a device that the code has no game, or one it cannot read. */
+  private refuse(ws: WebSocket, stored: Exclude<StoredRoom, { status: 'ok' }>) {
+    this.notify(ws, stored.status === 'none' ? 'missing' : 'unreadable')
+  }
+
+  /** Sends a notice, which ends the connection, and closes the socket. */
+  private notify(ws: WebSocket, type: Notice) {
+    if (sendTo(ws, { build: BUILD, type })) ws.close(1000, NOTICE_REASONS[type])
   }
 
   /** The open sockets, without one that is closing. */
@@ -135,15 +159,18 @@ export class GameRoom extends DurableObject<Env> {
 
   /**
    * The tokens of the devices with a connection: an open socket that said
-   * hello and showed a sign of life lately. A device whose battery died
-   * never closes its socket, so an open socket alone does not count.
+   * hello from this build and showed a sign of life lately. A device whose
+   * battery died never closes its socket, so an open socket alone does not
+   * count.
    */
   private connected(closing?: WebSocket): Set<string> {
     const now = Date.now()
-    const live = this.sockets(closing).filter((ws) =>
-      isLive(this.lastSeen(ws), now),
-    )
-    return new Set(live.map(tokenOf).filter((t): t is string => t !== null))
+    const tokens = this.sockets(closing).flatMap((ws) => {
+      const { token, build } = attachmentOf(ws)
+      const live = isLive(this.lastSeen(ws), now)
+      return token !== null && build === BUILD && live ? [token] : []
+    })
+    return new Set(tokens)
   }
 
   /** The last message or answered ping of a socket, in ms. */
@@ -153,40 +180,63 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   private send(ws: WebSocket, room: Room) {
-    const message = stateMessage(
-      room,
-      this.connected(),
-      tokenOf(ws),
-      Date.now(),
-    )
-    ws.send(JSON.stringify(message))
+    const now = Date.now()
+    const { token } = attachmentOf(ws)
+    sendTo(ws, stateMessage(room, this.connected(), token, now, BUILD))
   }
 
-  /** Sends each device that said hello its own state. */
+  /**
+   * Sends each device that said hello its own state. A socket of another
+   * build, which a deploy left open, gets outdated and closes instead.
+   */
   private broadcast(room: Room, closing?: WebSocket) {
+    const current: WebSocket[] = []
+    for (const ws of this.sockets(closing)) {
+      const { token, build } = attachmentOf(ws)
+      if (token === null) continue
+      if (build === BUILD) current.push(ws)
+      else this.notify(ws, 'outdated')
+    }
     const connected = this.connected(closing)
     this.sent = key(connected)
     const now = Date.now()
-    for (const ws of this.sockets(closing)) {
-      const token = tokenOf(ws)
-      if (token === null) continue
-      ws.send(JSON.stringify(stateMessage(room, connected, token, now)))
+    for (const ws of current) {
+      const { token } = attachmentOf(ws)
+      sendTo(ws, stateMessage(room, connected, token, now, BUILD))
     }
   }
 }
 
-function attachmentOf(ws: WebSocket): Attachment {
-  const raw: unknown = ws.deserializeAttachment()
-  if (typeof raw !== 'object' || raw === null) return { token: null, seenAt: 0 }
-  const token =
-    'token' in raw && typeof raw.token === 'string' ? raw.token : null
-  const seenAt =
-    'seenAt' in raw && typeof raw.seenAt === 'number' ? raw.seenAt : 0
-  return { token, seenAt }
+/** The reason of each close, for the logs of the browser. */
+const NOTICE_REASONS: Record<Notice, string> = {
+  missing: 'No game has this code',
+  unreadable: 'This build cannot read the game',
+  outdated: 'The page runs another build',
 }
 
-function tokenOf(ws: WebSocket): string | null {
-  return attachmentOf(ws).token
+/**
+ * Sends a message on a socket that is still open, and says whether it did.
+ * The object closes a socket with a notice at once, but a message that was
+ * on its way, such as the hello of the page, still arrives after the close.
+ */
+function sendTo(ws: WebSocket, message: ServerMessage): boolean {
+  if (ws.readyState !== WebSocket.OPEN) return false
+  ws.send(JSON.stringify(message))
+  return true
+}
+
+function attachmentOf(ws: WebSocket): Attachment {
+  const raw: unknown = ws.deserializeAttachment()
+  if (typeof raw !== 'object' || raw === null) {
+    return { token: null, build: null, seenAt: 0 }
+  }
+  const token =
+    'token' in raw && typeof raw.token === 'string' ? raw.token : null
+  const build =
+    'build' in raw && typeof raw.build === 'string' ? raw.build : null
+  const seenAt =
+    'seenAt' in raw && typeof raw.seenAt === 'number' ? raw.seenAt : 0
+  return { token, build, seenAt }
 }
 
 /** The connected tokens as one value, to compare two states. */

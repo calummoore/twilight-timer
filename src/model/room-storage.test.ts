@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { parseServerMessage } from './protocol'
-import { newRoom, parseRoom, roomState, stateMessage } from './room'
+import { newRoom, roomState, stateMessage } from './room'
+import { parseRoom, readRoom } from './room-storage'
 import {
+  BUILD,
   CODE,
   HOST,
   JAZ,
@@ -27,6 +29,17 @@ describe('the stored room', () => {
     expect(parseRoom(wire(s.room))).toEqual(s.room)
   })
 
+  it('reads a stored value as no room, a room, or a room it cannot read', () => {
+    const room = newRoom(CODE, SETUP, HOST)
+    expect(readRoom(undefined)).toEqual({ status: 'none' })
+    expect(readRoom(wire(room))).toEqual({ status: 'ok', room })
+    // A newer build stored it, or a step of the chain is wrong: the server
+    // keeps it, so it is not missing.
+    for (const raw of [{ ...room, version: 3 }, { version: 2 }, null, 'room']) {
+      expect(readRoom(raw)).toEqual({ status: 'unreadable' })
+    }
+  })
+
   it('reads a room of version 1, whose creator joined at once', () => {
     const v1 = {
       version: 1,
@@ -37,6 +50,9 @@ describe('the stored room', () => {
       members: [{ id: 'd1', token: HOST, seat: null, admin: true }],
     }
     expect(parseRoom(wire(v1))).toEqual({ ...v1, version: 2, creator: null })
+    // The step sets the creator, whatever a broken room of version 1 holds.
+    const odd = { ...v1, creator: 'short' }
+    expect(parseRoom(wire(odd))).toEqual({ ...v1, version: 2, creator: null })
   })
 
   it('reads a room whose game keeps the values of an older build', () => {
@@ -86,7 +102,9 @@ describe('the state that devices get', () => {
       { id: 'd2', seat: 'jaz', admin: false, connected: false },
       { id: 'd3', seat: 'kira', admin: false, connected: true },
     ])
-    const text = JSON.stringify(stateMessage(s.room, new Set(), HOST, T0))
+    const text = JSON.stringify(
+      stateMessage(s.room, new Set(), HOST, T0, BUILD),
+    )
     for (const token of [HOST, JAZ, KIRA]) expect(text).not.toContain(token)
   })
 
@@ -105,15 +123,15 @@ describe('the state that devices get', () => {
   it('names the receiving device, or none before it joins', () => {
     const s = seatedServer()
     const connected = new Set<string>()
-    expect(stateMessage(s.room, connected, JAZ, T0)).toMatchObject({
+    expect(stateMessage(s.room, connected, JAZ, T0, BUILD)).toMatchObject({
       type: 'state',
       serverTime: T0,
       you: 'd2',
     })
     expect(
-      stateMessage(s.room, connected, 'new-token-000000000005', T0),
+      stateMessage(s.room, connected, 'new-token-000000000005', T0, BUILD),
     ).toMatchObject({ you: null })
-    expect(stateMessage(s.room, connected, null, T0)).toMatchObject({
+    expect(stateMessage(s.room, connected, null, T0, BUILD)).toMatchObject({
       you: null,
     })
   })
@@ -121,15 +139,23 @@ describe('the state that devices get', () => {
   it('reaches the device as it left the server', () => {
     const s = seatedServer()
     playStrategyOn(s)
-    const message = stateMessage(s.room, new Set([JAZ]), JAZ, s.now)
+    const message = stateMessage(s.room, new Set([JAZ]), JAZ, s.now, BUILD)
     expect(parseServerMessage(wire(message))).toEqual(message)
-    const lobby = stateMessage(newRoom(CODE, SETUP, HOST), new Set(), HOST, T0)
-    expect(parseServerMessage(wire(lobby))).toEqual(lobby)
+    const lobby = newRoom(CODE, SETUP, HOST)
+    const first = stateMessage(lobby, new Set(), HOST, T0, BUILD)
+    expect(parseServerMessage(wire(first))).toEqual(first)
+    expect(first.build).toBe(BUILD)
   })
 
   it('reads a state with no creator flag as a device that did not create the game', () => {
     const room = roomState(seatedServer().room, new Set())
-    const older = { type: 'state', serverTime: T0, you: 'd2', room }
+    const older = {
+      build: BUILD,
+      type: 'state',
+      serverTime: T0,
+      you: 'd2',
+      room,
+    }
     expect(parseServerMessage(wire(older))).toMatchObject({ creator: false })
     const odd = { ...older, creator: 'yes' }
     expect(parseServerMessage(wire(odd))).toMatchObject({ creator: false })
