@@ -23,7 +23,10 @@ export interface RecentGame extends GameSummary {
 }
 
 export interface DeviceGames {
-  /** The game that the device has open, so that a reload returns to it. */
+  /**
+   * The game that the device has open, which is the game of its address, so
+   * that a new visit returns to it.
+   */
   current: string | null
   /** Newest first. */
   recent: RecentGame[]
@@ -54,28 +57,15 @@ export function saveGames(store: KeyValueStore, games: DeviceGames): void {
   store.setItem(GAMES_KEY, JSON.stringify(games))
 }
 
-/** The device opens a game, so that a reload returns to it. */
-export function openGame(games: DeviceGames, code: string): DeviceGames {
-  return { ...games, current: code }
-}
-
-/** The device has no game open, for example on Home. */
-export function closeGame(games: DeviceGames): DeviceGames {
-  return { ...games, current: null }
-}
-
 /** The device saw a game: it moves to the top of the recent games. */
-export function seeGame(games: DeviceGames, game: RecentGame): DeviceGames {
-  const others = games.recent.filter((g) => g.code !== game.code)
-  return { ...games, recent: [game, ...others].slice(0, RECENT_MAX) }
+export function seeGame(recent: RecentGame[], game: RecentGame): RecentGame[] {
+  const others = recent.filter((g) => g.code !== game.code)
+  return [game, ...others].slice(0, RECENT_MAX)
 }
 
-/** The device leaves a game: it forgets the game, also as its open game. */
-export function leaveGame(games: DeviceGames, code: string): DeviceGames {
-  return {
-    current: games.current === code ? null : games.current,
-    recent: games.recent.filter((g) => g.code !== code),
-  }
+/** The device leaves a game: it forgets the game. */
+export function leaveGame(recent: RecentGame[], code: string): RecentGame[] {
+  return recent.filter((g) => g.code !== code)
 }
 
 function parseRecent(raw: unknown): RecentGame | null {

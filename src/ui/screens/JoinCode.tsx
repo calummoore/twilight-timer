@@ -1,6 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react'
 import { useEffect, useState } from 'react'
-import { joinLink } from '../../model/code'
+import { joinLink } from '../../model/routes'
 
 /** How long Copy link shows that it copied. */
 const COPIED_MS = 2000

@@ -54,6 +54,8 @@ The core concepts have their own pages:
   limits and overtime, pauses, and corrections.
 - [Multiplayer](product/multiplayer.md): the game on the server, join
   codes, table and seated devices, and who may tap what.
+- [Addresses](product/addresses.md): the address of each screen, Back, and
+  the return to an open game.
 
 ---
 

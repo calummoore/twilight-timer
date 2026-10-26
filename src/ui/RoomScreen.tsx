@@ -1,7 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { RecentGame } from '../model/device-store'
 import type { Command } from '../model/protocol'
 import { mayCommand } from '../model/rights'
+import {
+  routePath,
+  settleRoute,
+  type GamePanel,
+  type GameRoute,
+} from '../model/routes'
 import type { LimitSettings, Settings } from '../model/settings'
 import { gameSummary } from '../model/summary'
 import { GameScreen } from './GameScreen'
@@ -11,55 +17,75 @@ import { PlayersScreen } from './screens/PlayersScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { useGameClient } from './useGameClient'
 
-/** The screens that a tap opens over the lobby or the game. */
-type Overlay = 'players' | 'settings' | 'claim' | null
-
 /**
  * One game on the server, under its code: the opening line, the claim screen
  * of a device that has not joined, the lobby, or the running game, with
- * Players & devices over it.
+ * Players & devices over it. The address names the panel over the game.
  */
 export function RoomScreen(props: {
-  code: string
+  route: GameRoute
   token: string
   settings: Settings
   onSettings: (settings: Settings) => void
   /** The device saw the game, so it moves to the top of the recent games. */
   onSeen: (game: RecentGame) => void
+  /** Opens a panel over the game. */
+  onPanel: (panel: GamePanel) => void
+  /** Returns to the panel under this one, or to the game with null. */
+  onBack: (panel: GamePanel | null) => void
+  /** Shows the route that the address settles on, in place of the address. */
+  onSettle: (route: GameRoute) => void
   onHome: () => void
   onLeave: () => void
   onNewGame: () => void
 }) {
+  const { code } = props.route
   const { status, room, you, creator, offset, refresh, send } = useGameClient(
-    props.code,
+    code,
     props.token,
   )
-  const [overlay, setOverlay] = useState<Overlay>(null)
   const connected = status === 'open'
   const device = room?.devices.find((d) => d.id === you)
   const admin = connected && !!device?.admin
+  const joined = !!device
+  const game = room?.game ?? null
+  const seats = room?.setup.players.length
+  const summary = useMemo(
+    () => (seats === undefined ? null : gameSummary(game, seats)),
+    [game, seats],
+  )
+
+  // Once the device has the game, the address shows the claim screen until
+  // the device joins, then the game, with the panels of its stage.
+  const { route: asked, onSeen, onSettle } = props
+  const route = useMemo(
+    () => (summary ? settleRoute(asked, joined, summary.phase) : asked),
+    [asked, joined, summary],
+  )
+  useEffect(() => {
+    if (routePath(route) !== routePath(asked)) onSettle(route)
+  }, [route, asked, onSettle])
 
   // A game is a recent game of the device once the device joined it.
-  const { code, onSeen } = props
-  const players = device && room?.setup.players.length
-  const game = room?.game ?? null
   useEffect(() => {
-    if (players === undefined) return
-    onSeen({ code, ...gameSummary(game, players), seenAt: Date.now() })
-  }, [code, game, players, onSeen])
+    if (!joined || !summary) return
+    onSeen({ code, ...summary, seenAt: Date.now() })
+  }, [code, joined, summary, onSeen])
 
   if (status === 'missing') {
-    return <OpeningScreen code={props.code} missing onHome={props.onHome} />
+    return <OpeningScreen code={code} missing onHome={props.onHome} />
   }
-  if (!room) {
-    return (
-      <OpeningScreen code={props.code} missing={false} onHome={props.onHome} />
-    )
+  if (!room || !summary) {
+    return <OpeningScreen code={code} missing={false} onHome={props.onHome} />
   }
 
+  const panel = route.screen === 'game' ? route.panel : null
+  // Change seat opens over Players & devices, which is the lobby before the
+  // start.
+  const backFromSeat = () => props.onBack(room.game ? 'players' : null)
   // Takes a seat, or makes this device a table device with null. The device
   // that created the game joins with admin.
-  const claim = (back: Overlay) => (
+  const claim = (
     <ClaimScreen
       code={room.code}
       players={room.setup.players}
@@ -69,12 +95,12 @@ export function RoomScreen(props: {
       connected={connected}
       onSeat={(seat) => {
         send({ type: 'claim', seat })
-        setOverlay(back)
+        if (device) backFromSeat()
       }}
-      onCancel={device ? () => setOverlay(back) : props.onHome}
+      onCancel={device ? backFromSeat : props.onHome}
     />
   )
-  if (!device) return claim(null)
+  if (!device) return claim
 
   // An admin device changes the limits of the game, and keeps them for its
   // next setup.
@@ -100,10 +126,10 @@ export function RoomScreen(props: {
       mayAdmin={mayAdmin}
       onAdmin={(deviceId, on) => send(adminCommand(deviceId, on))}
       onRefresh={refresh}
-      onChangeSeat={() => setOverlay('claim')}
+      onChangeSeat={() => props.onPanel('seat')}
       onLeave={props.onLeave}
       onStart={() => send({ type: 'start' })}
-      onSettings={round === null ? () => setOverlay('settings') : undefined}
+      onSettings={round === null ? () => props.onPanel('settings') : undefined}
       onClose={onClose}
     />
   )
@@ -112,16 +138,16 @@ export function RoomScreen(props: {
     return (
       <>
         {playersScreen(null)}
-        {overlay === 'settings' && (
+        {panel === 'settings' && (
           <SettingsScreen
             settings={props.settings}
             onChange={props.onSettings}
             limits={room.setup}
             onLimits={admin ? onLimits : undefined}
-            onClose={() => setOverlay(null)}
+            onClose={() => props.onBack(null)}
           />
         )}
-        {overlay === 'claim' && claim(null)}
+        {panel === 'seat' && claim}
       </>
     )
   }
@@ -137,15 +163,14 @@ export function RoomScreen(props: {
         send={send}
         connected={connected}
         device={device}
-        onPlayers={() => setOverlay('players')}
+        panel={panel}
+        onPanel={props.onPanel}
+        onClosePanel={() => props.onBack(null)}
         onNewGame={props.onNewGame}
       />
-      {overlay === 'players' &&
-        playersScreen(
-          gameSummary(room.game, room.setup.players.length).round,
-          () => setOverlay(null),
-        )}
-      {overlay === 'claim' && claim('players')}
+      {panel === 'players' &&
+        playersScreen(summary.round, () => props.onBack(null))}
+      {panel === 'seat' && claim}
     </>
   )
 }
