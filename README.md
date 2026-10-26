@@ -34,6 +34,7 @@ in the futex account. The app opens at https://ti4.nexus; see
 - Each game lives on the server under a join code, with a QR code and a link
   to open or copy.
   Every device shows every tap at once, and a reload returns to the game.
+  After an update of the app, every open device reloads into its game.
 - A phone takes the seat of its player, and taps for that player when the
   game waits for them: their pick, their turn, their tile in a reaction
   window, and their vote. A control that the device may not use is off, and
@@ -201,28 +202,40 @@ versions.
     of every older version.
   - `device-store.ts`: the token of the browser, and its open and recent
     games.
-  - `connection.ts`: the offset to the server clock, and the waits between
-    the tries after a lost connection.
+  - `connection.ts`: the offset to the server clock, the waits between the
+    tries after a lost connection, and the reload guard of a page of another
+    build.
   - `code.ts`: the join codes and their links.
   - `devices.ts`: the devices of a game, the seat takeover, and the
     last-admin rule.
   - `rights.ts`: who may tap what. The server and the screens call it.
   - `protocol.ts`: the messages between a device and the server, with their
-    parsers.
-  - `room.ts` and `setup.ts`: one game on the server, its reducer, and its
-    stored shape.
+    parsers. Every message from the server, and the hello of a page, names
+    its build first.
+  - `receive.ts`: what the server does with each message of a device: a
+    hello or a command of another build gets the outdated message.
+  - `room.ts` and `setup.ts`: one game on the server and its reducer.
+    `room-storage.ts` reads its stored shape, with the upgrade chain of the
+    room, into no room, a room, or a room that cannot be read.
+  - `fixtures/`: one stored shape of each version from game version 6 and
+    room version 1 on, as its build wrote it. `fixtures.test.ts` loads each
+    one and checks its clocks.
 - `worker/` holds the Worker.
   - `index.ts`: the routes. `POST /api/games` creates a game,
     `GET /api/games/<code>` looks a code up, and
     `GET /api/games/<code>/socket` opens the socket of a game.
   - `game-room.ts`: the Durable Object of one game. It applies each command
     with the model and its own clock, saves the room, and sends the state to
-    every socket. Its sockets use the WebSocket Hibernation API.
+    every socket. Its sockets use the WebSocket Hibernation API. It never
+    stores a new room over one that it cannot read.
 - `src/App.tsx` holds the routes: Home, the setup, and the game of one code,
   which a join link `/join/<code>` opens.
-- `src/ui/useGameClient.ts` owns the socket of a game: hello, the state, the
-  server clock, pings, and the reconnect. `src/ui/api.ts` creates a game and
-  looks a code up.
+- `src/build.ts` holds the build id, which `vite.config.ts` puts into the
+  page and the Worker.
+- `src/ui/useGameClient.ts` holds the game of one code for the screens.
+  `src/ui/gameSocket.ts` owns its socket: hello, the state, the server
+  clock, pings, the reconnect, and the reload of a page of another build.
+  `src/ui/api.ts` creates a game and looks a code up.
 - `src/ui/RoomScreen.tsx` shows one game: the opening line, the lobby, or the
   running game with Players & devices over it.
 - `src/ui/GameScreen.tsx` connects the model to the screens. Every control

@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { codeOfPath, joinLink, joinPath } from './code'
-import { LIVE_MS, isLive, nextOffset, retryDelay } from './connection'
+import {
+  LIVE_MS,
+  checkBuild,
+  isLive,
+  nextOffset,
+  retryDelay,
+} from './connection'
+import type { KeyValueStore } from './storage'
 import { gameSummary, lastActivity } from './summary'
+import { BUILD, OLD_BUILD } from './test-room'
+import { memoryStore } from './test-store'
 import { MIN, SEC, T0, playStrategy, table } from './test-table'
 
 describe('the connection', () => {
@@ -28,6 +37,55 @@ describe('the connection', () => {
       500, 1000, 2000, 4000, 8000, 8000, 8000,
     ])
     expect(retryDelay(-1)).toBe(500)
+  })
+})
+
+describe('the build check of a page', () => {
+  // The page runs OLD_BUILD, and the server runs BUILD after a deploy.
+  it('goes on while the page runs the build of the server', () => {
+    const store = memoryStore()
+    expect(checkBuild(store, BUILD, BUILD)).toBe('same')
+    expect(store.data.size).toBe(0)
+  })
+
+  it('reloads once, then stops when the reload brings the same old page', () => {
+    const store = memoryStore()
+    expect(checkBuild(store, OLD_BUILD, BUILD)).toBe('reload')
+    // The guard survives the reload, as sessionStorage does.
+    expect(checkBuild(store, OLD_BUILD, BUILD)).toBe('outdated')
+    expect(checkBuild(store, OLD_BUILD, BUILD)).toBe('outdated')
+  })
+
+  it('reloads again for each newer build of the server', () => {
+    const store = memoryStore()
+    expect(checkBuild(store, OLD_BUILD, BUILD)).toBe('reload')
+    // Another deploy came before the reloaded page heard from the server.
+    expect(checkBuild(store, BUILD, 'c4d5e6f')).toBe('reload')
+  })
+
+  it('clears the guard when the page runs the build of the server', () => {
+    const store = memoryStore()
+    expect(checkBuild(store, OLD_BUILD, BUILD)).toBe('reload')
+    expect(checkBuild(store, BUILD, BUILD)).toBe('same')
+    expect(store.data.size).toBe(0)
+    // A later deploy reloads the page again, also back to the older build.
+    expect(checkBuild(store, BUILD, OLD_BUILD)).toBe('reload')
+  })
+
+  it('reloads once for a server that names no build', () => {
+    const store = memoryStore()
+    expect(checkBuild(store, BUILD, null)).toBe('reload')
+    expect(checkBuild(store, BUILD, null)).toBe('outdated')
+  })
+
+  it('stops at once when the store cannot keep the guard', () => {
+    const blocked: KeyValueStore = {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    }
+    expect(checkBuild(blocked, OLD_BUILD, BUILD)).toBe('outdated')
+    expect(checkBuild(blocked, BUILD, BUILD)).toBe('same')
   })
 })
 

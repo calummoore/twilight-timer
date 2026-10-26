@@ -110,11 +110,22 @@ second mismatch, the page shows the notice instead and stops its socket.
 A matching build clears the guard. The statuses unreadable and outdated
 end the connection, like missing: the page does not reconnect from them.
 
-Transition. The pages open during the first deploy of this change send a
-hello without a build, which the object ignores, and the object closes
-their old sockets at its next broadcast. Those pages show the reconnecting
-bar or the opening line until one manual reload. Every later deploy
-reloads every open page.
+Transition. The first deploy of this change ends the sockets of the pages
+that are open, as every deploy does. Those pages connect again and send a
+hello without a build, which the object ignores. They show the
+reconnecting bar or the opening line until one manual reload. Every later
+deploy reloads every open page.
+
+Update, 2026-10-26, from the implementation: the Cloudflare docs say that a
+deploy restarts every Durable Object and ends every WebSocket, also a
+hibernated one. So an idle page connects again at once, gets the outdated
+message, and reloads. The lost tap of decision 5 needs a socket that
+outlives a deploy, which Cloudflare does not keep. Decision 5 stays as it
+is: the object still refuses a command of another build and closes the
+sockets of another build at its next broadcast. The New versions section of
+the spec says so. A deploy rolls out over some seconds, so a page that
+reloads can meet the other build for a moment. The guard then shows the
+notice, and RELOAD recovers.
 
 Stored shapes. These rules go into the repository rules:
 
@@ -172,51 +183,62 @@ The model, the Worker, and the connection of the page. At the end, a page
 of another build reloads, and the Worker never overwrites an unreadable
 room. The two notices come in milestone 4.
 
-- [ ] Add `src/build.ts` with the build id, and the `define` in
+- [x] Add `src/build.ts` with the build id, and the `define` in
       `vite.config.ts`. Check that the id reaches both the page and the
-      Worker in `npm run build` and in `npm run dev`.
-- [ ] Protocol: the build in hello and in every server message, the
+      Worker in `npm run build` and in `npm run dev`. Vite evaluates the
+      config once for each environment, so the config keeps the first id
+      in `TI4_BUILD` for the others.
+- [x] Protocol: the build in hello and in every server message, the
       parser of the build field, and the messages unreadable and
       outdated. Tests in `src/model/protocol.test.ts`.
-- [ ] Room: give the room its upgrade chain, with the step from version 1
-      to 2 that the parser now does inline. Keep the behaviour.
-- [ ] Room: read a stored value into none, ok, or unreadable, and the
+- [x] Receive: what the object does with a hello or a command, in
+      `src/model/receive.ts`, so that `worker/` stays thin. Tests in
+      `src/model/receive.test.ts`.
+- [x] Room: give the room its upgrade chain, with the step from version 1
+      to 2 that the parser now does inline. Keep the behaviour. The stored
+      shape moves to `src/model/room-storage.ts`.
+- [x] Room: read a stored value into none, ok, or unreadable, and the
       build in the state message. Tests in
       `src/model/room-storage.test.ts`.
-- [ ] Connection: the reload guard on a key-value store. Tests in
+- [x] Connection: the reload guard on a key-value store. Tests in
       `src/model/connection.test.ts`.
-- [ ] Fixtures: `src/model/fixtures/game-v6.json` and `room-v2.json` from
+- [x] Fixtures: `src/model/fixtures/game-v6.json` and `room-v2.json` from
       a game that the test table plays on this build, `room-v1.json` from
       a game that the test table plays on `d467cbd`, and
       `src/model/fixtures.test.ts`, which loads each one and checks a clock.
-- [ ] Worker: the three states in the object, create refuses a room that
+      The capture script: `.context/version-handling/capture/`.
+- [x] Worker: the three states in the object, create refuses a room that
       is not none, the build in the attachment, the outdated message and
       close for a hello or a command of another build and in the
       broadcast, and the unreadable message. Keep `worker/` thin.
-- [ ] Page: read the build before the message, reload once with the
+- [x] Page: read the build before the message, reload once with the
       guard, the statuses unreadable and outdated with no reconnect, and
-      the hello with the build. Split `src/ui/useGameClient.ts` when it
-      passes 200 lines.
-- [ ] Update the Key code section of `README.md`.
-- [ ] Smoke test with `vite preview`, which gives a new build per build:
-      two windows in a game, rebuild and restart, then tap in one window.
-      It reloads and the tap is lost, the other window reloads on the next
-      broadcast, and both show the game. Evidence under
-      `.context/version-handling/`.
+      the hello with the build. The socket moves from
+      `src/ui/useGameClient.ts` to `src/ui/gameSocket.ts`.
+- [x] Update the Key code section of `README.md`.
+- [x] Smoke test with `vite preview`, which gives a new build per build:
+      two windows in a game, then rebuild and restart. A restart ends every
+      socket, as a Cloudflare deploy does, so both windows connect again,
+      get outdated, reload once by themselves, and show the game. A tap
+      after the reload shows on both. The lost tap needs a socket that
+      outlives a deploy, so the receive tests cover it. Evidence:
+      `.context/version-handling/smoke-browser.log`, steps 1 to 3, and
+      `smoke-server-dev.log`: 11 checks of the object on `npm run dev`.
 
 ## Milestone 4: The notices
 
 Tags: ui
 
-- [ ] The Opening screen states outdated and unreadable, from the mockup,
+- [x] The Opening screen states outdated and unreadable, from the mockup,
       and the statuses in `src/ui/RoomScreen.tsx`. RELOAD reloads the
       page. An unreadable game stays in Recent games.
-- [ ] Smoke test: set the guard key in the console to the build of the
-      server, then restart `vite preview` with a new build. The notice
-      shows, and RELOAD opens the game. For unreadable, change the version
-      of a stored room in the local object storage under `.wrangler/`,
-      then open the game: the notice shows on every device, and the room
-      stays. Evidence under `.context/version-handling/`.
+- [x] Smoke test: set the guard key to the build of the server, then
+      restart `vite preview` with a new build. The notice shows, and
+      RELOAD opens the game. For unreadable, change the version of a
+      stored room in the local object storage under `.wrangler/`, then
+      open the game: the notice shows on every device, and the room
+      stays. Evidence: `.context/version-handling/smoke-browser.log`,
+      steps 4 and 5, 39 checks in all, with screenshots in `smoke/`.
 
 ## Milestone 5: Verification, commit, review, and pull request
 

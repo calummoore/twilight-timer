@@ -68,13 +68,15 @@ Rejected: a notice with a Reload button before the reload, because a device
 of another version shows wrong data, and the players should not have to
 act.
 
-The server applies no tap from a device of another version. An idle device
-learns of an update at the latest at the next tap of any device. When that
-tap comes from a device of the older version, it does nothing, that device
-reloads, and the player taps again. The other devices of the older version
-reload with it. Rejected: a device that asks the server for its version
-once a minute, and a connection check that wakes the game on the server,
-because a lost tap after an update is rare and costs one more tap.
+The server applies no tap from a device of another version. An update ends
+every connection, so every open device connects again within seconds,
+learns of the update, and reloads, also when it is idle. A tap waits during
+that reconnect, as during any lost connection. A connection that outlives an
+update ends at the next tap of any device: when the tap comes from a device
+of the older version, it does nothing, and the player taps again after the
+reload. Rejected: a device that asks the server for its version once a
+minute, and a connection check that wakes the game on the server, because
+an update already ends every connection, and a lost tap costs one more tap.
 
 A device reloads by itself once for each new version. When the reload does
 not bring the version of the server, the device stops and shows "A new
