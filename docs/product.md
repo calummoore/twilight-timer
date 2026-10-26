@@ -2,8 +2,9 @@
 
 A shared-table time tracker for **Twilight Imperium (4th Edition)**.
 
-It sits on an iPad or a phone in the middle of the table and answers the
-question every TI4 group eventually asks: *where did six hours go?*
+It sits on an iPad or a phone in the middle of the table, and on each
+player's phone, and answers the question every TI4 group eventually asks:
+*where did six hours go?*
 
 ---
 
@@ -51,18 +52,21 @@ The core concepts have their own pages:
   leave.
 - [Clocks and corrections](product/clocks.md): the reaction window, time
   limits and overtime, pauses, and corrections.
+- [Multiplayer](product/multiplayer.md): the game on the server, join
+  codes, table and seated devices, and who may tap what.
 
 ---
 
 ## Screens
 
-### Table device
+### Every device
 
-The table device runs the game. It can be an iPad, a phone, or a computer.
-Every table device shows the same screens, with the same information and
-controls. Only the layout changes. It follows the space that the app has, not
-the type of device. On a narrow screen, the columns of a screen stack, and the
-screen scrolls.
+Every device in a game shows the same screens, with the same information and
+controls. It can be an iPad, a phone, or a computer. A device is a table
+device or a seated device, and a control that the device may not use is
+disabled, as [Multiplayer](product/multiplayer.md) says. Only the layout
+changes. It follows the space that the app has, not the type of device. On a
+narrow screen, the columns of a screen stack, and the screen scrolls.
 
 Rejected: one fixed iPad layout, scaled to fit the window, because on a phone
 its text and buttons are too small to read or tap. Rejected: separate phone and
@@ -89,23 +93,9 @@ wait for an answer.
 | **Round Summary**   | Per-player time this round, split by phase                               |
 | **History & Undo**  | Action log; undo repeatedly to rewind, or edit any duration               |
 | **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count, rule-check time |
-| **Join**            | QR + join code for phone companions                                      |
-
-### Phone (companion — add-on)
-
-Explicitly a **later phase**. The tabletop device is fully functional alone; the
-phone is an enhancement, never a dependency. If a phone drops off, that player
-uses the table device exactly as before.
-
-| Screen              | Purpose                                                           |
-| ------------------- | ----------------------------------------------------------------- |
-| **Join**            | Enter code or scan QR                                             |
-| **Claim seat**      | Pick which player at the table you are                            |
-| **Waiting**         | Whose turn it is, their clock, your standing — glanceable          |
-| **Your turn**       | Colour-flooded, huge clock, End Turn / Play SC / Pass              |
-| **Reaction window** | Countdown + a single "I'm done" button                            |
-| **Pass confirm**    | Guard rail — passing is irreversible for the round                |
-| **Personal stats**  | Your time, your average, your worst turn                          |
+| **Home**            | New game, join a game by code, recent games of this device               |
+| **Claim seat**      | Which player this device is, or Join as table with the admin code        |
+| **Join**            | Join code, link, QR code, admin code, seats and their holders, devices    |
 
 ---
 
@@ -190,18 +180,21 @@ From the should-have list, the MVP adds the pause.
 - [ ] Export a game as JSON / CSV
 - [ ] Game history across sessions
 
-### Add-on (phase 2)
+### Multiplayer
 
-- [ ] Phone companion: join by code/QR, claim seat, act on own turn
-- [ ] Live sync between iPad and phones
-- [ ] Per-player push when their turn begins
+- [ ] Every game on the server, joined by a six-character code, a link, or a
+      QR code
+- [ ] Table devices and seated devices, with an admin code and admin rights
+- [ ] A seated device acts for its own player when the game waits for them
+- [ ] Every device shows the same screens, with the controls it may not use
+      disabled
 
 ### Explicitly out of scope
 
 - Victory point / objective tracking
 - Rules validation of any kind
 - Board state, units, resources, tech
-- Online play
+- Remote play. A code works from anywhere, but the app is made for one room.
 
 ---
 
