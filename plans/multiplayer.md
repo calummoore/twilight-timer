@@ -49,6 +49,21 @@ Decisions, all on 2026-10-26 by Cal, from the discussion of that day:
   after its last change. Reason: a game is about 50 KB, and a code must not
   be reused.
 
+Decisions of 2026-10-26 by Cal, from the lobby discussion of that day:
+
+- Lobby decision 1 = B: Create game puts the seats on the server and opens
+  Players & devices as the lobby. Start game, on an admin device, begins
+  the strategy phase, so no clock runs while the phones join. Alternatives:
+  A, start the game at Begin and let the host pause; C, a pause that opens
+  with the lobby. Reason: the host and the phones look at the same screen
+  while everyone joins, and nothing is timed before Start.
+- Lobby decision 2 = A: the host still types every name and faction before
+  anyone joins. Alternative: B, a phone edits its own seat in the lobby.
+  Cal: "for now, later we can add allowing joining players to add/change
+  their faction or colour". Not in this change.
+- Lobby decision 3 = B: the screen is "Players & devices", not "Join",
+  because the device joins on the claim screen. Alternative: C, "Invite".
+
 Design decisions of the same day, from the implementation side:
 
 - The object is authoritative. It stores the same game JSON that
@@ -91,16 +106,17 @@ Components:
   game, look a code up, and open the WebSocket of a game. Everything else
   is static assets.
 - **Game object**: one Durable Object per join code. It holds the room:
-  the join code, the admin code, the game, the devices, and the revision.
-  It applies commands with the model, saves, and broadcasts.
+  the join code, the admin code, the seats and the settings from Create
+  game, the game from Start game, the devices, and the revision. It applies
+  commands with the model, saves, and broadcasts.
 - **Game client**: the hook in the app that owns the socket, the
   reconnect, the server time offset, and the revision. The screens get the
   game, the device's rights, and a dispatch function, as they get them
   from the local store today.
 
 Messages, from the device: hello with the device token, claim a seat,
-claim table with the admin code, set the admin flag of a device, and a
-game command with the revision: an action input, undo, pause, resume, the
+claim table with the admin code, set the admin flag of a device, start the
+game, and a game command with the revision: an action input, undo, pause, resume, the
 pause reason, or the time limits. From the object: the state, with the
 revision, the server time, the game, the devices with their connection
 state, and the rights of this device; and a rejection with a reason.
@@ -161,9 +177,25 @@ iPad, and the phone frame, in the same style as the table screens.
       `.context/multiplayer/mockups/`, with `shoot.log`: 31 screens in
       three frames, no script error, and no sideways overflow.
 - The new screens, the chip, and the settings groups carry the Later mark
-  until milestones 4 and 5 build them.
+  until the UI milestones build them.
 
-## Milestone 3: Server
+## Milestone 3: Lobby mockups
+
+Tags: mockup
+
+Draw the lobby of the lobby decisions, and rename the Join screen.
+
+- [x] Rename the Join screen to Players & devices in the mockup, the chip
+      note, the Home help, and the claim help.
+- [x] Setup ends with Create game, not Begin game.
+- [x] The lobby: Players & devices before Start game, on the host's iPad
+      with Start game and Settings, and on a seated phone with the waiting
+      line and no admin code.
+- [x] Screenshot the new and changed screens in every frame. Evidence:
+      `.context/multiplayer/mockups/`, with `shoot.log`: 33 screens in
+      three frames, no script error, and no sideways overflow.
+
+## Milestone 4: Server
 
 Add the Worker, the object, and the pure model modules. The app still runs
 from `localStorage` at the end of this milestone.
@@ -187,51 +219,53 @@ from `localStorage` at the end of this milestone.
 - [ ] Smoke test: start the dev server, create a game with the API, and
       open its socket. Evidence: `.context/multiplayer/server/`.
 
-## Milestone 4: Shared table
+## Milestone 5: Shared table
 
 Tags: ui
 
 Put the game on the server, with every device as a table device. Player
 mode comes in the next milestone.
 
-- [ ] Home screen, with New game, Join game, and Recent games. Begin game
-      creates the game on the server, and the device joins it as a table
-      device.
+- [ ] Home screen, with New game, Join game, and Recent games. Create game
+      puts the seats on the server, and the device joins as a table device.
+- [ ] The lobby on the Players & devices screen, and Start game on an admin
+      device. No clock runs before Start.
 - [ ] Join by code or by the `/join/<code>` link, as a table device with
       the admin code.
 - [ ] The game client hook: the socket, the reconnect, the revision, and the
       server time offset. The reconnecting state disables the controls.
-- [ ] The Join screen: the code, the link, the QR code, the admin code, the
-      seats, and the devices. The top bar chip opens it.
+- [ ] The Players & devices screen: the code, the link, the QR code, the
+      admin code, the seats, and the devices. The top bar chip opens it.
 - [ ] Recent games, Leave game, and Continue on the server for a game that
       an older build saved on the device.
 - [ ] Settings in two groups. Time limits go through the object.
-- [ ] Port the mockup styles of the Home, Claim seat, and Join screens, the
-      top bar chips, and the reconnecting bar to `src/styles/mockup/`, and
-      remove their Later marks in the mockup.
+- [ ] Port the mockup styles of the Home, Claim seat, and Players & devices
+      screens, the top bar chips, and the reconnecting bar to
+      `src/styles/mockup/`, and remove their Later marks in the mockup.
 - [ ] Stop saving the game in `localStorage`. Keep the parser for the
       upload of an older game.
 - [ ] Smoke test on the dev server: two windows, one creates and one joins
       as table, and taps show on both. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 5: Player mode
+## Milestone 6: Player mode
 
 Tags: ui
 
 Seats, rights, and the disabled controls.
 
-- [ ] The claim screen, and seat changes on the Join screen.
+- [ ] The claim screen, and seat changes on the Players & devices screen.
 - [ ] Gate every control with the permission module, and name the player
       that a disabled main control waits for: the strategy, action,
       reaction, status, agenda, summary, seating, settings, and stats
       screens, and the top bar.
-- [ ] Admin toggles on the Join screen, never for the last admin.
+- [ ] Admin toggles on the Players & devices screen, never for the last
+      admin.
 - [ ] Remove the Later marks of the seated screens in the mockup.
 - [ ] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
       admin toggles work. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 6: Verification, commit, and review
+## Milestone 7: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 

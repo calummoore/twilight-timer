@@ -9,11 +9,21 @@ screens.
 
 ## The game on the server
 
-A game lives on the server from the moment it begins. The device that
-begins the game joins it at once as a table device. There is no game on a
-device alone. Rejected: a game that lives on one device with no server,
-next to the shared game, because two kinds of game double every command,
-every screen state, and every test.
+A game lives on the server from the moment the host creates it. Create
+game, at the end of setup, puts the seats on the server and opens the
+Players & devices screen as a lobby. The device that creates the game is a
+table device from the start. There is no game on a device alone. Rejected:
+a game that lives on one device with no server, next to the shared game,
+because two kinds of game double every command, every screen state, and
+every test.
+
+No clock runs before Start game. Start game, on an admin device, begins the
+strategy phase. A device that joins before Start sees the lobby and waits.
+A device that joins after Start lands in the running game. Rejected:
+starting the game when the host creates it, because the game clock and the
+first pick clock would run while the phones join. Rejected: a pause that
+opens with the lobby, because a phone that joins would see a paused game,
+and a pause is not a tap.
 
 Every device shows every tap, from any device, as soon as it applies.
 
@@ -48,8 +58,8 @@ letters and digits that look alike, such as the letter O and the digit zero.
 The app shows a code in capitals and accepts it in any case. No two games
 share a code, and a code is never reused.
 
-The Join screen of every device shows the join code, a link that holds it,
-and a QR code of the link. A phone that scans the QR code or opens the link
+The Players & devices screen of every device shows the join code, a link
+that holds it, and a QR code of the link. A phone that scans the QR code or opens the link
 goes straight to the claim screen of that game. Rejected: no QR code, because
 a six-character code is quick to type, but a scan is quicker and cannot be
 misread across a table.
@@ -97,7 +107,7 @@ Rejected: a confirmation by the holder, because the dead phone cannot
 answer.
 
 A device can change its seat, or become a table device with the admin code,
-at any time on the Join screen. A device can also leave a game: the device
+at any time on the Players & devices screen. A device can also leave a game: the device
 forgets the game, and the game keeps the device's place, shown as away.
 Rejected: removing a device from a game, because the last admin could not
 leave, and a seat is taken in one tap anyway.
@@ -112,8 +122,8 @@ the admin code is always at hand.
 An admin device can give admin to a seated device, and can take it away
 from a seated device, except from the last admin device of the game. A
 table device is always an admin, so its admin cannot be taken away. The
-Join screen lists every device of the game with its seat or Table, its
-admin state, and whether it is connected.
+Players & devices screen lists every device of the game with its seat or
+Table, its admin state, and whether it is connected.
 
 ## Who may tap what
 
@@ -132,6 +142,7 @@ whatever the device shows.
 | Status steps, Custodians, next phase, open voting, resolve, next round  | No                              | Yes                          |
 | Move the speaker, move the Naalu token, remove a player, end the game   | No                              | Yes                          |
 | Pause, resume, rule check, time limits                                  | No                              | Yes                          |
+| Start game, from the lobby                                              | No                              | Yes                          |
 | Undo                                                                    | No                              | Yes                          |
 | Change own seat, join as table with the admin code                      | Yes                             | Yes                          |
 | Give or take admin                                                      | No                              | Yes, not from the last admin |
@@ -158,19 +169,23 @@ device. The Settings screen shows the two groups apart.
 
 - **Home**: start a new game, join a game by code, and reopen a recent game
   of this device.
-- **Setup**: unchanged, on one device. Begin game puts the game on the
-  server and shows the join code. Rejected: a code during setup with a
-  waiting screen for early joiners, because it saves a few seconds at most,
-  and it can be added later. Rejected: a lobby where each player fills their
-  own seat, because the setup then becomes a shared document with its own
-  rules for every field, and the claim screen is needed anyway for a device
-  that joins mid-game.
+- **Setup**: unchanged, on one device. Create game puts the seats on the
+  server and opens Players & devices as the lobby. Rejected: a code during
+  setup with a waiting screen for early joiners, because it saves a few
+  seconds at most, and it can be added later. Rejected: a lobby where each
+  player fills their own seat, because the setup then becomes a shared
+  document with its own rules for every field, and the claim screen is
+  needed anyway for a device that joins mid-game.
 - **Claim seat**: the seats of the game, and the admin code field for a
   table device.
-- **Join**: the join code, the link, the QR code, the admin code on an admin
-  device, the seats with their holders, and the devices with their rights.
+- **Players & devices**: the join code, the link, the QR code, the admin
+  code on an admin device, and one row per seat with the device that holds
+  it, its admin switch, and its connection state, then the table devices.
+  Before Start game it is the lobby, with Start game on an admin device and
+  a waiting line on every other device. Rejected: the name "Join", because
+  the device joins on the claim screen, and this screen lists who is in.
 - The top bar of every in-game screen shows the device's seat or Table, and
-  opens the Join screen.
+  opens the Players & devices screen.
 - Every other screen is the same on every device, with the controls that
   the device may not use disabled. There are no separate phone companion
   screens. Rejected: separate companion screens for a seated phone, because

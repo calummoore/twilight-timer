@@ -95,7 +95,7 @@ wait for an answer.
 | **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count, rule-check time |
 | **Home**            | New game, join a game by code, recent games of this device               |
 | **Claim seat**      | Which player this device is, or Join as table with the admin code        |
-| **Join**            | Join code, link, QR code, admin code, seats and their holders, devices    |
+| **Players & devices** | Join code, link, QR code, admin code, one row per seat with its device; the lobby before Start game |
 
 ---
 
