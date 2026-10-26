@@ -82,7 +82,7 @@ Each build gets a build id: the first seven characters of `GITHUB_SHA` in
 CI, else a timestamp of the build. The page and the Worker of one build
 carry the same id. After a deploy, an open page of the old build reloads
 once and returns to its game, as
-[New versions](docs/product/multiplayer.md#new-versions) says. A local build
+[New versions](docs/product/versions.md) says. A local build
 gets a new id each time, and `npm run dev` keeps one id while it runs.
 
 `wrangler.jsonc` configures the Worker: the entry `worker/index.ts`, the

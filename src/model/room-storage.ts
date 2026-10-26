@@ -8,7 +8,7 @@ import { parseSetup } from './setup'
 /**
  * The room as the server stores it: one value under its join code, with its
  * own version. The room parser upgrades the room, then hands the game inside
- * to the game parser, which upgrades the game.
+ * to the game parser, which reads the versions of the game.
  */
 
 /** The value under a code: no room, a room, or one that cannot be read. */

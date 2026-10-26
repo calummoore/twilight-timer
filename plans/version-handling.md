@@ -13,8 +13,9 @@ keeps its old code until it reloads. Review 1 finding 3 of
 message that it cannot read, so a deploy during a game freezes every open
 device until someone reloads it. Stored data has the opposite direction: a
 newer build reads the games that older builds stored. The game has an
-upgrade chain with six versions. The room has two versions, which one
-parser reads, but no chain yet.
+upgrade chain with six versions, until PR #29 retired versions 1 to 5, so
+the game parser now reads version 6 only. The room has two versions, which
+one parser reads, but no chain yet.
 
 This change gives the wire one invariant, the same build on the page and
 on the server, and gives a stored room three states: none, ok, and
@@ -77,6 +78,8 @@ Contract owners:
 
 - [Multiplayer](../docs/product/multiplayer.md), the product spec of the
   game on the server.
+- [New versions](../docs/product/versions.md), the product spec page of
+  this change, split from Multiplayer after the merge of PR #29.
 - The [workspace README](../README.md) and the repository rules in
   [CLAUDE.md](../CLAUDE.md).
 
@@ -265,6 +268,11 @@ Tags: ui
         decision B, which PR #28 shipped. Separate branch.
       - `plans/multiplayer.md`: the status paragraph says that PR #21 is
         open, but it merged. Separate branch.
+- [x] After the merge of PR #29, which retired the games saved before the
+      server, move the New versions section to its own page,
+      `docs/product/versions.md`, because `docs/product/multiplayer.md`
+      passed 250 lines. Update its links. The merge and its conflicts:
+      `.context/version-handling/merge-justification.md`, merge 2.
 - [ ] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 

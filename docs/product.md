@@ -54,6 +54,9 @@ The core concepts have their own pages:
   limits and overtime, pauses, and corrections.
 - [Multiplayer](product/multiplayer.md): the game on the server, join
   codes, table and seated devices, and who may tap what.
+- [New versions](product/versions.md): one version on the server and on
+  every device, the reload after an update, and a game that the server
+  cannot read.
 
 ---
 
