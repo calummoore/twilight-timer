@@ -52,36 +52,18 @@ Decisions, 2026-10-26, Cal:
   one JSON fixture of the old shape and a test that loads it. The helpers
   that rebuild versions 1 to 5 stay. Alternative: A, keep only the
   helpers. Reason: a real fixture is a record, a helper is a guess.
-- Decision 5 is open: how an idle page learns about a deploy. See below.
-  Milestone 5 waits for it.
+- Decision 5, option A. An idle table hears nothing about a deploy until
+  a device sends a command, because the object sleeps between messages
+  and a ping does not wake it. The object refuses that command, the page
+  reloads, and the tap is lost, so the player taps again. The other pages
+  reload on the next broadcast. Alternatives: B, the page asks the Worker
+  for its build once a minute and when it shows again, on a new route,
+  and C, pings that wake the object. Reason: no extra request per page,
+  and a lost tap after a deploy is rare and costs one more tap.
 
 Assumption: the first fixtures are the current shapes, game version 6 and
 room version 1, captured in this change from a game that the test table
 plays. The next bump then has its fixture of the old shape ready.
-
-## Open decision 5: how an idle page learns about a deploy
-
-The object hibernates between messages, and a ping gets an automatic
-answer that does not wake it. After a deploy, the new code runs at the
-next wake: a hello, a command, or a closed socket. So an idle table hears
-nothing about a deploy until a device sends a command. The object refuses
-that command, because the page is outdated, and the page reloads. The tap
-is lost, and the player taps again. The reload sends a new hello, and the
-object then closes every other outdated socket, so the other pages reload
-within a second.
-
-- A. Accept it. The first tap after a deploy on an idle table reloads the
-  page and is lost. No code.
-- B. The page asks the Worker for its build once a minute and when the
-  page shows again, on a new route `GET /api/build`. The Worker runs the
-  new code at once after a deploy, so an idle page reloads within a
-  minute, in most cases before the next tap. Cost: one small request per
-  page per minute. Effort: Small.
-- C. Pings wake the object, which then closes the outdated sockets. Cost:
-  the object wakes every 20 seconds for every page, which defeats
-  hibernation. Effort: Small.
-
-Recommended: B.
 
 Contract owners:
 
@@ -147,9 +129,10 @@ Stored shapes. These rules go into the repository rules:
 State the requirements and the decisions before the mockup and the code.
 
 - [ ] Add a section to `docs/product/multiplayer.md`: one build on the
-      page and on the server, the reload, the notice after a failed
-      reload, the three states of a stored game, and the notice of an
-      unreadable game, each with its rejected alternatives.
+      page and on the server, the reload, the lost tap of an idle page,
+      the notice after a failed reload, the three states of a stored
+      game, and the notice of an unreadable game, each with its rejected
+      alternatives.
 - [ ] Add the two requirements to the Multiplayer list in
       `docs/product.md`.
 - [ ] Add the stored-shape rules to the repository rules in `CLAUDE.md`,
@@ -221,18 +204,7 @@ Tags: ui
       then open the game: the notice shows on every device, and the room
       stays. Evidence under `.context/version-handling/`.
 
-## Milestone 5: The build check of an idle page
-
-Waits for decision 5. With option A, remove this milestone. With option B:
-
-- [ ] The route `GET /api/build` in `worker/index.ts`, which answers the
-      build of the Worker.
-- [ ] The page asks for the build once a minute and when it shows again,
-      and reloads on a mismatch through the same guard.
-- [ ] The requirement in `docs/product/multiplayer.md`, and the route in
-      `README.md`.
-
-## Milestone 6: Verification, commit, review, and pull request
+## Milestone 5: Verification, commit, review, and pull request
 
 - [ ] Run the targeted tests and the complete gate named in `CLAUDE.md`.
 - [ ] Commit with Conventional Commits and push the branch.
