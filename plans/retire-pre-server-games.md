@@ -77,7 +77,7 @@ Contract owners:
 
 Tags: mockup
 
-- [ ] Remove the Home state "Saved on this device" from
+- [x] Remove the Home state "Saved on this device" from
       `docs/mockups/index.html`, with its sample data and its branch of
       the Home screen. Remove the styles that only it used, in the mockup
       and in `src/styles/mockup/`.
