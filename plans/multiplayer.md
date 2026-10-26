@@ -1,7 +1,10 @@
 # Multiplayer
 
-Status: Active. [PR #21](https://github.com/calummoore/twilight-timer/pull/21)
-is open. The plan closes when its pull request merges.
+Status: Completed. [PR #21](https://github.com/calummoore/twilight-timer/pull/21)
+merged on 2026-10-26. Open review items under milestone 11 wait for Cal:
+review 1 findings 2, 3, and 10, review 2 finding 4, and the unused-export
+follow-up. Cal chose B for review 1 finding 4 on 2026-10-26, and
+`plans/admin-recovery.md` carries that work.
 
 TI4 Tempo runs a Twilight Imperium game on one device. The game is an
 append-only log of taps in `localStorage`, and every screen folds that log.
@@ -414,7 +417,8 @@ Run the checks, push, and review the branch.
         cannot be read.
       - Review 1, 4. A lost last admin blocks the game. Severity Medium,
         effort Large. Recommended: B, a seated device may take admin while
-        no admin device is connected.
+        no admin device is connected. Cal chose B on 2026-10-26.
+        `plans/admin-recovery.md` carries the work.
       - Review 1, 10. A readable saved game cannot be dismissed. Severity
         Low, effort Small. Recommended: A, Dismiss with a confirm.
       - Review 2, 4. The fix rewrote a checked plan TODO. Severity Low,
