@@ -228,8 +228,8 @@ Run the checks, push, and review the branch.
   - `docs/mockups/index.html`: the History log shows a turn that ends after "Reaction window closed", which PR #12 no longer allows. origin/main has the same log. Separate branch.
   - `src/styles/mockup/responsive.css`: the phone rule `.count b{padding:10px 0}` does not reach the app's count buttons, so they are 2 px taller than in the mockup. Separate branch.
   - `docs/mockups/index.html`: the setup note says that the iPad keeps the expansion choice, but any table device keeps it. origin/main has the same note. Separate branch.
-  - `src/styles/mockup/responsive.css`: from 901 to 948 px wide, the one-row top bar wraps onto two lines, so it is 81 px tall, not 68 px. Separate branch.
-  - `src/styles/mockup/responsive.css`: from 741 to about 824 px wide, a long speaker name wraps in the speaker chip, so the two-row top bar is 124 to 141 px tall. Separate branch.
+  - `src/styles/mockup/responsive.css`: from 901 to 948 px wide, the one-row top bar wraps onto two lines, so it is 81 px tall, not 68 px. Separate branch. Fixed: the two-row bar now applies up to 1050 px, after Cal chose option B of PR #33, review 1, finding 1, on 2026-10-26.
+  - `src/styles/mockup/responsive.css`: from 741 to about 824 px wide, a long speaker name wraps in the speaker chip, so the two-row top bar is 124 to 141 px tall. Separate branch. Fixed: the chips now span two columns of the two-row bar, after the same decision.
   - `plans/pause-reasons.md`: the status still says that PR #13 is open, but it merged as `b8a74b6`. origin/main has the same text. Separate branch.
 
 ## Post-merge follow-up (non-blocking)
