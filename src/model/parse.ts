@@ -17,25 +17,24 @@ import {
 import type { Game } from './types'
 
 /**
- * Narrows stored data to a game, or returns null when it is not valid. Every
- * game on the server is of version 6 or 7. A version 6 game comes from a
- * build before seat swaps and has the shape of version 7, so it loads as
- * version 7.
+ * Reads a stored game of version 6 or later, in the shape of the newest.
+ * Returns null when it is not valid.
  */
 export function parseGame(raw: unknown): Game | null {
-  if (!isFields(raw) || (raw.version !== 6 && raw.version !== 7)) return null
-  const players = listOf(raw.players, parsePlayer)
-  const actions = listOf(raw.actions, parseAction)
-  const pauses = listOf(raw.pauses, parsePause)
-  const voids = listOf(raw.voids, parseInterval)
-  const limitsLog = listOf(raw.limitsLog, parseLimitsChange)
-  const { startedAt, firstSpeakerId, windowEndsTurn } = raw
+  const game = isFields(raw) ? upgrade(raw) : null
+  if (game?.version !== 7) return null
+  const players = listOf(game.players, parsePlayer)
+  const actions = listOf(game.actions, parseAction)
+  const pauses = listOf(game.pauses, parsePause)
+  const voids = listOf(game.voids, parseInterval)
+  const limitsLog = listOf(game.limitsLog, parseLimitsChange)
+  const { startedAt, firstSpeakerId, windowEndsTurn } = game
   if (!players || !actions || !pauses || !voids || !limitsLog) return null
   if (!isNumber(startedAt) || typeof firstSpeakerId !== 'string') return null
   if (typeof windowEndsTurn !== 'boolean') return null
   const isPlayer = (id: unknown) => players.some((p) => p.id === id)
   if (!isPlayer(firstSpeakerId)) return null
-  const owner = raw.naaluTokenOwnerId
+  const owner = game.naaluTokenOwnerId
   if (owner !== null && (typeof owner !== 'string' || !isPlayer(owner))) {
     return null
   }
@@ -50,6 +49,21 @@ export function parseGame(raw: unknown): Game | null {
     pauses,
     voids,
     limitsLog,
+  }
+}
+
+/**
+ * Gives a stored game of an older version the shape of the next version,
+ * until it has the shape of the newest. Another version stays as it is, so
+ * the parser rejects it.
+ */
+function upgrade(raw: Fields): Fields {
+  switch (raw.version) {
+    case 6:
+      // Builds before seat swaps have the shape of version 7.
+      return upgrade({ ...raw, version: 7 })
+    default:
+      return raw
   }
 }
 

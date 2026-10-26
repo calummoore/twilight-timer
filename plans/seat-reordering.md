@@ -60,14 +60,12 @@ Other branches that touch this change, read on 2026-10-26:
   rights table and its device rows stay. A seated device that takes admin
   while every admin device is away may swap seats, as it may do every
   admin tap.
-- Branch `calummoore/protocol-version-handling` plans a reload of pages from
-  another build. Its decision 4 asks each saved-game version bump, from the
-  next one on, to commit one JSON fixture of the old shape, captured from
-  the build before the bump, and a test that loads it. This change is that
-  bump, so it commits the version 6 fixture whichever branch merges first.
-  If this change merges first, its deploy freezes every open game page
-  until the page reloads, because an older page cannot read a version 7
-  game.
+- [PR #30](https://github.com/calummoore/twilight-timer/pull/30), the
+  version handling, merged on 2026-10-26, and this branch merged it. A page
+  of another build now reloads by itself, so the deploy of this change
+  reloads every open game page. PR #30 also committed the version 6
+  fixture, `src/model/fixtures/game-v6.json`, from the build before this
+  bump. This branch keeps that fixture in place of its own capture.
 - [PR #29](https://github.com/calummoore/twilight-timer/pull/29), the
   retirement of the games saved before the server, merged on 2026-10-26,
   and this branch merged it. The parser has no upgrade chain now. It reads
@@ -112,13 +110,13 @@ Contract owners:
 - Rights: only an admin device may swap seats. `mayActFor` already refuses
   an unlisted kind to a seated device. A test pins this.
 - Saved game version 7. `parseActionInput` reads `seatsSwapped`. The
-  parser reads a game of version 6 or 7 and gives version 7, because the
-  two have the same shape, and `startGame` writes version 7. The room
-  version stays 2. No `localStorage` key changes, because the app no longer
-  saves a game on the device.
-- The version 6 fixture: a game that the test table plays on the build
-  before the bump, saved as `src/model/fixtures/game-v6.json`, with a test
-  that loads it as version 7 and checks its clocks.
+  upgrade chain of the game parser gets the step from version 6 to 7, with
+  no other change, because the two have the same shape. `startGame` writes
+  version 7. The room version stays 2. No `localStorage` key changes,
+  because the app no longer saves a game on the device.
+- The version 6 fixture of PR #30 is the fixture of this bump. A test reads
+  it as version 7 with no other change, and the tests of PR #30 check its
+  clocks.
 
 ### Speaker & Seating screen
 
@@ -285,24 +283,24 @@ Build re-order mode and the setup handle as the mockup shows them.
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest. Review 1 is in
       `.context/seat-reordering/review-1.md`. It fixed findings 2 and 3.
-  - Review 1, 1. Deploy leaves older game pages stale. Severity Medium,
-    effort Small. Recommended: B, merge this branch first, and reload the
-    open game pages after its deploy.
+  - Review 1, 1. Deploy leaves older game pages stale. Resolved on
+    2026-10-26: PR #30 merged first, so the deploy reloads every open page.
   - Review 1, 4. Spec and code disagree on ending the mode. Severity Low,
     effort Small. Recommended: B, a tap anywhere outside the seats and the
     buttons ends the mode, as decision 1 says.
   - Review 2, 1. Plan misstates the open review findings. Severity Low,
-    effort Small. Recommended: B, keep the agent's recommendations, and add
-    the reviewer's option A and the second reload of option B. Review 2 is
-    in `.context/seat-reordering/review-2.md`.
+    effort Small. Recommended: B, keep the agent's recommendation for
+    finding 4, and add the reviewer's option A. Review 2 is in
+    `.context/seat-reordering/review-2.md`.
   - Outside the scope: `src/ui/useGameClient.ts`, a page drops a state
     message that it cannot read and shows no notice. Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked. Put
       its link in the status paragraph. Copy the merge justifications in
-      `.context/seat-reordering/merge-1.md` into its description. The
-      description asks Cal to test the preview on an iPad and a phone
-      before the merge: the long press, no text selection or menu, no
-      scroll during a drag, a plain tap on a seat, and reduced motion.
+      `.context/seat-reordering/merge-1.md` and `merge-2.md` into its
+      description. The description asks Cal to test the preview on an iPad
+      and a phone before the merge: the long press, no text selection or
+      menu, no scroll during a drag, a plain tap on a seat, and reduced
+      motion.
 
 ## Post-merge follow-up (non-blocking)
 
