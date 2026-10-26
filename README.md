@@ -1,4 +1,4 @@
-# TI4 Tempo
+# TI4 Nexus
 
 A shared-table time tracker for Twilight Imperium 4th Edition. The game lives
 on the server, and every device at the table joins it with a six-character

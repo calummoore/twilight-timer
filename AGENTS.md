@@ -1,6 +1,6 @@
 # A guide for agents
 
-TI4 Tempo is a React and TypeScript web app, built with Vite and deployed as
+TI4 Nexus is a React and TypeScript web app, built with Vite and deployed as
 a Cloudflare Worker with static assets. Each game lives in a Durable Object
 of the Worker. The game model is under `src/model/`, the screens are under
 `src/ui/`, the Worker is under `worker/`, and the product spec and the mockup
@@ -56,7 +56,9 @@ skill at that moment instead of guessing the rule.
   token, the open and the recent games, and the settings. Change the version
   when a stored shape changes, and keep reading the older shapes. The
   saved-game keys of the builds before the server stay readable, so that a
-  device can continue such a game on the server.
+  device can continue such a game on the server. The keys keep the
+  `ti4tempo.` prefix of the old product name, TI4 Tempo, so that each device
+  keeps its token and its games.
 - The Durable Object stores each game as a room with its own `version`.
   Change the room version when the stored room shape changes, and keep
   reading the older rooms. The game inside the room keeps the saved-game
