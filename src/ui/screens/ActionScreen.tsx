@@ -11,6 +11,17 @@ import { InitiativeRail } from './InitiativeRail'
 
 type ActionView = Extract<PhaseView, { phase: 'action' }>
 
+/**
+ * A pass that waits for its confirm: the turn in which it was asked, the
+ * cards it warns about, and the tap of that moment, which names the state
+ * that the device saw.
+ */
+interface PassAsk {
+  turn: string
+  unplayed: string[]
+  onPass: () => void
+}
+
 export function ActionScreen(props: {
   game: GameView
   view: ActionView
@@ -23,7 +34,7 @@ export function ActionScreen(props: {
   onPass: () => void
 }) {
   const { game, view, rights } = props
-  const [confirmPass, setConfirmPass] = useState(false)
+  const [ask, setAsk] = useState<PassAsk | null>(null)
   const seat = game.players.findIndex((p) => p.id === view.activeId)
   const player = game.players[seat]
   const turn = game.timer?.kind === 'turn' ? game.timer : null
@@ -37,8 +48,14 @@ export function ActionScreen(props: {
   const cards = view.activeCards
   const unplayed = cards.filter((c) => !c.played).map((c) => cardName(c.card))
 
+  const turnKey = `${game.round}:${view.activeId}:${view.turnNumber}`
   const pass = () =>
-    unplayed.length === 0 ? props.onPass() : setConfirmPass(true)
+    unplayed.length === 0
+      ? props.onPass()
+      : setAsk({ turn: turnKey, unplayed, onPass: props.onPass })
+  // The confirm belongs to the turn in which it opened. When a tap on another
+  // device ends the turn, it closes, so it cannot pass the next player.
+  const confirm = ask?.turn === turnKey ? ask : null
 
   return (
     <div className="body">
@@ -145,20 +162,20 @@ export function ActionScreen(props: {
         view={view}
         showCumulative={props.showCumulative}
       />
-      {confirmPass && (
+      {confirm && (
         <Dialog
-          title={`Pass before playing ${unplayed.join(' and ')}?`}
+          title={`Pass before playing ${confirm.unplayed.join(' and ')}?`}
           confirm={{
             label: 'Pass anyway',
             danger: true,
             onConfirm: () => {
-              setConfirmPass(false)
-              props.onPass()
+              setAsk(null)
+              confirm.onPass()
             },
           }}
-          onCancel={() => setConfirmPass(false)}
+          onCancel={() => setAsk(null)}
         >
-          {unplayed.length > 1
+          {confirm.unplayed.length > 1
             ? 'The rules say a player passes only after both strategic actions.'
             : 'The rules say a player passes only after their strategic action.'}{' '}
           Pass anyway if the table agrees.

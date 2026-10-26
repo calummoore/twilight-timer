@@ -141,28 +141,31 @@ Components:
   game, look a code up, and open the WebSocket of a game. Everything else
   is static assets.
 - **Game object**: one Durable Object per join code. It holds the room:
-  the join code, the admin code, the seats and the settings from Create
-  game, the game from Start game, the devices, and the revision. It applies
-  commands with the model, saves, and broadcasts.
+  the join code, the seats and the settings from Create game, the game
+  from Start game, the devices, and the revision. It applies commands with
+  the model, saves, and broadcasts.
 - **Game client**: the hook in the app that owns the socket, the
   reconnect, the server time offset, and the revision. The screens get the
-  game, the device's rights, and a dispatch function, as they get them
-  from the local store today.
+  game, the device, and a send function, and they derive the rights of
+  the device from the model.
 
-Messages, from the device: hello with the device token, claim a seat or
-the table, set the admin flag of a device, start the game, and a game
-command with the revision: an action input, undo, pause, resume, the
-pause reason, or the time limits. From the object: the state, with the
-revision, the server time, the game, the devices with their connection
-state, and the rights of this device; and a rejection with a reason.
+Messages, from the device: hello with the device token, and a command
+with the revision that the device saw: claim a seat or the table, set the
+admin flag of a device, start the game, an action input, undo, pause,
+resume, the pause reason, or the time limits. From the object: the state,
+with the revision, the server time, the setup, the game, the devices with
+their connection state, and the id of the receiving device; or that no
+game has the code. A command that the object drops gets the state again,
+so the device re-renders.
 
 Rights: a device has a seat or none, and an admin flag. A device without
 a seat is a table device: with admin it acts for every player, and without
 admin it is a viewer that may only take a seat. A device that has not
 joined sees the claim screen. A seat holder that loses its seat becomes a
-table device with its admin unchanged. The last admin cannot lose admin. The permission module takes the derived
-view, the device, and a command, and says whether the command is allowed.
-The object and the screens call the same function.
+table device with its admin unchanged. The last admin cannot lose admin.
+The permission module takes the derived view, the device, and a command,
+and says whether the command is allowed. The object and the screens call
+the same function.
 
 Storage: the room is one JSON value with its own version. The game inside
 keeps the saved-game versions, so the parser reads a game that an older
@@ -387,15 +390,15 @@ Seats, rights, and the disabled controls.
 - [x] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
       admin toggles work. Evidence: `.context/multiplayer/app/smoke-m10.log`:
-      25 checks passed, with the claim screen, the seat takeover, and Change
+      23 checks passed, with the claim screen, the seat takeover, and Change
       seat.
 
 ## Milestone 11: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 
-- [ ] Run the targeted tests and the complete gate named in `AGENTS.md`.
-- [ ] Commit with Conventional Commits and push the branch.
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+- [x] Commit with Conventional Commits and push the branch.
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,

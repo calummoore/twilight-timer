@@ -81,6 +81,18 @@ describe('the state that devices get', () => {
     for (const token of [HOST, JAZ, KIRA]) expect(text).not.toContain(token)
   })
 
+  it('sends only the public fields of a device, whatever the server keeps', () => {
+    const s = seatedServer()
+    const kept = { ...s.room.members[1], secret: 'kept on the server' }
+    const room = { ...s.room, members: [s.room.members[0], kept] }
+    expect(roomState(room, new Set()).devices[1]).toEqual({
+      id: 'd2',
+      seat: 'jaz',
+      admin: false,
+      connected: false,
+    })
+  })
+
   it('names the receiving device, or none before it joins', () => {
     const s = seatedServer()
     const connected = new Set<string>()

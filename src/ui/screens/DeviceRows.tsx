@@ -7,15 +7,15 @@ import { Toggle } from '../controls'
 
 /**
  * One row per seat with the device that holds it, then the table devices.
- * An admin device sees the admin switch of every device. The last admin keeps
- * its switch on.
+ * Every row has the admin switch of its device. Only an admin device with a
+ * connection uses the switches, and the last admin keeps its switch on.
  */
 export function DeviceRows(props: {
   players: Player[]
   devices: DeviceView[]
   you: string | null
-  /** This device may give admin and take it away. */
-  admin: boolean
+  /** This device may give admin and take it away now. */
+  mayChange: boolean
   onAdmin: (deviceId: string, admin: boolean) => void
 }) {
   const { players, devices } = props
@@ -28,8 +28,7 @@ export function DeviceRows(props: {
       device={device}
       player={player}
       you={device.id === props.you}
-      admin={props.admin}
-      last={isLastAdmin(devices, device)}
+      locked={!props.mayChange || isLastAdmin(devices, device)}
       onAdmin={(on) => props.onAdmin(device.id, on)}
     />
   )
@@ -72,8 +71,8 @@ function DeviceRow(props: {
   /** The player of the seat, or undefined for a table device. */
   player: Player | undefined
   you: boolean
-  admin: boolean
-  last: boolean
+  /** The switch shows, but this device may not use it. */
+  locked: boolean
   onAdmin: (admin: boolean) => void
 }) {
   const { device, player } = props
@@ -101,19 +100,13 @@ function DeviceRow(props: {
         <div className="st away">Away</div>
       )}
       <div className="adm">
-        {props.admin ? (
-          <>
-            Admin
-            <Toggle
-              label={`Admin: ${player ? player.name : 'Table device'}`}
-              on={device.admin}
-              disabled={props.last}
-              onChange={props.onAdmin}
-            />
-          </>
-        ) : (
-          device.admin && 'Admin'
-        )}
+        Admin
+        <Toggle
+          label={`Admin: ${player ? player.name : 'Table device'}`}
+          on={device.admin}
+          disabled={props.locked}
+          onChange={props.onAdmin}
+        />
       </div>
     </div>
   )

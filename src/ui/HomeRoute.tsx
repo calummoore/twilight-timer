@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { parseCode } from '../model/code'
 import type { RecentGame } from '../model/device-store'
+import { gameSummary } from '../model/summary'
 import {
   forgetGame,
   forgetLastGame,
@@ -24,8 +25,8 @@ export function HomeRoute(props: {
   recent: RecentGame[]
   onNewGame: () => void
   onSettings: () => void
-  /** Opens a game, by its code. */
-  onOpen: (code: string) => void
+  /** Opens a game, by its code. A continued game comes with its summary. */
+  onOpen: (code: string, created?: RecentGame) => void
 }) {
   const { store } = props
   const [now] = useState(() => Date.now())
@@ -62,7 +63,12 @@ export function HomeRoute(props: {
     setBusy(false)
     if (!('code' in created)) return setSavedError(UNREACHABLE)
     forget(slot)
-    props.onOpen(created.code)
+    const summary = gameSummary(game, game.players.length)
+    props.onOpen(created.code, {
+      code: created.code,
+      ...summary,
+      seenAt: Date.now(),
+    })
   }
 
   return (
@@ -75,7 +81,7 @@ export function HomeRoute(props: {
       busy={busy}
       onNewGame={props.onNewGame}
       onJoin={(text) => void join(text)}
-      onOpen={props.onOpen}
+      onOpen={(code) => props.onOpen(code)}
       onContinue={(slot) => void resume(slot)}
       onDismiss={forget}
       onSettings={props.onSettings}

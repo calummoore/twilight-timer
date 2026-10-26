@@ -13,6 +13,7 @@ import {
   founder,
   memberOf,
   parseMember,
+  publicDevice,
   setAdmin,
   takeSeat,
   type Member,
@@ -142,9 +143,9 @@ export function roomState(
   connected: ReadonlySet<string>,
 ): RoomState {
   const { code, revision, setup, game } = room
-  const devices = room.members.map(({ token, ...device }) => ({
-    ...device,
-    connected: connected.has(token),
+  const devices = room.members.map((member) => ({
+    ...publicDevice(member),
+    connected: connected.has(member.token),
   }))
   return { code, revision, setup, game, devices }
 }

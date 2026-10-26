@@ -18,7 +18,7 @@ export function PlayersScreen(props: {
   devices: DeviceView[]
   you: string | null
   connected: boolean
-  /** This device is an admin with a connection. */
+  /** This device is an admin. Without a connection, its controls wait. */
   admin: boolean
   onAdmin: (deviceId: string, admin: boolean) => void
   onChangeSeat: () => void
@@ -88,7 +88,7 @@ export function PlayersScreen(props: {
           players={props.players}
           devices={props.devices}
           you={props.you}
-          admin={props.admin}
+          mayChange={props.admin && props.connected}
           onAdmin={props.onAdmin}
         />
       </div>
@@ -100,7 +100,11 @@ export function PlayersScreen(props: {
                 Start when everyone has a seat, or start now. A phone can still
                 join later, and the table device acts for a seat without one.
               </div>
-              <button className="big" onClick={props.onStart}>
+              <button
+                className="big"
+                disabled={!props.connected}
+                onClick={props.onStart}
+              >
                 START GAME
               </button>
             </>

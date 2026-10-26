@@ -2118,12 +2118,11 @@ S.claim = {t:'Claim Seat', note:
 
 /* ── 15. Players & devices ── */
 // The code, the link, and the QR code for new devices, and one row per seat with the device that holds it, then the
-// table devices. An admin device sees the admin switch of every other device; the others see the admin state as
-// text. Before Start game the same screen is the lobby.
-const admCell = (m, me) => {
-  if (me.admin) return `<div class="adm">Admin ${tog(m.admin)}</div>`;
-  return `<div class="adm">${m.admin?'Admin':''}</div>`;
-};
+// table devices. Every device sees the admin switch of every device, and only an admin device uses them; on the
+// others they are off. Before Start game the same screen is the lobby.
+const admCell = (m, me) => me.admin
+  ? `<div class="adm">Admin ${tog(m.admin)}</div>`
+  : `<div class="adm">Admin <div class="tog ${m.admin?'on':''} off"></div></div>`;
 const devRow = (m, me) => {
   const seat = m.seat ? P[m.seat] : null;
   const isMe = me.seat ? m.seat===me.seat : !m.seat && m.me;
@@ -2167,7 +2166,7 @@ S.lobby = {t:'Players & Devices — Lobby', note:
  h:playersScreen(true, TABLE, MEMBERS_LOBBY)};
 
 S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', note:
- `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It has no admin switches, so it sees who is an admin as text. When the host starts, the phone goes to the strategy phase on its own.`,
+ `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It sees the admin switch of every device, off for this phone, because only an admin device gives admin. When the host starts, the phone goes to the strategy phase on its own.`,
  mnote:
  `On a phone, the waiting line sits at the end of the column.`,
  h:playersScreen(true, SEATED, MEMBERS_LOBBY)};

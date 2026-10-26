@@ -89,8 +89,10 @@ export function App() {
     return () => document.removeEventListener('click', unlockAudio)
   }, [])
 
-  const open = (code: string) => {
-    setGames((g) => openGame(g, code))
+  // A game that this device created or continued is a recent game at once,
+  // so that its code stays on Home also when the socket cannot connect.
+  const open = (code: string, created?: RecentGame) => {
+    setGames((g) => openGame(created ? seeGame(g, created) : g, code))
     setScreen({ name: 'room', code })
   }
   const show = (next: Screen) => {

@@ -87,7 +87,7 @@ export function RoomScreen(props: {
       devices={room.devices}
       you={you}
       connected={connected}
-      admin={admin}
+      admin={!!device?.admin}
       onAdmin={(deviceId, on) => send(adminCommand(deviceId, on))}
       onChangeSeat={() => setOverlay('claim')}
       onLeave={props.onLeave}

@@ -23,6 +23,15 @@ export type GameStatus =
   /** No game has the code. */
   | 'missing'
 
+type Timer = ReturnType<typeof setTimeout>
+
+/** One socket of the hook, with the ways to check it and to end it. */
+interface Connection {
+  ws: WebSocket
+  ping: (timeoutMs: number) => void
+  drop: () => void
+}
+
 export interface GameClient {
   status: GameStatus
   /** The game as the server sent it last, or null before the first state. */
@@ -53,37 +62,55 @@ export function useGameClient(code: string, token: string): GameClient {
   const socket = useRef<WebSocket | null>(null)
 
   useEffect(() => {
-    let ws: WebSocket | null = null
     let disposed = false
     let missing = false
     let attempt = 0
-    let sample: number | null = null
-    let retry: ReturnType<typeof setTimeout> | undefined
-    let deadline: ReturnType<typeof setTimeout> | undefined
-    let pings: ReturnType<typeof setInterval> | undefined
+    let retry: Timer | undefined
+    // The socket now, or null while the device waits to try again.
+    let current: Connection | null = null
 
-    // A socket that does not answer a ping in time is dead, so it closes.
-    const ping = (timeoutMs: number) => {
-      if (ws?.readyState !== WebSocket.OPEN) return
-      ws.send('ping')
-      clearTimeout(deadline)
-      const pinged = ws
-      deadline = setTimeout(() => pinged.close(), timeoutMs)
-    }
-
+    // Each socket has its own timers, and one way to end: drop. A close, a
+    // missed pong, and the end of the hook all drop the socket, so a dead
+    // connection shows at once, and an old socket cannot touch a new one.
     const connect = () => {
       clearTimeout(retry)
       if (disposed || missing) return
-      sample = null
-      const next = new WebSocket(socketUrl(code))
-      ws = next
-      socket.current = next
-      next.addEventListener('open', () => {
+      const ws = new WebSocket(socketUrl(code))
+      let sample: number | null = null
+      let deadline: Timer | undefined
+      let pings: Timer | undefined
+      let dropped = false
+
+      const drop = () => {
+        if (dropped) return
+        dropped = true
+        clearTimeout(deadline)
+        clearInterval(pings)
+        ws.close()
+        if (socket.current === ws) socket.current = null
+        if (current?.ws === ws) current = null
+        if (disposed || missing) return
+        setStatus((s) => (s === 'open' ? 'reconnecting' : s))
+        retry = setTimeout(connect, retryDelay(attempt++))
+      }
+      // A socket that does not answer a ping in time is dead.
+      const ping = (timeoutMs: number) => {
+        if (dropped || ws.readyState !== WebSocket.OPEN) return
+        ws.send('ping')
+        clearTimeout(deadline)
+        deadline = setTimeout(drop, timeoutMs)
+      }
+
+      current = { ws, ping, drop }
+      socket.current = ws
+      ws.addEventListener('open', () => {
+        if (dropped) return
         attempt = 0
-        next.send(JSON.stringify({ type: 'hello', token }))
+        ws.send(JSON.stringify({ type: 'hello', token }))
         pings = setInterval(() => ping(PONG_TIMEOUT_MS), PING_INTERVAL_MS)
       })
-      next.addEventListener('message', (event: MessageEvent<unknown>) => {
+      ws.addEventListener('message', (event: MessageEvent<unknown>) => {
+        if (dropped) return
         clearTimeout(deadline)
         const data = typeof event.data === 'string' ? event.data : ''
         const message = parseServerMessage(parseJson(data))
@@ -98,22 +125,16 @@ export function useGameClient(code: string, token: string): GameClient {
         setState({ room: message.room, you: message.you })
         setStatus('open')
       })
-      next.addEventListener('close', () => {
-        clearInterval(pings)
-        clearTimeout(deadline)
-        if (socket.current === next) socket.current = null
-        if (disposed || missing || ws !== next) return
-        setStatus((s) => (s === 'open' ? 'reconnecting' : s))
-        retry = setTimeout(connect, retryDelay(attempt++))
-      })
+      ws.addEventListener('close', drop)
     }
 
     // A phone that wakes up, or a browser that is online again, checks its
     // connection at once instead of at the next ping.
     const wake = () => {
       if (disposed || missing || document.visibilityState !== 'visible') return
-      if (ws?.readyState === WebSocket.OPEN) ping(WAKE_TIMEOUT_MS)
-      else if (ws?.readyState !== WebSocket.CONNECTING) {
+      const state = current?.ws.readyState
+      if (state === WebSocket.OPEN) current?.ping(WAKE_TIMEOUT_MS)
+      else if (state !== WebSocket.CONNECTING) {
         attempt = 0
         connect()
       }
@@ -125,11 +146,9 @@ export function useGameClient(code: string, token: string): GameClient {
     return () => {
       disposed = true
       clearTimeout(retry)
-      clearTimeout(deadline)
-      clearInterval(pings)
+      current?.drop()
       document.removeEventListener('visibilitychange', wake)
       window.removeEventListener('online', wake)
-      ws?.close()
     }
   }, [code, token])
 
