@@ -221,7 +221,10 @@ is deleted. If the pull request opens again, the next run makes a new preview.
   running game with Players & devices over it.
 - `src/ui/GameScreen.tsx` connects the model to the screens. Every control
   asks `src/ui/rights.ts`, which calls the rights of the model.
-- `src/ui/screens/` has one component per screen.
+- `src/ui/screens/` has one component per screen. `SeatRing.tsx` holds the
+  ring of Speaker & Seating, with re-order mode.
+- `src/ui/useSwapDrag.ts` drags one item onto another to swap them, with a
+  finger, a pen, or a mouse, after a long press or at once.
 - `src/ui/Stage.tsx` is the app root: it fills the window's safe area and is a
   CSS size container.
 - `src/styles/mockup/` holds the CSS ported from the mockup.

@@ -254,22 +254,25 @@ Tags: ui
 
 Build re-order mode and the setup handle as the mockup shows them.
 
-- [ ] `useSwapDrag.ts`: the pointer drag, the hold, the target, the blocked
+- [x] `useSwapDrag.ts`: the pointer drag, the hold, the target, the blocked
       scroll, and the swallowed release.
-- [ ] `SeatRing.tsx`: re-order mode, the shake, reduced motion, the slide
+- [x] `SeatRing.tsx`: re-order mode, the shake, reduced motion, the slide
       to the gap, the tap alternative, and Done.
-- [ ] Speaker & Seating: the button, the notes, and the dispatch of
+- [x] Speaker & Seating: the button, the notes, and the dispatch of
       `seatsSwapped`.
-- [ ] Claim screen and Players & devices: the order and the seat numbers
+- [x] Claim screen and Players & devices: the order and the seat numbers
       of a running game come from the ring.
 - [ ] Setup: the ⠿ handle and the row swap. Waits for Cal's answer on the
       readings.
-- [ ] Port the new mockup styles to `src/styles/mockup/`.
-- [ ] `README.md`: the new files under Key code.
-- [ ] Scratch smoke test, not committed: in headless Chrome with touch
+- [x] Port the new mockup styles to `src/styles/mockup/`.
+- [x] `README.md`: the new files under Key code.
+- [x] Scratch smoke test, not committed: in headless Chrome with touch
       emulation, long-press, drag, and drop on the ring. Check both orders,
-      a plain tap on a seat, and Undo. Drag a setup row. Save the evidence
-      under `.context/seat-reordering/smoke/`.
+      a plain tap on a seat, and Undo. Save the evidence under
+      `.context/seat-reordering/smoke/`. The logs `ring-ipad.log`,
+      `ring-phone.log`, and `ring-desktop.log` hold 46 passed checks.
+- [ ] Scratch smoke test of the setup handle: drag a setup row. Waits for
+      Cal's answer on the readings.
 
 ## Milestone 5: Verification, commit, review, and pull request
 

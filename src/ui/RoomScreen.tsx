@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { RecentGame } from '../model/device-store'
 import type { Command } from '../model/protocol'
+import { ringOf } from '../model/ring'
 import type { LimitSettings, Settings } from '../model/settings'
 import { gameSummary } from '../model/summary'
 import { GameScreen } from './GameScreen'
@@ -55,13 +56,16 @@ export function RoomScreen(props: {
       <OpeningScreen code={props.code} missing={false} onHome={props.onHome} />
     )
   }
+  // The seats in clockwise order: the setup in the lobby, then the ring of the
+  // game, which seat swaps change.
+  const seats = room.game ? ringOf(room.game) : room.setup.players
 
   // Takes a seat, or makes this device a table device with null. The device
   // that created the game joins with admin.
   const claim = (back: Overlay) => (
     <ClaimScreen
       code={room.code}
-      players={room.setup.players}
+      players={seats}
       devices={room.devices}
       device={device}
       admin={device ? device.admin : creator}
@@ -85,7 +89,7 @@ export function RoomScreen(props: {
     <PlayersScreen
       code={room.code}
       round={round}
-      players={room.setup.players}
+      players={seats}
       devices={room.devices}
       you={you}
       connected={connected}

@@ -18,6 +18,8 @@ export type Overlay = 'settings' | 'seating' | null
  */
 export function GameOverlays(props: {
   game: GameView
+  /** The revision of the game on the server. */
+  revision: number
   overlay: Overlay
   onOverlay: (overlay: Overlay) => void
   /** The End game confirm is open. */
@@ -63,12 +65,17 @@ export function GameOverlays(props: {
           speakerId={g.speakerId}
           pickOrder={g.pickOrder}
           voteOrder={g.voteOrder}
+          revision={props.revision}
           canUndo={rights.admin && g.canUndo}
           maySpeaker={(playerId) =>
             rights.may({ kind: 'speakerMoved', playerId })
           }
           canRemove={rights.admin}
+          canReorder={rights.admin}
           onSpeaker={(playerId) => dispatch({ kind: 'speakerMoved', playerId })}
+          onSwap={(playerId, otherId) =>
+            dispatch({ kind: 'seatsSwapped', playerId, otherId })
+          }
           onRemove={(playerId) => dispatch({ kind: 'playerRemoved', playerId })}
           onUndo={() => send({ type: 'undo' })}
           onClose={close}

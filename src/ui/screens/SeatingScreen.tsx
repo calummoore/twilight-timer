@@ -2,43 +2,41 @@ import { useState } from 'react'
 import type { Departure, Player } from '../../model/types'
 import { pc } from '../colour'
 import { RemovePlayerDialog } from './RemovePlayerDialog'
-
-// The seats sit on an ellipse inside a 500 by 410 box. Positions are in
-// percent, so that the ring scales with the screen.
-const W = 500
-const H = 410
-const CX = 250
-const CY = 205
-const RX = 190
-const RY = 150
+import { SeatRing, type Reorder } from './SeatRing'
 
 /**
- * The table ring. Tapping a seat moves the speaker token there. A player who
- * left keeps an empty seat, so the other seats keep their places.
+ * The table ring, and the two orders that derive from it. A tap on a seat
+ * moves the speaker token there. Re-order mode swaps two seats, to fix a ring
+ * that does not match the table.
  */
 export function SeatingScreen(props: {
   round: number
-  /** Every player, also those who left. */
+  /** Every player, also those who left, in ring order. */
   players: Player[]
   seated: string[]
   departures: Departure[]
   speakerId: string
   pickOrder: string[]
   voteOrder: string[]
+  /** The revision of the game, to which a swap that waits for the server belongs. */
+  revision: number
   canUndo: boolean
   /** Whether this device may hand the speaker token to the player. */
   maySpeaker: (playerId: string) => boolean
   canRemove: boolean
+  /** Whether this device may swap seats now. */
+  canReorder: boolean
   onSpeaker: (playerId: string) => void
+  onSwap: (playerId: string, otherId: string) => void
   onRemove: (playerId: string) => void
   onUndo: () => void
   onClose: () => void
 }) {
   const [removing, setRemoving] = useState(false)
+  const [reorder, setReorder] = useState<Reorder | null>(null)
+  // The mode ends when the device may no longer swap seats.
+  if (reorder && !props.canReorder) setReorder(null)
   const byId = new Map(props.players.map((p) => [p.id, p]))
-  const leftIn = new Map(props.departures.map((d) => [d.playerId, d.round]))
-  const speaker = byId.get(props.speakerId)
-  const n = props.players.length
 
   const orderList = (ids: string[]) =>
     ids.map((id, i) => {
@@ -93,48 +91,24 @@ export function SeatingScreen(props: {
           <div className="pnl-h">
             The table
             <span className="pnl-note">
-              tap a seat to move the speaker token
+              {reorder
+                ? 'drag a seat onto another to swap them'
+                : 'tap a seat to move the speaker · hold to re-order'}
             </span>
           </div>
-          <div style={{ padding: '18px 0 8px' }}>
-            <div className="ringwrap">
-              <div className="cc">
-                <div className="l">Speaker</div>
-                <div className="v">★ {speaker?.name}</div>
-                <div className="s">
-                  Picks first in the strategy phase. <br />
-                  Votes last, and breaks ties.
-                </div>
-              </div>
-              {props.players.map((p, i) => {
-                const angle = ((-90 + (i * 360) / n) * Math.PI) / 180
-                const isSpeaker = p.id === props.speakerId
-                const left = leftIn.get(p.id)
-                return (
-                  <button
-                    key={p.id}
-                    className={`seatnode ${isSpeaker ? 'isspk' : ''} ${left === undefined ? '' : 'out'}`}
-                    style={{
-                      ...pc(p.colour),
-                      left: `${((CX + RX * Math.cos(angle)) / W) * 100}%`,
-                      top: `${((CY + RY * Math.sin(angle)) / H) * 100}%`,
-                    }}
-                    disabled={left !== undefined || !props.maySpeaker(p.id)}
-                    onClick={() => props.onSpeaker(p.id)}
-                  >
-                    {isSpeaker && <span className="tok">★</span>}
-                    <i />
-                    <div className="nm">{p.name}</div>
-                    <div className="sn2">
-                      {left === undefined
-                        ? `Seat ${i + 1}`
-                        : `Left · round ${left}`}
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+          <SeatRing
+            players={props.players}
+            seated={props.seated}
+            departures={props.departures}
+            speakerId={props.speakerId}
+            revision={props.revision}
+            reorder={reorder}
+            canReorder={props.canReorder}
+            maySpeaker={props.maySpeaker}
+            onSpeaker={props.onSpeaker}
+            onReorder={setReorder}
+            onSwap={props.onSwap}
+          />
           <div style={{ padding: '0 20px 18px', marginTop: 'auto' }}>
             <div className="note-box">
               Seats match where people sit, so “clockwise” and “to the left”
@@ -158,6 +132,18 @@ export function SeatingScreen(props: {
                 Starts left of the speaker. The speaker votes last.
               </div>
             </div>
+          </div>
+          <button
+            className={`ibtn reorder ${reorder ? 'on' : ''}`}
+            disabled={!props.canReorder || props.seated.length < 2}
+            onClick={() => setReorder(reorder ? null : { chosenId: null })}
+          >
+            {reorder ? '✓ Done' : '⠿ Re-order seats'}
+          </button>
+          <div className="order-help" style={{ textAlign: 'center' }}>
+            {reorder
+              ? 'A tap on two seats swaps them too. Undo takes a swap back.'
+              : 'Swap two seats when the ring does not match the table.'}
           </div>
         </div>
       </div>

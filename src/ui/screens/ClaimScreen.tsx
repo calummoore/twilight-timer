@@ -12,6 +12,7 @@ import { NetBar } from '../controls'
  */
 export function ClaimScreen(props: {
   code: string
+  /** The seats in clockwise order, as the seat swaps of the game left them. */
   players: Player[]
   devices: DeviceView[]
   /** This device, when it has joined the game. */

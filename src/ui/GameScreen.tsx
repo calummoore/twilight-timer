@@ -160,6 +160,7 @@ export function GameScreen(props: {
       {screen}
       <GameOverlays
         game={g}
+        revision={props.revision}
         overlay={overlay}
         onOverlay={setOverlay}
         ending={ending !== null}
