@@ -38,8 +38,8 @@ export function HomeRoute(props: {
   const join = async (text: string) => {
     const typed = text.replace(/\s/g, '').toUpperCase()
     const code = parseCode(typed)
-    const missing = `No game has the code ${code ?? typed}. Check the code on the table device.`
-    if (!typed) return setJoinError('Enter the code from the table device.')
+    const missing = `No game has the code ${code ?? typed}. Check the code on a device in the game.`
+    if (!typed) return setJoinError('Enter the code from a device in the game.')
     if (!code) return setJoinError(missing)
     setBusy(true)
     const found = await lookUpGame(code)

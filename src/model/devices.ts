@@ -24,20 +24,17 @@ export function memberOf(
   return members.find((m) => m.token === token)
 }
 
-/** The device that creates a game: a table device with admin. */
-export function founder(token: string): Member {
-  return { id: 'd1', token, seat: null, admin: true }
-}
-
 /**
  * The device of `token` takes `seat`, or becomes a table device with null. A
- * device that has not joined joins without admin. The device that held the
- * seat becomes a table device, and keeps its admin.
+ * device that has not joined joins with `admin`, which only the device that
+ * created the game gets. A device that has joined keeps its admin. The device
+ * that held the seat becomes a table device, and keeps its admin.
  */
 export function takeSeat(
   members: readonly Member[],
   token: string,
   seat: string | null,
+  admin = false,
 ): Member[] {
   const freed = members.map((m) =>
     seat !== null && m.seat === seat && m.token !== token
@@ -46,7 +43,7 @@ export function takeSeat(
   )
   if (!memberOf(members, token)) {
     const id = `d${members.length + 1}`
-    return [...freed, { id, token, seat, admin: false }]
+    return [...freed, { id, token, seat, admin }]
   }
   return freed.map((m) => (m.token === token ? { ...m, seat } : m))
 }
@@ -72,6 +69,16 @@ export function isLastAdmin(
   device: Device,
 ): boolean {
   return device.admin && devices.filter((d) => d.admin).length === 1
+}
+
+/**
+ * Whether no admin device has a connection now. Then a seated device may
+ * switch its own admin on, so that the table can finish the game.
+ */
+export function adminsAway(
+  devices: readonly { admin: boolean; connected: boolean }[],
+): boolean {
+  return !devices.some((d) => d.admin && d.connected)
 }
 
 /** The device without its token, as the other devices see it. */

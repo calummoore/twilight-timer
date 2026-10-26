@@ -1,4 +1,5 @@
 import { DurableObject } from 'cloudflare:workers'
+import { isLive } from '../src/model/connection'
 import { parseClientMessage } from '../src/model/protocol'
 import {
   applyCommand,
@@ -14,6 +15,8 @@ const ROOM = 'room'
 interface Attachment {
   /** The token of the browser, from its hello, or null before it. */
   token: string | null
+  /** The time of the last message of the socket, in ms. */
+  seenAt: number
 }
 
 /**
@@ -24,6 +27,8 @@ interface Attachment {
 export class GameRoom extends DurableObject<Env> {
   /** The stored room, kept in memory while the object is awake. */
   private room: Room | null = null
+  /** The connected tokens that the last state to every device named. */
+  private sent: string | null = null
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env)
@@ -52,7 +57,10 @@ export class GameRoom extends DurableObject<Env> {
     }
     const { 0: client, 1: socket } = new WebSocketPair()
     this.ctx.acceptWebSocket(socket)
-    socket.serializeAttachment({ token: null } satisfies Attachment)
+    socket.serializeAttachment({
+      token: null,
+      seenAt: Date.now(),
+    } satisfies Attachment)
     if (!(await this.load())) {
       socket.send(JSON.stringify({ type: 'missing' }))
       socket.close(1000, 'No game has this code')
@@ -63,22 +71,27 @@ export class GameRoom extends DurableObject<Env> {
   async webSocketMessage(ws: WebSocket, data: string | ArrayBuffer) {
     const room = await this.load()
     if (!room) return
+    const now = Date.now()
     const message =
       typeof data === 'string' ? parseClientMessage(parseJson(data)) : null
+    const token = message?.type === 'hello' ? message.token : tokenOf(ws)
+    // Every message is a sign of life, as every answered ping is.
+    ws.serializeAttachment({ token, seenAt: now } satisfies Attachment)
     if (message?.type === 'hello') {
-      ws.serializeAttachment({ token: message.token } satisfies Attachment)
-      // The device gets the state, and the others see it connected.
-      this.broadcast(room)
+      // The device gets the state. The others get it only when a connection
+      // changed, so that a hello that asks for a fresh state costs little.
+      if (key(this.connected()) === this.sent) this.send(ws, room)
+      else this.broadcast(room)
       return
     }
-    const token = tokenOf(ws)
     if (!message || token === null) return
     const out = applyCommand(
       room,
       token,
       message.rev,
       message.command,
-      Date.now(),
+      now,
+      this.connected(),
     )
     if ('rejected' in out) {
       // The tap does nothing. The device gets the state again and re-renders.
@@ -120,9 +133,23 @@ export class GameRoom extends DurableObject<Env> {
       .filter((ws) => ws !== closing && ws.readyState === WebSocket.OPEN)
   }
 
+  /**
+   * The tokens of the devices with a connection: an open socket that said
+   * hello and showed a sign of life lately. A device whose battery died
+   * never closes its socket, so an open socket alone does not count.
+   */
   private connected(closing?: WebSocket): Set<string> {
-    const tokens = this.sockets(closing).map(tokenOf)
-    return new Set(tokens.filter((t): t is string => t !== null))
+    const now = Date.now()
+    const live = this.sockets(closing).filter((ws) =>
+      isLive(this.lastSeen(ws), now),
+    )
+    return new Set(live.map(tokenOf).filter((t): t is string => t !== null))
+  }
+
+  /** The last message or answered ping of a socket, in ms. */
+  private lastSeen(ws: WebSocket): number {
+    const pong = this.ctx.getWebSocketAutoResponseTimestamp(ws)
+    return Math.max(attachmentOf(ws).seenAt, pong?.getTime() ?? 0)
   }
 
   private send(ws: WebSocket, room: Room) {
@@ -138,6 +165,7 @@ export class GameRoom extends DurableObject<Env> {
   /** Sends each device that said hello its own state. */
   private broadcast(room: Room, closing?: WebSocket) {
     const connected = this.connected(closing)
+    this.sent = key(connected)
     const now = Date.now()
     for (const ws of this.sockets(closing)) {
       const token = tokenOf(ws)
@@ -147,11 +175,23 @@ export class GameRoom extends DurableObject<Env> {
   }
 }
 
+function attachmentOf(ws: WebSocket): Attachment {
+  const raw: unknown = ws.deserializeAttachment()
+  if (typeof raw !== 'object' || raw === null) return { token: null, seenAt: 0 }
+  const token =
+    'token' in raw && typeof raw.token === 'string' ? raw.token : null
+  const seenAt =
+    'seenAt' in raw && typeof raw.seenAt === 'number' ? raw.seenAt : 0
+  return { token, seenAt }
+}
+
 function tokenOf(ws: WebSocket): string | null {
-  const attachment: unknown = ws.deserializeAttachment()
-  if (typeof attachment !== 'object' || attachment === null) return null
-  const token = 'token' in attachment ? attachment.token : null
-  return typeof token === 'string' ? token : null
+  return attachmentOf(ws).token
+}
+
+/** The connected tokens as one value, to compare two states. */
+function key(connected: ReadonlySet<string>): string {
+  return [...connected].sort().join(' ')
 }
 
 function parseJson(text: string): unknown {

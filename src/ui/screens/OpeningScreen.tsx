@@ -26,7 +26,8 @@ export function OpeningScreen(props: {
                 No game has this code
               </div>
               <div className="h1s">
-                Check the code on the table device, and join again from Home.
+                Check the code on a device in the game, and join again from
+                Home.
               </div>
               <button
                 className="big lg"

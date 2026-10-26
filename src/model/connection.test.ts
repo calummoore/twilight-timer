@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { codeOfPath, joinPath } from './code'
-import { nextOffset, retryDelay } from './connection'
+import { codeOfPath, joinLink, joinPath } from './code'
+import { LIVE_MS, isLive, nextOffset, retryDelay } from './connection'
 import { gameSummary, lastActivity } from './summary'
 import { MIN, SEC, T0, playStrategy, table } from './test-table'
 
@@ -13,6 +13,14 @@ describe('the connection', () => {
     expect(offset).toBe(5 * SEC - 40)
     offset = nextOffset(offset, T0 + 7 * SEC, T0 + 2 * SEC + 900)
     expect(offset).toBe(5 * SEC - 40)
+  })
+
+  it('counts a socket as live until its last sign of life is too old', () => {
+    expect(isLive(T0, T0)).toBe(true)
+    expect(isLive(T0, T0 + LIVE_MS)).toBe(true)
+    expect(isLive(T0, T0 + LIVE_MS + 1)).toBe(false)
+    // A ping every minute, as a hidden page sends, keeps a device live.
+    expect(isLive(T0, T0 + 60 * SEC)).toBe(true)
   })
 
   it('waits longer after each failed try, up to a limit', () => {
@@ -31,6 +39,22 @@ describe('join links', () => {
     expect(codeOfPath('/join/7QK2H0')).toBeNull()
     expect(codeOfPath('/')).toBeNull()
     expect(codeOfPath('/join/7QK2HN/extra')).toBeNull()
+  })
+
+  it('opens the game at its own site, and reads out without the scheme', () => {
+    expect(joinLink('https://ti4.nexus', '7QK2HN')).toEqual({
+      url: 'https://ti4.nexus/join/7QK2HN',
+      text: 'ti4.nexus/join/7QK2HN',
+    })
+    expect(joinLink('http://localhost:5173', '7QK2HN')).toEqual({
+      url: 'http://localhost:5173/join/7QK2HN',
+      text: 'localhost:5173/join/7QK2HN',
+    })
+  })
+
+  it('gives a link that opens the same game', () => {
+    const { url } = joinLink('https://ti4.nexus', '7QK2HN')
+    expect(codeOfPath(new URL(url).pathname)).toBe('7QK2HN')
   })
 })
 

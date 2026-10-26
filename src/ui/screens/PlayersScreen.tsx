@@ -1,9 +1,10 @@
-import { QRCodeSVG } from 'qrcode.react'
-import { joinPath } from '../../model/code'
+import { useEffect } from 'react'
+import { REFRESH_MS } from '../../model/connection'
 import type { DeviceView } from '../../model/protocol'
 import type { Player } from '../../model/types'
 import { NetBar } from '../controls'
 import { DeviceRows } from './DeviceRows'
+import { JoinCode } from './JoinCode'
 
 /**
  * The join code, its link and QR code, and the seats and devices of the
@@ -20,7 +21,13 @@ export function PlayersScreen(props: {
   connected: boolean
   /** This device is an admin. Without a connection, its controls wait. */
   admin: boolean
+  /** No admin device has a connection, so a seated device may take admin. */
+  adminsAway: boolean
+  /** Whether this device may switch the admin of a device on or off now. */
+  mayAdmin: (deviceId: string, admin: boolean) => boolean
   onAdmin: (deviceId: string, admin: boolean) => void
+  /** Asks the server for a fresh state, with the connections of now. */
+  onRefresh: () => void
   onChangeSeat: () => void
   onLeave: () => void
   onStart?: () => void
@@ -28,7 +35,14 @@ export function PlayersScreen(props: {
   onClose?: () => void
 }) {
   const lobby = props.round === null
-  const link = `${location.host}${joinPath(props.code)}`
+  // The server sends no state when a device goes quiet, so this screen asks
+  // for the connections of now while it is open.
+  const { onRefresh } = props
+  useEffect(() => {
+    onRefresh()
+    const timer = setInterval(onRefresh, REFRESH_MS)
+    return () => clearInterval(timer)
+  }, [onRefresh])
 
   return (
     <div className={`lay ${lobby ? '' : 'settings-screen'}`}>
@@ -61,36 +75,22 @@ export function PlayersScreen(props: {
       </div>
       {!props.connected && <NetBar />}
       <div className="content join-grid">
-        <div style={{ textAlign: 'center' }}>
-          <div className="qr" style={{ margin: '0 auto' }}>
-            <QRCodeSVG
-              value={`${location.origin}${joinPath(props.code)}`}
-              title={`Join link of game ${props.code}`}
-            />
-          </div>
-          <div
-            style={{
-              fontSize: 10.5,
-              letterSpacing: '.18em',
-              textTransform: 'uppercase',
-              color: 'var(--faint)',
-              marginTop: 22,
-            }}
-          >
-            Join code
-          </div>
-          <div className="joincode num">{props.code}</div>
-          <div className="joinlink">
-            Scan the code, or open <b>{link}</b>
-          </div>
+        <JoinCode code={props.code} />
+        <div>
+          {props.adminsAway && props.connected && (
+            <div className="notice" role="status">
+              Every admin device is away. A device with a seat can take admin
+              with the switch on its row.
+            </div>
+          )}
+          <DeviceRows
+            players={props.players}
+            devices={props.devices}
+            you={props.you}
+            mayAdmin={props.mayAdmin}
+            onAdmin={props.onAdmin}
+          />
         </div>
-        <DeviceRows
-          players={props.players}
-          devices={props.devices}
-          you={props.you}
-          mayChange={props.admin && props.connected}
-          onAdmin={props.onAdmin}
-        />
       </div>
       {lobby && (
         <div className="foot">
@@ -98,7 +98,7 @@ export function PlayersScreen(props: {
             <>
               <div className="lobby-help">
                 Start when everyone has a seat, or start now. A phone can still
-                join later, and the table device acts for a seat without one.
+                join later, and an admin device acts for a seat without one.
               </div>
               <button
                 className="big"

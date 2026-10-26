@@ -32,6 +32,15 @@ export const SETUP: Setup = {
 export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
   let now = T0
   let current = room
+  // The devices that have no connection. Every other device is connected,
+  // also the device that created the game before it joins.
+  const away = new Set<string>()
+  const connected = (sender: string) => {
+    const tokens = current.members.map((m) => m.token)
+    if (current.creator !== null) tokens.push(current.creator)
+    tokens.push(sender)
+    return new Set(tokens.filter((t) => !away.has(t) || t === sender))
+  }
   return {
     get room() {
       return current
@@ -42,12 +51,23 @@ export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
     wait(ms: number) {
       now += ms
     },
+    /** The device of `token` loses its connection. */
+    leave(token: string) {
+      away.add(token)
+    },
     /**
      * Sends a command from the device of `token`, on the current revision
      * unless `rev` names another. Returns the rejection, or null.
      */
     send(token: string, command: Command, rev = current.revision) {
-      const out = applyCommand(current, token, rev, command, now)
+      const out = applyCommand(
+        current,
+        token,
+        rev,
+        command,
+        now,
+        connected(token),
+      )
       if ('rejected' in out) return out.rejected
       current = out.room
       return null
@@ -73,11 +93,21 @@ export function onServer(game: Game): Game | undefined {
 }
 
 /**
+ * The host created the game on the iPad in the middle of the table, and
+ * joined it as the table device, so the iPad is the first admin.
+ */
+export function tableServer(): Server {
+  const s = server()
+  s.send(HOST, { type: 'claim', seat: null })
+  return s
+}
+
+/**
  * Jaz's phone holds Jaz's seat and Kira's phone holds Kira's, both without
  * admin, and the host starts the game.
  */
 export function seatedServer(): Server {
-  const s = server()
+  const s = tableServer()
   s.send(JAZ, { type: 'claim', seat: 'jaz' })
   s.send(KIRA, { type: 'claim', seat: 'kira' })
   s.send(HOST, { type: 'start' })

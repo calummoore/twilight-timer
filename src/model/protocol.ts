@@ -48,6 +48,12 @@ export interface RoomState {
   /** The game from Start game on, or null in the lobby. */
   game: Game | null
   devices: DeviceView[]
+  /**
+   * No admin device has a connection now, so a seated device may take
+   * admin. The device that created the game counts as an admin device until
+   * it joins.
+   */
+  adminsAway: boolean
 }
 
 /** From the server: the state, or that no game has the code. */
@@ -58,6 +64,11 @@ export type ServerMessage =
       serverTime: number
       /** The id of the receiving device, or null before it joins. */
       you: string | null
+      /**
+       * The receiving device created the game and has not joined it yet, so
+       * it joins with admin.
+       */
+      creator: boolean
       room: RoomState
     }
   | { type: 'missing' }
@@ -121,8 +132,10 @@ export function parseServerMessage(raw: unknown): ServerMessage | null {
   const { serverTime, you } = raw
   if (raw.type !== 'state' || !isNumber(serverTime)) return null
   if (you !== null && typeof you !== 'string') return null
+  // A state without the flag reads as a device that did not create the game.
+  const creator = raw.creator === true
   const room = parseRoomState(raw.room)
-  return room && { type: 'state', serverTime, you, room }
+  return room && { type: 'state', serverTime, you, creator, room }
 }
 
 function parseRoomState(raw: unknown): RoomState | null {
@@ -133,7 +146,9 @@ function parseRoomState(raw: unknown): RoomState | null {
   const devices = listOf(raw.devices, parseDeviceView)
   if (!code || !isRevision(raw.revision) || !setup || !devices) return null
   if (game === null && raw.game !== null) return null
-  return { code, revision: raw.revision, setup, game, devices }
+  // A state without the flag reads as one with an admin device connected.
+  const adminsAway = raw.adminsAway === true
+  return { code, revision: raw.revision, setup, game, devices, adminsAway }
 }
 
 function parseDeviceView(raw: unknown): DeviceView | null {

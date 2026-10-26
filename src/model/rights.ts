@@ -8,16 +8,26 @@ import type { GameView } from './view'
  * applies, or null in the lobby. Every device may take a seat or join as a
  * table device. An admin may send every command. A seated device without
  * admin acts for its player when the game waits for them, and a viewer only
- * takes a seat. The server and the screens ask the same question.
+ * takes a seat. While every admin device is away, a seated device may also
+ * switch its own admin on. The server and the screens ask the same question.
  */
 export function mayCommand(
   device: Device | undefined,
   command: Command,
   game: GameView | null,
+  adminsAway = false,
 ): boolean {
   if (command.type === 'claim') return true
   if (!device) return false
   if (device.admin) return true
+  if (command.type === 'admin') {
+    return (
+      adminsAway &&
+      device.seat !== null &&
+      command.deviceId === device.id &&
+      command.admin
+    )
+  }
   if (command.type !== 'act' || device.seat === null || !game) return false
   return mayActFor(device.seat, command.input, game)
 }

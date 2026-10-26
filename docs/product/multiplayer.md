@@ -1,6 +1,6 @@
 # Multiplayer
 
-Part of the [TI4 Tempo product spec](../product.md).
+Part of the [TI4 Nexus product spec](../product.md).
 
 One game runs on the server, and every device at the table joins it with a
 join code. A device is a table device, which acts for every player, or a
@@ -10,12 +10,12 @@ screens.
 ## The game on the server
 
 A game lives on the server from the moment the host creates it. Create
-game, at the end of setup, puts the seats on the server and opens the
-Players & devices screen as a lobby. The device that creates the game is a
-table device from the start. There is no game on a device alone. Rejected:
-a game that lives on one device with no server, next to the shared game,
-because two kinds of game double every command, every screen state, and
-every test.
+game, at the end of setup, puts the seats on the server and opens the claim
+screen, where the device that creates the game joins it, see
+[Joining](#joining). Then the device shows the Players & devices screen as a
+lobby. There is no game on a device alone. Rejected: a game that lives on
+one device with no server, next to the shared game, because two kinds of
+game double every command, every screen state, and every test.
 
 No clock runs before Start game. Start game, on an admin device, begins the
 strategy phase. A device that joins before Start sees the lobby and waits.
@@ -48,8 +48,9 @@ Rejected: deleting old games, because a game is small, and a code must not
 be reused.
 
 A device that holds a game saved by an older build offers to continue that
-game on the server. The game then gets a code, and the device joins it as a
-table device. A saved game that cannot be read shows a notice, as before.
+game on the server. The game then gets a code, and the device joins it at
+once as a table device with admin, without the claim screen. A saved game
+that cannot be read shows a notice, as before.
 
 ## New versions
 
@@ -102,9 +103,16 @@ goes straight to the claim screen of that game. Rejected: no QR code, because
 a six-character code is quick to type, but a scan is quicker and cannot be
 misread across a table.
 
-The join code is the only code. A device becomes an admin only when an
-admin device gives it admin, see [Admin rights](#admin-rights). The device
-that creates the game is the first admin. Rejected: an
+The code and the link can be selected and copied. A tap on the link opens it
+in a new tab, and Players & devices stays open. Copy link puts the link on the
+clipboard, so that a player can send it in a chat. Rejected: opening the link
+in the same tab, because the page then loads again, and during a game it
+leaves Players & devices.
+
+The join code is the only code. A device becomes an admin when an admin
+device gives it admin, or when it holds a seat and takes admin while every
+admin device is away, see [Admin rights](#admin-rights). The device that
+creates the game is the first admin. Rejected: an
 admin code shown on admin devices, because it is readable wherever the
 join code is, on the device in the middle of the table. Rejected: a
 request for admin that an admin approves, because it adds a pending state
@@ -125,19 +133,26 @@ A device in a game is a table device or a seated device:
   also be an admin.
 
 An admin device may do every tap in the game, and may change the rights of
-other devices. At least one admin device always exists in a game. A device
-that is neither has not joined the game, and only sees the claim screen.
+other devices. Once the device that creates a game has joined it, at least
+one admin device always exists in the game. A device that is neither has not
+joined the game, and only sees the claim screen.
 
 ### Joining
 
 A device joins a game with the join code, by typing it on the home screen or
 by opening the link. The claim screen then lists the seats of the game: each
 player's name, colour, faction, and whether a device holds the seat. The
-device takes a seat, or joins as a table device. A new table device is a
-viewer until an admin device gives it admin.
+device takes a seat, or joins as a table device. A device that joins gets
+no admin, so a new table device is a viewer until an admin device gives it
+admin. The device that creates the game is the only exception.
 
-The device that creates a game is a table device with admin from the start.
-It can take a seat later and stays an admin.
+The device that creates a game with Create game also joins it on the claim
+screen, which Create game opens. It takes a seat or joins as a table device,
+and it gets admin either way, as the first admin of the game. Until it joins,
+it sees the claim screen, also after a reload. It can change its seat later
+and stays an admin. Rejected: the device that creates the game as a table
+device from the start, because a host can create the game on a phone, take
+their seat, and add the device in the middle of the table later.
 
 One device holds a seat at a time. When a device takes a seat that another
 device holds, the holder loses the seat and becomes a table device, with its
@@ -165,6 +180,17 @@ viewer and the switch are the same check as for a seated device. The
 Players & devices screen lists every device of the game with its seat or
 Table, its admin state, and whether it is connected.
 
+While no admin device has a connection, a seated device may give itself
+admin, with the switch on its own row. So a table whose only admin device is
+gone for good, for example after its browser data is lost, can finish the
+game. A viewer takes a seat first. The device that creates the game counts
+as an admin device until it joins, so a device that joins first cannot take
+admin from the host. The Players & devices screen says so on every device
+while every admin device is away. Rejected: a recovery link
+for the device that creates the game, because it is a second secret, close
+to the rejected admin code. Rejected: a tip in the lobby to give admin to a
+second device, because the stuck state stays possible.
+
 ## Who may tap what
 
 A seated device acts for its player only, and only when the game waits for
@@ -172,20 +198,20 @@ that player. The table below gives the rule for each tap. The server applies
 the same rules, so a tap outside the rights of a device does nothing,
 whatever the device shows.
 
-| Tap                                                                     | Seated device                   | Admin device                 |
-| ----------------------------------------------------------------------- | ------------------------------- | ---------------------------- |
-| Pick a strategy card                                                    | When it is the player's pick    | Any time                     |
-| End turn, play a strategy card, pass                                    | On the player's turn            | Any time                     |
-| Mark done in a reaction window                                          | The player's own tile           | Any tile                     |
-| Mark all done, extend the window, choose the Politics speaker           | When the player played the card | Any time                     |
-| Cast a vote                                                             | When it is the player's vote    | Any time                     |
-| Status steps, Custodians, next phase, open voting, resolve, next round  | No                              | Yes                          |
-| Move the speaker, move the Naalu token, remove a player, end the game   | No                              | Yes                          |
-| Pause, resume, rule check, time limits                                  | No                              | Yes                          |
-| Start game, from the lobby                                              | No                              | Yes                          |
-| Undo                                                                    | No                              | Yes                          |
-| Change own seat, become a table device                                  | Yes                             | Yes                          |
-| Give or take admin                                                      | No                              | Yes, not from the last admin |
+| Tap                                                                    | Seated device                                | Admin device                 |
+| ---------------------------------------------------------------------- | -------------------------------------------- | ---------------------------- |
+| Pick a strategy card                                                   | When it is the player's pick                 | Any time                     |
+| End turn, play a strategy card, pass                                   | On the player's turn                         | Any time                     |
+| Mark done in a reaction window                                         | The player's own tile                        | Any tile                     |
+| Mark all done, extend the window, choose the Politics speaker          | When the player played the card              | Any time                     |
+| Cast a vote                                                            | When it is the player's vote                 | Any time                     |
+| Status steps, Custodians, next phase, open voting, resolve, next round | No                                           | Yes                          |
+| Move the speaker, move the Naalu token, remove a player, end the game  | No                                           | Yes                          |
+| Pause, resume, rule check, time limits                                 | No                                           | Yes                          |
+| Start game, from the lobby                                             | No                                           | Yes                          |
+| Undo                                                                   | No                                           | Yes                          |
+| Change own seat, become a table device                                 | Yes                                          | Yes                          |
+| Give or take admin                                                     | Give itself admin, while every admin is away | Yes, not from the last admin |
 
 A viewer may only take a seat.
 
@@ -212,16 +238,19 @@ device. The Settings screen shows the two groups apart.
 - **Home**: start a new game, join a game by code, and reopen a recent game
   of this device.
 - **Setup**: unchanged, on one device. Create game puts the seats on the
-  server and opens Players & devices as the lobby. Rejected: a code during
-  setup with a waiting screen for early joiners, because it saves a few
-  seconds at most, and it can be added later. Rejected: a lobby where each
-  player fills their own seat, because the setup then becomes a shared
-  document with its own rules for every field, and the claim screen is
-  needed anyway for a device that joins mid-game.
-- **Claim seat**: the seats of the game, and Join as table device.
-- **Players & devices**: the join code, the link, the QR code, and one row
-  per seat with the device that holds it, its admin switch, and its
-  connection state, then the table devices.
+  server and opens the claim screen. After the claim, Players & devices
+  opens as the lobby. Rejected: a code during setup with a waiting screen
+  for early joiners, because it saves a few seconds at most, and it can be
+  added later. Rejected: a lobby where each player fills their own seat,
+  because the setup then becomes a shared document with its own rules for
+  every field, and the claim screen is needed anyway for a device that
+  joins mid-game.
+- **Claim seat**: the seats of the game, and Join as table device. On a
+  device that is an admin, or that gets admin when it joins, the screen
+  says that the device acts for every player, in a seat or at the table.
+- **Players & devices**: the join code, the link with Copy link, the QR code,
+  and one row per seat with the device that holds it, its admin switch, and
+  its connection state, then the table devices.
   Before Start game it is the lobby, with Start game on an admin device and
   a waiting line on every other device. Rejected: the name "Join", because
   the device joins on the claim screen, and this screen lists who is in.
