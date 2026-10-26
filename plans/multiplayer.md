@@ -33,7 +33,8 @@ Decisions, all on 2026-10-26 by Cal, from the discussion of that day:
 - Decision 3 = C: an admin code, shown only on admin devices, which Join as
   table asks for. Alternatives: A, trust the join code; B, an approval by
   an admin. Reason: a stranger with the join code cannot act for every
-  player, and no admin has to be awake to approve.
+  player, and no admin has to be awake to approve. Superseded the same day
+  by the admin decision below.
 - Decision 4 = A: a seated device taps only for its own seat, when the game
   waits for that player. Alternative: B, also the shared taps such as the
   status checklist. Reason: it matches "act when it is their turn", and an
@@ -63,6 +64,17 @@ Decisions of 2026-10-26 by Cal, from the lobby discussion of that day:
   their faction or colour". Not in this change.
 - Lobby decision 3 = B: the screen is "Players & devices", not "Join",
   because the device joins on the claim screen. Alternative: C, "Invite".
+
+Decision of 2026-10-26 by Cal, from the admin code discussion of that day:
+
+- Admin decision 1 = B: no admin code. A seated device asks for admin on
+  its own row, a device on the claim screen asks to join as a table device,
+  and an admin device approves or dismisses the request on that row. A
+  pending table device watches until it is approved. The chip in the top
+  bar counts the open requests on admin devices. Alternatives: A, the admin
+  code behind a tap; C, trust the join code. Reason, from Cal: the admin
+  code is on the table for everyone to read, so approval by the existing
+  admins is the real check.
 
 Design decisions of the same day, from the implementation side:
 
@@ -114,19 +126,22 @@ Components:
   game, the device's rights, and a dispatch function, as they get them
   from the local store today.
 
-Messages, from the device: hello with the device token, claim a seat,
-claim table with the admin code, set the admin flag of a device, start the
-game, and a game command with the revision: an action input, undo, pause, resume, the
+Messages, from the device: hello with the device token, claim a seat, ask
+for admin or for a table seat, approve or dismiss a request, set the admin
+flag of a device, start the game, and a game command with the revision: an action input, undo, pause, resume, the
 pause reason, or the time limits. From the object: the state, with the
 revision, the server time, the game, the devices with their connection
 state, and the rights of this device; and a rejection with a reason.
 
-Rights: a device without a seat and without admin is not in the game, and
-sees the claim screen. A seat holder that loses its seat keeps admin as a
-table device, or leaves the game. The last admin cannot lose admin. The
-permission module takes the derived view, the device, and a command, and
-says whether the command is allowed. The object and the screens call the
-same function.
+Rights: a device has a seat or none, an admin flag, and an open request
+for admin or for a table seat, or none. A device without a seat, without
+admin, and without a request is not in the game, and sees the claim
+screen. A device without a seat and without admin, with a table request,
+is pending and may only take a seat. A seat holder that loses its seat
+keeps admin as a table device, or leaves the game. The last admin cannot
+lose admin. The permission module takes the derived view, the device, and
+a command, and says whether the command is allowed. The object and the
+screens call the same function.
 
 Storage: the room is one JSON value with its own version. The game inside
 keeps the saved-game versions, so the parser reads a game that an older
@@ -195,15 +210,35 @@ Draw the lobby of the lobby decisions, and rename the Join screen.
       `.context/multiplayer/mockups/`, with `shoot.log`: 33 screens in
       three frames, no script error, and no sideways overflow.
 
-## Milestone 4: Server
+## Milestone 4: Admin request mockups
+
+Tags: mockup
+
+Draw the admin decision: no admin code, requests with inline approval, and
+the pending device.
+
+- [x] Remove the admin code from the Players & devices screen, the lobby,
+      and the claim screen. The claim screen asks to join as a table device.
+- [x] A request on its row: Ask for admin on the device's own row, Approve
+      and Dismiss on admin devices, and the request as text on the others.
+      A pending table device in the lobby.
+- [x] The chip counts the open requests on admin devices, and reads Pending
+      on a pending device.
+- [x] The pending device: the action phase with every control disabled and
+      the waiting bar.
+- [x] Screenshot the new and changed screens in every frame. Evidence:
+      `.context/multiplayer/mockups/`, with `shoot.log`: 34 screens in
+      three frames, no script error, and no sideways overflow.
+
+## Milestone 5: Server
 
 Add the Worker, the object, and the pure model modules. The app still runs
 from `localStorage` at the end of this milestone.
 
-- [ ] Add to `src/model/`, each with tests: the join and admin codes, the
-      devices with the last-admin rule and the seat takeover, the permission
-      rules of the spec table, the message parser, and the room reducer that
-      applies a message to a room.
+- [ ] Add to `src/model/`, each with tests: the join code, the devices with
+      the requests, the last-admin rule, and the seat takeover, the
+      permission rules of the spec table, the message parser, and the room
+      reducer that applies a message to a room.
 - [ ] Add `worker/`: the routes and the game object with the WebSocket
       Hibernation API and SQLite storage.
 - [ ] Configure `wrangler.jsonc`: the Worker entry, the object binding and
@@ -219,7 +254,7 @@ from `localStorage` at the end of this milestone.
 - [ ] Smoke test: start the dev server, create a game with the API, and
       open its socket. Evidence: `.context/multiplayer/server/`.
 
-## Milestone 5: Shared table
+## Milestone 6: Shared table
 
 Tags: ui
 
@@ -230,12 +265,13 @@ mode comes in the next milestone.
       puts the seats on the server, and the device joins as a table device.
 - [ ] The lobby on the Players & devices screen, and Start game on an admin
       device. No clock runs before Start.
-- [ ] Join by code or by the `/join/<code>` link, as a table device with
-      the admin code.
+- [ ] Join by code or by the `/join/<code>` link. A second device asks to
+      join as a table device, and the first device approves it.
 - [ ] The game client hook: the socket, the reconnect, the revision, and the
       server time offset. The reconnecting state disables the controls.
 - [ ] The Players & devices screen: the code, the link, the QR code, the
-      admin code, the seats, and the devices. The top bar chip opens it.
+      seats, the devices, and the requests with Approve and Dismiss. The top
+      bar chip opens it and counts the open requests.
 - [ ] Recent games, Leave game, and Continue on the server for a game that
       an older build saved on the device.
 - [ ] Settings in two groups. Time limits go through the object.
@@ -247,7 +283,7 @@ mode comes in the next milestone.
 - [ ] Smoke test on the dev server: two windows, one creates and one joins
       as table, and taps show on both. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 6: Player mode
+## Milestone 7: Player mode
 
 Tags: ui
 
@@ -258,14 +294,15 @@ Seats, rights, and the disabled controls.
       that a disabled main control waits for: the strategy, action,
       reaction, status, agenda, summary, seating, settings, and stats
       screens, and the top bar.
-- [ ] Admin toggles on the Players & devices screen, never for the last
-      admin.
+- [ ] Admin switches, Ask for admin, and Approve and Dismiss on the Players
+      & devices screen, never taking admin from the last admin. The pending
+      device state with its bar.
 - [ ] Remove the Later marks of the seated screens in the mockup.
 - [ ] Smoke test on the dev server: three windows, one table and two seats.
       A seated device ends its own turn and cannot end another's, and the
       admin toggles work. Evidence: `.context/multiplayer/app/`.
 
-## Milestone 7: Verification, commit, and review
+## Milestone 8: Verification, commit, and review
 
 Run the checks, push, and review the branch.
 

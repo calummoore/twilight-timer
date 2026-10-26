@@ -500,7 +500,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .seat-pick.you{border-color:var(--accent); background:#0a1a1c}
 .seat-pick.you .tk{color:var(--accent)}
 
-/* join: the code, the link, the QR code, the admin code, and the seats with their devices */
+/* players & devices: the code, the link, the QR code, and the seats with their devices and requests */
 .join-grid{display:grid; grid-template-columns:1fr 1fr; gap:34px; align-items:start; padding:0 40px}
 .qr{width:250px; height:250px; background:#fff; border-radius:14px; padding:14px; display:grid;
   grid-template-columns:repeat(25,1fr); grid-template-rows:repeat(25,1fr)}
@@ -508,11 +508,14 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .joincode{font-size:52px; font-weight:800; letter-spacing:.14em; margin-top:6px}
 .joinlink{font-size:15px; color:var(--dim); margin-top:12px; overflow-wrap:anywhere}
 .joinlink b{color:var(--txt); font-weight:600}
-.admincode{display:flex; align-items:center; gap:14px; margin-top:24px; padding:13px 16px; text-align:left;
-  border:1px solid #3a3218; border-radius:12px; background:#0f0d08}
-.admincode .l b{display:block; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#f0cf6a}
-.admincode .l span{display:block; font-size:12px; color:var(--dim); margin-top:3px; line-height:1.4}
-.admincode .c{margin-left:auto; font-size:24px; font-weight:800; letter-spacing:.14em; color:#f0cf6a; white-space:nowrap}
+/* a request on its row: Approve and Dismiss on an admin device, text on the others */
+.dev-row .adm.ask{gap:6px}
+.dev-row .adm .mini{margin-left:0; white-space:nowrap}
+.dev-row .adm .asks{color:var(--warn); white-space:nowrap}
+.dev-row.pending{border-style:dashed}
+/* the chip counts the open requests on an admin device */
+.ibtn .badge{min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--warn); color:#2a1a05;
+  font-size:11px; font-weight:800; display:grid; place-items:center}
 .dev-row{display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center; padding:12px 15px;
   border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16}
 .dev-row i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
@@ -546,6 +549,8 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .netbar{display:flex; align-items:center; justify-content:center; gap:10px; padding:9px 16px; flex:none; position:relative; z-index:5;
   background:#1d160a; border-bottom:1px solid #4a3a1c; color:var(--warn); font-size:12.5px; font-weight:700; letter-spacing:.06em}
 .netbar i{width:9px; height:9px; border-radius:50%; background:var(--warn); font-style:normal; animation:blink 1.1s ease-in-out infinite}
+.netbar.wait{background:#0a1f1e; border-color:#1f4a47; color:var(--accent)}
+.netbar.wait i{background:var(--accent)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 .offline .body, .offline .content, .offline .foot{opacity:.5; pointer-events:none}
 
@@ -931,7 +936,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .qr{width:206px; height:206px; padding:12px}
   .joincode{font-size:44px}
   .joinlink{font-size:14px}
-  .admincode{gap:10px; padding:11px 12px}
+  .dev-row .adm.ask{grid-column:1 / -1; justify-content:flex-end; flex-wrap:wrap}
   .dev-row{gap:9px; padding:11px 12px}
   .dev-row .adm{min-width:0}
   /* home: the code above the summary, and the button beside both */
@@ -1079,20 +1084,29 @@ const GEAR = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="eveno
 
 // The game on the server, and the devices in it. The iPad in the middle of the table is a table device, so it is an
 // admin. Kira's phone has a seat and admin, because Kira set the game up. Jaz's phone has a seat and no admin, so
-// it waits while Kira plays. Tom's phone holds a seat but is away.
-const CODE = '7QK2HN', ADMIN_CODE = 'R4DJ8W', LINK = 'ti4.nexus/join/7QK2HN';
-const TABLE  = {seat:null,  admin:true};
-const SEATED = {seat:'jaz', admin:false};
+// it waits while Kira plays. Tom's phone holds a seat but is away. Priya's phone asks for admin.
+const CODE = '7QK2HN', LINK = 'ti4.nexus/join/7QK2HN';
+const TABLE   = {seat:null,  admin:true};
+const SEATED  = {seat:'jaz', admin:false};
+const PENDING = {seat:null,  admin:false, ask:'table'};
 const MEMBERS = [
-  {seat:null,   admin:true,  on:true, me:true},
-  {seat:'kira', admin:true,  on:true},
-  {seat:'jaz',  admin:false, on:true},
-  {seat:'tom',  admin:false, on:false},
+  {seat:null,    admin:true,  on:true, me:true},
+  {seat:'kira',  admin:true,  on:true},
+  {seat:'jaz',   admin:false, on:true},
+  {seat:'tom',   admin:false, on:false},
+  {seat:'priya', admin:false, on:true, ask:'admin'},
 ];
-// The chip that opens Players & devices: the seat of this device, or Table.
-const youChip = me => me.seat
-  ? `<button class="ibtn youb later" style="${col(me.seat)}"><i></i><span class="word">You: </span>${P[me.seat].name}</button>`
-  : `<button class="ibtn youb table later"><i></i>Table<span class="word"> device</span></button>`;
+const REQUESTS = MEMBERS.filter(m=>m.ask).length;
+// The chip that opens Players & devices: the seat of this device, Table, or Pending. On an admin device it also
+// counts the open requests.
+const youChip = me => {
+  const badge = me.admin && REQUESTS ? `<b class="badge">${REQUESTS}</b>` : '';
+  return me.seat
+    ? `<button class="ibtn youb later" style="${col(me.seat)}"><i></i><span class="word">You: </span>${P[me.seat].name}${badge}</button>`
+    : me.admin
+      ? `<button class="ibtn youb table later"><i></i>Table<span class="word"> device</span>${badge}</button>`
+      : `<button class="ibtn youb later"><i></i>Pending<span class="word"> approval</span></button>`;
+};
 
 const PHASES = [['str','Strategy'],['act','Action'],['sta','Status'],['age','Agenda']];
 // `me` is the device that shows the screen. Undo and Pause need admin.
@@ -1452,7 +1466,7 @@ const actionScreen = (over, held=false, four=false, me=TABLE) => { const mine = 
   </div></div>`; };
 
 S.action = {t:'Action Phase', note:
- `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal: Kira's Pass button warns that Trade is not played yet, and passing early asks first. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state.`,
+ `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal: Kira's Pass button warns that Trade is not played yet, and passing early asks first. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state. The chip beside the speaker names this device's seat or Table and opens Players &amp; devices; on an admin device it counts the open admin requests, here Priya's.`,
  mnote:
  `The rail moves under the clock. End Turn, the strategic action, and Pass stay in the hero, under the clock, as on the iPad. The top bar takes two rows. On a phone, the rail rows become tiles in initiative order, so six players fit on one screen. Up to 740 px wide, and on a phone held sideways, the top bar is compact: the phase pill becomes a thin progress line with the phase name next to the round.`,
  h:actionScreen(false)};
@@ -1588,6 +1602,14 @@ S.reconnecting = {t:'Action Phase — Reconnecting', later:true, note:
  `The same bar under the compact top bar, and the screen under it dimmed.`,
  h:actionScreen(false).replace('<div class="lay">','<div class="lay offline">')
    .replace('<div class="body">','<div class="netbar"><i></i>Reconnecting · your taps wait for the connection</div><div class="body">')};
+
+// A device that asked to join as a table device, before an admin approves it. It watches, and it can take a seat.
+S.pending = {t:'Action Phase — Pending Device', later:true, note:
+ `A new device asked to join as a <b>table device</b>, and no admin has approved it yet. It sees the game, every control is disabled, and the bar says why. The chip reads Pending and opens Players &amp; devices, where the device can take a seat instead. When an admin approves the request, the bar goes, and the device is a table device with every control on.`,
+ mnote:
+ `The same bar under the compact top bar.`,
+ h:actionScreen(false, false, false, PENDING)
+   .replace('<div class="body">','<div class="netbar wait"><i></i>Waiting for an admin to approve this table device</div><div class="body">')};
 
 // The table paused 4:12 ago. A pause stops every clock behind the card, so the action screen drops its live clocks.
 // A rule check is game time, so during one the game clock in the top bar keeps running.
@@ -1975,9 +1997,9 @@ const seatRow = (id, you) => { const h = holder(id);
     <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f} · Seat ${P[id].seat}</div></div>
     <div class="tk ${h&&!you?'held':''}">${you?'✓ You':h?(h.on?'Held · connected':'Held · away'):'Free'}</div></div>`; };
 S.claim = {t:'Claim Seat', later:true, note:
- `The device has the code and sees the game. It <b>takes a seat</b> with one tap, or enters the admin code to join as a <b>table device</b>. Every seat shows whether a device holds it. A held seat can still be taken: the holder loses it, so a player whose phone dies takes the seat again on another phone in seconds. A holder that is an admin becomes a table device, and any other holder comes back to this screen. A device that opened the link or scanned the QR code lands here at once. Before Start game, a device that took a seat waits in the lobby. After it, the device lands in the running game. The screen opens again from Players &amp; devices, when a device changes its seat.`,
+ `The device has the code and sees the game. It <b>takes a seat</b> with one tap, or asks to join as a <b>table device</b>, which an admin approves on Players &amp; devices. Every seat shows whether a device holds it. A held seat can still be taken: the holder loses it, so a player whose phone dies takes the seat again on another phone in seconds. A holder that is an admin becomes a table device, and any other holder comes back to this screen. A device that opened the link or scanned the QR code lands here at once. Before Start game, a device that took a seat waits in the lobby. After it, the device lands in the running game. The screen opens again from Players &amp; devices, when a device changes its seat.`,
  mnote:
- `One column: the seats, then Join as table device with the admin code field.`,
+ `One column: the seats, then the request to join as a table device.`,
  h:`<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>Join game</b> · <span class="num">${CODE}</span></div><div class="spacer"></div><button class="ibtn">✕ Cancel</button></div>
   <div class="content"><div class="claim-grid">
@@ -1987,23 +2009,32 @@ S.claim = {t:'Claim Seat', later:true, note:
       ${SEATS.map(id=>seatRow(id, id==='jaz')).join('')}
     </div>
     <div class="pnl" style="align-self:start"><div class="pnl-h">Join as table device</div><div class="pad">
-      <div class="home-help">A table device acts for every player, like the iPad in the middle of the table, and it is an admin. The admin code is on the Players &amp; devices screen of an admin device.</div>
-      <div class="fld code empty">Admin code</div>
-      <button class="big lg" style="width:100%;margin-top:12px">JOIN AS TABLE</button></div></div>
+      <div class="home-help">A table device acts for every player, like the iPad in the middle of the table, and it is an admin. An admin approves the request on Players &amp; devices. Until then this device watches the game, and it can still take a seat.</div>
+      <button class="big lg" style="width:100%">ASK TO JOIN AS TABLE</button></div></div>
   </div></div></div>`};
 
 /* ── 15. Players & devices ── */
-// The code, the link, and the QR code for new devices; the admin code on an admin device; and one row per seat
-// with the device that holds it, then the table devices. Before Start game the same screen is the lobby: the rows
-// fill as the phones join, and an admin device starts the game.
+// The code, the link, and the QR code for new devices, and one row per seat with the device that holds it, then the
+// table devices and the pending devices. A request shows on the row of the device that asked: Approve and Dismiss
+// on an admin device, text on the others. Before Start game the same screen is the lobby.
+const askCell = (m, me) => {
+  const isMe = me.seat ? m.seat===me.seat : !m.seat && m.me;
+  const what = m.ask==='table' ? 'Asks to join as a table device' : 'Asks for admin';
+  if (m.ask) return me.admin
+    ? `<div class="adm ask"><span class="asks">${what}</span><button class="mini dn">Approve</button><button class="mini">Dismiss</button></div>`
+    : `<div class="adm"><span class="asks">${isMe?'Asked for admin':what}</span></div>`;
+  if (!m.seat) return '<div class="adm">Admin · always</div>';
+  if (me.admin) return `<div class="adm">Admin ${tog(m.admin)}</div>`;
+  if (isMe) return '<div class="adm"><button class="mini">Ask for admin</button></div>';
+  return `<div class="adm">${m.admin?'Admin':''}</div>`;
+};
 const devRow = (m, me) => {
-  const seat = m.seat ? P[m.seat] : null;
+  const seat = m.seat ? P[m.seat] : null, pending = !m.seat && !m.admin;
   const isMe = me.seat ? m.seat===me.seat : !m.seat && m.me;
   const st = m.on ? '<div class="st ok">● Connected</div>' : '<div class="st away">Away</div>';
-  const adm = m.seat ? `<div class="adm">Admin ${tog(m.admin)}</div>` : '<div class="adm">Admin · always</div>';
-  return `<div class="dev-row ${seat?'':'table'}" style="${seat?col(m.seat):'--pc:var(--accent)'}"><i></i>
-    <div><div class="nm">${seat?seat.name:'Table device'}${isMe?'<span class="you-tag">This device</span>':''}</div>
-      <div class="fc">${seat?seat.f:'Acts for every player'}</div></div>${st}${adm}</div>`;
+  return `<div class="dev-row ${seat?'':pending?'pending':'table'}" style="${seat?col(m.seat):'--pc:var(--accent)'}"><i></i>
+    <div><div class="nm">${seat?seat.name:pending?'New device':'Table device'}${isMe?'<span class="you-tag">This device</span>':''}</div>
+      <div class="fc">${seat?seat.f:pending?'No seat yet':'Acts for every player'}</div></div>${st}${askCell(m, me)}</div>`;
 };
 const freeRow = id => `<div class="dev-row" style="${col(id)}"><i></i>
     <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f}</div></div><div class="st no">No device</div><div class="adm"></div></div>`;
@@ -2012,8 +2043,9 @@ const deviceRows = (members, me) => `
       ${SEATS.map(id=>{ const h=holder(id, members); return h?devRow(h, me):freeRow(id); }).join('')}
       <div class="setup-label" style="margin-top:18px">Table devices</div>
       ${members.filter(m=>!m.seat).map(m=>devRow(m, me)).join('')}`;
-// Two phones took their seats before the start.
-const MEMBERS_LOBBY = MEMBERS.filter(m=>m.seat!=='tom');
+// Before the start: three phones took their seats, Priya's phone asks for admin, and a new device asks to join as
+// a table device.
+const MEMBERS_LOBBY = [...MEMBERS.filter(m=>m.seat!=='tom'), {seat:null, admin:false, on:true, ask:'table'}];
 const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space"></div><div class="lay">
   <div class="top stack"><div class="round"><b>Players &amp; devices</b> · ${lobby?'Lobby':'Round 3'}</div><div class="spacer"></div>
     <button class="ibtn">Change seat</button>${lobby
@@ -2025,7 +2057,6 @@ const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space">
       <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:22px">Join code</div>
       <div class="joincode num">${CODE}</div>
       <div class="joinlink">Scan the code, or open <b>${LINK}</b></div>
-      ${me.admin?`<div class="admincode"><div class="l"><b>Admin code</b><span>For a device that joins as a table device. Shown on admin devices only.</span></div><div class="c num">${ADMIN_CODE}</div></div>`:''}
     </div>
     <div>${deviceRows(members, me)}</div>
   </div>
@@ -2035,27 +2066,27 @@ const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space">
   </div>`;
 
 S.lobby = {t:'Players & Devices — Lobby', later:true, note:
- `Create game put the six seats on the server and opened this screen on the host's iPad. <b>No clock runs yet.</b> The host reads the code out or holds up the QR code, and each row flips to <b>Connected</b> as a phone takes its seat: Kira and Jaz are in, and four seats have no device yet. <b>Start game</b> begins the strategy phase. The host can start before every seat has a phone, because the table device acts for a seat without one, and a phone can still join later. The <b>admin code</b> shows here because the iPad is an admin. Settings opens the time limits before the start.`,
+ `Create game put the six seats on the server and opened this screen on the host's iPad. <b>No clock runs yet.</b> The host reads the code out or holds up the QR code, and each row flips to <b>Connected</b> as a phone takes its seat: Kira, Jaz, and Priya are in, and three seats have no device yet. Priya's phone <b>asks for admin</b>, and a new device asks to join as a <b>table device</b>: the host approves or dismisses each request on its row, and a switch gives admin without a request. <b>Start game</b> begins the strategy phase. The host can start before every seat has a phone, because the table device acts for a seat without one, and a phone can still join later. Settings opens the time limits before the start.`,
  mnote:
- `One column: the QR code and the codes, then the seats, then Start game at the end.`,
+ `One column: the QR code and the code, then the seats, then Start game at the end. A request puts its buttons on a second line of the row.`,
  h:playersScreen(true, TABLE, MEMBERS_LOBBY)};
 
 S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', later:true, note:
- `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. The admin code does not show, because Jaz's phone is not an admin. When the host starts, the phone goes to the strategy phase on its own.`,
+ `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. Jaz's phone can <b>ask for admin</b> on its own row, and it sees the requests of the others as text, without the buttons. When the host starts, the phone goes to the strategy phase on its own.`,
  mnote:
  `On a phone, the waiting line sits at the end of the column.`,
  h:playersScreen(true, SEATED, MEMBERS_LOBBY)};
 
 S.players = {t:'Players & Devices', later:true, note:
- `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. The <b>admin code</b> shows only on an admin device: a device needs it to join as a table device, which acts for every player. Every seat lists the device that holds it, connected or away, with the admin switch of that device. An admin gives admin to a seated device or takes it away, but never from the last admin, and a table device is always an admin. The table devices come last. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
+ `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. Every seat lists the device that holds it, connected or away, with the admin switch of that device. A seated device that wants admin, or a device that wants to be a table device, <b>asks</b>, and the request shows on its row: Priya's phone asks for admin, and the iPad approves or dismisses it there. The chip in the top bar counts the open requests on admin devices. An admin gives admin to a seated device or takes it away, but never from the last admin, and a table device is always an admin. The table devices come last. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
  mnote:
- `One column: the QR code and the codes first, then the seats and the devices. On a phone this is where a player checks that their seat is theirs.`,
+ `One column: the QR code and the code first, then the seats and the devices. On a phone this is where a player checks that their seat is theirs, and asks for admin.`,
  h:playersScreen(false)};
 
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','setup','setupMissing','setupDeal','settings','lobby','lobbyWait','claim','players','seating','remove','removeSpeaker','seatingOut','strategy','token','strategyFour','action','actionSeated','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','agenda','round','history','stats']],
+  ['Every device · iPad and phone', ['home','setup','setupMissing','setupDeal','settings','lobby','lobbyWait','claim','players','seating','remove','removeSpeaker','seatingOut','strategy','token','strategyFour','action','actionSeated','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','pending','status','agenda','round','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.

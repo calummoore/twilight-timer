@@ -64,13 +64,13 @@ goes straight to the claim screen of that game. Rejected: no QR code, because
 a six-character code is quick to type, but a scan is quicker and cannot be
 misread across a table.
 
-Each game also has an admin code of the same form. Only an admin device
-shows it. A device needs the admin code to become a table device. An admin
-device can also give admin to a seated device, see
+The join code is the only code. A device becomes an admin, or a table
+device, only when an admin device approves it, see
 [Admin rights](#admin-rights). Rejected: trusting the join code for admin,
 because anyone who reads the code across a room could then act for every
-player. Rejected: an approval by an admin device, because it needs an admin
-to be present and awake at that moment.
+player. Rejected: an admin code shown on admin devices, because it is
+readable wherever the join code is, on the device in the middle of the
+table.
 
 ## Devices and modes
 
@@ -78,23 +78,30 @@ A device is one browser. It keeps its place in a game, so a reload, a closed
 tab, or a lost connection returns it to the same game with the same seat and
 the same rights.
 
-A device in a game is a table device or a seated device:
+A device in a game is a table device, a seated device, or a pending
+device:
 
 - A **table device** has no seat and is always an admin. It acts for every
   player. The device in the middle of the table is usually a table device.
 - A **seated device** holds one seat, so it acts for that player. It can
   also be an admin.
+- A **pending device** asked to be a table device and waits for an admin.
+  It has no seat and no admin, so it sees the game with every control
+  disabled, and a bar says that it waits for an admin. It can take a seat
+  instead at any time.
 
 An admin device may do every tap in the game, and may change the rights of
 other devices. At least one admin device always exists in a game. A device
-that is neither has not joined the game, and only sees the claim screen.
+that is none of the three has not joined the game, and only sees the claim
+screen.
 
 ### Joining
 
 A device joins a game with the join code, by typing it on the home screen or
 by opening the link. The claim screen then lists the seats of the game: each
 player's name, colour, faction, and whether a device holds the seat. The
-device takes a seat, or enters the admin code to join as a table device.
+device takes a seat, or asks to join as a table device and is pending until
+an admin device approves it.
 
 The device that begins a game is a table device from the start. It can take
 a seat later and stays an admin.
@@ -106,24 +113,35 @@ whose phone dies takes their seat again on another phone in seconds.
 Rejected: a confirmation by the holder, because the dead phone cannot
 answer.
 
-A device can change its seat, or become a table device with the admin code,
-at any time on the Players & devices screen. A device can also leave a game: the device
+A device can change its seat, or ask to be a table device, at any time on
+the Players & devices screen. A device can also leave a game: the device
 forgets the game, and the game keeps the device's place, shown as away.
 Rejected: removing a device from a game, because the last admin could not
 leave, and a seat is taken in one tap anyway.
 
 More than one table device can be in a game, for example an iPad in the
-middle and a laptop at the side. There is no watch-only device. Rejected: a
-spectator mode, because the join code is the trust boundary, and a seat or
-the admin code is always at hand.
+middle and a laptop at the side. A device cannot choose to only watch.
+Rejected: a spectator mode, because the join code is the trust boundary,
+and a seat or a request is always at hand.
 
 ### Admin rights
 
-An admin device can give admin to a seated device, and can take it away
-from a seated device, except from the last admin device of the game. A
-table device is always an admin, so its admin cannot be taken away. The
-Players & devices screen lists every device of the game with its seat or
-Table, its admin state, and whether it is connected.
+A seated device asks for admin on its own row of the Players & devices
+screen. A device on the claim screen asks to join as a table device. Every
+admin device sees each open request on the row of the device that asked,
+and approves or dismisses it there. Approval gives the seated device admin,
+or makes the pending device a table device. A dismissed device can ask
+again. An admin device can also give admin to a seated device without a
+request, and can take it away from a seated device, except from the last
+admin device of the game. A table device is always an admin, so its admin
+cannot be taken away. Rejected: a request that an admin answers somewhere
+else, because the row that shows the device is where the admin looks.
+
+The Players & devices screen lists every device of the game with its seat
+or Table, its admin state or open request, and whether it is connected.
+The chip in the top bar of an admin device shows the number of open
+requests, so that a request during the game is seen without opening the
+screen.
 
 ## Who may tap what
 
@@ -144,8 +162,10 @@ whatever the device shows.
 | Pause, resume, rule check, time limits                                  | No                              | Yes                          |
 | Start game, from the lobby                                              | No                              | Yes                          |
 | Undo                                                                    | No                              | Yes                          |
-| Change own seat, join as table with the admin code                      | Yes                             | Yes                          |
-| Give or take admin                                                      | No                              | Yes, not from the last admin |
+| Change own seat, ask for admin, ask to be a table device                | Yes                             | Yes                          |
+| Approve or dismiss a request, give or take admin                        | No                              | Yes, not from the last admin |
+
+A pending device may only take a seat, or wait.
 
 Rejected: shared taps for seated devices, such as the status checklist or
 the next phase, because a seated device acts when it is the player's turn,
@@ -176,16 +196,17 @@ device. The Settings screen shows the two groups apart.
   player fills their own seat, because the setup then becomes a shared
   document with its own rules for every field, and the claim screen is
   needed anyway for a device that joins mid-game.
-- **Claim seat**: the seats of the game, and the admin code field for a
-  table device.
-- **Players & devices**: the join code, the link, the QR code, the admin
-  code on an admin device, and one row per seat with the device that holds
-  it, its admin switch, and its connection state, then the table devices.
+- **Claim seat**: the seats of the game, and the request to join as a table
+  device.
+- **Players & devices**: the join code, the link, the QR code, and one row
+  per seat with the device that holds it, its admin switch or open request,
+  and its connection state, then the table devices and the pending devices.
   Before Start game it is the lobby, with Start game on an admin device and
   a waiting line on every other device. Rejected: the name "Join", because
   the device joins on the claim screen, and this screen lists who is in.
-- The top bar of every in-game screen shows the device's seat or Table, and
-  opens the Players & devices screen.
+- The top bar of every in-game screen shows the device's seat, Table, or
+  Pending, with the number of open requests on an admin device, and opens
+  the Players & devices screen.
 - Every other screen is the same on every device, with the controls that
   the device may not use disabled. There are no separate phone companion
   screens. Rejected: separate companion screens for a seated phone, because
