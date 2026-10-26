@@ -1,8 +1,8 @@
 import { isFields, listOf } from './parse-fields'
 import { parseLimits, parsePlayer } from './parse-parts'
 import { MAX_PLAYERS, MIN_PLAYERS } from './rules'
-import { limitsNow, type LimitSettings } from './settings'
-import type { Game, Player } from './types'
+import type { LimitSettings } from './settings'
+import type { Player } from './types'
 
 /**
  * The seats and the time limits from Create game. Start game begins the game
@@ -12,15 +12,6 @@ export interface Setup extends LimitSettings {
   /** Seat order, clockwise. */
   players: Player[]
   speakerId: string
-}
-
-/** The setup of a game that already runs, such as an older saved game. */
-export function setupOfGame(game: Game): Setup {
-  return {
-    players: game.players,
-    speakerId: game.firstSpeakerId,
-    ...limitsNow(game.limitsLog),
-  }
 }
 
 /**

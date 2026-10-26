@@ -6,7 +6,7 @@ import type { CreateRequest } from '../model/protocol'
 /** A new game and its code, or the reason that the game has none. */
 export type Created = { code: string } | { error: 'offline' }
 
-/** Creates a game from a setup or from a game that this device saved. */
+/** Creates a game from a setup. */
 export async function createGame(request: CreateRequest): Promise<Created> {
   try {
     const response = await fetch('/api/games', {

@@ -41,7 +41,6 @@ export function ActionScreen(props: {
   const over = isOver(turn)
   const totalMs =
     view.rail.find((r) => r.playerId === view.activeId)?.totalMs ?? 0
-  const faction = factionName(player?.factionId ?? null)
   // At 3 or 4 players, each card has its own button.
   const cards = view.activeCards
   const unplayed = cards.filter((c) => !c.played).map((c) => cardName(c.card))
@@ -73,7 +72,7 @@ export function ActionScreen(props: {
           <div>
             <h3>{player?.name}</h3>
             <div className="fac">
-              {faction ? `${faction} · ` : ''}Seat {seat + 1}
+              {player && `${factionName(player.factionId)} · `}Seat {seat + 1}
             </div>
           </div>
           <div className="init">

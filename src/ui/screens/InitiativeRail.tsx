@@ -53,7 +53,7 @@ export function InitiativeRail(props: {
                     </span>
                   ))}
                   <span className="fn">
-                    {factionName(player?.factionId ?? null)}
+                    {player && factionName(player.factionId)}
                   </span>
                 </div>
               </div>

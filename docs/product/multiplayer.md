@@ -47,11 +47,6 @@ A game stays on the server, reachable by its code, without a time limit.
 Rejected: deleting old games, because a game is small, and a code must not
 be reused.
 
-A device that holds a game saved by an older build offers to continue that
-game on the server. The game then gets a code, and the device joins it at
-once as a table device with admin, without the claim screen. A saved game
-that cannot be read shows a notice, as before.
-
 ## Codes
 
 Each game has a join code: six characters, letters and digits, without the

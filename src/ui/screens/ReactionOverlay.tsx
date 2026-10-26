@@ -97,7 +97,7 @@ export function ReactionOverlay(props: {
                   <i />
                   {p?.name}
                 </div>
-                <div className="fc">{factionName(p?.factionId ?? null)}</div>
+                <div className="fc">{p && factionName(p.factionId)}</div>
                 {tile.tookMs !== null ? (
                   <>
                     <div className="st">✓ Done</div>

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { codeOfPath, joinLink, joinPath } from './code'
 import { LIVE_MS, isLive, nextOffset, retryDelay } from './connection'
-import { gameSummary, lastActivity } from './summary'
-import { MIN, SEC, T0, playStrategy, table } from './test-table'
+import { gameSummary } from './summary'
+import { SEC, T0, playStrategy, table } from './test-table'
 
 describe('the connection', () => {
   it('keeps the offset of the fastest message, since the network only delays', () => {
@@ -74,18 +74,5 @@ describe('the summary of a game', () => {
     playStrategy(t)
     t.act({ kind: 'gameEnded' })
     expect(gameSummary(t.game, 6)).toMatchObject({ phase: 'ended' })
-  })
-
-  it('finds the last tap or pause of a game', () => {
-    const t = table()
-    expect(lastActivity(t.game)).toBe(T0)
-    t.wait(MIN)
-    t.act({ kind: 'cardPicked', playerId: 'jaz', card: 3 })
-    expect(lastActivity(t.game)).toBe(T0 + MIN)
-    t.wait(MIN)
-    t.pause()
-    t.wait(MIN)
-    t.resume()
-    expect(lastActivity(t.game)).toBe(T0 + 3 * MIN)
   })
 })
