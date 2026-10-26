@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
-  closeGame,
   leaveGame,
   loadGames,
   loadToken,
-  openGame,
   saveGames,
   seeGame,
   type RecentGame,
@@ -36,10 +34,7 @@ describe('the games of this device', () => {
   it('starts with no game, and reads what it saved', () => {
     const store = memoryStore()
     expect(loadGames(store)).toEqual({ current: null, recent: [] })
-    const games = openGame(
-      seeGame(loadGames(store), recent('7QK2HN')),
-      '7QK2HN',
-    )
+    const games = { current: '7QK2HN', recent: seeGame([], recent('7QK2HN')) }
     saveGames(store, games)
     expect(loadGames(store)).toEqual({
       current: '7QK2HN',
@@ -49,37 +44,24 @@ describe('the games of this device', () => {
   })
 
   it('lists the games newest first, each once, and keeps twenty', () => {
-    let games = loadGames(memoryStore())
+    let games = loadGames(memoryStore()).recent
     for (let i = 0; i < 25; i++) {
       games = seeGame(
         games,
         recent(`K8N3V${'23456789ABCDEFGHJKMNPQRST'[i]}`, T0 + i),
       )
     }
-    expect(games.recent).toHaveLength(20)
-    expect(games.recent[0]?.code).toBe('K8N3VT')
+    expect(games).toHaveLength(20)
+    expect(games[0]?.code).toBe('K8N3VT')
     games = seeGame(games, { ...recent('K8N3VJ'), round: 4 })
-    expect(games.recent.map((g) => g.code).slice(0, 2)).toEqual([
-      'K8N3VJ',
-      'K8N3VT',
-    ])
-    expect(games.recent.filter((g) => g.code === 'K8N3VJ')).toHaveLength(1)
+    expect(games.map((g) => g.code).slice(0, 2)).toEqual(['K8N3VJ', 'K8N3VT'])
+    expect(games.filter((g) => g.code === 'K8N3VJ')).toHaveLength(1)
   })
 
-  it('closes the open game, and forgets a game that it leaves', () => {
-    const games = openGame(
-      seeGame(
-        seeGame(loadGames(memoryStore()), recent('K8N3VT')),
-        recent('7QK2HN'),
-      ),
-      '7QK2HN',
-    )
-    expect(closeGame(games)).toEqual({ ...games, current: null })
-    expect(leaveGame(games, '7QK2HN')).toEqual({
-      current: null,
-      recent: [recent('K8N3VT')],
-    })
-    expect(leaveGame(games, 'K8N3VT').current).toBe('7QK2HN')
+  it('forgets a game that it leaves, and keeps the others', () => {
+    const games = seeGame(seeGame([], recent('K8N3VT')), recent('7QK2HN'))
+    expect(leaveGame(games, '7QK2HN')).toEqual([recent('K8N3VT')])
+    expect(leaveGame(games, 'K8N3VT')).toEqual([recent('7QK2HN')])
   })
 
   it('drops a broken entry and keeps the rest', () => {

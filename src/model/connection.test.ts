@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { codeOfPath, joinLink, joinPath } from './code'
 import {
   LIVE_MS,
   checkBuild,
@@ -92,33 +91,6 @@ describe('the build check of a page', () => {
     }
     expect(checkBuild(blocked, OLD_BUILD, BUILD)).toBe('outdated')
     expect(checkBuild(blocked, BUILD, BUILD)).toBe('same')
-  })
-})
-
-describe('join links', () => {
-  it('holds the code in the path, and reads it in any case', () => {
-    expect(joinPath('7QK2HN')).toBe('/join/7QK2HN')
-    expect(codeOfPath('/join/7QK2HN')).toBe('7QK2HN')
-    expect(codeOfPath('/join/7qk2hn/')).toBe('7QK2HN')
-    expect(codeOfPath('/join/7QK2H0')).toBeNull()
-    expect(codeOfPath('/')).toBeNull()
-    expect(codeOfPath('/join/7QK2HN/extra')).toBeNull()
-  })
-
-  it('opens the game at its own site, and reads out without the scheme', () => {
-    expect(joinLink('https://ti4.nexus', '7QK2HN')).toEqual({
-      url: 'https://ti4.nexus/join/7QK2HN',
-      text: 'ti4.nexus/join/7QK2HN',
-    })
-    expect(joinLink('http://localhost:5173', '7QK2HN')).toEqual({
-      url: 'http://localhost:5173/join/7QK2HN',
-      text: 'localhost:5173/join/7QK2HN',
-    })
-  })
-
-  it('gives a link that opens the same game', () => {
-    const { url } = joinLink('https://ti4.nexus', '7QK2HN')
-    expect(codeOfPath(new URL(url).pathname)).toBe('7QK2HN')
   })
 })
 

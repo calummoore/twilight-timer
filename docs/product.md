@@ -57,6 +57,8 @@ The core concepts have their own pages:
 - [New versions](product/versions.md): one version on the server and on
   every device, the reload after an update, and a game that the server
   cannot read.
+- [Addresses](product/addresses.md): the address of each screen, Back, and
+  the return to an open game.
 
 ---
 
