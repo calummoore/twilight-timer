@@ -663,6 +663,13 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .frame.phone::before, .frame.tablet::before{content:""; position:absolute; bottom:8px; left:50%; width:138px; height:5px;
   margin-left:-69px; border-radius:3px; background:#e9eff7; opacity:.45; z-index:50}
 
+/* ─────────── the game top bar chips: up to 1150 px wide ─────────── */
+/* Beside the phase pill and the tools, the words of the chips need about 1100 px with the default names, and more with
+   longer names. Up to 1150 px, the speaker chip shows the star and the name, and the device chip the dot and the name. */
+@container app (max-width: 1150px){
+  .top.game .chips .word{display:none}
+}
+
 /* ─────────── narrow: an upright iPad or a phone ─────────── */
 @container app (max-width: 900px){
   .lay{overflow-y:auto; scrollbar-width:none}
@@ -1507,7 +1514,7 @@ const actionScreen = (over, held=false, four=false, me=TABLE) => { const mine = 
 S.action = {t:'Action Phase', note:
  `<b>The hero screen — roughly 90% of the game's screen time.</b> One enormous clock, one thumb-sized End Turn target. Each rail row carries its owner's <b>strategy card</b> beside the initiative number, which makes the derivation legible — the number <i>is</i> the card. The one exception is the Naalu: Sam holds the <b>"0" token</b>, so Sam's row sits first with 0 and still names Construction, the card Sam will play. Colour does double duty: a <b>blue card is still to play</b>, a <b>greyed card with a ✓ has been used</b>. That single chip answers the two questions the table actually asks — who holds Technology, and is Warfare still live — and it's also what makes Pass legal: Kira's Pass button warns that Trade is not played yet, and passing early asks first. Passed players are dimmed and struck through and are skipped automatically. Undo sits permanently in the top bar and restores <b>elapsed time</b>, not just state. The chip beside the speaker names this device's seat, Table, or Viewer, and opens Players &amp; devices.`,
  mnote:
- `The rail moves under the clock. End Turn, the strategic action, and Pass stay in the hero, under the clock, as on the iPad. The top bar takes two rows. On a phone, the rail rows become tiles in initiative order, so six players fit on one screen. Up to 740 px wide, and on a phone held sideways, the top bar is compact: the phase pill becomes a thin progress line with the phase name next to the round.`,
+ `The rail moves under the clock. End Turn, the strategic action, and Pass stay in the hero, under the clock, as on the iPad. The top bar takes two rows. Up to 1150 px wide, the speaker chip shows the star and the name, and the device chip the dot and the name. On a phone, the rail rows become tiles in initiative order, so six players fit on one screen. Up to 740 px wide, and on a phone held sideways, the top bar is compact: the phase pill becomes a thin progress line with the phase name next to the round.`,
  h:actionScreen(false)};
 
 S.overtime = {t:'Action Phase — Limit Exceeded', note:
