@@ -28,6 +28,9 @@ in the futex account. The app opens at https://ti4.nexus; see
 - The status checklist, and clocks for agenda discussion and each vote.
 - The table can remove a player who leaves mid-game. Their recorded time
   stays in the stats.
+- An admin device can swap two seats when the ring does not match the table:
+  a long press on a seat, or Re-order seats, starts re-order mode, and a drag
+  or two taps swap the seats. Undo takes a swap back.
 - Optional time limits with overtime and an alarm.
 - Undo that also restores time, a pause that can time rule checks, a round
   summary, and game stats.

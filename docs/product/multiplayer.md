@@ -157,6 +157,7 @@ whatever the device shows.
 | Cast a vote                                                             | When it is the player's vote    | Any time                     |
 | Status steps, Custodians, next phase, open voting, resolve, next round  | No                              | Yes                          |
 | Move the speaker, move the Naalu token, remove a player, end the game   | No                              | Yes                          |
+| Swap two seats                                                          | No                              | Yes                          |
 | Pause, resume, rule check, time limits                                  | No                              | Yes                          |
 | Start game, from the lobby                                              | No                              | Yes                          |
 | Undo                                                                    | No                              | Yes                          |

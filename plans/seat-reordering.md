@@ -174,23 +174,27 @@ Contract owners:
 
 State the swap rules as requirements before the code changes.
 
-- [ ] `docs/product.md`: remove "No seat re-ordering after setup" from the
-      MVP exceptions. Update the Setup and the Speaker & Seating rows of
-      the screens table. The Setup row waits for Cal's answer on the
-      readings.
-- [ ] `docs/product/rounds.md`, "Seating and the speaker": replace the
+- [x] `docs/product.md`: remove "No seat re-ordering after setup" from the
+      MVP exceptions. Update the Speaker & Seating row of the screens
+      table.
+- [ ] `docs/product.md`: the Setup row of the screens table. Waits for
+      Cal's answer on the readings.
+- [x] `docs/product/rounds.md`, "Seating and the speaker": replace the
       paragraph on understated re-ordering with the rules of the decisions
       and the Model section. Add the rejected alternatives of decisions 1
       to 3, and the rejected rewrite of the starting ring.
 - [ ] The same section: the setup handle, beside ▲ and ▼. Waits for Cal's
       answer on the readings.
-- [ ] `docs/product/clocks.md`, "Corrections": add seat swaps to the logged
+- [x] `docs/product/clocks.md`, "Corrections": add seat swaps to the logged
       taps.
-- [ ] `docs/product/multiplayer.md`: add "swap seats" to the admin row of
+- [x] `docs/product/multiplayer.md`: add "swap seats" to the admin row of
       the rights table.
-- [ ] `README.md`: the key features, and the new files under Key code.
-- [ ] Search `src/ui/` and the mockup for text that states the old rule,
-      as `AGENTS.md` asks.
+- [x] `README.md`: the key features. The new files go under Key code in
+      the milestones that add them.
+- [x] Search `src/ui/` and the mockup for text that states the old rule,
+      as `AGENTS.md` asks. Only the mockup states it, and Milestone 2
+      rewrites it. The search is in
+      `.context/seat-reordering/m1-old-rule-search.txt`.
 
 ## Milestone 2: Mockup
 
@@ -222,6 +226,7 @@ Log a seat swap, derive the ring, and move the saved game to version 7.
 - [ ] `parse-parts.ts`, `parse.ts`, and `commands.ts`: the action and
       version 7.
 - [ ] Adapt the screens that need it, so that the build passes.
+- [ ] `README.md`: the ring helper under Key code.
 - [ ] Unit tests:
   - [ ] A swap changes the ring, the pick order, and the voting order.
   - [ ] A swap with a player who left, an unknown player, or the same
@@ -257,6 +262,7 @@ Build re-order mode and the setup handle as the mockup shows them.
 - [ ] Setup: the ⠿ handle and the row swap. Waits for Cal's answer on the
       readings.
 - [ ] Port the new mockup styles to `src/styles/mockup/`.
+- [ ] `README.md`: the new files under Key code.
 - [ ] Scratch smoke test, not committed: in headless Chrome with touch
       emulation, long-press, drag, and drop on the ring. Check both orders,
       a plain tap on a seat, and Undo. Drag a setup row. Save the evidence
