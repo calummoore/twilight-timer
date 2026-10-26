@@ -165,3 +165,33 @@ describe('rights of every device', () => {
     expect(mayCommand(HOST, tap, null)).toBe(true)
   })
 })
+
+describe('admin recovery', () => {
+  const take = (deviceId: string, admin = true): Command => ({
+    type: 'admin',
+    deviceId,
+    admin,
+  })
+
+  it('lets a seated device take admin while every admin device is away', () => {
+    const jaz = phone('jaz')
+    expect(mayCommand(jaz, take(jaz.id), null, true)).toBe(true)
+    expect(mayCommand(jaz, take(jaz.id), actionTable().view(), true)).toBe(true)
+  })
+
+  it('keeps admin with the admin devices while one is connected', () => {
+    const jaz = phone('jaz')
+    expect(mayCommand(jaz, take(jaz.id), null, false)).toBe(false)
+    expect(mayCommand(jaz, take(jaz.id), null)).toBe(false)
+  })
+
+  it('gives a device its own admin only, and only to switch it on', () => {
+    const jaz = phone('jaz')
+    expect(mayCommand(jaz, take('d-kira'), null, true)).toBe(false)
+    expect(mayCommand(jaz, take(jaz.id, false), null, true)).toBe(false)
+  })
+
+  it('gives a viewer no admin, also while every admin device is away', () => {
+    expect(mayCommand(VIEWER, take(VIEWER.id), null, true)).toBe(false)
+  })
+})

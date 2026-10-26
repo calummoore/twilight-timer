@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  adminsAway,
   isLastAdmin,
   parseMember,
   publicDevice,
@@ -105,5 +106,15 @@ describe('devices', () => {
     expect(parseMember({ ...host, id: 'x1' })).toBeNull()
     expect(parseMember({ ...host, seat: 3 })).toBeNull()
     expect(parseMember({ ...host, admin: 'yes' })).toBeNull()
+  })
+})
+
+describe('admins away', () => {
+  it('holds only while no admin device has a connection', () => {
+    const host = { admin: true, connected: true }
+    const jaz = { admin: false, connected: true }
+    expect(adminsAway([host, jaz])).toBe(false)
+    expect(adminsAway([{ ...host, connected: false }, jaz])).toBe(true)
+    expect(adminsAway([])).toBe(true)
   })
 })

@@ -2140,26 +2140,29 @@ S.claimCreator = {t:'Claim Seat — After Create Game', note:
 
 /* ── 15. Players & devices ── */
 // The code, the link, and the QR code for new devices, and one row per seat with the device that holds it, then the
-// table devices. Every device sees the admin switch of every device, and only an admin device uses them; on the
-// others they are off. Before Start game the same screen is the lobby.
-const admCell = (m, me) => me.admin
+// table devices. Every device sees the admin switch of every device, and an admin device uses them; on the others
+// they are off. While every admin device is away, a seated device uses the switch on its own row. Before Start game
+// the same screen is the lobby.
+// `away`: every admin device is away, so a seated device may switch its own admin on.
+const admCell = (m, me, away=false) => me.admin || (away && me.seat && m.seat===me.seat)
   ? `<div class="adm">Admin ${tog(m.admin)}</div>`
   : `<div class="adm">Admin <div class="tog ${m.admin?'on':''} off"></div></div>`;
-const devRow = (m, me) => {
+const devRow = (m, me, away=false) => {
   const seat = m.seat ? P[m.seat] : null;
   const isMe = me.seat ? m.seat===me.seat : !m.seat && m.me;
   const st = m.on ? '<div class="st ok">● Connected</div>' : '<div class="st away">Away</div>';
   return `<div class="dev-row ${seat?'':'table'}" style="${seat?col(m.seat):'--pc:var(--accent)'}"><i></i>
     <div><div class="nm">${seat?seat.name:'Table device'}${isMe?'<span class="you-tag">This device</span>':''}</div>
-      <div class="fc">${seat?seat.f:m.admin?'Acts for every player':'Watches the game'}</div></div>${st}${admCell(m, me)}</div>`;
+      <div class="fc">${seat?seat.f:m.admin?'Acts for every player':'Watches the game'}</div></div>${st}${admCell(m, me, away)}</div>`;
 };
 const freeRow = id => `<div class="dev-row" style="${col(id)}"><i></i>
     <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f}</div></div><div class="st no">No device</div><div class="adm"></div></div>`;
-const deviceRows = (members, me) => `
+const deviceRows = (members, me) => { const away = members.every(m=>!m.admin || !m.on);
+  return `${away?'<div class="notice">Every admin device is away. A device with a seat can take admin with the switch on its row.</div>':''}
       <div class="setup-label">Seats and devices · ${members.filter(m=>m.seat).length} of 6 seats have a device</div>
-      ${SEATS.map(id=>{ const h=holder(id, members); return h?devRow(h, me):freeRow(id); }).join('')}
+      ${SEATS.map(id=>{ const h=holder(id, members); return h?devRow(h, me, away):freeRow(id); }).join('')}
       <div class="setup-label" style="margin-top:18px">Table devices</div>
-      ${members.filter(m=>!m.seat).map(m=>devRow(m, me)).join('')}`;
+      ${members.filter(m=>!m.seat).map(m=>devRow(m, me, away)).join('')}`; };
 // Before the start: three phones took their seats.
 const MEMBERS_LOBBY = MEMBERS.filter(m=>m.seat!=='tom');
 const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space"></div><div class="lay">
@@ -2182,6 +2185,9 @@ const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space">
     : '<div class="lobby-wait"><i></i>Waiting for the table to start</div>'}</div>`:''}
   </div>`;
 
+// Every admin device is away: the iPad's battery died, and Kira's phone closed its tab.
+const MEMBERS_AWAY = MEMBERS.map(m=>m.admin ? {...m, on:false} : m);
+
 S.lobby = {t:'Players & Devices — Lobby', note:
  `The lobby on the iPad in the middle of the table. Kira created the game on Kira's phone and took Kira's seat on the claim screen, so that phone is the first admin. The iPad joined as a table device, and Kira's phone gave it admin. <b>No clock runs yet.</b> The host reads the code out or holds up the QR code, and each row flips to <b>Connected</b> as a phone takes its seat: Kira, Jaz, and Priya are in, and three seats have no device yet. The <b>admin switch</b> on a row gives that device admin or takes it away. A laptop joined as a table device and is a <b>viewer</b> until an admin turns its switch on. <b>Leave game</b> takes the game off this device and goes to Home. <b>Start game</b> begins the strategy phase. An admin can start before every seat has a phone, because an admin device acts for a seat without one, and a phone can still join later. Settings opens the time limits before the start.`,
  mnote:
@@ -2189,10 +2195,16 @@ S.lobby = {t:'Players & Devices — Lobby', note:
  h:playersScreen(true, TABLE, MEMBERS_LOBBY)};
 
 S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', note:
- `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It sees the admin switch of every device, off for this phone, because only an admin device gives admin. When the host starts, the phone goes to the strategy phase on its own.`,
+ `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It sees the admin switch of every device, off for this phone, because an admin device is connected, and only an admin device gives admin then. When the host starts, the phone goes to the strategy phase on its own.`,
  mnote:
  `On a phone, the waiting line sits at the end of the column.`,
  h:playersScreen(true, SEATED, MEMBERS_LOBBY)};
+
+S.playersAway = {t:'Players & Devices — Every Admin Away', note:
+ `The same screen on <b>Jaz's phone</b> after both admin devices went away: the iPad's battery died, and Kira's phone closed its tab. No admin device has a connection, so the status steps, the next phase, undo, and pause wait on every device. The notice says what to do. While every admin device is away, a <b>seated device may switch its own admin on</b>, with the switch on its own row, so Jaz's switch is on and every other switch stays off. Once Jaz takes admin, the notice goes, and Jaz's phone taps for the table. A viewer takes a seat first. When the iPad comes back, it is still an admin, and so is Jaz's phone until an admin turns it off.`,
+ mnote:
+ `On a phone, the notice sits under the join code, above the seats.`,
+ h:playersScreen(false, SEATED, MEMBERS_AWAY)};
 
 S.players = {t:'Players & Devices', note:
  `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. The link opens in a new tab. <b>Copy link</b> puts the link on the clipboard, to send in a chat, and shows ✓ Copied for a moment. When the copy fails, it says so, and the next tap tries again. Every seat lists the device that holds it, connected or away, with the <b>admin switch</b> of that device. An admin gives admin to any other device or takes it away, but never from the last admin. A device that joins as a table device is a <b>viewer</b>: it watches the game, and the switch on its row gives it admin. The table devices come last. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
@@ -2203,7 +2215,7 @@ S.players = {t:'Players & Devices', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','homeSaved','homeCode','opening','openingMissing','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
+  ['Every device · iPad and phone', ['home','homeSaved','homeCode','opening','openingMissing','setup','setupMissing','setupDeal','setupFailed','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.

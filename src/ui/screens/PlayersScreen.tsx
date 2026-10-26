@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { REFRESH_MS } from '../../model/connection'
 import type { DeviceView } from '../../model/protocol'
 import type { Player } from '../../model/types'
 import { NetBar } from '../controls'
@@ -19,7 +21,13 @@ export function PlayersScreen(props: {
   connected: boolean
   /** This device is an admin. Without a connection, its controls wait. */
   admin: boolean
+  /** No admin device has a connection, so a seated device may take admin. */
+  adminsAway: boolean
+  /** Whether this device may switch the admin of a device on or off now. */
+  mayAdmin: (deviceId: string, admin: boolean) => boolean
   onAdmin: (deviceId: string, admin: boolean) => void
+  /** Asks the server for a fresh state, with the connections of now. */
+  onRefresh: () => void
   onChangeSeat: () => void
   onLeave: () => void
   onStart?: () => void
@@ -27,6 +35,14 @@ export function PlayersScreen(props: {
   onClose?: () => void
 }) {
   const lobby = props.round === null
+  // The server sends no state when a device goes quiet, so this screen asks
+  // for the connections of now while it is open.
+  const { onRefresh } = props
+  useEffect(() => {
+    onRefresh()
+    const timer = setInterval(onRefresh, REFRESH_MS)
+    return () => clearInterval(timer)
+  }, [onRefresh])
 
   return (
     <div className={`lay ${lobby ? '' : 'settings-screen'}`}>
@@ -60,13 +76,21 @@ export function PlayersScreen(props: {
       {!props.connected && <NetBar />}
       <div className="content join-grid">
         <JoinCode code={props.code} />
-        <DeviceRows
-          players={props.players}
-          devices={props.devices}
-          you={props.you}
-          mayChange={props.admin && props.connected}
-          onAdmin={props.onAdmin}
-        />
+        <div>
+          {props.adminsAway && props.connected && (
+            <div className="notice" role="status">
+              Every admin device is away. A device with a seat can take admin
+              with the switch on its row.
+            </div>
+          )}
+          <DeviceRows
+            players={props.players}
+            devices={props.devices}
+            you={props.you}
+            mayAdmin={props.mayAdmin}
+            onAdmin={props.onAdmin}
+          />
+        </div>
       </div>
       {lobby && (
         <div className="foot">

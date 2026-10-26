@@ -41,7 +41,8 @@ in the futex account. The app opens at https://ti4.nexus; see
 - An admin device taps for every player. After Create game, the device
   takes a seat or the table on the claim screen, and is the first admin
   either way. It gives admin to other devices with a switch. A table device
-  without admin is a viewer.
+  without admin is a viewer. While every admin device is away, a seated
+  device can take admin, so the table can finish the game.
 - Home lists the recent games of the device, and continues a game that an
   older build saved on the device. The device then joins that game as the
   table device, with admin.

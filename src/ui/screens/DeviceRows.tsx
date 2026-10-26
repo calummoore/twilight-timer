@@ -7,15 +7,15 @@ import { Toggle } from '../controls'
 
 /**
  * One row per seat with the device that holds it, then the table devices.
- * Every row has the admin switch of its device. Only an admin device with a
- * connection uses the switches, and the last admin keeps its switch on.
+ * Every row has the admin switch of its device. A switch is on only where
+ * the rights allow the change, and the last admin keeps its switch on.
  */
 export function DeviceRows(props: {
   players: Player[]
   devices: DeviceView[]
   you: string | null
-  /** This device may give admin and take it away now. */
-  mayChange: boolean
+  /** Whether this device may switch the admin of a device on or off now. */
+  mayAdmin: (deviceId: string, admin: boolean) => boolean
   onAdmin: (deviceId: string, admin: boolean) => void
 }) {
   const { players, devices } = props
@@ -28,7 +28,10 @@ export function DeviceRows(props: {
       device={device}
       player={player}
       you={device.id === props.you}
-      locked={!props.mayChange || isLastAdmin(devices, device)}
+      locked={
+        !props.mayAdmin(device.id, !device.admin) ||
+        isLastAdmin(devices, device)
+      }
       onAdmin={(on) => props.onAdmin(device.id, on)}
     />
   )
