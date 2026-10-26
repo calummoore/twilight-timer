@@ -31,6 +31,14 @@ select {
   user-select: text;
   -webkit-user-select: text;
 }
+/* The join code and the join link can be copied. A long press on the link
+   opens the menu of the system, with Copy and Share. */
+.joincode,
+.joinlink a {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
+}
 
 /* The app fills the window's safe area, so the status bar and the home
    indicator do not cover it. The stage is a size container, and the container
