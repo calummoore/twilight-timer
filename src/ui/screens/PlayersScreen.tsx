@@ -4,6 +4,7 @@ import type { DeviceView } from '../../model/protocol'
 import type { Expansions } from '../../model/settings'
 import type { Seat, SeatValues } from '../../model/types'
 import { NetBar } from '../controls'
+import { valuesOf } from '../seatText'
 import { DeviceRows } from './DeviceRows'
 import { JoinCode } from './JoinCode'
 import { LobbyFoot } from './LobbyFoot'
@@ -109,6 +110,11 @@ export function PlayersScreen(props: {
             onEdit={setEditing}
             mayMove={lobby && props.mayMove}
             onMove={props.onMove}
+            speakerId={props.speakerId}
+            onSpeaker={(playerId) => {
+              const seat = props.players.find((p) => p.id === playerId)
+              if (seat) props.onEdit(playerId, valuesOf(seat), true)
+            }}
           />
         </div>
       </div>
@@ -124,6 +130,7 @@ export function PlayersScreen(props: {
       {edited && (
         <SeatEditDialog
           key={edited.id}
+          kind="edit"
           seat={edited}
           seats={props.players}
           place={props.players.indexOf(edited) + 1}

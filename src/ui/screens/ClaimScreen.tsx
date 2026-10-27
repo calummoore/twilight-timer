@@ -4,22 +4,16 @@ import type { Expansions } from '../../model/settings'
 import type { Seat, SeatValues } from '../../model/types'
 import { pc } from '../colour'
 import { NetBar } from '../controls'
-import { seatFaction, seatProblem, valuesOf } from '../seatText'
-import { SeatFields } from './SeatFields'
-
-/** The seat that the device tapped, with the values in its fields. */
-interface Open {
-  id: string
-  values: SeatValues
-}
+import { seatFaction } from '../seatText'
+import { SeatEditDialog } from './SeatEditDialog'
 
 /**
  * Which player this device is. A tap on a seat opens its name, colour, and
- * faction, and Take seat takes the seat with them, also a seat that another
- * device holds. Or the device joins as a table device, which is a viewer
- * until an admin device gives it admin. The device that created the game
- * joins here too, with admin. It also changes the seat of a device in the
- * game.
+ * faction in a dialog, and Take seat takes the seat with them, also a seat
+ * that another device holds. Or the device joins as a table device, which
+ * is a viewer until an admin device gives it admin. The device that created
+ * the game joins here too, with admin. It also changes the seat of a device
+ * in the game.
  */
 export function ClaimScreen(props: {
   code: string
@@ -41,44 +35,9 @@ export function ClaimScreen(props: {
   onCancel: () => void
 }) {
   const { device, players } = props
-  const [open, setOpen] = useState<Open | null>(null)
+  const [openId, setOpenId] = useState<string | null>(null)
+  const open = players.find((p) => p.id === openId)
   const holder = (id: string) => props.devices.find((d) => d.seat === id)
-
-  const fields = (seat: Seat, values: SeatValues) => {
-    const problem =
-      seatProblem(players, seat, values, props.admin) ??
-      (!props.started && values.factionId === null
-        ? 'Pick a faction to take the seat.'
-        : null)
-    return (
-      <>
-        <SeatFields
-          seat={seat}
-          seats={players}
-          values={values}
-          expansions={props.expansions}
-          takes={props.admin}
-          started={props.started}
-          onChange={(next) => setOpen({ id: seat.id, values: next })}
-        />
-        <div className="fields">
-          {problem && <div className="need">{problem}</div>}
-          <div className="btns">
-            <button className="ibtn" onClick={() => setOpen(null)}>
-              Cancel
-            </button>
-            <button
-              className="big small"
-              disabled={!props.connected || problem !== null}
-              onClick={() => props.onSeat(seat.id, values)}
-            >
-              TAKE SEAT
-            </button>
-          </div>
-        </div>
-      </>
-    )
-  }
 
   return (
     <div className="lay settings-screen">
@@ -114,20 +73,16 @@ export function ClaimScreen(props: {
             {players.map((p, i) => {
               const held = holder(p.id)
               const you = !!device && held?.id === device.id
-              const isOpen = open?.id === p.id
               return (
                 <div
                   key={p.id}
-                  className={`seat-pick ${you ? 'you' : ''} ${isOpen ? 'open' : ''}`}
+                  className={`seat-pick ${you ? 'you' : ''}`}
                   style={pc(p.colour)}
                 >
                   <button
                     className="head"
                     disabled={!props.connected || you}
-                    aria-expanded={isOpen}
-                    onClick={() =>
-                      setOpen(isOpen ? null : { id: p.id, values: valuesOf(p) })
-                    }
+                    onClick={() => setOpenId(p.id)}
                   >
                     <i />
                     <div>
@@ -146,7 +101,6 @@ export function ClaimScreen(props: {
                           : 'Free'}
                     </div>
                   </button>
-                  {isOpen && fields(p, open.values)}
                 </div>
               )
             })}
@@ -183,6 +137,26 @@ export function ClaimScreen(props: {
           </div>
         </div>
       </div>
+      {open && (
+        <SeatEditDialog
+          key={open.id}
+          kind="claim"
+          seat={open}
+          seats={players}
+          place={players.indexOf(open) + 1}
+          expansions={props.expansions}
+          takes={props.admin}
+          started={props.started}
+          speaker={false}
+          maySpeaker={false}
+          connected={props.connected}
+          onSave={(values) => {
+            setOpenId(null)
+            props.onSeat(open.id, values)
+          }}
+          onCancel={() => setOpenId(null)}
+        />
+      )}
     </div>
   )
 }

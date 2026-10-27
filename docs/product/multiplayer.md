@@ -102,17 +102,20 @@ joined the game, and only sees the claim screen.
 A device joins a game with the join code, by typing it on the home screen or
 by opening the link. The claim screen then lists the seats of the game: each
 player's name, colour, faction or no faction yet, and whether a device holds
-the seat. A tap on a seat opens its name, colour, and faction, so that the
-player checks them and changes what they want. Take seat then takes the seat
-with these values, under the rules of [Seats](#seats). Before Start game, a
-seat without a faction needs one before Take seat. After Start game, only the
-name can change, and the colour and the faction show as text. The device can
-also join as a table device, which has no fields. A device that joins gets
-no admin, so a new table device is a viewer until an admin device gives it
-admin. The device that creates the game is the only exception. Rejected: a
-claim in one tap, with the fields only on the Players & devices screen or in
-a dialog that opens after the claim, because a seat without a faction then
-needs a second step before the game can start.
+the seat. A tap on a seat opens its name, colour, and faction in a dialog,
+so that the player checks them and changes what they want. Take seat in the
+dialog then takes the seat with these values, under the rules of
+[Seats](#seats). Before Start game, a seat without a faction needs one
+before Take seat. After Start game, only the name can change, and the colour
+and the faction show as text. The device can also join as a table device,
+which has no fields. A device that joins gets no admin, so a new table
+device is a viewer until an admin device gives it admin. The device that
+creates the game is the only exception. Rejected: a claim in one tap, with
+the fields only on the Players & devices screen or in a dialog that opens
+after the claim, because a seat without a faction then needs a second step
+before the game can start. Rejected: the fields under the tapped row,
+because the list then jumps, and the dialog of the lobby already holds the
+fields.
 
 The device that creates a game with Create game also joins it on the claim
 screen, which Create game opens. It takes a seat or joins as a table device,
@@ -173,7 +176,9 @@ A seated device without admin edits its own seat: the name, the colour, and
 the faction. It picks only a colour or a faction that no other seat holds. A
 taken value is off and names its holder. An admin device edits every seat,
 with Edit on its row, one seat at a time, in a dialog with the name, the
-colour, the faction, and the speaker token. An admin device takes a value:
+colour, the faction, and the speaker token. Each seat row also shows the
+speaker token, and an admin device moves the token with a tap on it before
+Start game. An admin device takes a value:
 when it gives a seat a faction that another seat holds, the other seat has
 no faction again, and when it gives a seat a colour that another seat holds,
 the other seat gets the first free colour. The same rules apply when a
@@ -183,8 +188,10 @@ gives them, and picks again instead. Rejected: a seat without a colour,
 because every screen identifies a player by colour.
 
 Two seats never share a name. The check trims spaces and ignores case, and
-an empty name is not valid. Create game, Take seat, and Save are off while a
-name is taken, and say so. Rejected: no name rule, because a disabled
+an empty name is not valid. A seat whose name is still the default of Setup,
+"Player" and a number, shows an empty name field with the default as a hint,
+so that the player types their name, and an empty field keeps the default.
+Create game, Take seat, and Save are off while a name is taken, and say so. Rejected: no name rule, because a disabled
 control names the player that the game waits for, and two players with one
 name could not be told apart there.
 
@@ -274,17 +281,18 @@ device. The expansions in play belong to the game from Create game on, see
   the host sets the count, the order, and the limits in one place, and the
   claim screen is needed anyway for a device that joins mid-game.
 - **Claim seat**: the seats of the game, and Join as table device. A tap on
-  a seat opens its name, colour, and faction, and Take seat takes the seat
-  with them. On a device that is an admin, or that gets admin when it
+  a seat opens its name, colour, and faction in a dialog, and Take seat
+  takes the seat with them. On a device that is an admin, or that gets admin when it
   joins, the screen says that the device acts for every player, in a seat
   or at the table.
 - **Players & devices**: the join code, the link with Copy link, the QR code,
   and one row per seat with the device that holds it, its admin switch, its
   connection state, and Edit when the device may edit the seat, then the
   table devices. Before Start game it is the lobby, with Start game on an
-  admin device and a waiting line on every other device. On an admin device
-  the lobby also has the ⠿ handle on each seat row, the seats without a
-  faction under Start game, and Random factions while a seat has none.
+  admin device and a waiting line on every other device. Each seat row
+  shows the speaker token. On an admin device the lobby also has the ⠿
+  handle on each seat row, the seats without a faction named beside Start
+  game, and Random factions under that line while a seat has none.
   Rejected: the name "Join", because the device joins on the claim screen,
   and this screen lists who is in.
 - The top bar of every in-game screen shows the device's seat, Table, or

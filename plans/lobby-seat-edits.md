@@ -146,6 +146,22 @@ seat rules of Create game go there and the Worker stays thin. The fixture
 rule of `AGENTS.md` keeps the fixture of the old shape, so this change
 reads `room-v2.json` as version 3 and captures no new fixture.
 
+Feedback, 2026-10-27, Cal, on the preview of PR #36, which milestones 6
+to 8 build:
+
+1. The claim screen opens the fields of a tapped seat in the edit dialog
+   of the lobby, with Take seat as its button, not under the row. Cal: "I
+   don't like the accordion style".
+2. The seat rows of the lobby show the speaker token, and an admin device
+   moves the token with a tap on it before Start game, as the ★ of Setup.
+3. A seat whose name is still the default of Setup, "Player" and a number,
+   shows an empty name field with the default as a hint, so that the player
+   types their name. An empty field keeps the default.
+4. The Edit buttons and the admin switches of the lobby rows line up: the
+   rows share their columns, as the setup rows do.
+5. Random factions is a small button under the line of the lobby, and the
+   line lists the seats without a faction with commas.
+
 Contract owners:
 
 - The [product spec](../docs/product.md), with its pages
@@ -284,6 +300,48 @@ Tags: ui
     Separate branch.
 - [x] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
+
+## Milestone 6: Mockup of the feedback
+
+Tags: mockup
+
+- [x] Claim seat: a tapped seat opens the edit dialog over the list, with
+      TAKE SEAT, before and during the game, and no fields under the row.
+- [x] The seat rows of the lobby: the speaker ★ on each row, on for the
+      speaker, and a tap target on an admin device before Start game. The
+      rows share their columns, so Edit and the switches line up.
+- [x] The edit dialog: an empty name field with the default as a hint for a
+      seat that still has the default name.
+- [x] The lobby foot: the line with a comma list, and Random factions as a
+      small button under it.
+
+## Milestone 7: Screens of the feedback
+
+Tags: ui
+
+- [x] Claim seat opens the edit dialog with TAKE SEAT, and keeps the
+      faction rule before Start game.
+- [x] The seat rows show the speaker ★, and an admin device moves the
+      token with a tap before Start game, through the edit command.
+- [x] The dialog starts with an empty name field for a default name, and
+      keeps the default when the field stays empty.
+- [x] The seat rows share their columns, as the setup rows do, with the
+      ported styles of the mockup.
+- [x] The lobby foot lists the seats with commas, and Random factions is a
+      small button under the line.
+- [x] Smoke test with two browsers, as in milestone 4. Evidence:
+      `.context/lobby-seat-edits/smoke/README-2.md`.
+
+## Milestone 8: Verification, commit, review, and pull request
+
+- [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
+      Evidence: `.context/lobby-seat-edits/gate-3.log`.
+- [x] Commit with Conventional Commits and push the branch.
+- [ ] Review the diff of milestones 6 and 7 against `origin/main` with the
+      `implementation-review` skill after the push. Report the findings,
+      then apply the review-fix rule: fix the `Auto-fix: yes` findings,
+      re-review once, and report the rest.
+- [ ] Update the description of PR #36.
 
 ## Post-merge follow-up (non-blocking)
 

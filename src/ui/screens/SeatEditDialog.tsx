@@ -1,16 +1,21 @@
 import { useState } from 'react'
+import { cleanName } from '../../model/seats'
 import type { Expansions } from '../../model/settings'
 import type { Seat, SeatValues } from '../../model/types'
 import { Dialog, Toggle } from '../controls'
-import { sameValues, seatProblem, valuesOf } from '../seatText'
+import { isDefaultName, sameValues, seatProblem, valuesOf } from '../seatText'
 import { SeatFields } from './SeatFields'
 
 /**
- * The dialog that edits one seat: the fields of a setup row, and before
- * Start game on an admin device the speaker token. Save applies the change
- * at once on every device.
+ * The dialog of one seat, with the fields of a setup row. From Players &
+ * devices it edits the seat, with Save, and before Start game on an admin
+ * device the speaker token. From the claim screen it takes the seat, with
+ * Take seat. A seat that still has the default name of Setup starts with an
+ * empty name field and the default as its hint, and an empty field keeps
+ * the default.
  */
 export function SeatEditDialog(props: {
+  kind: 'edit' | 'claim'
   seat: Seat
   seats: readonly Seat[]
   /** The place of the seat in the ring, from 1. */
@@ -27,12 +32,25 @@ export function SeatEditDialog(props: {
   onSave: (values: SeatValues, speaker: boolean) => void
   onCancel: () => void
 }) {
-  const { seat } = props
-  const [values, setValues] = useState<SeatValues>(() => valuesOf(seat))
+  const { seat, kind } = props
+  const hint = isDefaultName(seat.name) ? seat.name : null
+  const [values, setValues] = useState<SeatValues>(() => ({
+    ...valuesOf(seat),
+    name: hint === null ? seat.name : '',
+  }))
   const [speaker, setSpeaker] = useState(props.speaker)
-  const problem = seatProblem(props.seats, seat, values, props.takes)
+  // An empty field keeps the default name.
+  const saved: SeatValues = {
+    ...values,
+    name: cleanName(values.name) ?? hint ?? '',
+  }
+  const problem =
+    seatProblem(props.seats, seat, saved, props.takes) ??
+    (kind === 'claim' && !props.started && saved.factionId === null
+      ? 'Pick a faction to take the seat.'
+      : null)
   const gives = speaker && !props.speaker
-  const changed = !sameValues(seat, values) || gives
+  const changed = kind === 'claim' || !sameValues(seat, saved) || gives
 
   return (
     <Dialog
@@ -43,6 +61,7 @@ export function SeatEditDialog(props: {
             seat={seat}
             seats={props.seats}
             values={values}
+            hint={hint}
             expansions={props.expansions}
             takes={props.takes}
             started={props.started}
@@ -70,17 +89,19 @@ export function SeatEditDialog(props: {
         </>
       }
       confirm={{
-        label: 'Save',
+        label: kind === 'claim' ? 'TAKE SEAT' : 'Save',
         disabled: !props.connected || problem !== null || !changed,
-        onConfirm: () => props.onSave(values, gives),
+        onConfirm: () => props.onSave(saved, gives),
       }}
       onCancel={props.onCancel}
     >
       {props.started
         ? `Seat ${props.place}. Only the name changes after Start game.`
-        : props.takes
-          ? `Seat ${props.place}. A colour or a faction that another seat holds moves here, and that seat picks again.`
-          : `Seat ${props.place}. Pick a colour and a faction that no other seat holds.`}
+        : kind === 'claim'
+          ? `Seat ${props.place}. Check the name, the colour, and the faction, then take the seat.`
+          : props.takes
+            ? `Seat ${props.place}. A colour or a faction that another seat holds moves here, and that seat picks again.`
+            : `Seat ${props.place}. Pick a colour and a faction that no other seat holds.`}
     </Dialog>
   )
 }

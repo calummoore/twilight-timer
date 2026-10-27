@@ -85,6 +85,8 @@ export function SeatFields(props: {
   seat: Seat
   seats: readonly Seat[]
   values: SeatValues
+  /** The default name of the seat, as the hint of an empty name field. */
+  hint?: string | null
   expansions: Expansions
   /** This device takes a value that another seat holds, as an admin does. */
   takes: boolean
@@ -110,6 +112,7 @@ export function SeatFields(props: {
         id={`name-${seat.id}`}
         className="fld name"
         value={values.name}
+        placeholder={props.hint ?? undefined}
         maxLength={40}
         onChange={(e) => change({ name: e.target.value })}
       />

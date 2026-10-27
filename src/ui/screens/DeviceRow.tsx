@@ -7,8 +7,9 @@ import { seatFaction } from '../seatText'
 
 /**
  * One row of Players & devices: a seat with the device that holds it, a seat
- * without a device, or a table device. A seat row has Edit when this device
- * may edit the seat, and the drag handle when this device may move it.
+ * without a device, or a table device. A seat row shows the speaker token,
+ * has Edit when this device may edit the seat, and the drag handle when
+ * this device may move it.
  */
 export function DeviceRow(props: {
   /** The seat of the row, or undefined for a table device. */
@@ -19,6 +20,10 @@ export function DeviceRow(props: {
   /** The admin switch shows, but this device may not use it. */
   locked: boolean
   onAdmin: (admin: boolean) => void
+  /** The seat holds the speaker token. A table device has no token. */
+  speaker?: boolean
+  /** A tap gives the seat the speaker token. Without it, the token only shows. */
+  onSpeaker?: () => void
   onEdit?: () => void
   /** A press on the handle, which can start a drag of the seat. */
   onGrip?: (e: PointerEvent<HTMLElement>) => void
@@ -72,6 +77,21 @@ export function DeviceRow(props: {
           )}
         </div>
       </div>
+      {seat && (
+        <button
+          className={`spk ${props.speaker ? 'on' : ''}`}
+          aria-label={
+            props.speaker
+              ? `${name} is the speaker`
+              : `Make ${name} the speaker`
+          }
+          aria-pressed={props.speaker}
+          disabled={!props.onSpeaker || props.speaker}
+          onClick={props.onSpeaker}
+        >
+          ★
+        </button>
+      )}
       {device ? (
         device.connected ? (
           <div className="st ok">● Connected</div>

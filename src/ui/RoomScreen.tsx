@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import type { RecentGame } from '../model/device-store'
+import { foldGame } from '../model/fold'
 import { NOTICES, type Command } from '../model/protocol'
 import { ringOf } from '../model/ring'
 import { mayCommand } from '../model/rights'
@@ -156,7 +157,9 @@ export function RoomScreen(props: {
       admin={!!device?.admin}
       adminsAway={away}
       expansions={room.setup.expansions}
-      speakerId={room.setup.speakerId}
+      speakerId={
+        room.game ? foldGame(room.game).speakerId : room.setup.speakerId
+      }
       mayAdmin={mayAdmin}
       onAdmin={(deviceId, on) => send(adminCommand(deviceId, on))}
       mayEdit={mayEdit}

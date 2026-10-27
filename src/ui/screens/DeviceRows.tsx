@@ -9,9 +9,11 @@ import { DeviceRow } from './DeviceRow'
  * One row per seat with the device that holds it, then the table devices.
  * Every row has the admin switch of its device. A switch is on only where
  * the rights allow the change, and the last admin keeps its switch on. A
- * seat row has Edit when this device may edit the seat. Before Start game,
- * an admin device drags a seat row by its handle to the place of another,
- * and the rows between shift by one.
+ * seat row has Edit when this device may edit the seat, and the speaker
+ * token, which an admin device moves with a tap before Start game. Before
+ * Start game, an admin device also drags a seat row by its handle to the
+ * place of another, and the rows between shift by one. The rows of a list
+ * share their columns, so Edit and the switches line up.
  */
 export function DeviceRows(props: {
   players: Seat[]
@@ -23,9 +25,11 @@ export function DeviceRows(props: {
   /** Whether this device may edit the seat now. */
   mayEdit: (playerId: string) => boolean
   onEdit: (playerId: string) => void
-  /** This device may move seats now. */
+  /** This device may move seats and the speaker token now. */
   mayMove: boolean
   onMove: (playerId: string, toId: string) => void
+  speakerId: string
+  onSpeaker: (playerId: string) => void
 }) {
   const { players, devices } = props
   const holder = (id: string) => devices.find((d) => d.seat === id)
@@ -59,7 +63,10 @@ export function DeviceRows(props: {
       <div className="setup-label">
         Seats and devices · {held} of {players.length} seats have a device
       </div>
-      <div className={`dev-list ${dragging ? 'dragging' : ''}`} {...drag.scope}>
+      <div
+        className={`dev-list ${props.mayMove ? 'grips' : ''} ${dragging ? 'dragging' : ''}`}
+        {...drag.scope}
+      >
         {players.map((p) => {
           const device = holder(p.id)
           return (
@@ -70,6 +77,10 @@ export function DeviceRows(props: {
               you={!!device && device.id === props.you}
               locked={!device || locked(device)}
               onAdmin={(on) => device && props.onAdmin(device.id, on)}
+              speaker={p.id === props.speakerId}
+              onSpeaker={
+                props.mayMove ? () => props.onSpeaker(p.id) : undefined
+              }
               onEdit={
                 props.mayEdit(p.id) ? () => props.onEdit(p.id) : undefined
               }
@@ -85,16 +96,18 @@ export function DeviceRows(props: {
           <div className="setup-label" style={{ marginTop: 18 }}>
             Table devices
           </div>
-          {tables.map((device) => (
-            <DeviceRow
-              key={device.id}
-              seat={undefined}
-              device={device}
-              you={device.id === props.you}
-              locked={locked(device)}
-              onAdmin={(on) => props.onAdmin(device.id, on)}
-            />
-          ))}
+          <div className="dev-list tables">
+            {tables.map((device) => (
+              <DeviceRow
+                key={device.id}
+                seat={undefined}
+                device={device}
+                you={device.id === props.you}
+                locked={locked(device)}
+                onAdmin={(on) => props.onAdmin(device.id, on)}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
