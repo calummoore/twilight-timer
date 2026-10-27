@@ -101,6 +101,29 @@ describe('rights of a seated device', () => {
     expect(mayAct(HOST, { kind: 'voteCast' }, view)).toBe(true)
   })
 
+  it('edits its own seat, and leaves the other seats to admin devices', () => {
+    const values = { name: 'Jaz', colour: 'blue', factionId: 'sol' } as const
+    const own: Command = { type: 'edit', playerId: 'jaz', values }
+    const other: Command = { type: 'edit', playerId: 'kira', values }
+    expect(mayCommand(phone('jaz'), own, null)).toBe(true)
+    expect(mayCommand(phone('jaz'), other, null)).toBe(false)
+    expect(mayCommand(phone('jaz'), { ...own, speaker: true }, null)).toBe(
+      false,
+    )
+    expect(mayCommand(VIEWER, own, null)).toBe(false)
+    expect(mayCommand(undefined, own, null)).toBe(false)
+    expect(mayCommand(HOST, other, null)).toBe(true)
+    expect(mayCommand(HOST, { ...own, speaker: true }, null)).toBe(true)
+    const lobby: Command[] = [
+      { type: 'moveSeat', playerId: 'jaz', toId: 'kira' },
+      { type: 'deal' },
+    ]
+    for (const command of lobby) {
+      expect(mayCommand(phone('jaz'), command, null)).toBe(false)
+      expect(mayCommand(HOST, command, null)).toBe(true)
+    }
+  })
+
   it('leaves the shared taps to admin devices', () => {
     const view = actionTable().view()
     const shared: ActionInput[] = [

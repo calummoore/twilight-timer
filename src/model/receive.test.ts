@@ -106,4 +106,16 @@ describe('what the server does with a request that creates a game', () => {
     const noToken = { build: BUILD, setup: SETUP }
     expect(receiveCreate(noToken, BUILD)).toEqual({ type: 'invalid' })
   })
+
+  it('answers invalid when two seats share a name, from any build', () => {
+    const players = SETUP.players.map((p) =>
+      p.id === 'wren' ? { ...p, name: ' sam ' } : p,
+    )
+    const twins = { ...SETUP, players }
+    for (const build of [BUILD, OLD_BUILD, undefined]) {
+      expect(receiveCreate(create(build, twins), BUILD)).toEqual({
+        type: 'invalid',
+      })
+    }
+  })
 })

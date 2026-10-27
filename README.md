@@ -197,6 +197,9 @@ versions.
     and the expansion of each faction.
   - `deal.ts`: the factions in play for the chosen expansions, the choices
     of one seat, and the random deal for the empty seats.
+  - `seats.ts`: the rules of the seats before Start game: unique names, a
+    free or taken colour and faction, the first free colour, a seat move
+    with `list-move.ts`, the deal of the lobby, and the seats as players.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
     `fold-orders.ts` finds who acts next, `fold-removal.ts` takes out a
     player who leaves, and `fold-seats.ts` moves a seat on the ring.
@@ -224,14 +227,16 @@ versions.
     last-admin rule.
   - `rights.ts`: who may tap what. The server and the screens call it.
   - `protocol.ts`: the messages between a device and the server, with their
-    parsers. Every message from the server, and the hello of a page, names
-    its build first.
+    parsers. `parse-command.ts` reads each command. Every message from the
+    server, and the hello of a page, names its build first.
   - `receive.ts`: what the server does with each message of a device: a
     hello or a command of another build gets the outdated message. It also
     reads Create game: the server creates every game whose setup it can
     read, and answers outdated when it cannot read the setup of another
     build.
   - `room.ts` and `setup.ts`: one game on the server and its reducer.
+    `room-seats.ts` applies the commands that change the seats: a claim
+    with values, an edit, a seat move, the deal, and Start game.
     `room-storage.ts` reads its stored shape, with the upgrade chain of the
     room, into no room, a room, or a room that cannot be read.
   - `fixtures/`: the stored shapes of game version 6 and room versions 1

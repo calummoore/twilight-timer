@@ -1,23 +1,35 @@
 import { parseCode } from './code'
 import { parseDevice, parseToken, type Device } from './devices'
 import { parseGame } from './parse'
+import { parseCommand } from './parse-command'
 import { isFields, isNumber, listOf } from './parse-fields'
-import { parseActionInput, parseLimits } from './parse-parts'
 import { parseSetup, type Setup } from './setup'
-import {
-  PAUSE_REASONS,
-  type ActionInput,
-  type Game,
-  type Limits,
-  type PauseReason,
+import type {
+  ActionInput,
+  Game,
+  Limits,
+  PauseReason,
+  SeatValues,
 } from './types'
 
 /** The messages between a device and the game on the server. */
 
 /** A change that a device asks the game for. */
 export type Command =
-  /** Takes a seat, or joins as a table device with a null seat. */
-  | { type: 'claim'; seat: string | null }
+  /**
+   * Takes a seat, or joins as a table device with a null seat. With
+   * `values`, the seat gets them in the same step, under the seat rules.
+   */
+  | { type: 'claim'; seat: string | null; values?: SeatValues }
+  /**
+   * Gives a seat new values, under the seat rules. With `speaker`, the
+   * player also gets the speaker token, before Start game.
+   */
+  | { type: 'edit'; playerId: string; values: SeatValues; speaker?: true }
+  /** Moves a seat to the place of another, before Start game. */
+  | { type: 'moveSeat'; playerId: string; toId: string }
+  /** Gives each seat without a faction a random faction, before Start game. */
+  | { type: 'deal' }
   | { type: 'admin'; deviceId: string; admin: boolean }
   | { type: 'start' }
   | { type: 'act'; input: ActionInput }
@@ -116,44 +128,6 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
   if (raw.type !== 'command' || !isRevision(raw.rev)) return null
   const command = parseCommand(raw.command)
   return command && { type: 'command', rev: raw.rev, command }
-}
-
-function parseCommand(raw: unknown): Command | null {
-  if (!isFields(raw)) return null
-  switch (raw.type) {
-    case 'claim':
-      return raw.seat === null || typeof raw.seat === 'string'
-        ? { type: raw.type, seat: raw.seat }
-        : null
-    case 'admin':
-      return typeof raw.deviceId === 'string' && typeof raw.admin === 'boolean'
-        ? { type: raw.type, deviceId: raw.deviceId, admin: raw.admin }
-        : null
-    case 'act': {
-      const input = parseActionInput(raw.input)
-      return input && { type: raw.type, input }
-    }
-    case 'pauseReason': {
-      const reason = PAUSE_REASONS.find((r) => r === raw.reason) ?? null
-      return reason !== null || raw.reason === null
-        ? { type: raw.type, reason }
-        : null
-    }
-    case 'limits': {
-      const limits = parseLimits(raw.limits)
-      const { enforceLimits } = raw
-      return limits && typeof enforceLimits === 'boolean'
-        ? { type: raw.type, enforceLimits, limits }
-        : null
-    }
-    case 'start':
-    case 'undo':
-    case 'pause':
-    case 'resume':
-      return { type: raw.type }
-    default:
-      return null
-  }
 }
 
 export function parseServerMessage(raw: unknown): ServerMessage | null {

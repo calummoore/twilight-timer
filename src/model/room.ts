@@ -1,23 +1,22 @@
-import {
-  act,
-  pause,
-  resume,
-  setLimits,
-  setPauseReason,
-  startGame,
-  undo,
-} from './commands'
+import { act, pause, resume, setLimits, setPauseReason, undo } from './commands'
+import type { Random } from './deal'
 import { derive } from './derive'
 import {
   adminsAway,
   memberOf,
   publicDevice,
   setAdmin,
-  takeSeat,
   type Member,
 } from './devices'
 import type { Command, RoomState, ServerMessage } from './protocol'
 import { mayCommand } from './rights'
+import {
+  applyClaim,
+  applyDeal,
+  applyEdit,
+  applyMove,
+  applyStart,
+} from './room-seats'
 import type { Setup } from './setup'
 import type { Game } from './types'
 
@@ -27,7 +26,7 @@ import type { Game } from './types'
  * `room-storage.ts` reads.
  */
 export interface Room {
-  version: 2
+  version: 3
   code: string
   /** Grows with every change, so that a tap on an older state does nothing. */
   revision: number
@@ -59,7 +58,7 @@ export type Outcome = { room: Room } | { rejected: Rejection }
  */
 export function newRoom(code: string, setup: Setup, token: string): Room {
   return {
-    version: 2,
+    version: 3,
     code,
     revision: 0,
     setup,
@@ -71,9 +70,10 @@ export function newRoom(code: string, setup: Setup, token: string): Room {
 
 /**
  * Applies a command from the device of `token` at server time `now`.
- * `connected` holds the tokens of the devices that have a connection now.
- * The command must name the current revision, the device must have the
- * right, and the command must change the room.
+ * `connected` holds the tokens of the devices that have a connection now,
+ * and `random` is the random source of the server, for the deal. The
+ * command must name the current revision, the device must have the right,
+ * and the command must change the room.
  */
 export function applyCommand(
   room: Room,
@@ -82,6 +82,7 @@ export function applyCommand(
   command: Command,
   now: number,
   connected: ReadonlySet<string>,
+  random: Random,
 ): Outcome {
   if (rev !== room.revision) return { rejected: 'stale' }
   const device = memberOf(room.members, token)
@@ -90,7 +91,7 @@ export function applyCommand(
   if (!mayCommand(device, command, view, away)) {
     return { rejected: 'forbidden' }
   }
-  const next = change(room, token, command, now)
+  const next = change(room, token, command, now, random)
   return next
     ? { room: { ...next, revision: room.revision + 1 } }
     : { rejected: 'invalid' }
@@ -101,30 +102,26 @@ function change(
   token: string,
   command: Command,
   now: number,
+  random: Random,
 ): Room | null {
   const { game } = room
   switch (command.type) {
-    case 'claim': {
-      const { seat } = command
-      if (seat !== null && !room.setup.players.some((p) => p.id === seat)) {
-        return null
-      }
-      const device = memberOf(room.members, token)
-      if (device && device.seat === seat) return null
-      // The device that created the game joins with admin.
-      const creator = token === room.creator
-      const members = takeSeat(room.members, token, seat, creator)
-      return { ...room, members, creator: creator ? null : room.creator }
+    case 'claim':
+      return applyClaim(room, token, command.seat, command.values)
+    case 'edit': {
+      const { playerId, values, speaker } = command
+      return applyEdit(room, token, playerId, values, speaker === true)
     }
+    case 'moveSeat':
+      return applyMove(room, command.playerId, command.toId)
+    case 'deal':
+      return applyDeal(room, random)
     case 'admin': {
       const members = setAdmin(room.members, command.deviceId, command.admin)
       return members && { ...room, members }
     }
-    case 'start': {
-      if (game) return null
-      const { players, speakerId } = room.setup
-      return { ...room, game: startGame(players, speakerId, room.setup, now) }
-    }
+    case 'start':
+      return applyStart(room, now)
     case 'limits': {
       const { enforceLimits, limits } = command
       if (!game)

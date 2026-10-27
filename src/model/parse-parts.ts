@@ -1,6 +1,7 @@
-import { isFactionId } from './factions'
+import { EXPANSIONS, isFactionId } from './factions'
 import { isFields, isNumber } from './parse-fields'
 import { COLOURS, type Colour } from './rules'
+import { DEFAULT_EXPANSIONS, type Expansions } from './settings'
 import {
   PAUSE_REASONS,
   TIMER_KEYS,
@@ -12,17 +13,44 @@ import {
   type Pause,
   type Player,
   type ReasonRange,
+  type Seat,
+  type SeatValues,
 } from './types'
 
 /** Parsers for the parts of a game: players, actions, pauses, and limits. */
 
 export function parsePlayer(raw: unknown): Player | null {
+  const seat = parseSeat(raw)
+  if (!seat || seat.factionId === null) return null
+  return { ...seat, factionId: seat.factionId }
+}
+
+/** A seat of the setup, which can still lack a faction. */
+export function parseSeat(raw: unknown): Seat | null {
+  const values = parseSeatValues(raw)
+  if (!values || !isFields(raw) || typeof raw.id !== 'string') return null
+  return { id: raw.id, ...values }
+}
+
+export function parseSeatValues(raw: unknown): SeatValues | null {
   if (!isFields(raw)) return null
-  const { id, name, colour, factionId } = raw
+  const { name, colour, factionId } = raw
   const c: Colour | undefined = COLOURS.find((x) => x === colour)
-  if (typeof id !== 'string' || typeof name !== 'string' || !c) return null
-  if (!isFactionId(factionId)) return null
-  return { id, name, colour: c, factionId }
+  if (typeof name !== 'string' || !c) return null
+  if (factionId !== null && !isFactionId(factionId)) return null
+  return { name, colour: c, factionId }
+}
+
+/** The expansions of a game: one on/off value for each. */
+export function parseExpansions(raw: unknown): Expansions | null {
+  if (!isFields(raw)) return null
+  const out = { ...DEFAULT_EXPANSIONS }
+  for (const { id } of EXPANSIONS) {
+    const on = raw[id]
+    if (typeof on !== 'boolean') return null
+    out[id] = on
+  }
+  return out
 }
 
 export function parseAction(raw: unknown): Action | null {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { REFRESH_MS } from '../../model/connection'
 import type { DeviceView } from '../../model/protocol'
-import type { Player } from '../../model/types'
+import type { Seat } from '../../model/types'
 import { NetBar } from '../controls'
 import { DeviceRows } from './DeviceRows'
 import { JoinCode } from './JoinCode'
@@ -16,7 +16,7 @@ export function PlayersScreen(props: {
   /** The round, or null in the lobby. */
   round: number | null
   /** The seats in clockwise order, as the seat moves of the game left them. */
-  players: Player[]
+  players: Seat[]
   devices: DeviceView[]
   you: string | null
   connected: boolean

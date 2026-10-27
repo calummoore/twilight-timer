@@ -1,7 +1,7 @@
 import { isLastAdmin } from '../../model/devices'
-import { factionName } from '../../model/factions'
+import { seatFaction } from '../seatText'
 import type { DeviceView } from '../../model/protocol'
-import type { Player } from '../../model/types'
+import type { Seat } from '../../model/types'
 import { pc } from '../colour'
 import { Toggle } from '../controls'
 
@@ -11,7 +11,7 @@ import { Toggle } from '../controls'
  * the rights allow the change, and the last admin keeps its switch on.
  */
 export function DeviceRows(props: {
-  players: Player[]
+  players: Seat[]
   devices: DeviceView[]
   you: string | null
   /** Whether this device may switch the admin of a device on or off now. */
@@ -22,7 +22,7 @@ export function DeviceRows(props: {
   const holder = (id: string) => devices.find((d) => d.seat === id)
   const held = players.filter((p) => holder(p.id)).length
   const tables = devices.filter((d) => d.seat === null)
-  const row = (device: DeviceView, player?: Player) => (
+  const row = (device: DeviceView, player?: Seat) => (
     <DeviceRow
       key={device.id}
       device={device}
@@ -50,7 +50,7 @@ export function DeviceRows(props: {
             <i />
             <div>
               <div className="nm">{p.name}</div>
-              <div className="fc">{factionName(p.factionId)}</div>
+              <div className="fc">{seatFaction(p)}</div>
             </div>
             <div className="st no">No device</div>
             <div className="adm" />
@@ -72,7 +72,7 @@ export function DeviceRows(props: {
 function DeviceRow(props: {
   device: DeviceView
   /** The player of the seat, or undefined for a table device. */
-  player: Player | undefined
+  player: Seat | undefined
   you: boolean
   /** The switch shows, but this device may not use it. */
   locked: boolean
@@ -80,7 +80,7 @@ function DeviceRow(props: {
 }) {
   const { device, player } = props
   const about = player
-    ? factionName(player.factionId)
+    ? seatFaction(player)
     : device.admin
       ? 'Acts for every player'
       : 'Watches the game'

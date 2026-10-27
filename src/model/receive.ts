@@ -1,4 +1,5 @@
 import { isFields } from './parse-fields'
+import { sharedName } from './seats'
 import {
   buildOf,
   parseClientMessage,
@@ -81,10 +82,14 @@ export type CreateReceipt =
  * every game whose setup it can read, also from a page of another build,
  * which reloads when it opens the game. When the server cannot read the
  * setup of a page of another build, or of a page that names no build, the
- * answer is outdated, so that the page reloads once to get this build.
+ * answer is outdated, so that the page reloads once to get this build. A
+ * setup in which two seats share a name is invalid, as the seat rules say.
  */
 export function receiveCreate(raw: unknown, build: string): CreateReceipt {
   const request = parseCreateRequest(raw)
+  if (request && sharedName(request.setup.players) !== null) {
+    return { type: 'invalid' }
+  }
   if (request) return { type: 'create', ...request }
   return buildOf(raw) === build ? { type: 'invalid' } : { type: 'outdated' }
 }

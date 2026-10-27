@@ -3,6 +3,7 @@ import { parseMember, parseToken } from './devices'
 import { parseGame } from './parse'
 import { isFields, listOf, type Fields } from './parse-fields'
 import type { Room } from './room'
+import { DEFAULT_EXPANSIONS } from './settings'
 import { parseSetup } from './setup'
 
 /**
@@ -33,7 +34,7 @@ export function readRoom(raw: unknown): StoredRoom {
  */
 export function parseRoom(raw: unknown): Room | null {
   const room = isFields(raw) ? upgrade(raw) : null
-  if (room?.version !== 2) return null
+  if (room?.version !== 3) return null
   const code = typeof room.code === 'string' ? parseCode(room.code) : null
   const setup = parseSetup(room.setup)
   const game = room.game === null ? null : parseGame(room.game)
@@ -46,7 +47,7 @@ export function parseRoom(raw: unknown): Room | null {
     return null
   }
   if (revision < 0 || (game === null && room.game !== null)) return null
-  return { version: 2, code, revision, setup, game, members, creator }
+  return { version: 3, code, revision, setup, game, members, creator }
 }
 
 /**
@@ -59,6 +60,13 @@ function upgrade(raw: Fields): Fields {
     case 1:
       // The device that created a room of version 1 joined it at once.
       return upgrade({ ...raw, version: 2, creator: null })
+    case 2: {
+      // A room of version 2 kept the expansions on the device, so its lobby
+      // offers every faction.
+      const setup = isFields(raw.setup) ? raw.setup : {}
+      const expansions = { ...DEFAULT_EXPANSIONS }
+      return upgrade({ ...raw, version: 3, setup: { ...setup, expansions } })
+    }
     default:
       return raw
   }

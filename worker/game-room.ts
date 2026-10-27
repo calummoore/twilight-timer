@@ -5,6 +5,7 @@ import type { Notice, ServerMessage } from '../src/model/protocol'
 import { receive } from '../src/model/receive'
 import { applyCommand, stateMessage, type Room } from '../src/model/room'
 import { readRoom, type StoredRoom } from '../src/model/room-storage'
+import { random } from './random'
 
 /** The key of the room in the storage of the object. */
 const ROOM = 'room'
@@ -106,6 +107,7 @@ export class GameRoom extends DurableObject<Env> {
       received.command,
       now,
       this.connected(),
+      random,
     )
     if ('rejected' in out) {
       // The tap does nothing. The device gets the state again and re-renders.

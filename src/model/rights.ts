@@ -7,9 +7,11 @@ import type { GameView } from './view'
  * Whether a device may send a command, given the game at the time it
  * applies, or null in the lobby. Every device may take a seat or join as a
  * table device. An admin may send every command. A seated device without
- * admin acts for its player when the game waits for them, and a viewer only
- * takes a seat. While every admin device is away, a seated device may also
- * switch its own admin on. The server and the screens ask the same question.
+ * admin acts for its player when the game waits for them, edits its own
+ * seat, and a viewer only takes a seat. While every admin device is away, a
+ * seated device may also switch its own admin on. The server and the
+ * screens ask the same question. The seat rules of an edit, such as a free
+ * colour, are a question of the values, which the room reducer checks.
  */
 export function mayCommand(
   device: Device | undefined,
@@ -27,6 +29,9 @@ export function mayCommand(
       command.deviceId === device.id &&
       command.admin
     )
+  }
+  if (command.type === 'edit') {
+    return device.seat === command.playerId && !command.speaker
   }
   if (command.type !== 'act' || device.seat === null || !game) return false
   return mayActFor(device.seat, command.input, game)

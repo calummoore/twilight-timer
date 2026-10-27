@@ -1,7 +1,8 @@
+import type { Random } from './deal'
 import { derive } from './derive'
 import type { Command } from './protocol'
 import { applyCommand, newRoom, type Rejection, type Room } from './room'
-import { DEFAULT_LIMITS } from './settings'
+import { DEFAULT_EXPANSIONS, DEFAULT_LIMITS } from './settings'
 import type { Setup } from './setup'
 import { PICKS, PLAYERS, SEC, T0 } from './test-table'
 import type { ActionInput } from './types'
@@ -23,11 +24,18 @@ export const OLD_BUILD = '9f8e7d6'
 export const SETUP: Setup = {
   players: PLAYERS,
   speakerId: 'jaz',
+  expansions: DEFAULT_EXPANSIONS,
   enforceLimits: false,
   limits: DEFAULT_LIMITS,
 }
 
-export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
+/** The random source of the test server: always the first choice. */
+const FIRST: Random = () => 0
+
+export function server(
+  room: Room = newRoom(CODE, SETUP, HOST),
+  random = FIRST,
+) {
   let now = T0
   let current = room
   // The devices that have no connection. Every other device is connected,
@@ -65,6 +73,7 @@ export function server(room: Room = newRoom(CODE, SETUP, HOST)) {
         command,
         now,
         connected(token),
+        random,
       )
       if ('rejected' in out) return out.rejected
       current = out.room

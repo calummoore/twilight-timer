@@ -1,6 +1,6 @@
-import { factionName } from '../../model/factions'
+import { seatFaction } from '../seatText'
 import type { DeviceView } from '../../model/protocol'
-import type { Player } from '../../model/types'
+import type { Seat } from '../../model/types'
 import { pc } from '../colour'
 import { NetBar } from '../controls'
 
@@ -13,7 +13,7 @@ import { NetBar } from '../controls'
 export function ClaimScreen(props: {
   code: string
   /** The seats in clockwise order, as the seat moves of the game left them. */
-  players: Player[]
+  players: Seat[]
   devices: DeviceView[]
   /** This device, when it has joined the game. */
   device: DeviceView | undefined
@@ -75,7 +75,7 @@ export function ClaimScreen(props: {
                   <div>
                     <div className="nm">{p.name}</div>
                     <div className="fc">
-                      {factionName(p.factionId)} · Seat {i + 1}
+                      {seatFaction(p)} · Seat {i + 1}
                     </div>
                   </div>
                   <div className={`tk ${held && !you ? 'held' : ''}`}>

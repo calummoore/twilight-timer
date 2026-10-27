@@ -202,30 +202,30 @@ and phone frames, with the notes of each screen.
 The rules live in `src/model/`, where the tests reach them, and `worker/`
 stays thin.
 
-- [ ] The setup carries the expansions and seats with a faction or none,
+- [x] The setup carries the expansions and seats with a faction or none,
       with the seat type and its parser. The room version becomes 3, with
       the upgrade step from version 2 in the room chain, which reads with
       every expansion on. Start game turns the seats into players.
-- [ ] A test reads the fixture `room-v2.json` as a room of version 3 with
+- [x] A test reads the fixture `room-v2.json` as a room of version 3 with
       every expansion on, as `AGENTS.md` says under Stored shapes and
       versions. The fixture of the old shape exists, so no capture.
-- [ ] A seat rules module: the name key, the free values of a seat, take
+- [x] A seat rules module: the name key, the free values of a seat, take
       a value for an admin device with the first free colour, the move to a
       Seat number, the speaker, the deal for the empty seats, and the
       problems of a setup.
-- [ ] Protocol: the claim command with the values of the seat, the edit
+- [x] Protocol: the claim command with the values of the seat, the edit
       command, the deal command, and the seat move command of the lobby,
       with their parsers.
-- [ ] Rights: edit for an admin device or for the own seat of a seated
+- [x] Rights: edit for an admin device or for the own seat of a seated
       device, and deal for an admin device.
-- [ ] Room: the claim and edit cases with the rules of the device, also
+- [x] Room: the claim and edit cases with the rules of the device, also
       for the device that created the game, Start game that waits for every
       faction, a rename that updates the game, and the deal with the random
       source that the reducer takes next to the clock and the connections.
-- [ ] Worker: the create reading of the model rejects a setup that breaks
+- [x] Worker: the create reading of the model rejects a setup that breaks
       the seat rules, and the object passes the secure random source of the
       Worker to the deal.
-- [ ] Tests: the seat rules, the room cases for an admin device and for a
+- [x] Tests: the seat rules, the room cases for an admin device and for a
       seated device before and after Start game, the rights, the parsers,
       and the rooms of version 1 and 2 that still load.
 

@@ -5,6 +5,7 @@ import roomV1 from './fixtures/room-v1.json'
 import roomV2 from './fixtures/room-v2.json'
 import { parseGame } from './parse'
 import { parseRoom } from './room-storage'
+import { DEFAULT_EXPANSIONS } from './settings'
 import { postGameStats } from './stats'
 import { MIN, SEC } from './test-table'
 import type { Game } from './types'
@@ -58,7 +59,9 @@ describe('the stored shapes of older builds', () => {
 
   it('reads a room of version 2 with its game and its devices', () => {
     const room = parseRoom(roomV2)
-    expect(room).toMatchObject({ version: 2, revision: 63, creator: null })
+    expect(room).toMatchObject({ version: 3, revision: 63, creator: null })
+    // The build of version 2 kept the expansions on the device.
+    expect(room?.setup.expansions).toEqual(DEFAULT_EXPANSIONS)
     expect(room?.members.map((m) => [m.seat, m.admin])).toEqual([
       [null, true],
       ['jaz', false],
@@ -69,8 +72,9 @@ describe('the stored shapes of older builds', () => {
 
   it('reads a room of version 1 in the newest shape', () => {
     const room = parseRoom(roomV1)
-    expect(room).toMatchObject({ version: 2, revision: 62, creator: null })
+    expect(room).toMatchObject({ version: 3, revision: 62, creator: null })
     expect(room?.members).toEqual(parseRoom(roomV2)?.members)
+    expect(room?.setup).toEqual(parseRoom(roomV2)?.setup)
     expect(clocksOf(room?.game)).toEqual(CLOCKS)
   })
 

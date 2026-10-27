@@ -25,7 +25,8 @@ export function SetupRoute(props: {
 
   const create = async (players: Player[], speakerId: string) => {
     setCreating(true)
-    const setup = { players, speakerId, enforceLimits, limits }
+    const { expansions } = props.settings
+    const setup = { players, speakerId, expansions, enforceLimits, limits }
     const created = await createGame({
       token: props.token,
       build: BUILD,
