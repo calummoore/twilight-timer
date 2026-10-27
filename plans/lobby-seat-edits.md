@@ -290,8 +290,9 @@ Tags: ui
   - 4. Upgrade step reads a live default. Severity Low, effort Small.
     Recommended: A, a literal in the version 2 to 3 step.
   - 5. No test takes a colour and a faction from two seats. Severity Low,
-    effort Small. Recommended: B, an invariant helper and the two-holder
-    case.
+    effort Small. Cal chose B on 2026-10-27, as finding 6 of the report of
+    that day: an invariant helper for every seat-rule test and the
+    two-holder case, in `src/model/seats.test.ts`.
   - 6. "Sam is taken." reads as a held seat. Severity Low, effort Small.
     Recommended: B, one line builder for the name rule, shared by Setup
     and the seat fields.

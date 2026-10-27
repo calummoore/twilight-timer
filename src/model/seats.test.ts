@@ -20,6 +20,28 @@ const SEATS: Seat[] = PLAYERS.map((p) =>
 )
 const wren = { name: 'Wren', colour: 'orange', factionId: null } as const
 
+/**
+ * The seat rules that every edit keeps: the same seats in the same order,
+ * no two seats with one colour, no two seats with one faction, and every
+ * seat outside `changed` as it was. Returns the seats after the edit.
+ */
+function edited(
+  before: readonly Seat[],
+  after: readonly Seat[] | null,
+  changed: readonly string[],
+): Seat[] {
+  expect(after).not.toBeNull()
+  const seats = [...(after ?? [])]
+  expect(seats.map((s) => s.id)).toEqual(before.map((s) => s.id))
+  const colours = seats.map((s) => s.colour)
+  expect(new Set(colours).size).toBe(colours.length)
+  const factions = seats.flatMap((s) => s.factionId ?? [])
+  expect(new Set(factions).size).toBe(factions.length)
+  const kept = (s: Seat) => !changed.includes(s.id)
+  expect(seats.filter(kept)).toEqual(before.filter(kept))
+  return seats
+}
+
 describe('names', () => {
   it('compares names without spaces around them and in one case', () => {
     expect(nameKey('  Sam ')).toBe('sam')
@@ -38,19 +60,18 @@ describe('names', () => {
 
 describe('an edit of a seat', () => {
   it('takes a name, a free colour, and a free faction', () => {
-    const next = editSeat(
-      SEATS,
-      'wren',
-      { name: ' Ren ', colour: 'pink', factionId: 'argent' },
-      false,
-    )
-    expect(next?.find((s) => s.id === 'wren')).toEqual({
+    const values = {
+      name: ' Ren ',
+      colour: 'pink',
+      factionId: 'argent',
+    } as const
+    const next = edited(SEATS, editSeat(SEATS, 'wren', values, false), ['wren'])
+    expect(next.find((s) => s.id === 'wren')).toEqual({
       id: 'wren',
       name: 'Ren',
       colour: 'pink',
       factionId: 'argent',
     })
-    expect(next?.filter((s) => s.id !== 'wren')).toEqual(SEATS.slice(0, 5))
   })
 
   it('refuses an empty name, a taken name, and an unknown seat', () => {
@@ -69,33 +90,47 @@ describe('an edit of a seat', () => {
   })
 
   it('moves a taken colour and faction to the seat of an admin device', () => {
-    const next = editSeat(
-      SEATS,
+    const values = { ...wren, colour: 'blue', factionId: 'sol' } as const
+    const next = edited(SEATS, editSeat(SEATS, 'wren', values, true), [
+      'jaz',
       'wren',
-      { ...wren, colour: 'blue', factionId: 'sol' },
-      true,
-    )
-    expect(next?.find((s) => s.id === 'wren')).toMatchObject({
+    ])
+    expect(next.find((s) => s.id === 'wren')).toMatchObject({
       colour: 'blue',
       factionId: 'sol',
     })
     // Jaz held both: Jaz gets the first free colour, which Wren left, and
     // no faction.
-    expect(next?.find((s) => s.id === 'jaz')).toMatchObject({
+    expect(next.find((s) => s.id === 'jaz')).toMatchObject({
       colour: 'orange',
       factionId: null,
     })
-    expect(next?.filter((s) => !['jaz', 'wren'].includes(s.id))).toEqual(
-      SEATS.filter((s) => !['jaz', 'wren'].includes(s.id)),
-    )
+  })
+
+  it('takes a colour from one seat and a faction from another', () => {
+    const values = { ...wren, colour: 'blue', factionId: 'muaat' } as const
+    const next = edited(SEATS, editSeat(SEATS, 'wren', values, true), [
+      'jaz',
+      'kira',
+      'wren',
+    ])
+    expect(next.find((s) => s.id === 'wren')).toMatchObject(values)
+    // Jaz held the colour, and Kira the faction.
+    expect(next.find((s) => s.id === 'jaz')).toMatchObject({
+      colour: 'orange',
+      factionId: 'sol',
+    })
+    expect(next.find((s) => s.id === 'kira')).toMatchObject({
+      colour: 'red',
+      factionId: null,
+    })
   })
 
   it('keeps the own colour and faction of the seat', () => {
     const jaz = { name: 'Jaz', colour: 'blue', factionId: 'sol' } as const
-    expect(editSeat(SEATS, 'jaz', jaz, false)).toEqual(SEATS)
-    expect(sameSeats(editSeat(SEATS, 'jaz', jaz, false) ?? [], SEATS)).toBe(
-      true,
-    )
+    const next = edited(SEATS, editSeat(SEATS, 'jaz', jaz, false), [])
+    expect(next).toEqual(SEATS)
+    expect(sameSeats(next, SEATS)).toBe(true)
   })
 
   it('finds the first free colour', () => {
