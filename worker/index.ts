@@ -39,9 +39,10 @@ export default {
 const CODE_TRIES = 5
 
 /**
- * Creates a game from every setup that this build can read, also from a page
- * of another build. A page of another build whose setup this build cannot
- * read gets outdated, and reloads.
+ * Creates a game from every setup that this build can read and that keeps
+ * the seat rules, also from a page of another build. A page of another build
+ * whose setup this build cannot read, or in which two seats share a name,
+ * gets outdated, and reloads.
  */
 async function create(request: Request, env: Env): Promise<Response> {
   const body: unknown = await request.json().catch(() => null)

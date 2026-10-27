@@ -264,7 +264,22 @@ Tags: ui
 - [ ] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
-      re-review once, and report the rest.
+      re-review once, and report the rest. Review 1 of 2026-10-27:
+      `.context/lobby-seat-edits/review-1.md`, six Low findings, 1 and 2
+      fixed in 455fd73.
+  - 3. No bound on the length of a seat name. Severity Low, effort Small.
+    Recommended: A, reject a name over 40 characters in the parser.
+  - 4. Upgrade step reads a live default. Severity Low, effort Small.
+    Recommended: A, a literal in the version 2 to 3 step.
+  - 5. No test takes a colour and a faction from two seats. Severity Low,
+    effort Small. Recommended: B, an invariant helper and the two-holder
+    case.
+  - 6. "Sam is taken." reads as a held seat. Severity Low, effort Small.
+    Recommended: B, one line builder for the name rule, shared by Setup
+    and the seat fields.
+  - `src/styles/mockup/responsive.css`: 331 lines, over the 300-line
+    limit, as a word-for-word port of the mockup's container queries.
+    Separate branch.
 - [ ] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 

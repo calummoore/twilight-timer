@@ -72,9 +72,15 @@ export function receive(raw: unknown, build: string, caller: Caller): Receipt {
 
 export type CreateReceipt =
   | { type: 'create'; token: string; setup: Setup }
-  /** The server cannot read the setup of a page of another build. */
+  /**
+   * The server cannot read the setup of a page of another build, or two of
+   * its seats share a name.
+   */
   | { type: 'outdated' }
-  /** The server cannot read a request of its own build. */
+  /**
+   * The server cannot read a request of its own build, or two of its seats
+   * share a name.
+   */
   | { type: 'invalid' }
 
 /**
