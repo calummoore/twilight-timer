@@ -1,7 +1,7 @@
 # Seat edits in the lobby
 
-Status: Active. On branch `calummoore/player-lobby-setup-rules`, no pull
-request yet. The plan closes when its PR merges.
+Status: Active. [PR #36](https://github.com/calummoore/twilight-timer/pull/36)
+is open. The plan closes when its PR merges.
 
 Today the host types every name, colour, and faction on the Setup screen
 before anyone joins, and Create game waits for a faction on every seat. A
@@ -261,12 +261,14 @@ Tags: ui
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
       Evidence: `.context/lobby-seat-edits/gate-1.log`.
 - [x] Commit with Conventional Commits and push the branch.
-- [ ] Review the complete local diff against `origin/main` with the
+- [x] Review the complete local diff against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
       re-review once, and report the rest. Review 1 of 2026-10-27:
       `.context/lobby-seat-edits/review-1.md`, six Low findings, 1 and 2
-      fixed in 455fd73.
+      fixed in 455fd73. Review 2: `.context/lobby-seat-edits/review-2.md`,
+      both fixes correct, one comment gap fixed in c647607. Findings 3 to
+      6 of review 1 stay open below.
   - 3. No bound on the length of a seat name. Severity Low, effort Small.
     Recommended: A, reject a name over 40 characters in the parser.
   - 4. Upgrade step reads a live default. Severity Low, effort Small.
@@ -280,7 +282,7 @@ Tags: ui
   - `src/styles/mockup/responsive.css`: 331 lines, over the 300-line
     limit, as a word-for-word port of the mockup's container queries.
     Separate branch.
-- [ ] Open the pull request when every other milestone TODO is ticked.
+- [x] Open the pull request when every other milestone TODO is ticked.
       Put its link in the status paragraph.
 
 ## Post-merge follow-up (non-blocking)
