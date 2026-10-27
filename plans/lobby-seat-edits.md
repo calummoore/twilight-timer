@@ -337,11 +337,23 @@ Tags: ui
 - [x] Run the targeted tests and the complete gate named in `AGENTS.md`.
       Evidence: `.context/lobby-seat-edits/gate-3.log`.
 - [x] Commit with Conventional Commits and push the branch.
-- [ ] Review the diff of milestones 6 and 7 against `origin/main` with the
+- [x] Review the diff of milestones 6 and 7 against `origin/main` with the
       `implementation-review` skill after the push. Report the findings,
       then apply the review-fix rule: fix the `Auto-fix: yes` findings,
-      re-review once, and report the rest.
-- [ ] Update the description of PR #36.
+      re-review once, and report the rest. Review 3 of 2026-10-27:
+      `.context/lobby-seat-edits/review-3.md`, three Low findings, none
+      auto-fix, so no fix round.
+  - 1. The hint colour of the name field differs from the mockup. Severity
+    Low, effort Small. Recommended: C, one placeholder colour rule in the
+    base styles for every field.
+  - 2. The default-name rule lives in three places. Severity Low, effort
+    Medium. Recommended: B, the default name and its check in the seat
+    rules of the model, with tests.
+  - 3. One spec line is not wrapped. Severity Low, effort Small.
+    Recommended: A, wrap the paragraph.
+  - `docs/product/multiplayer.md:61` has 90 characters, from before this
+    branch. Separate branch.
+- [x] Update the description of PR #36.
 
 ## Post-merge follow-up (non-blocking)
 
