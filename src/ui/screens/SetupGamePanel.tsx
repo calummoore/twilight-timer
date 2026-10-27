@@ -16,8 +16,10 @@ export function SetupGamePanel(props: {
   speakerName: string
   /** The player with the Naalu faction, or null when nobody has it. */
   naaluName: string | null
-  /** A seat has no faction yet, so the game cannot begin. */
+  /** A seat has no faction yet. It gets one in the lobby, before Start game. */
   factionsMissing: boolean
+  /** The name that two seats share, which keeps Create game off, or null. */
+  nameTaken: string | null
   settings: Settings
   /** Create game waits for the server. */
   creating: boolean
@@ -117,13 +119,19 @@ export function SetupGamePanel(props: {
         </div>
         {props.factionsMissing && (
           <>
-            <div className="setup-need">
-              Pick a faction for every seat to create the game.
+            <div className="setup-note">
+              A seat without a faction gets one in the lobby, from its player or
+              from the host.
             </div>
             <button className="deal" onClick={props.onDeal}>
               Random factions for empty seats
             </button>
           </>
+        )}
+        {props.nameTaken !== null && (
+          <div className="setup-need">
+            Two seats are named {props.nameTaken}. Give each seat its own name.
+          </div>
         )}
         {props.failure === 'offline' && !props.creating && (
           <div className="setup-need">
@@ -147,7 +155,7 @@ export function SetupGamePanel(props: {
           <button
             className="big lg"
             style={{ width: '100%' }}
-            disabled={props.factionsMissing || props.creating}
+            disabled={props.nameTaken !== null || props.creating}
             onClick={props.onCreate}
           >
             {props.creating ? 'CREATING…' : 'CREATE GAME'}

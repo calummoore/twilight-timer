@@ -532,8 +532,13 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .seat-pick.you{border-color:var(--accent); background:#0a1a1c}
 .seat-pick.you .tk{color:var(--accent)}
 .seat-pick .fc.none, .dev-row .fc .none{color:var(--warn)}
-/* an open seat on the claim screen: the fields of the seat under its row, and Take seat. The edit dialog shares them. */
-.seat-pick{flex-wrap:wrap}
+/* an open seat on the claim screen: a tap on its head opens the fields of the seat under it, and Take seat. The edit
+   dialog shares the fields. */
+.seat-pick{flex-wrap:wrap; cursor:default}
+.seat-pick .head{display:flex; align-items:center; gap:13px; flex:1; min-width:0; background:none; border:0; padding:0;
+  color:inherit; font:inherit; text-align:left; cursor:pointer}
+.seat-pick .head:disabled{cursor:default}
+.seat-pick .fields + .fields{margin-top:12px; padding-top:0; border-top:none}
 .fields{display:grid; grid-template-columns:auto 1fr; gap:12px 14px; align-items:center}
 .seat-pick .fields{flex-basis:100%; margin-top:14px; padding-top:14px; border-top:1px solid var(--line)}
 .fields .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
@@ -2262,9 +2267,9 @@ const seatRow = (id, you, members=MEMBERS, {empty=[], open=null, running=false}=
     <div class="lbl">Faction</div>${running?`<div class="fixed">${P[id].f}</div>`:`<div class="fld sel fac ${pick?'':'none'}">${pick??'Faction'}</div>`}
     ${pick||running?'':'<div class="need">Pick a faction to take the seat.</div>'}
     <div class="btns"><button class="ibtn">Cancel</button><button class="big small" ${pick||running?'':'disabled'}>TAKE SEAT</button></div></div>`;
-  return `<div class="seat-pick ${you?'you':''} ${isOpen?'open':''}" style="${col(id)}"><i></i>
+  return `<div class="seat-pick ${you?'you':''} ${isOpen?'open':''}" style="${col(id)}"><button class="head"><i></i>
     <div><div class="nm">${P[id].name}</div><div class="fc ${none?'none':''}">${none?'No faction yet':P[id].f} · Seat ${P[id].seat}</div></div>
-    <div class="tk ${h&&!you?'held':''}">${you?'✓ You':h?(h.on?'Held · connected':'Held · away'):'Free'}</div>${fields}</div>`; };
+    <div class="tk ${h&&!you?'held':''}">${you?'✓ You':h?(h.on?'Held · connected':'Held · away'):'Free'}</div></button>${fields}</div>`; };
 // `admin`: the device is an admin, or gets admin when it joins, as the device that created the game does. `members`:
 // the devices that hold seats now. `me`: the seat of this device, or null. `empty`, `open`, `running`: see seatRow.
 const claimScreen = ({admin=false, members=MEMBERS, me='jaz', empty=[], open=null, running=false}={}) => `<div class="space"></div><div class="lay">

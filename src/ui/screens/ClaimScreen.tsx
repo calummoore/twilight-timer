@@ -1,33 +1,84 @@
-import { seatFaction } from '../seatText'
+import { useState } from 'react'
 import type { DeviceView } from '../../model/protocol'
-import type { Seat } from '../../model/types'
+import type { Expansions } from '../../model/settings'
+import type { Seat, SeatValues } from '../../model/types'
 import { pc } from '../colour'
 import { NetBar } from '../controls'
+import { seatFaction, seatProblem, valuesOf } from '../seatText'
+import { SeatFields } from './SeatFields'
+
+/** The seat that the device tapped, with the values in its fields. */
+interface Open {
+  id: string
+  values: SeatValues
+}
 
 /**
- * Which player this device is: one tap takes a seat, also one that another
- * device holds, or joins as a table device, which is a viewer until an admin
- * device gives it admin. The device that created the game joins here too,
- * with admin. It also changes the seat of a device in the game.
+ * Which player this device is. A tap on a seat opens its name, colour, and
+ * faction, and Take seat takes the seat with them, also a seat that another
+ * device holds. Or the device joins as a table device, which is a viewer
+ * until an admin device gives it admin. The device that created the game
+ * joins here too, with admin. It also changes the seat of a device in the
+ * game.
  */
 export function ClaimScreen(props: {
   code: string
-  /** The seats in clockwise order, as the seat moves of the game left them. */
   players: Seat[]
   devices: DeviceView[]
+  expansions: Expansions
+  /** The game has started, so only the name of a seat still changes. */
+  started: boolean
   /** This device, when it has joined the game. */
   device: DeviceView | undefined
   /**
    * This device is an admin, or gets admin when it joins, as the device that
-   * created the game does. So it acts for every player, also in a seat.
+   * created the game does. So it acts for every player, also in a seat, and
+   * it takes a colour or a faction that another seat holds.
    */
   admin: boolean
   connected: boolean
-  onSeat: (seat: string | null) => void
+  onSeat: (seat: string | null, values?: SeatValues) => void
   onCancel: () => void
 }) {
-  const { device } = props
+  const { device, players } = props
+  const [open, setOpen] = useState<Open | null>(null)
   const holder = (id: string) => props.devices.find((d) => d.seat === id)
+
+  const fields = (seat: Seat, values: SeatValues) => {
+    const problem =
+      seatProblem(players, seat, values, props.admin) ??
+      (!props.started && values.factionId === null
+        ? 'Pick a faction to take the seat.'
+        : null)
+    return (
+      <>
+        <SeatFields
+          seat={seat}
+          seats={players}
+          values={values}
+          expansions={props.expansions}
+          takes={props.admin}
+          started={props.started}
+          onChange={(next) => setOpen({ id: seat.id, values: next })}
+        />
+        <div className="fields">
+          {problem && <div className="need">{problem}</div>}
+          <div className="btns">
+            <button className="ibtn" onClick={() => setOpen(null)}>
+              Cancel
+            </button>
+            <button
+              className="big small"
+              disabled={!props.connected || problem !== null}
+              onClick={() => props.onSeat(seat.id, values)}
+            >
+              TAKE SEAT
+            </button>
+          </div>
+        </div>
+      </>
+    )
+  }
 
   return (
     <div className="lay settings-screen">
@@ -60,34 +111,43 @@ export function ClaimScreen(props: {
                 </>
               )}
             </div>
-            {props.players.map((p, i) => {
+            {players.map((p, i) => {
               const held = holder(p.id)
               const you = !!device && held?.id === device.id
+              const isOpen = open?.id === p.id
               return (
-                <button
+                <div
                   key={p.id}
-                  className={`seat-pick ${you ? 'you' : ''}`}
+                  className={`seat-pick ${you ? 'you' : ''} ${isOpen ? 'open' : ''}`}
                   style={pc(p.colour)}
-                  disabled={!props.connected || you}
-                  onClick={() => props.onSeat(p.id)}
                 >
-                  <i />
-                  <div>
-                    <div className="nm">{p.name}</div>
-                    <div className="fc">
-                      {seatFaction(p)} · Seat {i + 1}
+                  <button
+                    className="head"
+                    disabled={!props.connected || you}
+                    aria-expanded={isOpen}
+                    onClick={() =>
+                      setOpen(isOpen ? null : { id: p.id, values: valuesOf(p) })
+                    }
+                  >
+                    <i />
+                    <div>
+                      <div className="nm">{p.name}</div>
+                      <div className={`fc ${p.factionId ? '' : 'none'}`}>
+                        {seatFaction(p)} · Seat {i + 1}
+                      </div>
                     </div>
-                  </div>
-                  <div className={`tk ${held && !you ? 'held' : ''}`}>
-                    {you
-                      ? '✓ You'
-                      : held
-                        ? held.connected
-                          ? 'Held · connected'
-                          : 'Held · away'
-                        : 'Free'}
-                  </div>
-                </button>
+                    <div className={`tk ${held && !you ? 'held' : ''}`}>
+                      {you
+                        ? '✓ You'
+                        : held
+                          ? held.connected
+                            ? 'Held · connected'
+                            : 'Held · away'
+                          : 'Free'}
+                    </div>
+                  </button>
+                  {isOpen && fields(p, open.values)}
+                </div>
               )
             })}
           </div>

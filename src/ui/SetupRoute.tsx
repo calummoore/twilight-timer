@@ -3,7 +3,7 @@ import { BUILD } from '../build'
 import type { RecentGame } from '../model/device-store'
 import type { Settings } from '../model/settings'
 import { gameSummary } from '../model/summary'
-import type { Player } from '../model/types'
+import type { Seat } from '../model/types'
 import { createGame } from './api'
 import { checkServerBuild } from './reload'
 import type { CreateFailure } from './screens/SetupGamePanel'
@@ -23,7 +23,7 @@ export function SetupRoute(props: {
   const [failure, setFailure] = useState<CreateFailure | null>(null)
   const { enforceLimits, limits } = props.settings
 
-  const create = async (players: Player[], speakerId: string) => {
+  const create = async (players: Seat[], speakerId: string) => {
     setCreating(true)
     const { expansions } = props.settings
     const setup = { players, speakerId, expansions, enforceLimits, limits }

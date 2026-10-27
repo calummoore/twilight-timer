@@ -233,28 +233,28 @@ stays thin.
 
 Tags: ui
 
-- [ ] A shared component for the name, colour, and faction fields, used by
+- [x] A shared component for the name, colour, and faction fields, used by
       Setup, the claim screen, and the edit dialog.
-- [ ] Setup: Create game without a faction on every seat, the line and the
+- [x] Setup: Create game without a faction on every seat, the line and the
       deal, Create game off while two seats share a name, and the
       expansions in the create request.
-- [ ] Claim seat: a tap opens the fields of the seat, and Take seat sends
+- [x] Claim seat: a tap opens the fields of the seat, and Take seat sends
       the claim with the values. At the join link, the screen stays until
       the device holds the seat, then the address becomes the game. As the
       Change seat panel, it returns to Players & devices at once. The device
       that created the game lands here after Create game and claims the
       same way. An empty seat shows that it has no faction, here and on
       Players & devices.
-- [ ] Players & devices: Edit on the rows that the device may edit, the
+- [x] Players & devices: Edit on the rows that the device may edit, the
       edit dialog with the fields of the device's rights and of the game
       state, the ⠿ handle on the seat rows for an admin device before Start
       game, START GAME that waits for every faction, and the deal button.
-- [ ] Port the new mockup styles to `src/styles/mockup/`, with the class
+- [x] Port the new mockup styles to `src/styles/mockup/`, with the class
       names of the mockup.
-- [ ] Smoke test with two browsers: create a game without factions, claim a
+- [x] Smoke test with two browsers: create a game without factions, claim a
       seat with a faction from a phone window, edit a seat as the admin,
       take a faction that another seat holds, start the game, and rename
-      after the start.
+      after the start. Evidence: `.context/lobby-seat-edits/smoke/`.
 
 ## Milestone 5: Verification, commit, review, and pull request
 
