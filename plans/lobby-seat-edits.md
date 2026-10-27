@@ -66,13 +66,13 @@ Decisions, all on 2026-10-26 by Cal, from the discussion of that day:
   before Start game, like the ★ of Setup. Alternative: B, no speaker
   control in the lobby. Reason: the dialog is the Setup row in another
   place, and the switch is small.
-- Decision 6, open, asked on 2026-10-26 after the second merge of main: how
-  an admin device changes the seat order in the lobby. A, a Seat number in
-  the edit dialog, as the plan first said. B, a ⠿ drag handle on the seat
-  rows of Players & devices before Start game, as the setup rows have since
-  PR #34, with one command per drop and no position in the dialog.
-  Recommended: B, because the setup rows and the ring both move by drag
-  now, and the spec rejected ▲ and ▼ beside the handle.
+- Decision 6 = B, 2026-10-27, Cal, asked after the second merge of main:
+  an admin device changes the seat order in the lobby with a ⠿ drag handle
+  on the seat rows of Players & devices before Start game, as the setup
+  rows have since PR #34, with one command per drop and no position in the
+  edit dialog. Alternative: A, a Seat number in the edit dialog, as the plan
+  first said. Reason: the setup rows and the ring both move by drag now,
+  and the spec rejected ▲ and ▼ beside the handle.
 
 Design decisions of the same day, from the implementation side:
 
@@ -110,10 +110,11 @@ Design decisions of the same day, from the implementation side:
 - The name rule applies to the commands and to Create game, not to stored
   rooms, so a room with two equal names from before this change still
   loads. A name is trimmed, and an empty name is not valid.
-- The seat position: by decision 6, a Seat number in the dialog or a drag
-  of the seat rows. In both, the player moves to the chosen place, the
-  seats between shift by one place, as a setup row does, and the speaker
-  stays with its player. Until Cal answers, no milestone builds it.
+- The seat order: an admin device drags a seat row of the lobby by its ⠿
+  handle, with the drag hook and the list move of the setup rows. Each drop
+  is one command: the player moves to the place of the row under the
+  finger, and the rows between shift by one place. The speaker stays with
+  its player. The rows of a device without admin have no handle.
 - The edit dialog has no address, like the other dialogs, as the
   [Addresses](../docs/product/addresses.md) page says. The claim screen
   keeps its address, the join link, and the open seat is a state of it.
@@ -190,11 +191,10 @@ and phone frames, with the notes of each screen.
       the line that names the seats without a faction, and the deal button.
 - [ ] Lobby on a seated phone: Edit on its own row only.
 - [ ] Edit seat dialog of an admin device before Start game: name, colour,
-      faction, Speaker switch, Save, and Cancel, and the Seat number when
-      decision 6 is A. The note says that after Start game only the name
-      stays.
-- [ ] When decision 6 is B: the ⠿ handle on the seat rows of the lobby on
-      an admin device, as the setup rows have.
+      faction, Speaker switch, Save, and Cancel. The note says that after
+      Start game only the name stays.
+- [ ] The ⠿ handle on the seat rows of the lobby on an admin device, as the
+      setup rows have, with a row held over another row.
 - [ ] The Speaker & Seating screen and the setup rows do not change.
 
 ## Milestone 3: Model and server
@@ -214,8 +214,8 @@ stays thin.
       Seat number, the speaker, the deal for the empty seats, and the
       problems of a setup.
 - [ ] Protocol: the claim command with the values of the seat, the edit
-      command, the deal command, and the seat move of decision 6, with
-      their parsers.
+      command, the deal command, and the seat move command of the lobby,
+      with their parsers.
 - [ ] Rights: edit for an admin device or for the own seat of a seated
       device, and deal for an admin device.
 - [ ] Room: the claim and edit cases with the rules of the device, also
@@ -247,8 +247,8 @@ Tags: ui
       Players & devices.
 - [ ] Players & devices: Edit on the rows that the device may edit, the
       edit dialog with the fields of the device's rights and of the game
-      state, the seat order control of decision 6, START GAME that waits for
-      every faction, and the deal button.
+      state, the ⠿ handle on the seat rows for an admin device before Start
+      game, START GAME that waits for every faction, and the deal button.
 - [ ] Port the new mockup styles to `src/styles/mockup/`, with the class
       names of the mockup.
 - [ ] Smoke test with two browsers: create a game without factions, claim a
