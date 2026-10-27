@@ -348,8 +348,9 @@ Tags: ui
     Low, effort Small. Recommended: C, one placeholder colour rule in the
     base styles for every field.
   - 2. The default-name rule lives in three places. Severity Low, effort
-    Medium. Recommended: B, the default name and its check in the seat
-    rules of the model, with tests.
+    Medium. Cal chose B on 2026-10-27: the default name and its check live
+    in the seat rules of the model, with tests, and the three screens call
+    them.
   - 3. One spec line is not wrapped. Severity Low, effort Small.
     Recommended: A, wrap the paragraph.
   - `docs/product/multiplayer.md:61` has 90 characters, from before this

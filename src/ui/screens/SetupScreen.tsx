@@ -9,7 +9,7 @@ import {
   type Colour,
 } from '../../model/rules'
 import { moveItem, movedIndex } from '../../model/list-move'
-import { sharedName } from '../../model/seats'
+import { defaultName, sharedName } from '../../model/seats'
 import type { Expansions, Settings } from '../../model/settings'
 import type { Seat } from '../../model/types'
 import { SetupGamePanel, type CreateFailure } from './SetupGamePanel'
@@ -42,7 +42,7 @@ export function SetupScreen(props: {
   )
   const [speaker, setSpeaker] = useState(0)
   const seats = rows.slice(0, count)
-  const nameOf = (i: number) => seats[i]?.name.trim() || `Player ${i + 1}`
+  const nameOf = (i: number) => seats[i]?.name.trim() || defaultName(i + 1)
   const naalu = seats.findIndex((row) => row.factionId === NAALU)
   // A seat without a faction gets one in the lobby, so Create game does not
   // wait for it. Start game does.

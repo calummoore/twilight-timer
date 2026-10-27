@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   cleanName,
   dealSeats,
+  defaultName,
   editSeat,
   firstFreeColour,
+  isDefaultName,
   moveSeat,
   nameKey,
   sameSeats,
@@ -47,6 +49,15 @@ describe('names', () => {
     expect(nameKey('  Sam ')).toBe('sam')
     expect(cleanName('  Sam ')).toBe('Sam')
     expect(cleanName('   ')).toBeNull()
+  })
+
+  it('knows the default name of a seat, which Setup gives an empty field', () => {
+    expect(defaultName(3)).toBe('Player 3')
+    expect(isDefaultName(defaultName(12))).toBe(true)
+    expect(isDefaultName('Player 1')).toBe(true)
+    for (const name of ['Player', 'player 1', 'Player 1 ', 'Sam']) {
+      expect(isDefaultName(name)).toBe(false)
+    }
   })
 
   it('finds the name that two seats share', () => {

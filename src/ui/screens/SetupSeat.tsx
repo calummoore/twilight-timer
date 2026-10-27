@@ -1,6 +1,7 @@
 import type { PointerEvent } from 'react'
 import type { FactionId } from '../../model/factions'
 import type { Colour } from '../../model/rules'
+import { defaultName } from '../../model/seats'
 import type { Expansions } from '../../model/settings'
 import { pc } from '../colour'
 import { ColourSwatches, FactionSelect } from './SeatFields'
@@ -61,7 +62,7 @@ export function SetupSeat(props: {
       <input
         className="fld name"
         value={row.name}
-        placeholder={`Player ${index + 1}`}
+        placeholder={defaultName(index + 1)}
         onChange={(e) => props.onName(e.target.value)}
       />
       <FactionSelect

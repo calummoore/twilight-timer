@@ -9,6 +9,23 @@ import type { Player, Seat, SeatValues } from './types'
  * screen, the edit dialog, Setup, and the server apply them.
  */
 
+/**
+ * The name that Setup gives a seat whose name field stays empty: "Player"
+ * and the place of the seat in the ring, from 1.
+ */
+export function defaultName(place: number): string {
+  return `Player ${place}`
+}
+
+/**
+ * Whether a name is still a default name of Setup. A form then starts with
+ * an empty field and the default as its hint, so that the player types
+ * their name.
+ */
+export function isDefaultName(name: string): boolean {
+  return /^Player \d+$/.test(name)
+}
+
 /** The key under which two names are the same: trimmed, in one case. */
 export function nameKey(name: string): string {
   return name.trim().toLocaleLowerCase()

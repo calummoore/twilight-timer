@@ -15,14 +15,6 @@ export function seatFaction(seat: Seat): string {
     : factionName(seat.factionId)
 }
 
-/**
- * Whether the name is still the default of Setup, "Player" and a number. A
- * form then starts with an empty field and the default as its hint.
- */
-export function isDefaultName(name: string): boolean {
-  return /^Player \d+$/.test(name)
-}
-
 /** The colour as a word, for a seat whose colour is fixed. */
 export function colourName(colour: Colour): string {
   return colour.charAt(0).toUpperCase() + colour.slice(1)

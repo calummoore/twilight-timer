@@ -197,9 +197,10 @@ versions.
     and the expansion of each faction.
   - `deal.ts`: the factions in play for the chosen expansions, the choices
     of one seat, and the random deal for the empty seats.
-  - `seats.ts`: the rules of the seats before Start game: unique names, a
-    free or taken colour and faction, the first free colour, a seat move
-    with `list-move.ts`, the deal of the lobby, and the seats as players.
+  - `seats.ts`: the rules of the seats before Start game: the default name
+    of a seat, unique names, a free or taken colour and faction, the first
+    free colour, a seat move with `list-move.ts`, the deal of the lobby,
+    and the seats as players.
   - `fold.ts` and `fold-state.ts`: the phase state machine and the clocks.
     `fold-orders.ts` finds who acts next, `fold-removal.ts` takes out a
     player who leaves, and `fold-seats.ts` moves a seat on the ring.

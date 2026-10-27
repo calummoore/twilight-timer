@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { cleanName } from '../../model/seats'
+import { cleanName, isDefaultName } from '../../model/seats'
 import type { Expansions } from '../../model/settings'
 import type { Seat, SeatValues } from '../../model/types'
 import { Dialog, Toggle } from '../controls'
-import { isDefaultName, sameValues, seatProblem, valuesOf } from '../seatText'
+import { sameValues, seatProblem, valuesOf } from '../seatText'
 import { SeatFields } from './SeatFields'
 
 /**
