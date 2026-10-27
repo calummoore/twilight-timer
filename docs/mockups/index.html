@@ -215,6 +215,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .kv span{color:var(--dim)} .kv b{font-weight:600}
 .fld.sel.none{color:var(--faint)}
 .setup-need{font-size:12.5px; color:var(--warn); text-align:center; margin-bottom:10px}
+.setup-note{font-size:12.5px; color:var(--dim); text-align:center; margin-bottom:10px; line-height:1.5}
 /* expansions: one chip for each, and the random deal for the empty seats */
 .exps{margin-bottom:14px}
 .exps .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-bottom:8px}
@@ -530,6 +531,21 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .seat-pick .tk.held{color:var(--warn)}
 .seat-pick.you{border-color:var(--accent); background:#0a1a1c}
 .seat-pick.you .tk{color:var(--accent)}
+.seat-pick .fc.none, .dev-row .fc .none{color:var(--warn)}
+/* an open seat on the claim screen: the fields of the seat under its row, and Take seat. The edit dialog shares them. */
+.seat-pick{flex-wrap:wrap}
+.fields{display:grid; grid-template-columns:auto 1fr; gap:12px 14px; align-items:center}
+.seat-pick .fields{flex-basis:100%; margin-top:14px; padding-top:14px; border-top:1px solid var(--line)}
+.fields .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.fields .fld{width:100%; box-sizing:border-box}
+.fields .fixed{font-size:14px; color:var(--dim)}
+.fields .need{grid-column:1 / -1; font-size:12.5px; color:var(--warn)}
+.fields .btns{grid-column:1 / -1; display:flex; gap:12px; justify-content:flex-end; margin-top:4px}
+.fields .spkrow{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.fields .spkrow span{font-size:13px; color:var(--dim)}
+/* a colour that another seat holds: off for a device without admin, with the holder's name as its title */
+.sw.taken{opacity:.12; cursor:default; position:relative}
+.sw.taken::after{content:""; position:absolute; inset:9px -3px; border-top:2px solid var(--dim); rotate:-45deg}
 
 /* players & devices: the code, the link, the QR code, and the seats with their devices and requests */
 .qr{width:250px; height:250px; background:#fff; border-radius:14px; padding:14px; display:grid;
@@ -543,7 +559,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 /* Copy link sits under the link, and turns green for a moment after it copies */
 .ibtn.copy{display:inline-flex; margin-top:14px}
 .ibtn.copy.done{color:var(--ok); border-color:#1d4a2e; background:#0d2418}
-.dev-row{display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center; padding:12px 15px;
+.dev-row{display:grid; grid-template-columns:auto 1fr auto auto auto; gap:12px; align-items:center; padding:12px 15px;
   border:1px solid var(--line); border-radius:11px; margin-bottom:8px; background:#0a0f16}
 .dev-row i{width:11px; height:11px; border-radius:50%; background:var(--pc); font-style:normal}
 .dev-row .nm{font-size:15px; font-weight:650}
@@ -553,6 +569,16 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .dev-row .adm{display:flex; align-items:center; justify-content:flex-end; gap:8px; min-width:96px;
   font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
 .dev-row.table{border-color:#2b4a58; background:#0c1620}
+/* the seat rows of an admin device in the lobby: a handle moves a seat, as a setup row moves, and Edit opens the seat */
+.dev-row.grip{grid-template-columns:auto auto 1fr auto auto auto}
+.dev-row .drag{margin:-12px 0 -12px -7px; padding:0 5px}
+.dev-row .drag i{width:10px; height:16px; border-radius:0; background:radial-gradient(circle, currentColor 1.5px, transparent 1.8px) 0 0/5px 5.33px}
+.ibtn.edit{padding:8px 12px; font-size:12px}
+.dev-list.dragging .dev-row{transition:translate .2s ease}
+.dev-list .dev-row.held{position:relative; z-index:2; transition:none; border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 12px 30px rgba(0,0,0,.55)}
+.dev-list .dev-row.held .drag{cursor:grabbing}
+@media (prefers-reduced-motion: reduce){ .dev-list.dragging .dev-row{transition:none} }
 .you-tag{font-size:9px; letter-spacing:.12em; text-transform:uppercase; padding:2px 7px; border-radius:20px; font-weight:700; white-space:nowrap;
   background:var(--accent); color:#04211f; margin-left:8px; vertical-align:middle}
 /* the lobby: Start game on an admin device, and the waiting line on every other device */
@@ -590,6 +616,7 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
 .dialog p{font-size:14.5px; color:var(--dim); margin-top:10px; line-height:1.55}
 .dialog .heir{margin-top:16px; color:#f0cf6a}
 .dialog .btns{display:flex; gap:12px; margin-top:24px; justify-content:flex-end}
+.dialog .fields{margin-top:20px; gap:14px 16px}
 .pause-card{text-align:center}
 .pause-card .t{font-size:120px; font-weight:800; letter-spacing:-.05em; line-height:.9}
 .pause-card .l{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin:14px 0 34px}
@@ -984,6 +1011,13 @@ kbd{background:var(--panel2); border:1px solid var(--line2); border-radius:4px; 
   .joinlink{font-size:14px}
   .dev-row{gap:9px; padding:11px 12px}
   .dev-row .adm{min-width:0}
+  /* a seat row takes two lines: the status right of the name, and Edit left of the admin switch */
+  .dev-row{grid-template-columns:auto 1fr auto; grid-template-areas:"dot txt st" "dot edt adm"}
+  .dev-row.grip{grid-template-columns:auto auto 1fr auto; grid-template-areas:"grip dot txt st" "grip dot edt adm"}
+  .dev-row > i{grid-area:dot} .dev-row .txt{grid-area:txt} .dev-row .st{grid-area:st}
+  .dev-row .edt{grid-area:edt; justify-self:start} .dev-row .adm{grid-area:adm} .dev-row .drag{grid-area:grip}
+  .fields{grid-template-columns:1fr}
+  .fields .lbl{margin-bottom:-6px}
   /* home: the code above the summary, and the button beside both */
   .recent{grid-template-columns:1fr auto; gap:3px 12px}
   .recent .code{grid-column:1}
@@ -1184,19 +1218,23 @@ const S = {};
 const EXPANSIONS = [['pok','Prophecy of Kings'], ['te',"Thunder's Edge"], ['keleres','Council Keleres']];
 const ALL_SETS = EXPANSIONS.map(([k])=>k);
 // The translate of a setup row during a drag. A row is as tall as the others, with a 9 px gap under it.
-const rowShift = (id, drag) => {
+// `gap`: the space between two rows, in px, which a row that shifts by one crosses too.
+const rowShift = (id, drag, gap=9) => {
   if (!drag) return '';
   const at = k => Object.keys(P).indexOf(k), from = at(drag.held), to = at(drag.over), i = at(id);
-  if (id===drag.held) return `translate:0 calc(${to-from} * (100% + 9px) + ${drag.dy}px)`;
+  if (id===drag.held) return `translate:0 calc(${to-from} * (100% + ${gap}px) + ${drag.dy}px)`;
   const between = from<to ? i>from && i<=to : i>=to && i<from;
-  return between ? `translate:0 calc(${from<to?-1:1} * (100% + 9px))` : '';
+  return between ? `translate:0 calc(${from<to?-1:1} * (100% + ${gap}px))` : '';
 };
 
 // failed: Create game did not reach the server ('offline'), or the server runs a newer version that a reload did
 // not bring ('outdated').
 // drag: the row that a finger holds by its handle, the row under the finger, and how far the finger is from the centre
 // of that row, in px. The rows between slide by one into the gap.
-const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false, drag=null) => { const missing = empty.length>0; return `<div class="space"></div><div class="lay">
+// taken: a name that two rows share, which keeps CREATE GAME off. Wren's row then shows that name.
+const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false, drag=null, taken=null) => { const missing = empty.length>0;
+  const nameOf = id => taken && id==='wren' ? taken : P[id].name;
+  return `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>New Game</b></div><div class="spacer"></div>
     <button class="ibtn">✕ Back</button><button class="ibtn">⚙<span class="word"> Settings</span></button></div>
   <div class="content"><div class="setup-grid">
@@ -1214,7 +1252,7 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false, drag=nu
           <div class="sn">Seat<br>${d.seat}</div>
           <div class="swatches">${COLOURS.map(c=>
             `<div class="sw ${c===d.c?'on':''}" style="--pc:var(--c-${c})"></div>`).join('')}</div>
-          <div class="fld name">${d.name}</div>
+          <div class="fld name">${nameOf(id)}</div>
           <div class="fld sel fac ${none?'none':''}">${none?'Faction':d.f}</div>
           <div class="spk ${d.speaker?'on':''}">★</div>
         </div>`}).join('')}
@@ -1238,10 +1276,11 @@ const setupScreen = (empty=[], sets=ALL_SETS, limits=true, failed=false, drag=nu
         <div class="exps"><div class="lbl">Expansions</div><div class="exp-row">
           ${EXPANSIONS.map(([k,n])=>`<button class="exp ${sets.includes(k)?'on':''}">${n}</button>`).join('')}
         </div></div>
-        ${missing?'<div class="setup-need">Pick a faction for every seat to create the game.</div><button class="deal">Random factions for empty seats</button>':''}
+        ${missing?'<div class="setup-note">A seat without a faction gets one in the lobby, from its player or from the host.</div><button class="deal">Random factions for empty seats</button>':''}
+        ${taken?`<div class="setup-need">Two seats are named ${taken}. Give each seat its own name.</div>`:''}
         ${failed==='offline'?'<div class="setup-need">The game could not be created. Check the connection and try again.</div>':''}
         ${failed==='outdated'?'<div class="setup-need">A new version is live. Reload the page.</div>':''}
-        <button class="big lg" style="width:100%" ${missing?'disabled':''}>${failed==='outdated'?'RELOAD':'CREATE GAME'}</button>
+        <button class="big lg" style="width:100%" ${taken?'disabled':''}>${failed==='outdated'?'RELOAD':'CREATE GAME'}</button>
       </div>
     </div>
   </div></div></div>`; };
@@ -1273,14 +1312,20 @@ S.setupOutdated = {t:'Setup — New Version', note:
  `The line sits above RELOAD, at the end of the Game panel.`,
  h:setupScreen([], ALL_SETS, true, 'outdated')};
 
-S.setupMissing = {t:'Setup — Faction Missing', note:
- `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The empty choice is only a placeholder, so <b>CREATE GAME stays off</b> until every seat has a faction. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks.`,
+S.setupMissing = {t:'Setup — Faction Open', note:
+ `Every seat needs a faction before the game begins, because a rule can depend on it: a forgotten Naalu faction would put the Naalu player in card order for the whole game. The host can leave a faction open: <b>CREATE GAME stays on</b>, and the line says that the seat gets its faction in the lobby, from its player on the claim screen or from an admin device. Here Wren has not picked one yet. <b>Random factions for empty seats</b> gives Wren a faction from the base game or the chosen expansions that no other seat holds. The other five seats keep their picks. Start game then waits until every seat has a faction.`,
  mnote:
- `The same check in the narrow layout. The message and the deal button sit above CREATE GAME, at the end of the Game panel.`,
+ `The same state in the narrow layout. The line and the deal button sit above CREATE GAME, at the end of the Game panel.`,
  h:setupScreen(['wren'])};
 
+S.setupNames = {t:'Setup — Name Taken', note:
+ `Two seats never share a name, because a disabled control names the player that the game waits for, and two players with one name could not be told apart there. Here the host typed Sam on two rows. The line says so, and <b>CREATE GAME stays off</b> until each seat has its own name. The check trims spaces and ignores case. The same rule holds on the claim screen and in the edit dialog of a seat.`,
+ mnote:
+ `The line sits above CREATE GAME, at the end of the Game panel.`,
+ h:setupScreen([], ALL_SETS, true, false, null, 'Sam')};
+
 S.setupDeal = {t:'Setup — Random Factions', note:
- `A new setup, before any seat has a faction. This table plays with the base game and Prophecy of Kings, so <b>Thunder's Edge</b> and <b>Council Keleres</b> are off. Every faction list then offers only the 24 factions of those two boxes, and so does the deal. The time limits show their default, off. <b>Random factions for empty seats</b> gives each empty seat a different faction, and CREATE GAME turns on. The button shows only while a seat has no faction, so it never replaces a faction that a player picked. A seat keeps its faction when its expansion turns off.`,
+ `A new setup, before any seat has a faction. This table plays with the base game and Prophecy of Kings, so <b>Thunder's Edge</b> and <b>Council Keleres</b> are off. Every faction list then offers only the 24 factions of those two boxes, and so does the deal. The time limits show their default, off. <b>Random factions for empty seats</b> gives each empty seat a different faction, and CREATE GAME is on either way. The button shows only while a seat has no faction, so it never replaces a faction that a player picked. A seat keeps its faction when its expansion turns off.`,
  mnote:
  `The same setup in the narrow layout. The deal button sits above CREATE GAME. On a phone, the expansion chips wrap.`,
  h:setupScreen(Object.keys(P), ['pok'], false)};
@@ -2202,13 +2247,27 @@ S.openingUnreadable = {t:'Opening a Game — Needs a Newer Version', note:
 // A device that joined with the code or the link. Jaz's phone takes Jaz's seat. A seat that another device holds
 // can be taken back: the dead phone cannot answer, so the new one wins.
 const holder = (id, members=MEMBERS) => members.find(m=>m.seat===id);
-const seatRow = (id, you, members=MEMBERS) => { const h = holder(id, members);
-  return `<div class="seat-pick ${you?'you':''}" style="${col(id)}"><i></i>
-    <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f} · Seat ${P[id].seat}</div></div>
-    <div class="tk ${h&&!you?'held':''}">${you?'✓ You':h?(h.on?'Held · connected':'Held · away'):'Free'}</div></div>`; };
+// The colours that the other seats hold. A device without admin cannot pick them, and an admin device takes them.
+const takenColours = id => SEATS.filter(s=>s!==id).map(s=>P[s].c);
+const swatches = (id, admin=false) => COLOURS.map(c=>
+  `<div class="sw ${c===P[id].c?'on':''} ${!admin&&takenColours(id).includes(c)?'taken':''}" style="--pc:var(--c-${c})"></div>`).join('');
+const cap = s => s[0].toUpperCase()+s.slice(1);
+// `empty`: the seats without a faction. `open`: the seat that the device tapped, with the faction that the player picked
+// in its fields, or null while the seat has none. `running`: after Start game, so only the name changes.
+const seatRow = (id, you, members=MEMBERS, {empty=[], open=null, running=false}={}) => { const h = holder(id, members);
+  const none = empty.includes(id), isOpen = open?.id===id, pick = isOpen ? (open.f ?? (none ? null : P[id].f)) : null;
+  const fields = !isOpen ? '' : `<div class="fields">
+    <div class="lbl">Name</div><div class="fld name">${P[id].name}</div>
+    <div class="lbl">Colour</div>${running?`<div class="fixed">${cap(P[id].c)}</div>`:`<div class="swatches">${swatches(id)}</div>`}
+    <div class="lbl">Faction</div>${running?`<div class="fixed">${P[id].f}</div>`:`<div class="fld sel fac ${pick?'':'none'}">${pick??'Faction'}</div>`}
+    ${pick||running?'':'<div class="need">Pick a faction to take the seat.</div>'}
+    <div class="btns"><button class="ibtn">Cancel</button><button class="big small" ${pick||running?'':'disabled'}>TAKE SEAT</button></div></div>`;
+  return `<div class="seat-pick ${you?'you':''} ${isOpen?'open':''}" style="${col(id)}"><i></i>
+    <div><div class="nm">${P[id].name}</div><div class="fc ${none?'none':''}">${none?'No faction yet':P[id].f} · Seat ${P[id].seat}</div></div>
+    <div class="tk ${h&&!you?'held':''}">${you?'✓ You':h?(h.on?'Held · connected':'Held · away'):'Free'}</div>${fields}</div>`; };
 // `admin`: the device is an admin, or gets admin when it joins, as the device that created the game does. `members`:
-// the devices that hold seats now. `me`: the seat of this device, or null.
-const claimScreen = ({admin=false, members=MEMBERS, me='jaz'}={}) => `<div class="space"></div><div class="lay">
+// the devices that hold seats now. `me`: the seat of this device, or null. `empty`, `open`, `running`: see seatRow.
+const claimScreen = ({admin=false, members=MEMBERS, me='jaz', empty=[], open=null, running=false}={}) => `<div class="space"></div><div class="lay">
   <div class="top"><div class="round"><b>Join game</b> · <span class="num">${CODE}</span></div><div class="spacer"></div><button class="ibtn">✕ Cancel</button></div>
   <div class="content"><div class="claim-grid">
     <div>
@@ -2216,7 +2275,7 @@ const claimScreen = ({admin=false, members=MEMBERS, me='jaz'}={}) => `<div class
       <div class="h1s" style="margin-bottom:18px">${admin
         ? 'Take your seat. This device is an admin, so it also acts for every player.'
         : 'Take your seat. This device then acts for that player, when it is their turn.'}</div>
-      ${SEATS.map(id=>seatRow(id, id===me, members)).join('')}
+      ${SEATS.map(id=>seatRow(id, id===me, members, {empty, open, running})).join('')}
     </div>
     <div class="pnl" style="align-self:start"><div class="pnl-h">Join as table device</div><div class="pad">
       <div class="home-help">${admin
@@ -2226,13 +2285,13 @@ const claimScreen = ({admin=false, members=MEMBERS, me='jaz'}={}) => `<div class
   </div></div></div>`;
 
 S.claim = {t:'Claim Seat', note:
- `The device has the code and sees the game. It <b>takes a seat</b> with one tap, or joins as a <b>table device</b>, which watches the game until an admin gives it admin. Every seat shows whether a device holds it. A held seat can still be taken: the holder loses it, so a player whose phone dies takes the seat again on another phone in seconds. The holder becomes a table device and keeps its admin, so a holder without admin becomes a viewer. A device that opened the link or scanned the QR code lands here at once. Before Start game, a device that took a seat waits in the lobby. After it, the device lands in the running game. The screen opens again from Players &amp; devices, when a device changes its seat.`,
+ `The device has the code and sees the game. A tap on a seat opens its name, colour, and faction, and <b>TAKE SEAT</b> takes the seat with them, as the next screens show. Or the device joins as a <b>table device</b>, which watches the game until an admin gives it admin. Every seat shows whether a device holds it, and a seat without a faction says so. A held seat can still be taken: the holder loses it, so a player whose phone dies takes the seat again on another phone in seconds. The holder becomes a table device and keeps its admin, so a holder without admin becomes a viewer. A device that opened the link or scanned the QR code lands here at once. Before Start game, a device that took a seat waits in the lobby. After it, the device lands in the running game. The screen opens again from Players &amp; devices, when a device changes its seat.`,
  mnote:
  `One column: the seats, then Join as table device.`,
  h:claimScreen()};
 
 S.claimCreator = {t:'Claim Seat — After Create Game', note:
- `Create game put the six seats on the server, and the device that created the game lands here before the lobby. No seat has a device yet. The host takes a seat, as Kira did on Kira's phone, or joins as a <b>table device</b>, like the iPad in the middle of the table. This device is the <b>first admin</b> of the game either way, so both lines say that it acts for every player. An admin device that changes its seat reads the same lines. Until it joins, the device comes back here, also after a reload. <b>Cancel</b> goes to Home, where the game stays under Recent games. After the claim, the lobby opens with the join code, and an admin gives admin to the iPad when it joins.`,
+ `Create game put the six seats on the server, and the device that created the game lands here before the lobby. No seat has a device yet. The host taps a seat, checks its name, colour, and faction, and takes it, as Kira did on Kira's phone, or joins as a <b>table device</b>, like the iPad in the middle of the table. This device is the <b>first admin</b> of the game either way, so both lines say that it acts for every player. An admin device that changes its seat reads the same lines. Until it joins, the device comes back here, also after a reload. <b>Cancel</b> goes to Home, where the game stays under Recent games. After the claim, the lobby opens with the join code, and an admin gives admin to the iPad when it joins.`,
  mnote:
  `One column: the seats, then Join as table device. A host who set the game up on a phone takes their seat here.`,
  h:claimScreen({admin:true, members:[], me:null})};
@@ -2246,25 +2305,36 @@ S.claimCreator = {t:'Claim Seat — After Create Game', note:
 const admCell = (m, me, away=false) => me.admin || (away && me.seat && m.seat===me.seat)
   ? `<div class="adm">Admin ${tog(m.admin)}</div>`
   : `<div class="adm">Admin <div class="tog ${m.admin?'on':''} off"></div></div>`;
-const devRow = (m, me, away=false) => {
+// Edit opens the dialog of a seat: on an admin device for every seat, on a seated device for its own seat.
+const editCell = may => `<div class="edt">${may?'<button class="ibtn edit">Edit</button>':''}</div>`;
+// In the lobby, an admin device moves a seat by the handle of its row.
+const grip = (me, lobby) => me.admin && lobby ? '<div class="drag" aria-hidden="true"><i></i></div>' : '';
+const factionOf = (id, empty) => empty.includes(id) ? '<span class="none">No faction yet</span>' : P[id].f;
+// `lobby`: before Start game. `empty`: the seats without a faction. `drag`: a row held by its handle, as in setup.
+const devRow = (m, me, away=false, {lobby=false, empty=[], drag=null}={}) => {
   const seat = m.seat ? P[m.seat] : null;
   const isMe = me.seat ? m.seat===me.seat : !m.seat && m.me;
   const st = m.on ? '<div class="st ok">● Connected</div>' : '<div class="st away">Away</div>';
-  return `<div class="dev-row ${seat?'':'table'}" style="${seat?col(m.seat):'--pc:var(--accent)'}"><i></i>
-    <div><div class="nm">${seat?seat.name:'Table device'}${isMe?'<span class="you-tag">This device</span>':''}</div>
-      <div class="fc">${seat?seat.f:m.admin?'Acts for every player':'Watches the game'}</div></div>${st}${admCell(m, me, away)}</div>`;
+  const handle = seat ? grip(me, lobby) : '';
+  return `<div class="dev-row ${seat?'':'table'} ${handle?'grip':''} ${drag?.held===m.seat?'held':''}" style="${seat?col(m.seat):'--pc:var(--accent)'};${seat?rowShift(m.seat, drag, 8):''}">${handle}<i></i>
+    <div class="txt"><div class="nm">${seat?seat.name:'Table device'}${isMe?'<span class="you-tag">This device</span>':''}</div>
+      <div class="fc">${seat?factionOf(m.seat, empty):m.admin?'Acts for every player':'Watches the game'}</div></div>${st}${editCell(seat && (me.admin || isMe))}${admCell(m, me, away)}</div>`;
 };
-const freeRow = id => `<div class="dev-row" style="${col(id)}"><i></i>
-    <div><div class="nm">${P[id].name}</div><div class="fc">${P[id].f}</div></div><div class="st no">No device</div><div class="adm"></div></div>`;
-const deviceRows = (members, me) => { const away = members.every(m=>!m.admin || !m.on);
+const freeRow = (id, me, {lobby=false, empty=[], drag=null}={}) => { const handle = grip(me, lobby);
+  return `<div class="dev-row ${handle?'grip':''} ${drag?.held===id?'held':''}" style="${col(id)};${rowShift(id, drag, 8)}">${handle}<i></i>
+    <div class="txt"><div class="nm">${P[id].name}</div><div class="fc">${factionOf(id, empty)}</div></div><div class="st no">No device</div>${editCell(me.admin)}<div class="adm"></div></div>`; };
+const deviceRows = (members, me, opts={}) => { const away = members.every(m=>!m.admin || !m.on);
   return `${away?'<div class="notice">Every admin device is away. A device with a seat can take admin with the switch on its row.</div>':''}
       <div class="setup-label">Seats and devices · ${members.filter(m=>m.seat).length} of 6 seats have a device</div>
-      ${SEATS.map(id=>{ const h=holder(id, members); return h?devRow(h, me, away):freeRow(id); }).join('')}
+      <div class="dev-list ${opts.drag?'dragging':''}">${SEATS.map(id=>{ const h=holder(id, members); return h?devRow(h, me, away, opts):freeRow(id, me, opts); }).join('')}</div>
       <div class="setup-label" style="margin-top:18px">Table devices</div>
       ${members.filter(m=>!m.seat).map(m=>devRow(m, me, away)).join('')}`; };
 // Before the start: three phones took their seats.
 const MEMBERS_LOBBY = MEMBERS.filter(m=>m.seat!=='tom');
-const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space"></div><div class="lay">
+// `empty`: the seats without a faction, which Start game waits for. `drag`: a seat row held by its handle.
+const playersScreen = (lobby, me=TABLE, members=MEMBERS, {empty=[], drag=null}={}) => { const missing = empty.length>0;
+  const who = empty.map(id=>P[id].name).join(' and ');
+  return `<div class="space"></div><div class="lay">
   <div class="top stack"><div class="round"><b>Players &amp; devices</b> · ${lobby?'Lobby':'Round 3'}</div><div class="spacer"></div>
     <button class="ibtn">Change seat</button><button class="ibtn">Leave game</button>${lobby
       ? '<button class="ibtn">⚙<span class="word"> Settings</span></button>'
@@ -2277,27 +2347,65 @@ const playersScreen = (lobby, me=TABLE, members=MEMBERS) => `<div class="space">
       <div class="joinlink">Scan the code, or open <a href="https://${LINK}" target="_blank" rel="noreferrer">${LINK}</a></div>
       <button class="ibtn copy">Copy link</button>
     </div>
-    <div>${deviceRows(members, me)}</div>
+    <div>${deviceRows(members, me, {lobby, empty, drag})}</div>
   </div>
   ${lobby?`<div class="foot">${me.admin
-    ? '<div class="lobby-help">Start when everyone has a seat, or start now. A phone can still join later, and an admin device acts for a seat without one.</div><button class="big">START GAME</button>'
+    ? `<div class="lobby-help">${missing
+        ? `${who} ${empty.length>1?'have':'has'} no faction yet. Start when every seat has one, or deal now.`
+        : 'Start when everyone has a seat, or start now. A phone can still join later, and an admin device acts for a seat without one.'}</div>${missing?'<button class="ibtn">Random factions</button>':''}<button class="big" ${missing?'disabled':''}>START GAME</button>`
     : '<div class="lobby-wait"><i></i>Waiting for the table to start</div>'}</div>`:''}
-  </div>`;
+  </div>`; };
+// The edit dialog of a seat on an admin device before Start game: the fields of a setup row, and the speaker token.
+const editDialog = id => `<div class="overlay ask"><div class="dialog">
+  <h3>${P[id].name}’s seat</h3>
+  <p>Seat ${P[id].seat}. A colour or a faction that another seat holds moves here, and that seat picks again.</p>
+  <div class="fields">
+    <div class="lbl">Name</div><div class="fld name">${P[id].name}</div>
+    <div class="lbl">Colour</div><div class="swatches">${swatches(id, true)}</div>
+    <div class="lbl">Faction</div><div class="fld sel fac">${P[id].f}</div>
+    <div class="lbl">Speaker</div><div class="spkrow"><span>Picks first in the strategy phase</span>${tog(!!P[id].speaker)}</div>
+  </div>
+  <div class="btns"><button class="ibtn">Cancel</button><button class="big small">Save</button></div>
+</div></div>`;
 
 // Every admin device is away: the iPad's battery died, and Kira's phone closed its tab.
 const MEMBERS_AWAY = MEMBERS.map(m=>m.admin ? {...m, on:false} : m);
 
 S.lobby = {t:'Players & Devices — Lobby', note:
- `The lobby on the iPad in the middle of the table. Kira created the game on Kira's phone and took Kira's seat on the claim screen, so that phone is the first admin. The iPad joined as a table device, and Kira's phone gave it admin. <b>No clock runs yet.</b> The host reads the code out or holds up the QR code, and each row flips to <b>Connected</b> as a phone takes its seat: Kira, Jaz, and Priya are in, and three seats have no device yet. The <b>admin switch</b> on a row gives that device admin or takes it away. A laptop joined as a table device and is a <b>viewer</b> until an admin turns its switch on. <b>Leave game</b> takes the game off this device and goes to Home. <b>Start game</b> begins the strategy phase. An admin can start before every seat has a phone, because an admin device acts for a seat without one, and a phone can still join later. Settings opens the time limits before the start.`,
+ `The lobby on the iPad in the middle of the table. Kira created the game on Kira's phone and took Kira's seat on the claim screen, so that phone is the first admin. The iPad joined as a table device, and Kira's phone gave it admin. <b>No clock runs yet.</b> The host reads the code out or holds up the QR code, and each row flips to <b>Connected</b> as a phone takes its seat: Kira, Jaz, and Priya are in, and three seats have no device yet. The <b>admin switch</b> on a row gives that device admin or takes it away. A laptop joined as a table device and is a <b>viewer</b> until an admin turns its switch on. <b>Leave game</b> takes the game off this device and goes to Home. <b>Start game</b> begins the strategy phase. An admin can start before every seat has a phone, because an admin device acts for a seat without one, and a phone can still join later. The host left Wren's faction open, so Wren's row says <b>No faction yet</b>, and Start game waits until every seat has a faction: the line names the seats without one, and <b>Random factions</b> deals to them. <b>Edit</b> on a seat row opens the seat's dialog, and the <b>⠿ handle</b> moves a seat, both on an admin device before the start. Settings opens the time limits before the start.`,
  mnote:
- `One column: the QR code and the code, then the seats, then Start game at the end.`,
- h:playersScreen(true, TABLE, MEMBERS_LOBBY)};
+ `One column: the QR code and the code, then the seats, then Start game at the end. Each seat row takes two lines.`,
+ h:playersScreen(true, TABLE, MEMBERS_LOBBY, {empty:['wren']})};
 
 S.lobbyWait = {t:'Players & Devices — Lobby, Seated Device', note:
- `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It sees the admin switch of every device, off for this phone, because an admin device is connected, and only an admin device gives admin then. When the host starts, the phone goes to the strategy phase on its own.`,
+ `The same lobby on <b>Jaz's phone</b>, which took Jaz's seat before the start. It sees the code and the seats fill, and it waits: Start game sits on the admin devices. It sees the admin switch of every device, off for this phone, because an admin device is connected, and only an admin device gives admin then. Its own row has <b>Edit</b>, so Jaz can change Jaz's name, colour, or faction to a free value. The other rows have no Edit and no handle on this phone. When the host starts, the phone goes to the strategy phase on its own.`,
  mnote:
  `On a phone, the waiting line sits at the end of the column.`,
- h:playersScreen(true, SEATED, MEMBERS_LOBBY)};
+ h:playersScreen(true, SEATED, MEMBERS_LOBBY, {empty:['wren']})};
+
+S.lobbyEdit = {t:'Players & Devices — Edit a Seat', note:
+ `<b>Edit</b> on a seat row opens the seat's dialog: on an admin device for every seat, on a seated device for its own seat. The dialog holds the fields of a setup row: the name, the colour swatches, the faction list, and before Start game the <b>speaker</b> switch. An admin device <b>takes</b> a value: when it gives Sam a colour or a faction that another seat holds, that seat loses it, gets the first free colour or no faction, and its player picks again. A seated device picks only free values, so its swatches show the taken colours crossed out. <b>Save</b> applies the change at once on every device. After Start game, the dialog keeps only the name.`,
+ mnote:
+ `On a phone, the dialog opens as a sheet at the bottom, and the fields stack.`,
+ h:playersScreen(true, TABLE, MEMBERS_LOBBY, {empty:['wren']}) + editDialog('sam')};
+
+S.lobbyMove = {t:'Players & Devices — Move a Seat', note:
+ `Before Start game, an admin device moves a seat by the <b>⠿ handle</b> of its row, as a setup row moves. Here Wren sits between Kira and Tom at the table, so the finger drags Wren's row up over Tom's. The rows from Tom to Sam slide down by one into the gap, and the drop puts Wren in seat 3. The speaker ★ stays with its player. Each drop applies at once on every device. After Start game, seats move on the Speaker &amp; Seating screen.`,
+ mnote:
+ `On a phone, the handle runs down the left edge of each row, and a drag on it does not scroll the list.`,
+ h:playersScreen(true, TABLE, MEMBERS_LOBBY, {drag:{held:'wren', over:'tom', dy:12}})};
+
+S.claimSeat = {t:'Claim Seat — Take a Seat', note:
+ `Wren's phone opened the join link in the lobby. A tap on a seat opens its <b>name, colour, and faction</b>, so that the player checks them and changes what they want. The host left Wren's faction open, so the row says <b>No faction yet</b>, and TAKE SEAT waits until the player picks one. A colour that another seat holds is crossed out, and a taken faction is off in the list, each with the name of its holder. Wren picked Argent Flight, so TAKE SEAT is on: it takes the seat with these values in one step. The device that created the game claims the same way after Create game.`,
+ mnote:
+ `On a phone, the fields stack under the row, and the buttons fill the width.`,
+ h:claimScreen({members:MEMBERS_LOBBY, me:null, empty:['wren'], open:{id:'wren', f:'Argent Flight'}})};
+
+S.claimRunning = {t:'Claim Seat — During the Game', note:
+ `Tom's phone died in round 3, and Tom opens the join link on another phone. After Start game, the colour and the faction of a seat are fixed, so the open seat shows them as text, and only the <b>name</b> still changes. TAKE SEAT takes the seat from the dead phone, which becomes a table device.`,
+ mnote:
+ `The same row on a phone.`,
+ h:claimScreen({me:null, open:{id:'tom'}, running:true})};
 
 S.playersAway = {t:'Players & Devices — Every Admin Away', note:
  `The same screen on <b>Jaz's phone</b> after both admin devices went away: the iPad's battery died, and Kira's phone closed its tab. No admin device has a connection, so the status steps, the next phase, undo, and pause wait on every device. The notice says what to do. While every admin device is away, a <b>seated device may switch its own admin on</b>, with the switch on its own row, so Jaz's switch is on and every other switch stays off. Once Jaz takes admin, the notice goes, and Jaz's phone taps for the table. A viewer takes a seat first. When the iPad comes back, it is still an admin, and so is Jaz's phone until an admin turns it off.`,
@@ -2306,7 +2414,7 @@ S.playersAway = {t:'Players & Devices — Every Admin Away', note:
  h:playersScreen(false, SEATED, MEMBERS_AWAY)};
 
 S.players = {t:'Players & Devices', note:
- `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. The link opens in a new tab. <b>Copy link</b> puts the link on the clipboard, to send in a chat, and shows ✓ Copied for a moment. When the copy fails, it says so, and the next tap tries again. Every seat lists the device that holds it, connected or away, with the <b>admin switch</b> of that device. An admin gives admin to any other device or takes it away, but never from the last admin. A device that joins as a table device is a <b>viewer</b>: it watches the game, and the switch on its row gives it admin. The table devices come last. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
+ `The screen that the chip in the top bar opens during the game, here on the iPad in the middle of the table. The <b>join code</b>, the link, and the QR code bring a new device to the claim screen. The link opens in a new tab. <b>Copy link</b> puts the link on the clipboard, to send in a chat, and shows ✓ Copied for a moment. When the copy fails, it says so, and the next tap tries again. Every seat lists the device that holds it, connected or away, with the <b>admin switch</b> of that device. An admin gives admin to any other device or takes it away, but never from the last admin. A device that joins as a table device is a <b>viewer</b>: it watches the game, and the switch on its row gives it admin. The table devices come last. <b>Edit</b> on a seat row changes that player's name on every device; the colour and the faction are fixed after Start game. <b>Change seat</b> opens the claim screen for this device, and <b>Leave game</b> forgets the game on this device only: the game keeps the device's place, shown as away.`,
  mnote:
  `One column: the QR code and the code first, then the seats and the devices. On a phone this is where a player checks that their seat is theirs.`,
  h:playersScreen(false)};
@@ -2314,7 +2422,7 @@ S.players = {t:'Players & Devices', note:
 
 /* ══════════════════ shell ══════════════════ */
 const GROUPS = [
-  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMove','setupMissing','setupDeal','setupFailed','setupOutdated','settings','settingsNew','claimCreator','lobby','lobbyWait','claim','players','playersAway','seating','reorder','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
+  ['Every device · iPad and phone', ['home','homeCode','opening','openingMissing','openingOutdated','openingUnreadable','setup','setupMove','setupMissing','setupNames','setupDeal','setupFailed','setupOutdated','settings','settingsNew','claimCreator','lobby','lobbyWait','lobbyEdit','lobbyMove','claim','claimSeat','claimRunning','players','playersAway','seating','reorder','remove','removeSpeaker','seatingOut','strategy','strategySeated','token','strategyFour','action','actionSeated','actionViewer','overtime','actionFour','paused','pausedRule','reaction','reactionSeated','reactionOver','politics','passWarn','reconnecting','status','statusSeated','agenda','agendaSeated','round','roundSeated','history','stats']],
 ];
 const KEYS = GROUPS.flatMap(g=>g[1]);
 // The frames: every screen draws in each of them.

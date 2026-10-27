@@ -181,21 +181,21 @@ Tags: mockup
 Draw the new flow in `docs/mockups/index.html`, in the iPad, upright iPad,
 and phone frames, with the notes of each screen.
 
-- [ ] Setup: CREATE GAME on while seats have no faction, with the line that
+- [x] Setup: CREATE GAME on while seats have no faction, with the line that
       says that the players pick in the lobby, and the deal.
-- [ ] Claim seat, and Claim seat after Create game: one seat open with its
+- [x] Claim seat, and Claim seat after Create game: one seat open with its
       name, colour swatches, faction list, and TAKE SEAT, before Start game.
       A taken colour or faction is off and names its holder. An empty seat
       says that it has no faction.
-- [ ] Lobby on an admin device: Edit on every seat row, START GAME off with
+- [x] Lobby on an admin device: Edit on every seat row, START GAME off with
       the line that names the seats without a faction, and the deal button.
-- [ ] Lobby on a seated phone: Edit on its own row only.
-- [ ] Edit seat dialog of an admin device before Start game: name, colour,
+- [x] Lobby on a seated phone: Edit on its own row only.
+- [x] Edit seat dialog of an admin device before Start game: name, colour,
       faction, Speaker switch, Save, and Cancel. The note says that after
       Start game only the name stays.
-- [ ] The ⠿ handle on the seat rows of the lobby on an admin device, as the
+- [x] The ⠿ handle on the seat rows of the lobby on an admin device, as the
       setup rows have, with a row held over another row.
-- [ ] The Speaker & Seating screen and the setup rows do not change.
+- [x] The Speaker & Seating screen and the setup rows do not change.
 
 ## Milestone 3: Model and server
 
