@@ -83,13 +83,14 @@ export type CreateReceipt =
  * which reloads when it opens the game. When the server cannot read the
  * setup of a page of another build, or of a page that names no build, the
  * answer is outdated, so that the page reloads once to get this build. A
- * setup in which two seats share a name is invalid, as the seat rules say.
+ * setup in which two seats share a name breaks the seat rules, so it gets
+ * the same answers: invalid from this build, and outdated from another
+ * build, whose page may lack the rule.
  */
 export function receiveCreate(raw: unknown, build: string): CreateReceipt {
   const request = parseCreateRequest(raw)
-  if (request && sharedName(request.setup.players) !== null) {
-    return { type: 'invalid' }
+  if (request && sharedName(request.setup.players) === null) {
+    return { type: 'create', ...request }
   }
-  if (request) return { type: 'create', ...request }
   return buildOf(raw) === build ? { type: 'invalid' } : { type: 'outdated' }
 }

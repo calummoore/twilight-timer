@@ -64,8 +64,12 @@ export function DeviceRow(props: {
           {name}
           {props.you && <span className="you-tag">This device</span>}
         </div>
-        <div className={`fc ${seat && !seat.factionId ? 'none' : ''}`}>
-          {about}
+        <div className="fc">
+          {seat && !seat.factionId ? (
+            <span className="none">{about}</span>
+          ) : (
+            about
+          )}
         </div>
       </div>
       {device ? (

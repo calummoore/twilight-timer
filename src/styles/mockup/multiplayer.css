@@ -36,7 +36,7 @@
 .seat-pick .tk.held{color:var(--warn)}
 .seat-pick.you{border-color:var(--accent); background:#0a1a1c}
 .seat-pick.you .tk{color:var(--accent)}
-.seat-pick .fc.none, .dev-row .fc.none{color:var(--warn)}
+.seat-pick .fc.none, .dev-row .fc .none{color:var(--warn)}
 /* an open seat on the claim screen: the fields of the seat under its row, and Take seat. The edit dialog shares them. */
 .seat-pick{flex-wrap:wrap; cursor:default}
 .seat-pick .head{display:flex; align-items:center; gap:13px; flex:1; min-width:0; background:none; border:0; padding:0;
