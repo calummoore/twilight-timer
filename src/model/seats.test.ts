@@ -1,167 +1,190 @@
 import { describe, expect, it } from 'vitest'
-import { ringOf } from './ring'
-import { parseRoom } from './room-storage'
-import { HOST, JAZ, seatedServer } from './test-room'
-import { PLAYERS, playStrategy, table } from './test-table'
+import {
+  cleanName,
+  dealSeats,
+  defaultName,
+  editSeat,
+  firstFreeColour,
+  isDefaultName,
+  moveSeat,
+  nameKey,
+  sameSeats,
+  seatedPlayers,
+  sharedName,
+} from './seats'
+import { DEFAULT_EXPANSIONS } from './settings'
+import { PLAYERS } from './test-table'
+import type { Seat } from './types'
 
-/** Seats, clockwise: Jaz, Kira, Tom, Priya, Sam, Wren. Jaz is the speaker. */
+/** The table with Wren's seat still without a faction. */
+const SEATS: Seat[] = PLAYERS.map((p) =>
+  p.id === 'wren' ? { ...p, factionId: null } : p,
+)
+const wren = { name: 'Wren', colour: 'orange', factionId: null } as const
 
-const ids = (players: readonly { id: string }[]) => players.map((p) => p.id)
+/**
+ * The seat rules that every edit keeps: the same seats in the same order,
+ * no two seats with one colour, no two seats with one faction, and every
+ * seat outside `changed` as it was. Returns the seats after the edit.
+ */
+function edited(
+  before: readonly Seat[],
+  after: readonly Seat[] | null,
+  changed: readonly string[],
+): Seat[] {
+  expect(after).not.toBeNull()
+  const seats = [...(after ?? [])]
+  expect(seats.map((s) => s.id)).toEqual(before.map((s) => s.id))
+  const colours = seats.map((s) => s.colour)
+  expect(new Set(colours).size).toBe(colours.length)
+  const factions = seats.flatMap((s) => s.factionId ?? [])
+  expect(new Set(factions).size).toBe(factions.length)
+  const kept = (s: Seat) => !changed.includes(s.id)
+  expect(seats.filter(kept)).toEqual(before.filter(kept))
+  return seats
+}
 
-describe('a seat move', () => {
-  it('changes the ring, the pick order, and the voting order', () => {
-    const t = table()
-    // Kira moves two seats on, so Tom and Priya shift back into the gap.
-    expect(t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'priya' })).toBe(
-      true,
-    )
-    const view = t.view()
-    const ring = ['jaz', 'tom', 'priya', 'kira', 'sam', 'wren']
-    expect(ids(view.players)).toEqual(ring)
-    expect(view.seated).toEqual(ring)
-    expect(view.pickOrder).toEqual(ring)
-    expect(view.voteOrder).toEqual([
-      'tom',
-      'priya',
-      'kira',
-      'sam',
-      'wren',
-      'jaz',
-    ])
-    expect(ids(ringOf(t.game))).toEqual(ring)
+describe('names', () => {
+  it('compares names without spaces around them and in one case', () => {
+    expect(nameKey('  Sam ')).toBe('sam')
+    expect(cleanName('  Sam ')).toBe('Sam')
+    expect(cleanName('   ')).toBeNull()
   })
 
-  it('moves a seat back with a second move the other way round', () => {
-    const t = table()
-    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'priya' })
-    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'tom' })
-    expect(ids(t.view().players)).toEqual(ids(PLAYERS))
-  })
-
-  it('keeps the speaker token with its player', () => {
-    const t = table()
-    t.act({ kind: 'seatMoved', playerId: 'jaz', toId: 'priya' })
-    const view = t.view()
-    expect(view.speakerId).toBe('jaz')
-    expect(ids(view.players)).toEqual([
-      'kira',
-      'tom',
-      'priya',
-      'jaz',
-      'sam',
-      'wren',
-    ])
-    expect(view.pickOrder).toEqual([
-      'jaz',
-      'sam',
-      'wren',
-      'kira',
-      'tom',
-      'priya',
-    ])
-  })
-
-  it('rejects a player who left, an unknown player, and the same player', () => {
-    const t = table()
-    t.act({ kind: 'playerRemoved', playerId: 'tom' })
-    const rejected = [
-      { playerId: 'tom', toId: 'kira' },
-      { playerId: 'kira', toId: 'tom' },
-      { playerId: 'kira', toId: 'zed' },
-      { playerId: 'kira', toId: 'kira' },
-    ]
-    for (const move of rejected) {
-      expect(t.act({ kind: 'seatMoved', ...move })).toBe(false)
+  it('knows the default name of a seat, which Setup gives an empty field', () => {
+    expect(defaultName(3)).toBe('Player 3')
+    expect(isDefaultName(defaultName(12))).toBe(true)
+    expect(isDefaultName('Player 1')).toBe(true)
+    for (const name of ['Player', 'player 1', 'Player 1 ', 'Sam']) {
+      expect(isDefaultName(name)).toBe(false)
     }
-    expect(t.game.actions).toHaveLength(1)
   })
 
-  it('does nothing after the game ends', () => {
-    const t = table()
-    t.act({ kind: 'gameEnded' })
-    const move = { playerId: 'kira', toId: 'sam' }
-    expect(t.act({ kind: 'seatMoved', ...move })).toBe(false)
-  })
-
-  it('keeps the empty seat of a player who left in its place', () => {
-    const t = table()
-    t.act({ kind: 'playerRemoved', playerId: 'tom' })
-    // Priya and Sam shift back past Tom's empty seat, which stays.
-    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'sam' })
-    const view = t.view()
-    expect(ids(view.players)).toEqual([
-      'jaz',
-      'priya',
-      'tom',
-      'sam',
-      'kira',
-      'wren',
-    ])
-    expect(view.seated).toEqual(['jaz', 'priya', 'sam', 'kira', 'wren'])
-    expect(view.departures).toEqual([{ playerId: 'tom', round: 1 }])
-  })
-
-  it('passes the token of a speaker who leaves to their new left neighbour', () => {
-    const t = table()
-    // Jaz moves to seat 4, so Sam sits on Jaz's left.
-    t.act({ kind: 'seatMoved', playerId: 'jaz', toId: 'priya' })
-    t.act({ kind: 'playerRemoved', playerId: 'jaz' })
-    const view = t.view()
-    expect(view.speakerId).toBe('sam')
-    expect(view.pickOrder).toEqual(['sam', 'wren', 'kira', 'tom', 'priya'])
-  })
-
-  it('keeps the initiative order of the action phase', () => {
-    const t = table()
-    playStrategy(t)
-    t.act({ kind: 'seatMoved', playerId: 'tom', toId: 'wren' })
-    const view = t.view().view
-    expect(view.phase === 'action' && view.rail.map((r) => r.playerId)).toEqual(
-      ['tom', 'wren', 'jaz', 'sam', 'kira', 'priya'],
+  it('finds the name that two seats share', () => {
+    expect(sharedName(SEATS)).toBeNull()
+    const twins = SEATS.map((s) =>
+      s.id === 'wren' ? { ...s, name: ' SAM' } : s,
     )
-    expect(view).toMatchObject({ activeId: 'tom' })
-  })
-
-  it('keeps the tiles of an open reaction window', () => {
-    const t = table()
-    playStrategy(t)
-    t.act({ kind: 'turnEnded' }) // Tom
-    t.act({ kind: 'turnEnded' }) // Wren
-    t.act({ kind: 'strategyCardPlayed', card: 3 }) // Jaz plays Politics
-    // Kira moves the shorter way round, past Jaz, to Wren's seat.
-    t.act({ kind: 'seatMoved', playerId: 'kira', toId: 'wren' })
-    const view = t.view().view
-    const r = view.phase === 'action' ? view.reaction : null
-    expect(r?.tiles.map((tile) => tile.playerId)).toEqual([
-      'kira',
-      'tom',
-      'priya',
-      'sam',
-      'wren',
-    ])
-    // The new speaker choice follows the ring.
-    expect(r?.speakerChoice?.options).toEqual([
-      'wren',
-      'tom',
-      'priya',
-      'sam',
-      'kira',
-    ])
+    expect(sharedName(twins)).toBe('SAM')
   })
 })
 
-describe('a seat move on the server', () => {
-  it('applies for an admin device only, and keeps the setup', () => {
-    const s = seatedServer()
-    const move = { kind: 'seatMoved', playerId: 'jaz', toId: 'kira' } as const
-    expect(s.act(JAZ, move)).toBe('forbidden')
-    expect(s.act(HOST, move)).toBeNull()
-    const ring = ['kira', 'jaz', 'tom', 'priya', 'sam', 'wren']
-    expect(ids(s.view()?.players ?? [])).toEqual(ring)
-    expect(s.room.setup.players).toEqual(PLAYERS)
-    // The stored room keeps the move.
-    const stored = parseRoom(JSON.parse(JSON.stringify(s.room)))
-    expect(stored).toEqual(s.room)
-    expect(stored?.game && ids(ringOf(stored.game))).toEqual(ring)
+describe('an edit of a seat', () => {
+  it('takes a name, a free colour, and a free faction', () => {
+    const values = {
+      name: ' Ren ',
+      colour: 'pink',
+      factionId: 'argent',
+    } as const
+    const next = edited(SEATS, editSeat(SEATS, 'wren', values, false), ['wren'])
+    expect(next.find((s) => s.id === 'wren')).toEqual({
+      id: 'wren',
+      name: 'Ren',
+      colour: 'pink',
+      factionId: 'argent',
+    })
+  })
+
+  it('refuses an empty name, a taken name, and an unknown seat', () => {
+    expect(editSeat(SEATS, 'wren', { ...wren, name: '  ' }, true)).toBeNull()
+    expect(editSeat(SEATS, 'wren', { ...wren, name: 'sam ' }, true)).toBeNull()
+    expect(editSeat(SEATS, 'zed', wren, true)).toBeNull()
+  })
+
+  it('refuses a taken colour or faction to a device that does not take', () => {
+    expect(
+      editSeat(SEATS, 'wren', { ...wren, colour: 'blue' }, false),
+    ).toBeNull()
+    expect(
+      editSeat(SEATS, 'wren', { ...wren, factionId: 'sol' }, false),
+    ).toBeNull()
+  })
+
+  it('moves a taken colour and faction to the seat of an admin device', () => {
+    const values = { ...wren, colour: 'blue', factionId: 'sol' } as const
+    const next = edited(SEATS, editSeat(SEATS, 'wren', values, true), [
+      'jaz',
+      'wren',
+    ])
+    expect(next.find((s) => s.id === 'wren')).toMatchObject({
+      colour: 'blue',
+      factionId: 'sol',
+    })
+    // Jaz held both: Jaz gets the first free colour, which Wren left, and
+    // no faction.
+    expect(next.find((s) => s.id === 'jaz')).toMatchObject({
+      colour: 'orange',
+      factionId: null,
+    })
+  })
+
+  it('takes a colour from one seat and a faction from another', () => {
+    const values = { ...wren, colour: 'blue', factionId: 'muaat' } as const
+    const next = edited(SEATS, editSeat(SEATS, 'wren', values, true), [
+      'jaz',
+      'kira',
+      'wren',
+    ])
+    expect(next.find((s) => s.id === 'wren')).toMatchObject(values)
+    // Jaz held the colour, and Kira the faction.
+    expect(next.find((s) => s.id === 'jaz')).toMatchObject({
+      colour: 'orange',
+      factionId: 'sol',
+    })
+    expect(next.find((s) => s.id === 'kira')).toMatchObject({
+      colour: 'red',
+      factionId: null,
+    })
+  })
+
+  it('keeps the own colour and faction of the seat', () => {
+    const jaz = { name: 'Jaz', colour: 'blue', factionId: 'sol' } as const
+    const next = edited(SEATS, editSeat(SEATS, 'jaz', jaz, false), [])
+    expect(next).toEqual(SEATS)
+    expect(sameSeats(next, SEATS)).toBe(true)
+  })
+
+  it('finds the first free colour', () => {
+    expect(firstFreeColour(SEATS)).toBe('pink')
+    expect(firstFreeColour(SEATS.slice(1))).toBe('blue')
+  })
+})
+
+describe('the places of the seats', () => {
+  it('moves a seat to the place of another, and shifts the seats between', () => {
+    const ids = (seats: readonly Seat[] | null) => seats?.map((s) => s.id)
+    expect(ids(moveSeat(SEATS, 'wren', 'tom'))).toEqual([
+      'jaz',
+      'kira',
+      'wren',
+      'tom',
+      'priya',
+      'sam',
+    ])
+    expect(ids(moveSeat(SEATS, 'jaz', 'priya'))).toEqual([
+      'kira',
+      'tom',
+      'priya',
+      'jaz',
+      'sam',
+      'wren',
+    ])
+    expect(moveSeat(SEATS, 'jaz', 'jaz')).toBeNull()
+    expect(moveSeat(SEATS, 'jaz', 'zed')).toBeNull()
+  })
+})
+
+describe('the deal and the start', () => {
+  it('deals a faction in play to each seat without one', () => {
+    // The first choice of the pool, in name order, that no seat holds.
+    const dealt = dealSeats(SEATS, DEFAULT_EXPANSIONS, () => 0)
+    expect(dealt?.find((s) => s.id === 'wren')?.factionId).toBe('argent')
+    expect(dealt?.slice(0, 5)).toEqual(SEATS.slice(0, 5))
+    expect(dealSeats(PLAYERS, DEFAULT_EXPANSIONS, () => 0)).toBeNull()
+  })
+
+  it('turns the seats into players only when every seat has a faction', () => {
+    expect(seatedPlayers(SEATS)).toBeNull()
+    expect(seatedPlayers(PLAYERS)).toEqual(PLAYERS)
   })
 })

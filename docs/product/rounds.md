@@ -94,11 +94,14 @@ of their time.
 
 ## Factions
 
-Each player picks their faction at setup from the list of official factions.
-The game cannot begin until every seat has a faction. The app stores the faction
+Each player picks their faction from the list of official factions, at setup or
+in the lobby before Start game, as [Seats](multiplayer.md#seats) says. The game
+cannot begin until every seat has a faction: Create game puts a seat without a
+faction on the server, and Start game waits for it. The app stores the faction
 itself, not a typed name, so a rule that depends on a faction can find its
-player. Two players cannot hold the same faction: taking a faction that another
-seat holds swaps the two, as colours do.
+player. Two players cannot hold the same faction. At setup, taking a faction
+that another seat holds swaps the two, as colours do. In the lobby, a player
+picks only a free faction, and an admin device takes it from its holder.
 
 Rejected: a free-text faction field, because the app cannot apply a faction rule
 to a name that a player typed. A faction outside the official list cannot be
@@ -110,9 +113,10 @@ The base game is always in play. Setup has one on/off choice for each expansion
 that adds factions: Prophecy of Kings, Thunder's Edge, and the Council Keleres.
 The Council Keleres came in Codex III, and the Thunder's Edge box also holds it.
 The choices sit on the setup screen, next to the random deal. All three start on,
-and the device keeps the choice for the next game. Rejected: a choice on the
-Settings screen, because the choice matters only at setup, where the deal uses
-it. Rejected: one choice of game version, because a table can own Thunder's
+and the device keeps the choice for the next game. The game keeps the choice from
+Create game on, so the lobby offers the same factions on every device. Rejected:
+a choice on the Settings screen, because the table makes the choice at setup,
+where the first deal uses it. Rejected: one choice of game version, because a table can own Thunder's
 Edge without Prophecy of Kings, or a printed Codex III without Thunder's Edge.
 Rejected: only Prophecy of Kings on at first, because the lists would then
 change for a table that never uses the choice.
@@ -122,11 +126,12 @@ the expansions that are on. A seat keeps a faction that it holds when its
 expansion turns off. Rejected: every official faction in every list, because
 the choice then means one thing for the list and another for the deal.
 
-While a seat has no faction, setup offers a random deal for the empty seats. One
-tap gives each seat without a faction a random faction of the base game or of an
-expansion that is on, which no other seat holds. A seat that has a faction keeps
-it. Rejected: a new faction for every seat at each tap, because setup has no
-undo, and the tap would discard the factions that players chose. The deal
+While a seat has no faction, setup offers a random deal for the empty seats, and
+so does the lobby on an admin device. One tap gives each seat without a faction a
+random faction of the base game or of an expansion that is on, which no other
+seat holds. A seat that has a faction keeps it. Rejected: a new faction for every
+seat at each tap, because setup and the lobby have no undo, and the tap would
+discard the factions that players chose. The deal
 applies no faction rules, because the app is not a rules engine.
 
 ## Initiative order

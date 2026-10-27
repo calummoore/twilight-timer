@@ -9,6 +9,21 @@ export interface Player {
   factionId: FactionId
 }
 
+/** What a seat holds before Start game. A seat can still lack a faction. */
+export interface SeatValues {
+  name: string
+  colour: Colour
+  factionId: FactionId | null
+}
+
+/**
+ * A seat of the setup: a player of the game to come. Start game turns the
+ * seats into players, so it waits until every seat has a faction.
+ */
+export interface Seat extends SeatValues {
+  id: string
+}
+
 export const TIMER_KEYS = [
   'turn',
   'reactionWindow',

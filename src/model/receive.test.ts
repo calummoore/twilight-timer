@@ -106,4 +106,20 @@ describe('what the server does with a request that creates a game', () => {
     const noToken = { build: BUILD, setup: SETUP }
     expect(receiveCreate(noToken, BUILD)).toEqual({ type: 'invalid' })
   })
+
+  it('refuses two seats with one name as it refuses a broken setup', () => {
+    const players = SETUP.players.map((p) =>
+      p.id === 'wren' ? { ...p, name: ' sam ' } : p,
+    )
+    const twins = { ...SETUP, players }
+    expect(receiveCreate(create(BUILD, twins), BUILD)).toEqual({
+      type: 'invalid',
+    })
+    // A page of another build may lack the name rule, so it reloads.
+    for (const build of [OLD_BUILD, undefined]) {
+      expect(receiveCreate(create(build, twins), BUILD)).toEqual({
+        type: 'outdated',
+      })
+    }
+  })
 })

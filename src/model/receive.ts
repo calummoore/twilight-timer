@@ -1,4 +1,5 @@
 import { isFields } from './parse-fields'
+import { sharedName } from './seats'
 import {
   buildOf,
   parseClientMessage,
@@ -71,9 +72,15 @@ export function receive(raw: unknown, build: string, caller: Caller): Receipt {
 
 export type CreateReceipt =
   | { type: 'create'; token: string; setup: Setup }
-  /** The server cannot read the setup of a page of another build. */
+  /**
+   * The server cannot read the setup of a page of another build, or two of
+   * its seats share a name.
+   */
   | { type: 'outdated' }
-  /** The server cannot read a request of its own build. */
+  /**
+   * The server cannot read a request of its own build, or two of its seats
+   * share a name.
+   */
   | { type: 'invalid' }
 
 /**
@@ -81,10 +88,15 @@ export type CreateReceipt =
  * every game whose setup it can read, also from a page of another build,
  * which reloads when it opens the game. When the server cannot read the
  * setup of a page of another build, or of a page that names no build, the
- * answer is outdated, so that the page reloads once to get this build.
+ * answer is outdated, so that the page reloads once to get this build. A
+ * setup in which two seats share a name breaks the seat rules, so it gets
+ * the same answers: invalid from this build, and outdated from another
+ * build, whose page may lack the rule.
  */
 export function receiveCreate(raw: unknown, build: string): CreateReceipt {
   const request = parseCreateRequest(raw)
-  if (request) return { type: 'create', ...request }
+  if (request && sharedName(request.setup.players) === null) {
+    return { type: 'create', ...request }
+  }
   return buildOf(raw) === build ? { type: 'invalid' } : { type: 'outdated' }
 }

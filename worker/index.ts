@@ -3,6 +3,7 @@ import { newCode, parseCode } from '../src/model/code'
 import type { CreateError } from '../src/model/protocol'
 import { receiveCreate } from '../src/model/receive'
 import { newRoom } from '../src/model/room'
+import { random } from './random'
 
 export { GameRoom } from './game-room'
 
@@ -38,9 +39,10 @@ export default {
 const CODE_TRIES = 5
 
 /**
- * Creates a game from every setup that this build can read, also from a page
- * of another build. A page of another build whose setup this build cannot
- * read gets outdated, and reloads.
+ * Creates a game from every setup that this build can read and that keeps
+ * the seat rules, also from a page of another build. A page of another build
+ * whose setup this build cannot read, or in which two seats share a name,
+ * gets outdated, and reloads.
  */
 async function create(request: Request, env: Env): Promise<Response> {
   const body: unknown = await request.json().catch(() => null)
@@ -58,12 +60,6 @@ async function create(request: Request, env: Env): Promise<Response> {
   }
   const busy: CreateError = 'busy'
   return json({ error: busy }, 503)
-}
-
-/** A number from 0 up to but not including 1, from the secure source. */
-function random(): number {
-  const [value = 0] = crypto.getRandomValues(new Uint32Array(1))
-  return value / 2 ** 32
 }
 
 /** An answer of the game API, which names the build of the server first. */

@@ -1,9 +1,10 @@
 import type { PointerEvent } from 'react'
-import { factionChoices } from '../../model/deal'
-import { factionName, isFactionId, type FactionId } from '../../model/factions'
-import { COLOURS, type Colour } from '../../model/rules'
+import type { FactionId } from '../../model/factions'
+import type { Colour } from '../../model/rules'
+import { defaultName } from '../../model/seats'
 import type { Expansions } from '../../model/settings'
 import { pc } from '../colour'
+import { ColourSwatches, FactionSelect } from './SeatFields'
 
 /**
  * One seat of the setup screen, before the game begins. A seat can be empty:
@@ -57,41 +58,18 @@ export function SetupSeat(props: {
         <br />
         {index + 1}
       </div>
-      <div className="swatches">
-        {COLOURS.map((colour) => (
-          <button
-            key={colour}
-            aria-label={colour}
-            className={`sw ${colour === row.colour ? 'on' : ''}`}
-            style={pc(colour)}
-            onClick={() => props.onColour(colour)}
-          />
-        ))}
-      </div>
+      <ColourSwatches colour={row.colour} onChange={props.onColour} />
       <input
         className="fld name"
         value={row.name}
-        placeholder={`Player ${index + 1}`}
+        placeholder={defaultName(index + 1)}
         onChange={(e) => props.onName(e.target.value)}
       />
-      <select
-        className={`fld sel fac ${row.factionId ? '' : 'none'}`}
-        aria-label="Faction"
-        value={row.factionId ?? ''}
-        onChange={(e) => {
-          const id = e.target.value
-          props.onFaction(isFactionId(id) ? id : null)
-        }}
-      >
-        <option value="" disabled>
-          Faction
-        </option>
-        {factionChoices(props.expansions, row.factionId).map((id) => (
-          <option key={id} value={id}>
-            {factionName(id)}
-          </option>
-        ))}
-      </select>
+      <FactionSelect
+        factionId={row.factionId}
+        expansions={props.expansions}
+        onChange={props.onFaction}
+      />
       <button
         className={`spk ${props.speaker ? 'on' : ''}`}
         aria-label="Make speaker"

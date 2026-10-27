@@ -1,32 +1,42 @@
-import { factionName } from '../../model/factions'
+import { useState } from 'react'
 import type { DeviceView } from '../../model/protocol'
-import type { Player } from '../../model/types'
+import type { Expansions } from '../../model/settings'
+import type { Seat, SeatValues } from '../../model/types'
 import { pc } from '../colour'
 import { NetBar } from '../controls'
+import { seatFaction } from '../seatText'
+import { SeatEditDialog } from './SeatEditDialog'
 
 /**
- * Which player this device is: one tap takes a seat, also one that another
- * device holds, or joins as a table device, which is a viewer until an admin
- * device gives it admin. The device that created the game joins here too,
- * with admin. It also changes the seat of a device in the game.
+ * Which player this device is. A tap on a seat opens its name, colour, and
+ * faction in a dialog, and Take seat takes the seat with them, also a seat
+ * that another device holds. Or the device joins as a table device, which
+ * is a viewer until an admin device gives it admin. The device that created
+ * the game joins here too, with admin. It also changes the seat of a device
+ * in the game.
  */
 export function ClaimScreen(props: {
   code: string
-  /** The seats in clockwise order, as the seat moves of the game left them. */
-  players: Player[]
+  players: Seat[]
   devices: DeviceView[]
+  expansions: Expansions
+  /** The game has started, so only the name of a seat still changes. */
+  started: boolean
   /** This device, when it has joined the game. */
   device: DeviceView | undefined
   /**
    * This device is an admin, or gets admin when it joins, as the device that
-   * created the game does. So it acts for every player, also in a seat.
+   * created the game does. So it acts for every player, also in a seat, and
+   * it takes a colour or a faction that another seat holds.
    */
   admin: boolean
   connected: boolean
-  onSeat: (seat: string | null) => void
+  onSeat: (seat: string | null, values?: SeatValues) => void
   onCancel: () => void
 }) {
-  const { device } = props
+  const { device, players } = props
+  const [openId, setOpenId] = useState<string | null>(null)
+  const open = players.find((p) => p.id === openId)
   const holder = (id: string) => props.devices.find((d) => d.seat === id)
 
   return (
@@ -60,34 +70,38 @@ export function ClaimScreen(props: {
                 </>
               )}
             </div>
-            {props.players.map((p, i) => {
+            {players.map((p, i) => {
               const held = holder(p.id)
               const you = !!device && held?.id === device.id
               return (
-                <button
+                <div
                   key={p.id}
                   className={`seat-pick ${you ? 'you' : ''}`}
                   style={pc(p.colour)}
-                  disabled={!props.connected || you}
-                  onClick={() => props.onSeat(p.id)}
                 >
-                  <i />
-                  <div>
-                    <div className="nm">{p.name}</div>
-                    <div className="fc">
-                      {factionName(p.factionId)} · Seat {i + 1}
+                  <button
+                    className="head"
+                    disabled={!props.connected || you}
+                    onClick={() => setOpenId(p.id)}
+                  >
+                    <i />
+                    <div>
+                      <div className="nm">{p.name}</div>
+                      <div className={`fc ${p.factionId ? '' : 'none'}`}>
+                        {seatFaction(p)} · Seat {i + 1}
+                      </div>
                     </div>
-                  </div>
-                  <div className={`tk ${held && !you ? 'held' : ''}`}>
-                    {you
-                      ? '✓ You'
-                      : held
-                        ? held.connected
-                          ? 'Held · connected'
-                          : 'Held · away'
-                        : 'Free'}
-                  </div>
-                </button>
+                    <div className={`tk ${held && !you ? 'held' : ''}`}>
+                      {you
+                        ? '✓ You'
+                        : held
+                          ? held.connected
+                            ? 'Held · connected'
+                            : 'Held · away'
+                          : 'Free'}
+                    </div>
+                  </button>
+                </div>
               )
             })}
           </div>
@@ -123,6 +137,26 @@ export function ClaimScreen(props: {
           </div>
         </div>
       </div>
+      {open && (
+        <SeatEditDialog
+          key={open.id}
+          kind="claim"
+          seat={open}
+          seats={players}
+          place={players.indexOf(open) + 1}
+          expansions={props.expansions}
+          takes={props.admin}
+          started={props.started}
+          speaker={false}
+          maySpeaker={false}
+          connected={props.connected}
+          onSave={(values) => {
+            setOpenId(null)
+            props.onSeat(open.id, values)
+          }}
+          onCancel={() => setOpenId(null)}
+        />
+      )}
     </div>
   )
 }

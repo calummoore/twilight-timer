@@ -101,10 +101,21 @@ joined the game, and only sees the claim screen.
 
 A device joins a game with the join code, by typing it on the home screen or
 by opening the link. The claim screen then lists the seats of the game: each
-player's name, colour, faction, and whether a device holds the seat. The
-device takes a seat, or joins as a table device. A device that joins gets
-no admin, so a new table device is a viewer until an admin device gives it
-admin. The device that creates the game is the only exception.
+player's name, colour, faction or no faction yet, and whether a device holds
+the seat. A tap on a seat opens its name, colour, and faction in a dialog,
+so that the player checks them and changes what they want. Take seat in the
+dialog then takes the seat with these values, under the rules of
+[Seats](#seats). Before Start game, a seat without a faction needs one
+before Take seat. After Start game, only the name can change, and the colour
+and the faction show as text. The device can also join as a table device,
+which has no fields. A device that joins gets no admin, so a new table
+device is a viewer until an admin device gives it admin. The device that
+creates the game is the only exception. Rejected: a claim in one tap, with
+the fields only on the Players & devices screen or in a dialog that opens
+after the claim, because a seat without a faction then needs a second step
+before the game can start. Rejected: the fields under the tapped row,
+because the list then jumps, and the dialog of the lobby already holds the
+fields.
 
 The device that creates a game with Create game also joins it on the claim
 screen, which Create game opens. It takes a seat or joins as a table device,
@@ -151,6 +162,63 @@ for the device that creates the game, because it is a second secret, close
 to the rejected admin code. Rejected: a tip in the lobby to give admin to a
 second device, because the stuck state stays possible.
 
+## Seats
+
+Each seat has a name, a colour, a faction or none, and a place in the ring.
+Setup fills the seats on one device and can leave a faction open. Before
+Start game, a seat changes on the claim screen and on the Players & devices
+screen, under the rules below. Start game waits until every seat has a
+faction, as [Factions](rounds.md#factions) says, and names the seats
+without one. An admin device deals a random faction to every seat without
+one, with Random factions in the lobby.
+
+A seated device without admin edits its own seat: the name, the colour, and
+the faction. It picks only a colour or a faction that no other seat holds. A
+taken value is off and names its holder. An admin device edits every seat,
+with Edit on its row, one seat at a time, in a dialog with the name, the
+colour, the faction, and the speaker token. Each seat row also shows the
+speaker token, and an admin device moves the token with a tap on it before
+Start game. An admin device takes a value:
+when it gives a seat a faction that another seat holds, the other seat has
+no faction again, and when it gives a seat a colour that another seat holds,
+the other seat gets the first free colour. The same rules apply when a
+device takes a seat on the claim screen. Rejected: a swap of the two values,
+as setup does, because the other player did not choose the value that a swap
+gives them, and picks again instead. Rejected: a seat without a colour,
+because every screen identifies a player by colour.
+
+Two seats never share a name. The check trims spaces and ignores case, and
+an empty name is not valid. A seat whose name is still the default of Setup,
+"Player" and a number, shows an empty name field with the default as a hint,
+so that the player types their name, and an empty field keeps the default.
+Create game, Take seat, and Save are off while a name is taken, and say so. Rejected: no name rule, because a disabled
+control names the player that the game waits for, and two players with one
+name could not be told apart there.
+
+Before Start game, an admin device moves a seat by the ⠿ handle of its row
+on Players & devices, as a setup row moves: a drop on another row moves the
+player there, and the rows between shift by one. The speaker token stays
+with its player. Each drop applies at once on every device. After Start
+game, seats move on the Speaker & Seating screen, as
+[Seat moves](rounds.md#seat-moves) says.
+
+After Start game, the colour and the faction of a seat do not change. The
+name still changes, on the own seat or from an admin device, and every
+screen shows the new name. Rejected: no change after Start game, because a
+typo in a name costs nothing to fix, while a colour or a faction after the
+start would change the record of the game.
+
+The expansions in play belong to the game from Create game on. The faction
+lists of the lobby and Random factions offer the factions of the base game
+and of these expansions, on every device. The device that creates the game
+keeps its choice for its next setup. Rejected: the expansions of each phone,
+because a phone would then offer factions that the table does not play with.
+
+A change to a seat applies to the state that the device saw, as every tap
+does. When two devices change the same seat, or pick the same faction at
+once, the first change applies and the second does nothing. The second
+device sees the live seats and picks again.
+
 ## Who may tap what
 
 A seated device acts for its player only, and only when the game waits for
@@ -172,6 +240,8 @@ whatever the device shows.
 | Start game, from the lobby                                             | No                                           | Yes                          |
 | Undo                                                                   | No                                           | Yes                          |
 | Change own seat, become a table device                                 | Yes                                          | Yes                          |
+| Edit a seat: name, colour, faction                                     | Own seat, to a free colour or faction        | Any seat, and takes a value  |
+| Random factions, and the speaker in the lobby                          | No                                           | Yes                          |
 | Give or take admin                                                     | Give itself admin, while every admin is away | Yes, not from the last admin |
 
 A viewer may only take a seat.
@@ -192,29 +262,39 @@ looks at another device would not find them.
 Time limits and the end of the game belong to the game, so only an admin
 device changes them, and every device follows them. The alarm, keep awake,
 the cumulative display, and the expansions for the next setup belong to the
-device. The Settings screen shows the two groups apart.
+device. The expansions in play belong to the game from Create game on, see
+[Seats](#seats). The Settings screen shows the two groups apart.
 
 ## Screens
 
 - **Home**: start a new game, join a game by code, and reopen a recent game
   of this device.
-- **Setup**: unchanged, on one device. Create game puts the seats on the
-  server and opens the claim screen. After the claim, Players & devices
-  opens as the lobby. Rejected: a code during setup with a waiting screen
-  for early joiners, because it saves a few seconds at most, and it can be
-  added later. Rejected: a lobby where each player fills their own seat,
-  because the setup then becomes a shared document with its own rules for
-  every field, and the claim screen is needed anyway for a device that
-  joins mid-game.
-- **Claim seat**: the seats of the game, and Join as table device. On a
-  device that is an admin, or that gets admin when it joins, the screen
-  says that the device acts for every player, in a seat or at the table.
+- **Setup**: on one device. The host sets the player count, the seat order,
+  the speaker, the expansions, and the time limits, and gives each seat its
+  name and colour, and its faction or none yet. Create game puts the seats
+  on the server, also the seats without a faction, and opens the claim
+  screen. After the claim, Players & devices opens as the lobby, where the
+  seats change under the rules of [Seats](#seats). Rejected: a code during
+  setup with a waiting screen for early joiners, because it saves a few
+  seconds at most, and it can be added later. Rejected: a lobby in place of
+  the setup, where each player fills their own seat from nothing, because
+  the host sets the count, the order, and the limits in one place, and the
+  claim screen is needed anyway for a device that joins mid-game.
+- **Claim seat**: the seats of the game, and Join as table device. A tap on
+  a seat opens its name, colour, and faction in a dialog, and Take seat
+  takes the seat with them. On a device that is an admin, or that gets admin when it
+  joins, the screen says that the device acts for every player, in a seat
+  or at the table.
 - **Players & devices**: the join code, the link with Copy link, the QR code,
-  and one row per seat with the device that holds it, its admin switch, and
-  its connection state, then the table devices.
-  Before Start game it is the lobby, with Start game on an admin device and
-  a waiting line on every other device. Rejected: the name "Join", because
-  the device joins on the claim screen, and this screen lists who is in.
+  and one row per seat with the device that holds it, its admin switch, its
+  connection state, and Edit when the device may edit the seat, then the
+  table devices. Before Start game it is the lobby, with Start game on an
+  admin device and a waiting line on every other device. Each seat row
+  shows the speaker token. On an admin device the lobby also has the ⠿
+  handle on each seat row, the seats without a faction named beside Start
+  game, and Random factions under that line while a seat has none.
+  Rejected: the name "Join", because the device joins on the claim screen,
+  and this screen lists who is in.
 - The top bar of every in-game screen shows the device's seat, Table, or
   Viewer, and opens the Players & devices screen.
 - Every other screen is the same on every device, with the controls that

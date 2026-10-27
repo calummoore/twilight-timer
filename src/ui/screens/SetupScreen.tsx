@@ -8,9 +8,10 @@ import {
   MIN_PLAYERS,
   type Colour,
 } from '../../model/rules'
+import { moveItem, movedIndex } from '../../model/list-move'
+import { defaultName, sharedName } from '../../model/seats'
 import type { Expansions, Settings } from '../../model/settings'
-import type { Player } from '../../model/types'
-import { moveItem, movedIndex } from '../listMove'
+import type { Seat } from '../../model/types'
 import { SetupGamePanel, type CreateFailure } from './SetupGamePanel'
 import type { SeatRow } from './SetupSeat'
 import { SetupSeatList } from './SetupSeatList'
@@ -32,7 +33,7 @@ export function SetupScreen(props: {
   onSettings: () => void
   /** Saves changed settings, for example the expansions in play. */
   onSettingsChange: (settings: Settings) => void
-  onCreate: (players: Player[], speakerId: string) => void
+  onCreate: (players: Seat[], speakerId: string) => void
 }) {
   const { expansions } = props.settings
   const [count, setCount] = useState(DEFAULT_PLAYERS)
@@ -41,10 +42,19 @@ export function SetupScreen(props: {
   )
   const [speaker, setSpeaker] = useState(0)
   const seats = rows.slice(0, count)
-  const nameOf = (i: number) => seats[i]?.name.trim() || `Player ${i + 1}`
+  const nameOf = (i: number) => seats[i]?.name.trim() || defaultName(i + 1)
   const naalu = seats.findIndex((row) => row.factionId === NAALU)
-  // The game begins only when every seat has a faction.
+  // A seat without a faction gets one in the lobby, so Create game does not
+  // wait for it. Start game does.
   const factionsMissing = seats.some((row) => row.factionId === null)
+  const players: Seat[] = seats.map((row, i) => ({
+    id: `p${i + 1}`,
+    name: nameOf(i),
+    colour: row.colour,
+    factionId: row.factionId,
+  }))
+  // Two seats never share a name.
+  const nameTaken = sharedName(players)
 
   const update = (i: number, patch: Partial<SeatRow>) =>
     setRows((all) =>
@@ -102,14 +112,8 @@ export function SetupScreen(props: {
     setSpeaker((at) => movedIndex(at, from, to))
   }
 
-  // Create game is off while a seat is empty, so every seat has a faction.
   const create = () => {
-    const players: Player[] = []
-    for (const [i, { colour, factionId }] of seats.entries()) {
-      if (factionId === null) return
-      players.push({ id: `p${i + 1}`, name: nameOf(i), colour, factionId })
-    }
-    props.onCreate(players, `p${speaker + 1}`)
+    if (nameTaken === null) props.onCreate(players, `p${speaker + 1}`)
   }
 
   return (
@@ -168,6 +172,7 @@ export function SetupScreen(props: {
             speakerName={nameOf(speaker)}
             naaluName={naalu < 0 ? null : nameOf(naalu)}
             factionsMissing={factionsMissing}
+            nameTaken={nameTaken}
             settings={props.settings}
             creating={props.creating}
             failure={props.failure}

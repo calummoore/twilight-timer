@@ -301,6 +301,15 @@
   .joinlink{font-size:14px}
   .dev-row{gap:9px; padding:11px 12px}
   .dev-row .adm{min-width:0}
+  /* a seat row takes two lines: the speaker and the status right of the name, and Edit left of the admin switch */
+  .dev-list{display:block}
+  .dev-row, .dev-list .dev-row{grid-template-columns:auto 1fr auto auto; grid-template-areas:"dot txt spk st" "dot edt edt adm"}
+  .dev-row.grip{grid-template-columns:auto auto 1fr auto auto; grid-template-areas:"grip dot txt spk st" "grip dot edt edt adm"}
+  .dev-list.tables .dev-row{grid-template-columns:auto 1fr auto; grid-template-areas:"dot txt st" "dot edt adm"}
+  .dev-row > i{grid-area:dot} .dev-row .txt{grid-area:txt} .dev-row .spk{grid-area:spk} .dev-row .st{grid-area:st}
+  .dev-row .edt{grid-area:edt; justify-self:start} .dev-row .adm{grid-area:adm} .dev-row .drag{grid-area:grip}
+  .fields{grid-template-columns:1fr}
+  .fields .lbl{margin-bottom:-6px}
   /* home: the code above the summary, and the button beside both */
   .recent{grid-template-columns:1fr auto; gap:3px 12px}
   .recent .code{grid-column:1}

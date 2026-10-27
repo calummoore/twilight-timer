@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import type { RecentGame } from '../model/device-store'
+import { foldGame } from '../model/fold'
 import { NOTICES, type Command } from '../model/protocol'
 import { ringOf } from '../model/ring'
 import { mayCommand } from '../model/rights'
@@ -11,6 +12,7 @@ import {
 } from '../model/routes'
 import type { LimitSettings, Settings } from '../model/settings'
 import { gameSummary } from '../model/summary'
+import type { SeatValues } from '../model/types'
 import { GameScreen } from './GameScreen'
 import { ClaimScreen } from './screens/ClaimScreen'
 import { OpeningScreen } from './screens/OpeningScreen'
@@ -101,11 +103,13 @@ export function RoomScreen(props: {
       code={room.code}
       players={seatOrder}
       devices={room.devices}
+      expansions={room.setup.expansions}
+      started={room.game !== null}
       device={device}
       admin={device ? device.admin : creator}
       connected={connected}
-      onSeat={(seat) => {
-        send({ type: 'claim', seat })
+      onSeat={(seat, values) => {
+        send({ type: 'claim', seat, values })
         if (device) backFromSeat()
       }}
       onCancel={device ? backFromSeat : props.onHome}
@@ -124,6 +128,24 @@ export function RoomScreen(props: {
   const away = room.adminsAway
   const mayAdmin = (deviceId: string, on: boolean) =>
     connected && mayCommand(device, adminCommand(deviceId, on), null, away)
+  // The seat rules of the rights module: an admin device edits every seat,
+  // and a seated device its own.
+  const mayEdit = (playerId: string) => {
+    const seat = seatOrder.find((p) => p.id === playerId)
+    if (!seat) return false
+    const { name, colour, factionId } = seat
+    const values = { name, colour, factionId }
+    return (
+      connected && mayCommand(device, { type: 'edit', playerId, values }, null)
+    )
+  }
+  const mayMove = connected && mayCommand(device, { type: 'deal' }, null)
+  const edit = (playerId: string, values: SeatValues, speaker: boolean) =>
+    send(
+      speaker
+        ? { type: 'edit', playerId, values, speaker: true }
+        : { type: 'edit', playerId, values },
+    )
   const playersScreen = (round: number | null, onClose?: () => void) => (
     <PlayersScreen
       code={room.code}
@@ -134,8 +156,17 @@ export function RoomScreen(props: {
       connected={connected}
       admin={!!device?.admin}
       adminsAway={away}
+      expansions={room.setup.expansions}
+      speakerId={
+        room.game ? foldGame(room.game).speakerId : room.setup.speakerId
+      }
       mayAdmin={mayAdmin}
       onAdmin={(deviceId, on) => send(adminCommand(deviceId, on))}
+      mayEdit={mayEdit}
+      onEdit={edit}
+      mayMove={mayMove}
+      onMove={(playerId, toId) => send({ type: 'moveSeat', playerId, toId })}
+      onDeal={() => send({ type: 'deal' })}
       onRefresh={refresh}
       onChangeSeat={() => props.onPanel('seat')}
       onLeave={props.onLeave}

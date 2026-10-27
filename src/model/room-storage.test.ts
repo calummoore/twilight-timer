@@ -13,6 +13,7 @@ import {
   seatedServer,
   tableServer,
 } from './test-room'
+import { DEFAULT_EXPANSIONS } from './settings'
 import { withNullCards } from './test-shapes'
 import { MIN, T0, olderTable, playStrategy, table } from './test-table'
 
@@ -35,24 +36,50 @@ describe('the stored room', () => {
     expect(readRoom(wire(room))).toEqual({ status: 'ok', room })
     // A newer build stored it, or a step of the chain is wrong: the server
     // keeps it, so it is not missing.
-    for (const raw of [{ ...room, version: 3 }, { version: 2 }, null, 'room']) {
+    for (const raw of [{ ...room, version: 4 }, { version: 3 }, null, 'room']) {
       expect(readRoom(raw)).toEqual({ status: 'unreadable' })
     }
   })
 
   it('reads a room of version 1, whose creator joined at once', () => {
+    const { expansions, ...oldSetup } = SETUP
     const v1 = {
       version: 1,
       code: CODE,
       revision: 3,
-      setup: SETUP,
+      setup: oldSetup,
       game: null,
       members: [{ id: 'd1', token: HOST, seat: null, admin: true }],
     }
-    expect(parseRoom(wire(v1))).toEqual({ ...v1, version: 2, creator: null })
+    const newest = { ...v1, version: 3, creator: null, setup: SETUP }
+    expect(parseRoom(wire(v1))).toEqual(newest)
     // The step sets the creator, whatever a broken room of version 1 holds.
     const odd = { ...v1, creator: 'short' }
-    expect(parseRoom(wire(odd))).toEqual({ ...v1, version: 2, creator: null })
+    expect(parseRoom(wire(odd))).toEqual(newest)
+    expect(expansions).toEqual(DEFAULT_EXPANSIONS)
+  })
+
+  it('reads a room of version 2 with every expansion on', () => {
+    const { expansions, ...oldSetup } = SETUP
+    const v2 = {
+      version: 2,
+      code: CODE,
+      revision: 3,
+      setup: oldSetup,
+      game: null,
+      members: [],
+      creator: HOST,
+    }
+    const newest = { ...v2, version: 3, setup: { ...oldSetup, expansions } }
+    expect(parseRoom(wire(v2))).toEqual(newest)
+  })
+
+  it('reads a seat without a faction in the lobby', () => {
+    const players = SETUP.players.map((p) =>
+      p.id === 'wren' ? { ...p, factionId: null } : p,
+    )
+    const room = newRoom(CODE, { ...SETUP, players }, HOST)
+    expect(parseRoom(wire(room))).toEqual(room)
   })
 
   it('reads a room whose game keeps the values of an older build', () => {
@@ -77,8 +104,9 @@ describe('the stored room', () => {
   it('rejects a broken room', () => {
     const room = newRoom(CODE, SETUP, HOST)
     const broken = [
-      { ...room, version: 3 },
+      { ...room, version: 4 },
       { ...room, code: '7qk2hn' },
+      { ...room, setup: { ...SETUP, expansions: { pok: true } } },
       { ...room, revision: -1 },
       { ...room, revision: 1.5 },
       { ...room, game: { version: 6 } },

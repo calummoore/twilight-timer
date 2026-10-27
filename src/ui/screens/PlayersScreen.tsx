@@ -1,22 +1,27 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { REFRESH_MS } from '../../model/connection'
 import type { DeviceView } from '../../model/protocol'
-import type { Player } from '../../model/types'
+import type { Expansions } from '../../model/settings'
+import type { Seat, SeatValues } from '../../model/types'
 import { NetBar } from '../controls'
+import { valuesOf } from '../seatText'
 import { DeviceRows } from './DeviceRows'
 import { JoinCode } from './JoinCode'
+import { LobbyFoot } from './LobbyFoot'
+import { SeatEditDialog } from './SeatEditDialog'
 
 /**
  * The join code, its link and QR code, and the seats and devices of the
  * game. Before Start game it is the lobby, with Start game on an admin device
- * and a waiting line on every other device.
+ * and a waiting line on every other device. Edit on a seat row opens the
+ * dialog of the seat.
  */
 export function PlayersScreen(props: {
   code: string
   /** The round, or null in the lobby. */
   round: number | null
   /** The seats in clockwise order, as the seat moves of the game left them. */
-  players: Player[]
+  players: Seat[]
   devices: DeviceView[]
   you: string | null
   connected: boolean
@@ -24,9 +29,18 @@ export function PlayersScreen(props: {
   admin: boolean
   /** No admin device has a connection, so a seated device may take admin. */
   adminsAway: boolean
+  expansions: Expansions
+  speakerId: string
   /** Whether this device may switch the admin of a device on or off now. */
   mayAdmin: (deviceId: string, admin: boolean) => boolean
   onAdmin: (deviceId: string, admin: boolean) => void
+  /** Whether this device may edit the seat now. */
+  mayEdit: (playerId: string) => boolean
+  onEdit: (playerId: string, values: SeatValues, speaker: boolean) => void
+  /** This device may move seats and deal factions now. */
+  mayMove: boolean
+  onMove: (playerId: string, toId: string) => void
+  onDeal: () => void
   /** Asks the server for a fresh state, with the connections of now. */
   onRefresh: () => void
   onChangeSeat: () => void
@@ -36,6 +50,8 @@ export function PlayersScreen(props: {
   onClose?: () => void
 }) {
   const lobby = props.round === null
+  const [editing, setEditing] = useState<string | null>(null)
+  const edited = props.players.find((p) => p.id === editing)
   // The server sends no state when a device goes quiet, so this screen asks
   // for the connections of now while it is open.
   const { onRefresh } = props
@@ -90,32 +106,46 @@ export function PlayersScreen(props: {
             you={props.you}
             mayAdmin={props.mayAdmin}
             onAdmin={props.onAdmin}
+            mayEdit={props.mayEdit}
+            onEdit={setEditing}
+            mayMove={lobby && props.mayMove}
+            onMove={props.onMove}
+            speakerId={props.speakerId}
+            onSpeaker={(playerId) => {
+              const seat = props.players.find((p) => p.id === playerId)
+              if (seat) props.onEdit(playerId, valuesOf(seat), true)
+            }}
           />
         </div>
       </div>
       {lobby && (
-        <div className="foot">
-          {props.admin ? (
-            <>
-              <div className="lobby-help">
-                Start when everyone has a seat, or start now. A phone can still
-                join later, and an admin device acts for a seat without one.
-              </div>
-              <button
-                className="big"
-                disabled={!props.connected}
-                onClick={props.onStart}
-              >
-                START GAME
-              </button>
-            </>
-          ) : (
-            <div className="lobby-wait" role="status">
-              <i />
-              Waiting for the table to start
-            </div>
-          )}
-        </div>
+        <LobbyFoot
+          players={props.players}
+          admin={props.admin}
+          connected={props.connected}
+          onStart={() => props.onStart?.()}
+          onDeal={props.onDeal}
+        />
+      )}
+      {edited && (
+        <SeatEditDialog
+          key={edited.id}
+          kind="edit"
+          seat={edited}
+          seats={props.players}
+          place={props.players.indexOf(edited) + 1}
+          expansions={props.expansions}
+          takes={props.admin}
+          started={!lobby}
+          speaker={edited.id === props.speakerId}
+          maySpeaker={lobby && props.admin}
+          connected={props.connected}
+          onSave={(values, speaker) => {
+            props.onEdit(edited.id, values, speaker)
+            setEditing(null)
+          }}
+          onCancel={() => setEditing(null)}
+        />
       )}
     </div>
   )

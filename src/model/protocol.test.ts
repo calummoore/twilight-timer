@@ -16,9 +16,16 @@ describe('messages from a device', () => {
   it('reads hello with the build of the page, and every command', () => {
     const hello = { type: 'hello', token: HOST, build: BUILD }
     expect(parseClientMessage(wire(hello))).toEqual(hello)
+    const values = { name: 'Jaz', colour: 'blue', factionId: 'sol' } as const
     const commands: Command[] = [
       { type: 'claim', seat: 'jaz' },
+      { type: 'claim', seat: 'jaz', values },
+      { type: 'claim', seat: 'wren', values: { ...values, factionId: null } },
       { type: 'claim', seat: null },
+      { type: 'edit', playerId: 'jaz', values },
+      { type: 'edit', playerId: 'jaz', values, speaker: true },
+      { type: 'moveSeat', playerId: 'wren', toId: 'tom' },
+      { type: 'deal' },
       { type: 'admin', deviceId: 'd2', admin: true },
       { type: 'start' },
       { type: 'act', input: { kind: 'cardPicked', playerId: 'jaz', card: 3 } },
@@ -54,6 +61,26 @@ describe('messages from a device', () => {
       { type: 'command', command: { type: 'undo' } },
       { type: 'command', rev: 1, command: { type: 'teleport' } },
       { type: 'command', rev: 1, command: { type: 'claim', seat: 4 } },
+      {
+        type: 'command',
+        rev: 1,
+        command: { type: 'claim', seat: 'jaz', values: { name: 'Jaz' } },
+      },
+      { type: 'command', rev: 1, command: { type: 'edit', playerId: 'jaz' } },
+      {
+        type: 'command',
+        rev: 1,
+        command: {
+          type: 'edit',
+          playerId: 'jaz',
+          values: { name: 'Jaz', colour: 'teal', factionId: 'sol' },
+        },
+      },
+      {
+        type: 'command',
+        rev: 1,
+        command: { type: 'moveSeat', playerId: 'wren' },
+      },
       { type: 'command', rev: 1, command: { type: 'admin', deviceId: 'd2' } },
       {
         type: 'command',
@@ -135,14 +162,25 @@ describe('the request that creates a game', () => {
     expect(parseCreateRequest(wire(seats))).toEqual(seats)
   })
 
-  it('rejects a setup that cannot start a game', () => {
+  it('reads a setup with a seat that has no faction yet', () => {
+    const empty = PLAYERS.map((p, i) => (i ? p : { ...p, factionId: null }))
+    const setup = { ...SETUP, players: empty }
+    const request = { token: HOST, build: BUILD, setup }
+    expect(parseCreateRequest(wire(request))).toEqual({ token: HOST, setup })
+  })
+
+  it('rejects a setup that it cannot read', () => {
     const two = { ...SETUP, players: PLAYERS.slice(0, 2), speakerId: 'jaz' }
     const twin = PLAYERS.map((p) => ({ ...p, id: 'jaz' }))
-    const empty = PLAYERS.map((p, i) => (i ? p : { ...p, factionId: null }))
+    const { expansions, ...noExpansions } = SETUP
     const broken = [
       { token: HOST, setup: two },
       { token: HOST, setup: { ...SETUP, players: twin } },
-      { token: HOST, setup: { ...SETUP, players: empty } },
+      { token: HOST, setup: noExpansions },
+      {
+        token: HOST,
+        setup: { ...SETUP, expansions: { ...expansions, te: 1 } },
+      },
       { token: HOST, setup: { ...SETUP, speakerId: 'zed' } },
       { token: HOST, setup: { ...SETUP, enforceLimits: 'yes' } },
       { token: 'short', setup: SETUP },
