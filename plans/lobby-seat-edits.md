@@ -159,20 +159,20 @@ Contract owners:
 Write the requirements and the decisions above into the spec, so that the
 mockup and the code follow them.
 
-- [ ] Update [Multiplayer](../docs/product/multiplayer.md): the claim
+- [x] Update [Multiplayer](../docs/product/multiplayer.md): the claim
       screen with the fields of the seat and a missing faction, also for
       the device that created the game, the new rows of Who may tap what,
       the Setup, Claim seat, and Players & devices entries under Screens,
       the rejected alternatives that this change replaces, and the
       expansions of a game under Settings.
-- [ ] Update [Rounds and turn order](../docs/product/rounds.md) under
+- [x] Update [Rounds and turn order](../docs/product/rounds.md) under
       Factions: Create game without a faction on every seat, Start game
       that waits, the taken rule in the lobby for a seated device and for
       an admin device, and the unique name rule.
-- [ ] Update the [product spec](../docs/product.md): the Setup, Claim
+- [x] Update the [product spec](../docs/product.md): the Setup, Claim
       seat, and Players & devices rows of the screens table, and the Setup
       must-have.
-- [ ] Update the key features of the [README](../README.md).
+- [x] Update the key features of the [README](../README.md).
 
 ## Milestone 2: Mockup
 

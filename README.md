@@ -16,7 +16,8 @@ in the futex account. The app opens at https://ti4.nexus; see
 
 - Setup for 3 to 8 players: name, colour, faction from the official list, seat,
   and the speaker. A row moves by its ⠿ handle. The table chooses its
-  expansions, and one tap deals random factions to the empty seats.
+  expansions, and one tap deals random factions to the empty seats. A seat
+  can stay without a faction until the lobby, where its player picks it.
 - Strategy picks in speaker order, with trade goods on unpicked cards. With 3
   or 4 players, each player picks two cards, and the lower card sets their
   place in the turn order.
@@ -42,15 +43,18 @@ in the futex account. The app opens at https://ti4.nexus; see
 - Each screen has its own address, such as `/new` or `/game/<code>/players`,
   so Back, a reload, and a link open the same screen. See
   [Addresses](docs/product/addresses.md).
-- A phone takes the seat of its player, and taps for that player when the
-  game waits for them: their pick, their turn, their tile in a reaction
-  window, and their vote. A control that the device may not use is off, and
+- A phone takes the seat of its player, sets the seat's name, colour, and
+  faction as it does, and taps for that player when the game waits for
+  them: their pick, their turn, their tile in a reaction window, and their
+  vote. A control that the device may not use is off, and
   names the player that the game waits for.
 - An admin device taps for every player. After Create game, the device
   takes a seat or the table on the claim screen, and is the first admin
   either way. It gives admin to other devices with a switch. A table device
   without admin is a viewer. While every admin device is away, a seated
-  device can take admin, so the table can finish the game.
+  device can take admin, so the table can finish the game. In the lobby, an
+  admin device edits any seat, moves seats by drag, and deals random
+  factions to the empty seats.
 - Home lists the recent games of the device.
 - The screen stays awake, and the same screens show on a phone, an iPad, and
   a computer, arranged for the space.

@@ -84,7 +84,7 @@ wait for an answer.
 
 | Screen              | Purpose                                                                 |
 | ------------------- | ----------------------------------------------------------------------- |
-| **Setup**           | Player count, names, colours, factions, expansions, random faction deal, seating order by ⠿ drag, speaker token |
+| **Setup**           | Player count, names, colours, factions or open seats, expansions, random faction deal, seating order by ⠿ drag, speaker token |
 | **Settings**        | Time limits, alarm, display options                                      |
 | **Speaker & Seating** | Table ring; tap a seat to move the speaker, both orders re-derive; hold a seat or tap Re-order seats, then drag or tap to move a seat; remove a player who leaves |
 | **Strategy Phase**  | Card selection in speaker order; sets initiative                         |
@@ -99,8 +99,8 @@ wait for an answer.
 | **History & Undo**  | Action log; undo repeatedly to rewind, or edit any duration               |
 | **Post-game Stats** | Totals, averages, longest turns, phase breakdown, overtime count, rule-check time |
 | **Home**            | New game, join a game by code, recent games of this device               |
-| **Claim seat**      | Which player this device is, or join as a table device                   |
-| **Players & devices** | Join code, a link to open or copy, QR code, one row per seat with its device and its admin switch; the lobby before Start game |
+| **Claim seat**      | Which player this device is, with the seat's name, colour, and faction, or join as a table device |
+| **Players & devices** | Join code, a link to open or copy, QR code, one row per seat with its device, its admin switch, and Edit; the lobby before Start game, with ⠿ drag and random factions on an admin device |
 
 ---
 
@@ -159,7 +159,8 @@ From the should-have list, the MVP adds the pause.
 
 - [ ] Setup: 3–8 players with name, colour, faction, seat order, speaker. The
       expansions in play limit the factions, and a random deal fills the seats
-      without one.
+      without one. A seat can wait for its faction until the lobby, where its
+      player or an admin device picks it.
 - [ ] Speaker movable at any time; strategy pick and agenda voting orders derive
       from it automatically. Seats re-orderable as a correction.
 - [ ] Remove a player who leaves the game, and keep their recorded time
