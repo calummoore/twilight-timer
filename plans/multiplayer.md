@@ -408,7 +408,9 @@ Run the checks, push, and review the branch.
       findings. Fixed: 1, 2, and 3. Open:
       - Review 1, 2. One revision drops taps that do not conflict. Severity
         Medium, effort Small. Recommended: D, a tap that names its player or
-        its device applies while it is still valid.
+        its device applies while it is still valid. Decided 2026-11-01: B,
+        a tap that can apply late names the state that it needs, in
+        [Taps that do not conflict](non-conflicting-taps.md).
       - Review 1, 3. An older page freezes on a newer game. Severity Medium,
         effort Small. Recommended: A, reload the page once when a state
         cannot be read. Decided 2026-10-26: C, a build id on the wire, in
